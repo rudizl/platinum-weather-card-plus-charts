@@ -23,6 +23,53 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.0.5**
+
+**Fix: slot editor layout**
+- Slot dropdowns were cramped and truncated — label and dropdown were on the same horizontal line
+- Labels are now above their dropdowns, giving each dropdown the full column width
+
+---
+
+**v2.0.4**
+
+**Fix: tap/hold/double-tap actions on mobile**
+- Replaced the custom `action-handler-directive` with a `click` + `pointerdown` hybrid that works reliably in HA Companion App (Android WebView / sections view scroll container)
+- `click` → tap / double-tap; `pointerdown` + 500ms → hold
+
+**Editor: Actions in Global Options**
+- Tap / Hold / Double-tap actions configurable from the visual editor
+- Card Title 1 / 2 moved from Overview section to Global Options
+- Translations for all 12 supported languages
+
+**Editor: Use Attribute for entity_summary_1**
+- Toggle + attribute picker for non-weather sensor entities
+- Config keys: `summary_1_use_attr` + `summary_1_name_attr`
+
+---
+
+**v2.0.3**
+
+**Fix: horizontal scroll in dashboard**
+- `ha-card`: `overflow: hidden`; `.day-horiz`: removed `float: left`, added `min-width: 0`
+
+---
+
+**v2.0.2**
+
+**Fix: day/night icons broken with non-English HA**
+- Use `sun.sun` elevation attribute (numeric, language-independent) instead of translated state string (`above_horizon`/`below_horizon` is translated in non-English setups)
+
+---
+
+**v2.0.1**
+
+- Locale dropdown — full language list in Global Options instead of text field
+- GitHub Actions CI with HACS validation (`hacs/action@main`) and build check
+- Fix: remove `resize-observer-polyfill` import — use native `ResizeObserver`
+
+---
+
 **v2.0.0**
 
 **New: Charts Section** (merged from Weather Chart Card)
@@ -48,43 +95,14 @@ Install via HACS as a custom repository:
 
 **Editor overhaul**
 - Lock/unlock icons for section visibility toggles (replacing `ha-switch`)
-- MDI section icons throughout (`mdi:eye-outline`, `mdi:text-box-outline`, `mdi:view-grid-outline`, `mdi:calendar-week`, `mdi:chart-line`, `mdi:cog`)
+- MDI section icons throughout
 - Global Options moved to the top of the editor
-- Locale dropdown — select from all supported languages (BG, DA, DE, EN, ES, FR, HE, IT, NL, PL, RU, UA)
-- Dropdown option translations (EN + BG: daily/hourly/twice_daily, horizontal/vertical, 12h/24h/system)
 - i18n framework with 112 translated strings — EN and BG complete
 
 **Other**
 - `option_show_current_day` — include today in the forecast/chart strip instead of starting from tomorrow
-- Config validation in `setConfig` — required fields, entity ID format, `section_order` values, `daily_forecast_days` range
-- Wind forecast data in chart (bearing + speed available to tooltip)
+- Config validation in `setConfig`
 - HA 2026.5/2026.6 compatibility: `ha-textfield` → `ha-input`, WebAwesome switch tokens, `ha-switch` removal
-
----
-
-**v2.0.4**
-
-**Fix: tap/hold/double-tap actions on mobile**
-- Replaced the custom `action-handler-directive` with a `click` + `pointerdown` hybrid that works reliably in HA Companion App (Android WebView / sections view scroll container)
-- `click` → tap / double-tap; `pointerdown` + 500ms → hold
-
-**Fix: horizontal scroll caused by forecast section**
-- `ha-card`: `overflow: hidden`; `.day-horiz`: removed `float: left`, added `min-width: 0`
-
-**Fix: day/night icons broken with non-English HA**
-- Use `sun.sun` elevation attribute (numeric, language-independent) instead of translated state string
-
-**Fix: remove `resize-observer-polyfill` import**
-- Use native `ResizeObserver` (supported in all HA-compatible browsers)
-
-**Editor: Actions in Global Options**
-- Tap / Hold / Double-tap actions configurable from the visual editor
-- Card Title 1 / 2 moved from Overview section to Global Options
-- Translations for all 12 supported languages
-
-**Editor: Use Attribute for entity_summary_1**
-- Toggle + attribute picker for non-weather sensor entities
-- Config keys: `summary_1_use_attr` + `summary_1_name_attr`
 
 ---
 
