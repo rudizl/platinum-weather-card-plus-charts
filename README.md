@@ -175,11 +175,20 @@ Install via HACS as a custom repository:
 <tr>
 <td align="center" width="50%">
 
+**Classic weather forecast**
+
+![Classic weather forecast](images/classic-weather-forecast.png)
+
+</td>
+<td align="center" width="50%">
+
 **Card with Charts section**
 
 ![Card overview](images/platinum-weather-card.png)
 
 </td>
+</tr>
+<tr>
 <td align="center" width="50%">
 
 **Forecast hover tooltip**
@@ -187,8 +196,6 @@ Install via HACS as a custom repository:
 ![Forecast tooltip](images/tooltip-forecast.png)
 
 </td>
-</tr>
-<tr>
 <td align="center" width="50%">
 
 **Editor — section list**
@@ -196,6 +203,8 @@ Install via HACS as a custom repository:
 ![Editor sections](images/editor-sections.png)
 
 </td>
+</tr>
+<tr>
 <td align="center" width="50%">
 
 **Editor — Global Options (locale & icon pack)**
@@ -203,8 +212,6 @@ Install via HACS as a custom repository:
 ![Editor global options](images/global-options.png)
 
 </td>
-</tr>
-<tr>
 <td align="center" width="50%">
 
 **Slot configuration in editor**
@@ -212,12 +219,16 @@ Install via HACS as a custom repository:
 ![Editor slots](images/slots-section-highlighted.png)
 
 </td>
+</tr>
+<tr>
 <td align="center" width="50%">
 
 **Icon pack selection**
 
 ![Editor icon pack](images/editor-icon-pack.png)
 
+</td>
+<td align="center" width="50%">
 </td>
 </tr>
 </table>
