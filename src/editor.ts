@@ -1201,84 +1201,116 @@ get _forecast_type(): string {
 
     return html`
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l1')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l1'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l1)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r1')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r1'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r1)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l1')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l1'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l1)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r1')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r1'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r1)}
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l2')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l2'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l2)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r2')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r2'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r2)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l2')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l2'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l2)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r2')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r2'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r2)}
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l3')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l3'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l3)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r3')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r3'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r3)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l3')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l3'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l3)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r3')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r3'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r3)}
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l4')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l4'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l4)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r4')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r4'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r4)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l4')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l4'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l4)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r4')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r4'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r4)}
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l5')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l5'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l5)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r5')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r5'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r5)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l5')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l5'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l5)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r5')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r5'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r5)}
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l6')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l6'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l6)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r6')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r6'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r6)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l6')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l6'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l6)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r6')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r6'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r6)}
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l7')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l7'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l7)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r7')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r7'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r7)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l7')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l7'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l7)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r7')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r7'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r7)}
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('slot_l8')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_l8'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_l8)}
-        </select>
-        <label class='mdc-label'>${this._t('slot_r8')}</label>
-        <select class='ha-select-compat' .configValue=${'slot_r8'} @change=${this._valueChanged}>
-          ${this._slotOptions(this._slot_r8)}
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('slot_l8')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_l8'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_l8)}
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('slot_r8')}</label>
+          <select class='ha-select-compat' .configValue=${'slot_r8'} @change=${this._valueChanged}>
+            ${this._slotOptions(this._slot_r8)}
+          </select>
+        </div>
       </div>
       ${this._optional_entities}
     `;
