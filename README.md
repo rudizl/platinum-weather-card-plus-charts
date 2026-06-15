@@ -342,6 +342,14 @@ The chart uses the same weather entity forecast subscription as the daily foreca
 
 Hovering over any chart column shows the same tooltip as hovering over the corresponding forecast column.
 
+### Forecast columns and the Charts section
+
+When the **Charts section is disabled**, max/min temperature and precipitation are shown as text directly in each forecast column:
+
+![Forecast columns without charts](https://github.com/user-attachments/assets/0ae818c6-f5cd-4a5f-b1c3-f20595fe3dbd)
+
+When the **Charts section is enabled**, the same data is rendered visually as temperature lines (max in orange, min in blue) and precipitation bars in the chart strip below the forecast. The text values are automatically hidden to avoid duplication — the chart already tells the full story.
+
 ## Global Options
 
 | Option | Type | Description |
