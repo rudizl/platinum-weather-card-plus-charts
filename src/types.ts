@@ -129,6 +129,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   daily_extended_name_attr?: string;
   summary_1_use_attr?: boolean;
   summary_1_name_attr?: string;
+  option_compact_slots?: boolean;
 
   option_today_temperature_decimals?: boolean;
   option_today_rainfall_decimals?: boolean;

@@ -3072,6 +3072,10 @@ export class PlatinumWeatherCard extends LitElement {
     return `wind`;
   }
 
+  get compact(): boolean {
+    return this._config?.option_compact_slots === true;
+  }
+
   get locale(): string | undefined {
     try {
       Intl.NumberFormat(this._config.option_locale);
@@ -3099,6 +3103,7 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get localeTextObservedMax(): string {
+    if (this.compact) return this.localeTextObsMax;
     switch (this.locale) {
       case 'it': return "Osservata Max";
       case 'fr': return "Observé Max";
@@ -3116,6 +3121,7 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get localeTextObservedMin(): string {
+    if (this.compact) return this.localeTextObsMin;
     switch (this.locale) {
       case 'it': return "Osservata Min";
       case 'fr': return "Observé Min";
@@ -3167,6 +3173,12 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get localeTextForecastMax(): string {
+    if (this.compact) {
+      switch (this.locale) {
+        case 'ru': return "Макс"; case 'ua': return "Макс"; case 'bg': return "Макс";
+        case 'he': return "מקס"; default: return "Max";
+      }
+    }
     switch (this.locale) {
       case 'it': return "Max oggi";
       case 'fr': return "Max aujourd'hui";
@@ -3184,6 +3196,12 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get localeTextForecastMin(): string {
+    if (this.compact) {
+      switch (this.locale) {
+        case 'ru': return "Мин"; case 'ua': return "Мін"; case 'bg': return "Мин";
+        case 'he': return "מינ"; default: return "Min";
+      }
+    }
     switch (this.locale) {
       case 'it': return "Min oggi";
       case 'fr': return "Min aujourd'hui";
@@ -3201,6 +3219,7 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get localeTextPosToday(): string {
+    if (this.compact) return "";
     switch (this.locale) {
       case 'it': return "Previsione";
       case 'fr': return "Prévoir";
@@ -3218,6 +3237,14 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get localeTextPosTomorrow(): string {
+    if (this.compact) {
+      switch (this.locale) {
+        case 'ru': return "Завтра"; case 'ua': return "Завтра"; case 'bg': return "Утре";
+        case 'he': return "מחר"; case 'de': return "Morgen"; case 'nl': return "Morgen";
+        case 'da': return "Morgen"; case 'pl': return "Jutro"; case 'it': return "Dom";
+        case 'fr': return "Dem"; case 'es': return "Mañ"; default: return "Tom";
+      }
+    }
     switch (this.locale) {
       case 'it': return "Prev per domani";
       case 'fr': return "Prév demain";

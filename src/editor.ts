@@ -1559,6 +1559,12 @@ get _forecast_type(): string {
           <div class="toggle-row">
               <ha-icon-button class=${this._option_static_icons !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_static_icons !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_static_icons'} .checked=${this._option_static_icons !== false} @click=${this._toggleVisibility}></ha-icon-button>
               <span class="toggle-label">${this._t("show_static_icons")}</span>
+          </div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <ha-icon-button class=${this._config?.option_compact_slots ? "eye-toggle active" : "eye-toggle"} .path=${this._config?.option_compact_slots ? mdiLockOpenVariant : mdiLock} .value=${'option_compact_slots'} .checked=${this._config?.option_compact_slots === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class="toggle-label">${this._t("compact_slots")}</span>
             </div>
         </div>
         <div></div>
@@ -1852,8 +1858,8 @@ get _forecast_type(): string {
   private static readonly _translations: Record<string, Record<string, string>> = {
     en: {
       global_options:'Global Options',overview_section:'Overview Section',extended_section:'Extended Section',slots_section:'Slots Section',daily_forecast_section:'Daily Forecast Section',
-      show_static_icons:'Show Static Icons',time_format:'Time Format',locale:'Locale',icon_pack:'Icon Pack',opt_locale_auto:'Auto (browser)',
-      actions:'Actions',tap_action:'Tap Action',hold_action:'Hold Action',double_tap_action:'Double-tap Action',icon_pack_default:'Default (built-in animated)',icon_pack_met_fill:'Meteocons — Fill (CDN, basmilius)',icon_pack_met_line:'Meteocons — Line (CDN, basmilius)',icon_pack_ammap:'ammap Weather Icons (requires weather-chart-card)',icon_pack_custom:'Custom path...',icon_path:'Icon path',icon_path_hint:'Use {condition} as placeholder — e.g. /local/icons/{condition}.svg',
+      compact_slots:'Compact slot labels',show_static_icons:'Show Static Icons',time_format:'Time Format',locale:'Locale',icon_pack:'Icon Pack',opt_locale_auto:'Auto (browser)',
+      compact_slots:'Libellés compacts',actions:'Actions',tap_action:'Tap Action',hold_action:'Hold Action',double_tap_action:'Double-tap Action',icon_pack_default:'Default (built-in animated)',icon_pack_met_fill:'Meteocons — Fill (CDN, basmilius)',icon_pack_met_line:'Meteocons — Line (CDN, basmilius)',icon_pack_ammap:'ammap Weather Icons (requires weather-chart-card)',icon_pack_custom:'Custom path...',icon_path:'Icon path',icon_path_hint:'Use {condition} as placeholder — e.g. /local/icons/{condition}.svg',
       overview_layout:'Overview Layout',card_title_1:'Card Title Text Line 1',card_title_2:'Card Title Text Line 2',entity_temperature:'Entity Current Temperature',entity_apparent_temp:'Entity Apparent Temperature',entity_forecast_icon:'Entity Forecast Icon',entity_forecast_icon_1:'Entity Forecast Icon 1',entity_summary:'Entity Forecast Summary',entity_summary_1:'Entity Forecast Summary 1',entity_extended:'Entity Extended Forecast',entity_extended_1:'Entity Extended Forecast 1',use_attribute:'Use Attribute',attribute:'Attribute',
       slot_l1:'Slot Left 1',slot_l2:'Slot Left 2',slot_l3:'Slot Left 3',slot_l4:'Slot Left 4',slot_l5:'Slot Left 5',slot_l6:'Slot Left 6',slot_l7:'Slot Left 7',slot_l8:'Slot Left 8',slot_r1:'Slot Right 1',slot_r2:'Slot Right 2',slot_r3:'Slot Right 3',slot_r4:'Slot Right 4',slot_r5:'Slot Right 5',slot_r6:'Slot Right 6',slot_r7:'Slot Right 7',slot_r8:'Slot Right 8',
       today_temp_decimals:'Todays Temperature Decimals',today_rain_decimals:'Todays Rainfall Decimals',forecast_temp_decimals:'Forecast Temperature Decimals',pressure_decimals:'Pressure Decimals',show_separator:'Show separator',show_temp_decimals:'Show temperature decimals',
@@ -1864,8 +1870,8 @@ get _forecast_type(): string {
     },
     bg: {
       global_options:'Глобални настройки',overview_section:'Секция Преглед',extended_section:'Разширена секция',slots_section:'Секция Слотове',daily_forecast_section:'Секция Прогноза',
-      show_static_icons:'Статични икони',time_format:'Формат на часа',locale:'Локал',icon_pack:'Пакет с икони',opt_locale_auto:'Автоматично (браузър)',
-      actions:'Действия',tap_action:'Действие при натискане',hold_action:'Действие при задържане',double_tap_action:'Двойно натискане',icon_pack_default:'По подразбиране (вградени анимирани)',icon_pack_met_fill:'Meteocons — Запълнен (CDN)',icon_pack_met_line:'Meteocons — Линеен (CDN)',icon_pack_ammap:'ammap икони (изисква weather-chart-card)',icon_pack_custom:'Персонализиран път...',icon_path:'Път до икона',icon_path_hint:'Използвай {condition} като плейсхолър',
+      compact_slots:'Компактни надписи',show_static_icons:'Статични икони',time_format:'Формат на часа',locale:'Език',icon_pack:'Пакет с икони',opt_locale_auto:'Автоматично (браузър)',
+      compact_slots:'Компактные подписи',actions:'Действия',tap_action:'Действие при натискане',hold_action:'Действие при задържане',double_tap_action:'Двойно натискане',icon_pack_default:'По подразбиране (вградени анимирани)',icon_pack_met_fill:'Meteocons — Запълнен (CDN)',icon_pack_met_line:'Meteocons — Линеен (CDN)',icon_pack_ammap:'ammap икони (изисква weather-chart-card)',icon_pack_custom:'Персонализиран път...',icon_path:'Път до икона',icon_path_hint:'Използвай {condition} като плейсхолър',
       overview_layout:'Оформление на преглед',card_title_1:'Заглавие ред 1',card_title_2:'Заглавие ред 2',entity_temperature:'Текуща температура',entity_apparent_temp:'Усещана температура',entity_forecast_icon:'Икона прогноза',entity_forecast_icon_1:'Икона прогноза 1',entity_summary:'Резюме прогноза',entity_summary_1:'Резюме прогноза 1',entity_extended:'Разширена прогноза',entity_extended_1:'Разширена прогноза 1',use_attribute:'Използвай атрибут',attribute:'Атрибут',
       slot_l1:'Слот Ляво 1',slot_l2:'Слот Ляво 2',slot_l3:'Слот Ляво 3',slot_l4:'Слот Ляво 4',slot_l5:'Слот Ляво 5',slot_l6:'Слот Ляво 6',slot_l7:'Слот Ляво 7',slot_l8:'Слот Ляво 8',slot_r1:'Слот Дясно 1',slot_r2:'Слот Дясно 2',slot_r3:'Слот Дясно 3',slot_r4:'Слот Дясно 4',slot_r5:'Слот Дясно 5',slot_r6:'Слот Дясно 6',slot_r7:'Слот Дясно 7',slot_r8:'Слот Дясно 8',
       today_temp_decimals:'Десетични за текуща темп.',today_rain_decimals:'Десетични за валежи',forecast_temp_decimals:'Десетични за прогнозна темп.',pressure_decimals:'Десетични за налягане',show_separator:'Показвай разделител',show_temp_decimals:'Показвай десетични',
@@ -1875,34 +1881,34 @@ get _forecast_type(): string {
       opt_daily:'Дневна',opt_hourly:'Почасова',opt_twice_daily:'Два пъти дневно',opt_horizontal:'Хоризонтална',opt_vertical:'Вертикална',opt_complete:'Пълно',opt_observations:'Наблюдения',opt_forecast:'Прогноза',opt_title_only:'Само заглавие',opt_system:'Системен',opt_12hour:'12-часов',opt_24hour:'24-часов',
     },
     da: {
-      actions:'Handlinger',tap_action:'Tryk-handling',hold_action:'Hold-handling',double_tap_action:'Dobbelttryk-handling',
+      compact_slots:'Kompakte etiketter',actions:'Handlinger',tap_action:'Tryk-handling',hold_action:'Hold-handling',double_tap_action:'Dobbelttryk-handling',
     },
     de: {
-      actions:'Aktionen',tap_action:'Tipp-Aktion',hold_action:'Halte-Aktion',double_tap_action:'Doppeltipp-Aktion',
+      compact_slots:'Kompakte Beschriftungen',actions:'Aktionen',tap_action:'Tipp-Aktion',hold_action:'Halte-Aktion',double_tap_action:'Doppeltipp-Aktion',
     },
     es: {
-      actions:'Acciones',tap_action:'Acción al tocar',hold_action:'Acción al mantener',double_tap_action:'Doble toque',
+      compact_slots:'Etiquetas compactas',actions:'Acciones',tap_action:'Acción al tocar',hold_action:'Acción al mantener',double_tap_action:'Doble toque',
     },
     fr: {
       actions:'Actions',tap_action:'Action au toucher',hold_action:'Action maintenue',double_tap_action:'Double toucher',
     },
     he: {
-      actions:'פעולות',tap_action:'פעולה בלחיצה',hold_action:'פעולה בלחיצה ממושכת',double_tap_action:'פעולה בלחיצה כפולה',
+      compact_slots:'תוויות קומפקטיות',actions:'פעולות',tap_action:'פעולה בלחיצה',hold_action:'פעולה בלחיצה ממושכת',double_tap_action:'פעולה בלחיצה כפולה',
     },
     it: {
-      actions:'Azioni',tap_action:'Azione al tocco',hold_action:'Azione prolungata',double_tap_action:'Doppio tocco',
+      compact_slots:'Etichette compatte',actions:'Azioni',tap_action:'Azione al tocco',hold_action:'Azione prolungata',double_tap_action:'Doppio tocco',
     },
     nl: {
-      actions:'Acties',tap_action:'Tik-actie',hold_action:'Vasthoudactie',double_tap_action:'Dubbele tik-actie',
+      compact_slots:'Compacte labels',actions:'Acties',tap_action:'Tik-actie',hold_action:'Vasthoudactie',double_tap_action:'Dubbele tik-actie',
     },
     pl: {
-      actions:'Akcje',tap_action:'Akcja dotknięcia',hold_action:'Akcja przytrzymania',double_tap_action:'Podwójne dotknięcie',
+      compact_slots:'Kompaktowe etykiety',actions:'Akcje',tap_action:'Akcja dotknięcia',hold_action:'Akcja przytrzymania',double_tap_action:'Podwójne dotknięcie',
     },
     ru: {
       actions:'Действия',tap_action:'Действие при нажатии',hold_action:'Действие при удержании',double_tap_action:'Двойное нажатие',
     },
     ua: {
-      actions:'Дії',tap_action:'Дія при дотику',hold_action:'Дія при утриманні',double_tap_action:'Подвійний дотик',
+      compact_slots:'Компактні підписи',actions:'Дії',tap_action:'Дія при дотику',hold_action:'Дія при утриманні',double_tap_action:'Подвійний дотик',
     },
   };
 
