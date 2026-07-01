@@ -23,6 +23,16 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.0.7**
+
+**Fix: missing weather icons for non-Meteocons icon packs**
+- The 110 built-in SVG icon files (`Default` icon pack) were never included as release assets — only the JS file was uploaded. HACS only downloads what's present in the release. All icon SVGs are now attached to releases alongside the JS.
+
+**Fix: false "value needs to have a number" warning**
+- `entity_pop`, `entity_forecast_min`, `entity_forecast_max` (single "today" values without `_1` suffix) were incorrectly validated against a digit-in-entity-ID regex meant only for the day-increment pattern (`_1`, `_2`, `_3`...). Helper/template sensors without digits in their name now work correctly.
+
+---
+
 **v2.0.6**
 
 **New: Compact slot labels**
