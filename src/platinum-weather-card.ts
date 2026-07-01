@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, PropertyValues, CSSResult, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators';
-import { HomeAssistant, LovelaceCardEditor, getLovelace, debounce, hasAction, ActionHandlerEvent, handleAction } from 'custom-card-helpers';
+import { HomeAssistant, LovelaceCardEditor, getLovelace, debounce, hasAction, handleAction } from 'custom-card-helpers';
 import { stringComputeStateDisplay } from './compute_state_display';
 
 //tjl add ifDefined in support of tap action
@@ -19,7 +19,6 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 //  From  https://github.com/bramkragten/weather-card/blob/master/dist/weather-card.js
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
-import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 
 
@@ -82,8 +81,6 @@ export class PlatinumWeatherCard extends LitElement {
 
   public getCardSize(): number {
 
-    // console.info(`Tempate Test String:${entityComputeStateDisplay(this.hass.localize, this.hass.states['sensor.template_test_string'], getLocale(this.hass))}`);
-    // console.info(`Tempate Test Number:${entityComputeStateDisplay(this.hass.localize, this.hass.states['sensor.template_test_number'], getLocale(this.hass))}`);
 
     // Get the heights of each section
     const overiewSectionHeight = this._getCardSizeOverviewSection();
@@ -98,7 +95,6 @@ export class PlatinumWeatherCard extends LitElement {
     // Now calculate an estimated cardsize
     const cardSize = Math.ceil(cardHeight / 50);
 
-    //    console.info(`Card Size=${cardSize} Card Height=${cardHeight} Overview=${overiewSectionHeight} Extended=${extendedSectionHeight} Slots=${slotsSectionHeight} DailyForecast=${dailyForecastSectionHeight}`);
 
     return cardSize;
   }
@@ -235,14 +231,19 @@ export class PlatinumWeatherCard extends LitElement {
 
 
   //tjl from bramkragten's weather-card
+  // Stable bound references so removeEventListener can find them
+  private _boundPointerDown = this._onPointerDown.bind(this);
+  private _boundPointerCancel = this._onPointerCancel.bind(this);
+  private _boundCardClick = this._onCardClick.bind(this);
+
   connectedCallback() {
     super.connectedCallback();
     if (this.hasUpdated && this._config && this.hass) {
       this._subscribeForecastEvents();
     }
-    this.addEventListener('pointerdown', this._onPointerDown.bind(this));
-    this.addEventListener('pointercancel', this._onPointerCancel.bind(this));
-    this.addEventListener('click', this._onCardClick.bind(this));
+    this.addEventListener('pointerdown', this._boundPointerDown);
+    this.addEventListener('pointercancel', this._boundPointerCancel);
+    this.addEventListener('click', this._boundCardClick);
   }
 
 
@@ -250,6 +251,9 @@ export class PlatinumWeatherCard extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._unsubscribeForecastEvents();
+    this.removeEventListener('pointerdown', this._boundPointerDown);
+    this.removeEventListener('pointercancel', this._boundPointerCancel);
+    this.removeEventListener('click', this._boundCardClick);
     clearTimeout(this._pHoldTimer); clearTimeout(this._clickTimer);
   }
 
@@ -331,7 +335,6 @@ export class PlatinumWeatherCard extends LitElement {
   protected firstUpdated(): void {
     this._resize();
     this._attachObserver();
-    // console.info(`Initial cardwdith = ${this._cardWidth}`);
   }
 
   private _attachObserver() {
@@ -358,7 +361,6 @@ export class PlatinumWeatherCard extends LitElement {
     const card = this.shadowRoot?.querySelector('ha-card');
     if (!card) return;
     this._cardWidth = card.getBoundingClientRect().width;
-    // console.info(`Resize cardwdith = ${this._cardWidth}`);
   }
 
   private _checkForErrors(): boolean {
@@ -800,7 +802,6 @@ export class PlatinumWeatherCard extends LitElement {
       var maxTemp: string | undefined;
       var minTemp: string | undefined;
 
-    //console.info(`Forecast-H Date ${forecastDate}`); //tjl
 
       if (this._config.entity_forecast_icon_1?.match('^weather.')) {
         // using a weather domain entity
@@ -1024,7 +1025,6 @@ export class PlatinumWeatherCard extends LitElement {
       var fireDanger: TemplateResult;
       var condition: string | undefined; //tjl moved to here; changed to var
 
-    //console.info(`Forecast-V Date ${forecastDate}`); //tjl
 
       if (this._config.entity_forecast_icon_1?.match('^weather.')) {
         // using a weather domain entity
@@ -2798,7 +2798,7 @@ export class PlatinumWeatherCard extends LitElement {
 
     if (pack === 'default') {
       const prefix = this._config?.option_static_icons ? 's-' : 'a-';
-      return new URL(prefix + adjusted + '.svg', import.meta.url).href;
+      return this._iconBaseUrl() + prefix + adjusted + '.svg';
     }
 
     const wccName = this._iconToWcc(adjusted);
@@ -2811,7 +2811,15 @@ export class PlatinumWeatherCard extends LitElement {
 
     // fallback to default
     const prefix = this._config?.option_static_icons ? 's-' : 'a-';
-    return new URL(prefix + adjusted + '.svg', import.meta.url).href;
+    return this._iconBaseUrl() + prefix + adjusted + '.svg';
+  }
+
+  // Base directory of the card JS — strips filename AND query string
+  // (import.meta.url may carry ?v=/?hacstag= cache-busting params that
+  //  must not leak into icon URLs)
+  private _iconBaseUrl(): string {
+    const url = import.meta.url.split('?')[0];
+    return url.substring(0, url.lastIndexOf('/') + 1);
   }
 
   private _iconToWcc(iconName: string): string {

@@ -69,8 +69,6 @@ export const stringComputeStateDisplay = (
     stringObj: string,
 ): string | undefined => {
 
-  //console.info(`Localize String = ${stringObj}`);
-  //console.info(`Localize Test = ${ localize(`component.weather.state._.${stringObj}`) }`);
 
     return (
         // Return default translation
