@@ -23,6 +23,17 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.0.6**
+
+**New: Compact slot labels**
+- Toggle in Global Options ("Compact slot labels" / `option_compact_slots`) shortens slot section text — "Forecast Max" → "Max", "Forecast Min" → "Min", "Observed Max/Min" → short form, "Forecast" prefix hidden
+- Localized for all 12 supported languages
+
+**Fix: BG translation**
+- "Локал" → "Език" for the Global Options locale dropdown label
+
+---
+
 **v2.0.5**
 
 **Fix: slot editor layout**
