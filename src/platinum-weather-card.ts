@@ -374,7 +374,7 @@ export class PlatinumWeatherCard extends LitElement {
 
     //tjl add a few more configs to check if they are weather entities.
     for (const entityName of ['entity_forecast_icon_1', 'entity_summary_1', 'entity_forecast_min_1', 'entity_forecast_max_1', 
-      'entity_pop_1', 'entity_pos_1', 'entity_extended_1', 'entity_pop', 'entity_forecast_min', 'entity_forecast_max']) {
+      'entity_pop_1', 'entity_pos_1', 'entity_extended_1']) {
       if (this._config[entityName] !== undefined) {
         // tjl - build warning - says "entity" never used, so for now comment it out
       //const entity = this.hass.states[this._config[entityName]];
