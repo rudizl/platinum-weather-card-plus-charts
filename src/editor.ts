@@ -6,13 +6,8 @@ import { keys } from 'ts-transformer-keys';
 
 import { mdiPencil, mdiArrowDown, mdiArrowUp, mdiApplicationEditOutline, mdiLockOpenVariant, mdiLock } from '@mdi/js';
 
-//import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
 import { customElement, property, state } from 'lit/decorators';
-import { formfieldDefinition } from '../elements/formfield';
-import { selectDefinition } from '../elements/select';
-import { switchDefinition } from '../elements/switch';
-import { textfieldDefinition } from '../elements/textfield';
 
 @customElement('platinum-weather-card-plus-charts-editor')
 export class WeatherCardEditor extends LitElement implements LovelaceCardEditor {
@@ -26,14 +21,6 @@ export class WeatherCardEditor extends LitElement implements LovelaceCardEditor 
 
   private _initialized = false;
   private _config_version = 8;
-
-  static elementDefinitions = {
-    "ha-card": customElements.get("ha-card"),  // This works because ha-card is ALWAYS loaded before custom cards (for now)
-    ...textfieldDefinition,
-    ...selectDefinition,
-    ...switchDefinition,
-    ...formfieldDefinition,
-  };
 
   public setConfig(config: WeatherCardConfig): void {
     this._config = config;
