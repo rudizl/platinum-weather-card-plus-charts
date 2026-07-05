@@ -1422,6 +1422,12 @@ export class PlatinumWeatherCard extends LitElement {
         `</svg>`;
     })() : '';
 
+    // Precipitation unit: entity attribute first (HA converts forecast values
+    // to this unit), then unit-system fallback; localized for display
+    const _precipUnit = this._localizeUnit(
+      (this._config.entity ? (this.hass.states[this._config.entity]?.attributes?.precipitation_unit as string | undefined) : undefined)
+      || this.getUOM('precipitation'));
+
     // ── Per-column HTML ────────────────────────────────────────────────────
     const colItems = data.map((d, i) => {
       let colHtml = '';
@@ -1437,7 +1443,7 @@ export class PlatinumWeatherCard extends LitElement {
         if (d.precip > 0) {
           const bH    = Math.max((d.precip / pMax) * maxBarH, 2);
           const bTop  = tempH - bH;
-          const label = (d.precip % 1 === 0 ? String(d.precip) : d.precip.toFixed(1)) + ' мм';
+          const label = (d.precip % 1 === 0 ? String(d.precip) : d.precip.toFixed(1)) + ' ' + _precipUnit;
           // Bar behind everything (z-index 0), rising from bottom of temp area
           colHtml = `<div style="position:absolute;top:${bTop}px;left:0;right:0;height:${bH}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>` + colHtml;
           // Label centered ON the baseline
@@ -1449,7 +1455,7 @@ export class PlatinumWeatherCard extends LitElement {
       }
       const colDivH = totalH;
       // Hover tooltip (same CSS mechanism as forecast section)
-      const locale = this._config.option_locale || 'bg';
+      const locale = this.locale; // undefined → browser/HA locale
       const ttDate = d.datetime ? new Date(d.datetime).toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' }) : '';
       // wind arrow built in _buildTooltipRows via _getWindUnit()
       // Get condition text from entity_summary_1 — same mechanism as forecast tooltip
