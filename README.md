@@ -23,6 +23,30 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.0.8**
+
+**Performance: bundle size 508K → 223K (−56%)**
+- Removed the dead Material Web Components chain — the editor registered mwc textfield/select/switch/formfield definitions that were never consumed (the ScopedRegistryHost mixin was disabled), yet all @material/* packages were still bundled. The editor exclusively uses `ha-input`/`ha-selector`/native selects since the HA 2026.x compat work.
+
+**Fix: chart tooltip date locale**
+- Chart tooltip dates had a hardcoded Bulgarian locale fallback when Locale was set to Auto — now follows browser/HA locale like the forecast tooltips
+
+**Fix: chart precipitation unit label**
+- Bar labels were hardcoded to "мм" — imperial users saw a mm label on values that HA had already converted to inches (`precipitation_unit` attribute). Label now resolves the unit the same way the tooltip does: entity attribute → unit-system fallback → localized
+
+**Fix: icon URLs with cache-busting query params**
+- `?v=`/`?hacstag=` params from the resource URL were leaking into built icon SVG URLs via `import.meta.url` — query string is now stripped before building icon paths
+
+**Fix: pointer listener leak**
+- `connectedCallback` added new bound listeners on every card reattach with no cleanup; now uses stable bound references with `removeEventListener` in `disconnectedCallback`
+
+**Maintenance**
+- `CARD_VERSION` and `package.json` version now match release tags (console banner was stuck at "2.0.0-preview")
+- Removed 499 lines of dead code: action-handler-directive.ts (replaced by pointer events in v2.0.4), helpers.ts, translations.ts, commented-out debug lines
+- Removed unused directories (elements/, rollup-plugins/) and 10 unused dependencies
+
+---
+
 **v2.0.7**
 
 **Fix: missing weather icons for non-Meteocons icon packs**
