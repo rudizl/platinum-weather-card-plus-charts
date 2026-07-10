@@ -2522,7 +2522,7 @@ export class PlatinumWeatherCard extends LitElement {
   private _windIcon(fallback: string, enabled: boolean | undefined): TemplateResult {
     const deg = this.windBearingDegrees;
     if (enabled === true && deg !== null) {
-      return html`<ha-icon icon="mdi:arrow-up" style="transform: rotate(${(deg + 180) % 360}deg);"></ha-icon>`;
+      return html`<ha-icon icon="mdi:arrow-up" style="display:inline-block; transform: rotate(${(deg + 180) % 360}deg);"></ha-icon>`;
     }
     return html`<ha-icon icon="${fallback}"></ha-icon>`;
   }
