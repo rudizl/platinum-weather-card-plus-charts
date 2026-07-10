@@ -2125,7 +2125,7 @@ export class PlatinumWeatherCard extends LitElement {
       <li>
         <div class="slot">
           <div class="slot-icon">
-            <ha-icon icon="mdi:weather-windy"></ha-icon>
+            ${this._windIcon('mdi:weather-windy', this._config.option_wind_bearing_icon)}
           </div>
           ${beaufort}${bearing}${speed}${gust}
         </div>
@@ -2140,7 +2140,7 @@ export class PlatinumWeatherCard extends LitElement {
       <li>
         <div class="slot">
           <div class="slot-icon">
-            <ha-icon icon="mdi:weather-windy-variant"></ha-icon>
+            ${this._windIcon('mdi:weather-windy-variant', this._config.option_gust_bearing_icon)}
           </div>
           <div class="slot-text">${this.localeTextGust}&nbsp;</div>
           <div class="slot-text">${this.currentWindGust}</div>${units}
@@ -2503,6 +2503,28 @@ export class PlatinumWeatherCard extends LitElement {
           ? (Number(this.hass.states[entity].attributes.visibility)).toLocaleString(this.locale)
           : '---'
       : '---';
+  }
+
+  // Numeric wind bearing in degrees (direction wind comes FROM), or null
+  // when unavailable / non-numeric (e.g. entity reports "NW" as text)
+  get windBearingDegrees(): number | null {
+    const entity = this._config.entity_wind_bearing;
+    if (!entity || !this.hass.states[entity]) return null;
+    const raw = entity.match('^weather.') === null
+      ? this.hass.states[entity].state
+      : this.hass.states[entity].attributes.wind_bearing;
+    const n = Number(raw);
+    return raw !== undefined && raw !== null && raw !== '' && !isNaN(n) ? n : null;
+  }
+
+  // Arrow icon rotated to show where the wind blows TOWARD
+  // (bearing 180 / "from south" → arrow points up), falls back to given icon
+  private _windIcon(fallback: string, enabled: boolean | undefined): TemplateResult {
+    const deg = this.windBearingDegrees;
+    if (enabled === true && deg !== null) {
+      return html`<ha-icon icon="mdi:arrow-up" style="transform: rotate(${(deg + 180) % 360}deg);"></ha-icon>`;
+    }
+    return html`<ha-icon icon="${fallback}"></ha-icon>`;
   }
 
   get currentWindBearing(): string {
