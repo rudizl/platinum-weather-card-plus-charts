@@ -156,13 +156,13 @@ const bg: Translation = {
   },
   "moonPhases": {
     "new_moon": "Новолуние",
-    "waxing_crescent": "Растящ полумесец",
+    "waxing_crescent": "Растяща луна",
     "first_quarter": "Първа четвърт",
     "waxing_gibbous": "Растяща луна",
     "full_moon": "Пълнолуние",
     "waning_gibbous": "Намаляваща луна",
     "last_quarter": "Последна четвърт",
-    "waning_crescent": "Намаляващ полумесец"
+    "waning_crescent": "Намаляваща луна"
   },
   "windDirections": [
     "С",
