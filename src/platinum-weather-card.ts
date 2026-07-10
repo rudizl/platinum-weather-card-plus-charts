@@ -1353,7 +1353,7 @@ export class PlatinumWeatherCard extends LitElement {
     const days     = Math.min(this._config.daily_forecast_days || 5, this.forecast1.length);
     const startIdx = this._config.option_show_current_day ? 0 : 1;
 
-    const compassMapC: {[k:string]:number} = {N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337};
+    const compassMapC = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
     const data: { maxT: number; minT: number; precip: number; windSpeed: number | null; windBear: number | null; datetime: string }[] = [];
     for (let i = 0; i < days; i++) {
       const f = this.forecast1[startIdx + i];
@@ -2373,16 +2373,25 @@ export class PlatinumWeatherCard extends LitElement {
       : '---';
   }
 
-  // Numeric wind bearing in degrees (direction wind comes FROM), or null
-  // when unavailable / non-numeric (e.g. entity reports "NW" as text)
+  // Compass point → degrees (shared by slot arrow and chart tooltip)
+  private static readonly COMPASS_DEG: { [k: string]: number } = {
+    N: 0, NNE: 22.5, NE: 45, ENE: 67.5, E: 90, ESE: 112.5, SE: 135, SSE: 157.5,
+    S: 180, SSW: 202.5, SW: 225, WSW: 247.5, W: 270, WNW: 292.5, NW: 315, NNW: 337.5,
+  };
+
+  // Numeric wind bearing in degrees (direction wind comes FROM), or null.
+  // Accepts numeric degrees or compass text ("NW", "sse") — anything else → null
   get windBearingDegrees(): number | null {
     const entity = this._config.entity_wind_bearing;
     if (!entity || !this.hass.states[entity]) return null;
     const raw = entity.match('^weather.') === null
       ? this.hass.states[entity].state
       : this.hass.states[entity].attributes.wind_bearing;
+    if (raw === undefined || raw === null || raw === '') return null;
     const n = Number(raw);
-    return raw !== undefined && raw !== null && raw !== '' && !isNaN(n) ? n : null;
+    if (!isNaN(n)) return n;
+    const compass = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG[String(raw).toUpperCase().trim()];
+    return compass !== undefined ? compass : null;
   }
 
   // Arrow icon rotated to show where the wind blows TOWARD
