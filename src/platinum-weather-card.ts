@@ -20,6 +20,7 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
 import { CARD_VERSION } from './const';
+import { tCard, tMoonPhase, tWindDirections } from './translations';
 
 
 /* eslint no-console: 0 */
@@ -2223,133 +2224,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
   }
 
-  localeTextMoonPhase(phase: string): string {
-    switch (this.locale) {
-      case 'bg': switch (phase) {
-        case 'new_moon':        return 'Новолуние';
-        case 'waxing_crescent': return 'Растящ полумесец';
-        case 'first_quarter':   return 'Първа четвърт';
-        case 'waxing_gibbous':  return 'Растяща луна';
-        case 'full_moon':       return 'Пълнолуние';
-        case 'waning_gibbous':  return 'Намаляваща луна';
-        case 'last_quarter':    return 'Последна четвърт';
-        case 'waning_crescent': return 'Намаляващ полумесец';
-        default: break;
-      } break;
-      case 'ru': switch (phase) {
-        case 'new_moon':        return 'Новолуние';
-        case 'waxing_crescent': return 'Растущий серп';
-        case 'first_quarter':   return 'Первая четверть';
-        case 'waxing_gibbous':  return 'Растущая луна';
-        case 'full_moon':       return 'Полнолуние';
-        case 'waning_gibbous':  return 'Убывающая луна';
-        case 'last_quarter':    return 'Последняя четверть';
-        case 'waning_crescent': return 'Убывающий серп';
-        default: break;
-      } break;
-      case 'ua': switch (phase) {
-        case 'new_moon':        return 'Новий місяць';
-        case 'waxing_crescent': return 'Молодий місяць';
-        case 'first_quarter':   return 'Перша чверть';
-        case 'waxing_gibbous':  return 'Зростаючий місяць';
-        case 'full_moon':       return 'Повний місяць';
-        case 'waning_gibbous':  return 'Спадаючий місяць';
-        case 'last_quarter':    return 'Остання чверть';
-        case 'waning_crescent': return 'Старий місяць';
-        default: break;
-      } break;
-      case 'de': switch (phase) {
-        case 'new_moon':        return 'Neumond';
-        case 'waxing_crescent': return 'Zunehmende Sichel';
-        case 'first_quarter':   return 'Erstes Viertel';
-        case 'waxing_gibbous':  return 'Zunehmender Mond';
-        case 'full_moon':       return 'Vollmond';
-        case 'waning_gibbous':  return 'Abnehmender Mond';
-        case 'last_quarter':    return 'Letztes Viertel';
-        case 'waning_crescent': return 'Abnehmende Sichel';
-        default: break;
-      } break;
-      case 'fr': switch (phase) {
-        case 'new_moon':        return 'Nouvelle lune';
-        case 'waxing_crescent': return 'Croissant';
-        case 'first_quarter':   return 'Premier quartier';
-        case 'waxing_gibbous':  return 'Lune croissante';
-        case 'full_moon':       return 'Pleine lune';
-        case 'waning_gibbous':  return 'Lune décroissante';
-        case 'last_quarter':    return 'Dernier quartier';
-        case 'waning_crescent': return 'Dernier croissant';
-        default: break;
-      } break;
-      case 'it': switch (phase) {
-        case 'new_moon':        return 'Luna nuova';
-        case 'waxing_crescent': return 'Luna crescente';
-        case 'first_quarter':   return 'Primo quarto';
-        case 'waxing_gibbous':  return 'Luna quasi piena';
-        case 'full_moon':       return 'Luna piena';
-        case 'waning_gibbous':  return 'Luna calante';
-        case 'last_quarter':    return 'Ultimo quarto';
-        case 'waning_crescent': return 'Falce calante';
-        default: break;
-      } break;
-      case 'nl': switch (phase) {
-        case 'new_moon':        return 'Nieuwe maan';
-        case 'waxing_crescent': return 'Wassende sikkel';
-        case 'first_quarter':   return 'Eerste kwartier';
-        case 'waxing_gibbous':  return 'Wassende maan';
-        case 'full_moon':       return 'Volle maan';
-        case 'waning_gibbous':  return 'Afnemende maan';
-        case 'last_quarter':    return 'Laatste kwartier';
-        case 'waning_crescent': return 'Afnemende sikkel';
-        default: break;
-      } break;
-      case 'pl': switch (phase) {
-        case 'new_moon':        return 'Nów';
-        case 'waxing_crescent': return 'Sierp rosnący';
-        case 'first_quarter':   return 'Pierwsza kwadra';
-        case 'waxing_gibbous':  return 'Rosnący księżyc';
-        case 'full_moon':       return 'Pełnia';
-        case 'waning_gibbous':  return 'Malejący księżyc';
-        case 'last_quarter':    return 'Ostatnia kwadra';
-        case 'waning_crescent': return 'Sierp ubywający';
-        default: break;
-      } break;
-      case 'da': switch (phase) {
-        case 'new_moon':        return 'Nymåne';
-        case 'waxing_crescent': return 'Voksende måne';
-        case 'first_quarter':   return 'Første kvartal';
-        case 'waxing_gibbous':  return 'Voksende måne';
-        case 'full_moon':       return 'Fuldmåne';
-        case 'waning_gibbous':  return 'Aftagende måne';
-        case 'last_quarter':    return 'Sidste kvartal';
-        case 'waning_crescent': return 'Aftagende måne';
-        default: break;
-      } break;
-      case 'es': switch (phase) {
-        case 'new_moon':        return 'Luna nueva';
-        case 'waxing_crescent': return 'Creciente';
-        case 'first_quarter':   return 'Cuarto creciente';
-        case 'waxing_gibbous':  return 'Luna creciente';
-        case 'full_moon':       return 'Luna llena';
-        case 'waning_gibbous':  return 'Luna menguante';
-        case 'last_quarter':    return 'Cuarto menguante';
-        case 'waning_crescent': return 'Menguante';
-        default: break;
-      } break;
-      case 'he': switch (phase) {
-        case 'new_moon':        return 'ירח חדש';
-        case 'waxing_crescent': return 'סהר בגדילה';
-        case 'first_quarter':   return 'רבע ראשון';
-        case 'waxing_gibbous':  return 'ירח גדל';
-        case 'full_moon':       return 'ירח מלא';
-        case 'waning_gibbous':  return 'ירח קטן';
-        case 'last_quarter':    return 'רבע אחרון';
-        case 'waning_crescent': return 'סהר בקטנה';
-        default: break;
-      } break;
-    }
-    // default: capitalise the HA phase key
-    return phase.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  }
+  localeTextMoonPhase(phase: string): string { return tMoonPhase(this.locale, phase); }
 
   get slotCustom1(): TemplateResult {
     var icon = this._config.custom1_icon ? this._config.custom1_icon : 'mdi:help-box';
@@ -2597,39 +2472,7 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   // windDirections - returns set of possible wind directions by specified language
-  get windDirections(): string[] {
-    const windDirections_en = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N'];
-    const windDirections_fr = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO', 'N'];
-    const windDirections_de = ['N', 'NNO', 'NO', 'ONO', 'O', 'OSO', 'SO', 'SSO', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N'];
-    const windDirections_nl = ['N', 'NNO', 'NO', 'ONO', 'O', 'OZO', 'ZO', 'ZZO', 'Z', 'ZZW', 'ZW', 'WZW', 'W', 'WNW', 'NW', 'NNW', 'N'];
-    const windDirections_he = ['צפון', 'צ-צ-מז', 'צפון מזרח', 'מז-צ-מז', 'מזרח', 'מז-ד-מז', 'דרום מזרח', 'ד-ד-מז', 'דרום', 'ד-ד-מע', 'דרום מערב', 'מע-ד-מע', 'מערב', 'מע-צ-מע', 'צפון מערב', 'צ-צ-מע', 'צפון'];
-    const windDirections_da = ['N', 'NNØ', 'NØ', 'ØNØ', 'Ø', 'ØSØ', 'SØ', 'SSØ', 'S', 'SSV', 'SV', 'VSV', 'V', 'VNV', 'NV', 'NNV', 'N'];
-    const windDirections_ru = ['С', 'ССВ', 'СВ', 'ВСВ', 'В', 'ВЮВ', 'ЮВ', 'ЮЮВ', 'Ю', 'ЮЮЗ', 'ЮЗ', 'ЗЮЗ', 'З', 'ЗСЗ', 'СЗ', 'ССЗ', 'С'];
-    const windDirections_es = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO', 'N'];
-    const windDirections_bg = ['С', 'ССИ', 'СИ', 'ИСИ', 'И', 'ИЮИ', 'ЮИ', 'ЮЮИ', 'Ю', 'ЮЮЗ', 'ЮЗ', 'ЗЮЗ', 'З', 'ЗСЗ', 'СЗ', 'ССЗ', 'С'];
-
-    switch (this.locale) {
-      case "it":
-      case "fr":
-        return windDirections_fr;
-      case "de":
-        return windDirections_de;
-      case "nl":
-        return windDirections_nl;
-      case "es":
-        return windDirections_es;
-      case "he":
-        return windDirections_he;
-      case "ru":
-        return windDirections_ru;
-      case "da":
-        return windDirections_da;
-      case "bg":
-        return windDirections_bg;
-      default:
-        return windDirections_en;
-    }
-  }
+  get windDirections(): string[] { return tWindDirections(this.locale); }
 
   // beaufortWind - returns the wind speed on the beaufort scale
   // reference https://en.wikipedia.org/wiki/Beaufort_scale
@@ -3121,249 +2964,31 @@ export class PlatinumWeatherCard extends LitElement {
     }
   }
 
-  get localeTextFeelsLike(): string {
-    switch (this.locale) {
-      case 'it': return "Percepito";
-      case 'fr': return "Ressenti";
-      case 'de': return "Gefühlt";
-      case 'nl': return "Voelt als";
-      case 'pl': return "Odczuwalne";
-      case 'he': return "מרגיש כמו";
-      case 'da': return "Føles som";
-      case 'ru': return "Ощущается как";
-      case 'es': return "Sensación";
-      case 'ua': return "Відчувається як";
-      case 'bg': return "Усеща се като";
-      default: return "Feels like";
-    }
-  }
+  get localeTextFeelsLike(): string { return tCard(this.locale, 'feels_like'); }
 
-  get localeTextObservedMax(): string {
-    if (this.compact) return this.localeTextObsMax;
-    switch (this.locale) {
-      case 'it': return "Osservata Max";
-      case 'fr': return "Observé Max";
-      case 'de': return "Beobachtet Max";
-      case 'nl': return "Opgemerkt Max";
-      case 'pl': return "Zaobserwowany Max";
-      case 'he': return "נצפה מקסימום";
-      case 'da': return "Observeret Max";
-      case 'ru': return "Наблюдаемый макс.";
-      case 'es': return "Observado Max";
-      case 'ua': return "Спостережуваний макс.";
-      case 'bg': return "Наблюдавано макс.";
-      default: return "Observed Max";
-    }
-  }
+  get localeTextObservedMax(): string { return tCard(this.locale, this.compact ? 'obs_max' : 'observed_max'); }
 
-  get localeTextObservedMin(): string {
-    if (this.compact) return this.localeTextObsMin;
-    switch (this.locale) {
-      case 'it': return "Osservata Min";
-      case 'fr': return "Observé Min";
-      case 'de': return "Beobachtet Min";
-      case 'nl': return "Opgemerkt Min";
-      case 'pl': return "Zaobserwowany Min";
-      case 'he': return "נצפה מינימום";
-      case 'da': return "Observeret Min";
-      case 'ru': return "Наблюдаемый мин.";
-      case 'es': return "Observado Min";
-      case 'ua': return "Спостережуваний мін.";
-      case 'bg': return "Наблюдавано мин.";
-      default: return "Observed Min";
-    }
-  }
+  get localeTextObservedMin(): string { return tCard(this.locale, this.compact ? 'obs_min' : 'observed_min'); }
 
-  get localeTextObsMax(): string {
-    switch (this.locale) {
-      case 'it': return "Oss Max";
-      case 'fr': return "Obs Max";
-      case 'de': return "Beob Max";
-      case 'nl': return "Opgem Max";
-      case 'pl': return "Obs Max";
-      case 'he': return "נצפה מקס";
-      case 'da': return "Obs Max";
-      case 'ru': return "Набл макс.";
-      case 'es': return "Obs Max";
-      case 'ua': return "Спост макс.";
-      case 'bg': return "Набл. макс.";
-      default: return "Obs Max";
-    }
-  }
+  get localeTextObsMax(): string { return tCard(this.locale, 'obs_max'); }
 
-  get localeTextObsMin(): string {
-    switch (this.locale) {
-      case 'it': return "Oss Min";
-      case 'fr': return "Obs Min";
-      case 'de': return "Beob Min";
-      case 'nl': return "Opgem Min";
-      case 'pl': return "Obs Min";
-      case 'he': return "נצפה מינ";
-      case 'da': return "Obs Min";
-      case 'ru': return "Набл мин.";
-      case 'es': return "Obs Min";
-      case 'ua': return "Спост мін.";
-      case 'bg': return "Набл. мин.";
-      default: return "Obs Min";
-    }
-  }
+  get localeTextObsMin(): string { return tCard(this.locale, 'obs_min'); }
 
-  get localeTextForecastMax(): string {
-    if (this.compact) {
-      switch (this.locale) {
-        case 'ru': return "Макс"; case 'ua': return "Макс"; case 'bg': return "Макс";
-        case 'he': return "מקס"; default: return "Max";
-      }
-    }
-    switch (this.locale) {
-      case 'it': return "Max oggi";
-      case 'fr': return "Max aujourd'hui";
-      case 'de': return "Max heute";
-      case 'nl': return "Max vandaag";
-      case 'pl': return "Maks Temperatura";
-      case 'he': return "מקסימלי היום";
-      case 'da': return "Højeste i dag";
-      case 'ru': return "Макс сегодня";
-      case 'es': return "Máx hoy";
-      case 'ua': return "Макс сьогодні";
-      case 'bg': return "Макс днес";
-      default: return "Forecast Max";
-    }
-  }
+  get localeTextForecastMax(): string { return tCard(this.locale, this.compact ? 'forecast_max_compact' : 'forecast_max'); }
 
-  get localeTextForecastMin(): string {
-    if (this.compact) {
-      switch (this.locale) {
-        case 'ru': return "Мин"; case 'ua': return "Мін"; case 'bg': return "Мин";
-        case 'he': return "מינ"; default: return "Min";
-      }
-    }
-    switch (this.locale) {
-      case 'it': return "Min oggi";
-      case 'fr': return "Min aujourd'hui";
-      case 'de': return "Min heute";
-      case 'nl': return "Min vandaag";
-      case 'pl': return "Min Temperatura";
-      case 'he': return "דקות היום";
-      case 'da': return "Laveste i dag";
-      case 'ru': return "Мин сегодня";
-      case 'es': return "Mín hoy";
-      case 'ua': return "Мін сьогодні";
-      case 'bg': return "Мин днес";
-      default: return "Forecast Min";
-    }
-  }
+  get localeTextForecastMin(): string { return tCard(this.locale, this.compact ? 'forecast_min_compact' : 'forecast_min'); }
 
-  get localeTextPosToday(): string {
-    if (this.compact) return "";
-    switch (this.locale) {
-      case 'it': return "Previsione";
-      case 'fr': return "Prévoir";
-      case 'de': return "Vorhersage";
-      case 'nl': return "Prognose";
-      case 'pl': return "Prognoza";
-      case 'he': return "תַחֲזִית";
-      case 'da': return "Vejrudsigt";
-      case 'ru': return "Прогноз";
-      case 'es': return "Previsión";
-      case 'ua': return "Прогноз";
-      case 'bg': return "Прогноза";
-      default: return "Forecast";
-    }
-  }
+  get localeTextPosToday(): string { return this.compact ? '' : tCard(this.locale, 'pos_today'); }
 
-  get localeTextPosTomorrow(): string {
-    if (this.compact) {
-      switch (this.locale) {
-        case 'ru': return "Завтра"; case 'ua': return "Завтра"; case 'bg': return "Утре";
-        case 'he': return "מחר"; case 'de': return "Morgen"; case 'nl': return "Morgen";
-        case 'da': return "Morgen"; case 'pl': return "Jutro"; case 'it': return "Dom";
-        case 'fr': return "Dem"; case 'es': return "Mañ"; default: return "Tom";
-      }
-    }
-    switch (this.locale) {
-      case 'it': return "Prev per domani";
-      case 'fr': return "Prév demain";
-      case 'de': return "Prog morgen";
-      case 'nl': return "Prog morgen";
-      case 'pl': return "Prog jutro";
-      case 'he': return "תחזית מחר";
-      case 'da': return "Prog i morgen";
-      case 'ru': return "Прогноз на завтра";
-      case 'es': return "Prev mañana";
-      case 'ua': return "Прогноз на завтра";
-      case 'bg': return "Прогноза за утре";
-      default: return "Fore Tom";
-    }
-  }
+  get localeTextPosTomorrow(): string { return tCard(this.locale, this.compact ? 'pos_tomorrow_compact' : 'pos_tomorrow'); }
 
-  get localeTextFore(): string {
-    switch (this.locale) {
-      case 'it': return "Prev";
-      case 'fr': return "Prév";
-      case 'de': return "Prog";
-      case 'nl': return "Prog";
-      case 'pl': return "Prog";
-      case 'he': return "תַחֲזִית";
-      case 'da': return "Prog";
-      case 'ru': return "Прогноз";
-      case 'es': return "Prev";
-      case 'ua': return "Прогноз";
-      case 'bg': return "Прогноза";
-      default: return "Fore";
-    }
-  }
+  get localeTextFore(): string { return tCard(this.locale, 'fore'); }
 
-  get localeTextUVRating(): string {
-    switch (this.locale) {
-      case 'it': return "UV";
-      case 'fr': return "UV";
-      case 'de': return "UV";
-      case 'nl': return "UV";
-      case 'pl': return "UV";
-      case 'he': return "UV";
-      case 'da': return "UV";
-      case 'ru': return "УФ";
-      case 'es': return "UV";
-      case 'ua': return "УФ";
-      case 'bg': return "UV";
-      default: return "UV";
-    }
-  }
+  get localeTextUVRating(): string { return tCard(this.locale, 'uv_rating'); }
 
-  get localeTextFireDanger(): string {
-    switch (this.locale) {
-      case 'it': return "Fuoco";
-      case 'fr': return "Feu";
-      case 'de': return "Feuer";
-      case 'nl': return "Brand";
-      case 'pl': return "Ogień";
-      case 'he': return "אֵשׁ";
-      case 'da': return "Brand";
-      case 'ru': return "Огонь";
-      case 'es': return "Fuego";
-      case 'ua': return "Вогонь";
-      case 'bg': return "Пожар";
-      default: return "Fire";
-    }
-  }
+  get localeTextFireDanger(): string { return tCard(this.locale, 'fire_danger'); }
 
-  get localeTextGust(): string {
-    switch (this.locale) {
-      case 'it': return "Raffica";
-      case 'fr': return "Rafale";
-      case 'de': return "Böe";
-      case 'nl': return "Windstoot";
-      case 'pl': return "Poryw";
-      case 'he': return "נשיבה";
-      case 'da': return "Vindstød";
-      case 'ru': return "Порыв";
-      case 'es': return "Ráfaga";
-      case 'ua': return "Порив";
-      case 'bg': return "Пориви";
-      default: return "Gust";
-    }
-  }
+  get localeTextGust(): string { return tCard(this.locale, 'gust'); }
 
   getUOM(measure: string): string {
     const lengthUnit = this.hass.config.unit_system.length;

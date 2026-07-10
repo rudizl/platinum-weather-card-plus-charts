@@ -6,6 +6,7 @@ import { keys } from 'ts-transformer-keys';
 
 import { mdiPencil, mdiArrowDown, mdiArrowUp, mdiApplicationEditOutline, mdiLockOpenVariant, mdiLock } from '@mdi/js';
 
+import { tEditor } from './translations';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
@@ -1846,67 +1847,10 @@ get _forecast_type(): string {
 
 
   private _t(key: string): string {
-    const lang = (this.hass?.language || 'en').split('-')[0].toLowerCase();
-    const t = (this.constructor as unknown as {_translations: Record<string, Record<string, string>>})._translations;
-    return (t[lang] && t[lang][key]) ? t[lang][key] : (t['en'][key] ?? key);
+    return tEditor(this.hass?.language || 'en', key);
   }
 
-  private static readonly _translations: Record<string, Record<string, string>> = {
-    en: {
-      global_options:'Global Options',overview_section:'Overview Section',extended_section:'Extended Section',slots_section:'Slots Section',daily_forecast_section:'Daily Forecast Section',
-      wind_bearing_icon:'Wind bearing arrow icon',compact_slots:'Compact slot labels',show_static_icons:'Show Static Icons',time_format:'Time Format',locale:'Locale',icon_pack:'Icon Pack',opt_locale_auto:'Auto (browser)',
-      actions:'Actions',tap_action:'Tap Action',hold_action:'Hold Action',double_tap_action:'Double-tap Action',icon_pack_default:'Default (built-in animated)',icon_pack_met_fill:'Meteocons — Fill (CDN, basmilius)',icon_pack_met_line:'Meteocons — Line (CDN, basmilius)',icon_pack_ammap:'ammap Weather Icons (requires weather-chart-card)',icon_pack_custom:'Custom path...',icon_path:'Icon path',icon_path_hint:'Use {condition} as placeholder — e.g. /local/icons/{condition}.svg',
-      overview_layout:'Overview Layout',card_title_1:'Card Title Text Line 1',card_title_2:'Card Title Text Line 2',entity_temperature:'Entity Current Temperature',entity_apparent_temp:'Entity Apparent Temperature',entity_forecast_icon:'Entity Forecast Icon',entity_forecast_icon_1:'Entity Forecast Icon 1',entity_summary:'Entity Forecast Summary',entity_summary_1:'Entity Forecast Summary 1',entity_extended:'Entity Extended Forecast',entity_extended_1:'Entity Extended Forecast 1',use_attribute:'Use Attribute',attribute:'Attribute',
-      slot_l1:'Slot Left 1',slot_l2:'Slot Left 2',slot_l3:'Slot Left 3',slot_l4:'Slot Left 4',slot_l5:'Slot Left 5',slot_l6:'Slot Left 6',slot_l7:'Slot Left 7',slot_l8:'Slot Left 8',slot_r1:'Slot Right 1',slot_r2:'Slot Right 2',slot_r3:'Slot Right 3',slot_r4:'Slot Right 4',slot_r5:'Slot Right 5',slot_r6:'Slot Right 6',slot_r7:'Slot Right 7',slot_r8:'Slot Right 8',
-      today_temp_decimals:'Todays Temperature Decimals',today_rain_decimals:'Todays Rainfall Decimals',forecast_temp_decimals:'Forecast Temperature Decimals',pressure_decimals:'Pressure Decimals',show_separator:'Show separator',show_temp_decimals:'Show temperature decimals',
-      entity_humidity:'Humidity',entity_pressure:'Atmospheric Pressure',entity_pop:'Chance of Rain',entity_pos:'Possible Rain Today',entity_2day_pos:'Possible Rain Tomorrow',entity_rainfall:'Todays Rain',entity_fire_danger:'Fire Danger',entity_uv_summary:'UV Alert Summary',entity_sun:'Entity Sun',entity_moon:'Moon Phase Entity',entity_visibility:'Entity Visibility',entity_wind_speed:'Entity Wind Speed',entity_wind_bearing:'Entity Wind Bearing',entity_wind_gust:'Entity Wind Gust',entity_wind_speed_kt:'Entity Wind Speed Kt',entity_wind_gust_kt:'Entity Wind Gust Kt',entity_update_time:'Entity Update Time',update_time_prefix:'Update Time Prefix',entity_uv_today:"Entity Today's UV Forecast",entity_fire_today:"Entity Today's Fire Danger",entity_observed_max:'Entity Observed Max',entity_observed_min:'Entity Observed Min',entity_forecast_max:'Entity Forecast Max',entity_forecast_max_1:'Entity Forecast Max 1',entity_forecast_min:'Entity Forecast Min',entity_forecast_min_1:'Entity Forecast Min 1',entity_temp_next:'Entity Temp Next',entity_temp_next_label:'Entity Temp Next Label',entity_temp_following:'Entity Temp Following',entity_temp_fol_label:'Entity Temp Following Label',entity_fire_danger_1:'Entity Fire Danger 1',entity_pop_1:'Entity Forecast Chance of Rain 1',entity_pos_1:'Entity Forecast Possible Rain 1',
-      custom1_value:'Custom 1 Value',custom2_value:'Custom 2 Value',custom3_value:'Custom 3 Value',custom4_value:'Custom 4 Value',custom1_icon:'Custom 1 Icon',custom2_icon:'Custom 2 Icon',custom3_icon:'Custom 3 Icon',custom4_icon:'Custom 4 Icon',custom1_units:'Custom 1 Units',custom2_units:'Custom 2 Units',custom3_units:'Custom 3 Units',custom4_units:'Custom 4 Units',custom1_label:'Custom 1 Label (optional)',custom2_label:'Custom 2 Label (optional)',custom3_label:'Custom 3 Label (optional)',custom4_label:'Custom 4 Label (optional)',
-      weather_entity:'Weather Entity with Forecasts',forecast_type:'Forecast Type',daily_forecast_layout:'Daily Forecast Layout',daily_forecast_days:'Daily Forecast Days',daily_extended_days:'Daily Extended Days',show_forecast_pop:'Show Precipitation Probability in Forecast',show_forecast_wind:'Show Wind in Forecast',show_gust_in_wind:'Show Gust in Wind Slot',colour_fire_danger:'Colour Fire Danger',include_today:'Include Today in Forecast',show_temp_chart:'Show Temperature Chart',show_precip_chart:'Show Precipitation Chart',forecast_tooltips:'Enable forecast tooltips',charts_section:'Charts Section',
-      opt_daily:'Daily',opt_hourly:'Hourly',opt_twice_daily:'Twice Daily',opt_horizontal:'Horizontal',opt_vertical:'Vertical',opt_complete:'Complete',opt_observations:'Observations',opt_forecast:'Forecast',opt_title_only:'Title only',opt_system:'System',opt_12hour:'12 hour',opt_24hour:'24 hour',
-    },
-    bg: {
-      global_options:'Глобални настройки',overview_section:'Секция Преглед',extended_section:'Разширена секция',slots_section:'Секция Слотове',daily_forecast_section:'Секция Прогноза',
-      wind_bearing_icon:'Стрелка за посока на вятъра',compact_slots:'Компактни надписи',show_static_icons:'Статични икони',time_format:'Формат на часа',locale:'Език',icon_pack:'Пакет с икони',opt_locale_auto:'Автоматично (браузър)',
-      actions:'Действия',tap_action:'Действие при натискане',hold_action:'Действие при задържане',double_tap_action:'Двойно натискане',icon_pack_default:'По подразбиране (вградени анимирани)',icon_pack_met_fill:'Meteocons — Запълнен (CDN)',icon_pack_met_line:'Meteocons — Линеен (CDN)',icon_pack_ammap:'ammap икони (изисква weather-chart-card)',icon_pack_custom:'Персонализиран път...',icon_path:'Път до икона',icon_path_hint:'Използвай {condition} като плейсхолър',
-      overview_layout:'Оформление на преглед',card_title_1:'Заглавие ред 1',card_title_2:'Заглавие ред 2',entity_temperature:'Текуща температура',entity_apparent_temp:'Усещана температура',entity_forecast_icon:'Икона прогноза',entity_forecast_icon_1:'Икона прогноза 1',entity_summary:'Резюме прогноза',entity_summary_1:'Резюме прогноза 1',entity_extended:'Разширена прогноза',entity_extended_1:'Разширена прогноза 1',use_attribute:'Използвай атрибут',attribute:'Атрибут',
-      slot_l1:'Слот Ляво 1',slot_l2:'Слот Ляво 2',slot_l3:'Слот Ляво 3',slot_l4:'Слот Ляво 4',slot_l5:'Слот Ляво 5',slot_l6:'Слот Ляво 6',slot_l7:'Слот Ляво 7',slot_l8:'Слот Ляво 8',slot_r1:'Слот Дясно 1',slot_r2:'Слот Дясно 2',slot_r3:'Слот Дясно 3',slot_r4:'Слот Дясно 4',slot_r5:'Слот Дясно 5',slot_r6:'Слот Дясно 6',slot_r7:'Слот Дясно 7',slot_r8:'Слот Дясно 8',
-      today_temp_decimals:'Десетични за текуща темп.',today_rain_decimals:'Десетични за валежи',forecast_temp_decimals:'Десетични за прогнозна темп.',pressure_decimals:'Десетични за налягане',show_separator:'Показвай разделител',show_temp_decimals:'Показвай десетични',
-      entity_humidity:'Влажност',entity_pressure:'Атмосферно налягане',entity_pop:'Вероятност за дъжд',entity_pos:'Възможен дъжд днес',entity_2day_pos:'Възможен дъжд утре',entity_rainfall:'Дъжд днес',entity_fire_danger:'Опасност от пожар',entity_uv_summary:'UV сигнал',entity_sun:'Слънце',entity_moon:'Фаза на луната',entity_visibility:'Видимост',entity_wind_speed:'Скорост на вятъра',entity_wind_bearing:'Посока на вятъра',entity_wind_gust:'Пориви',entity_wind_speed_kt:'Скорост (kn)',entity_wind_gust_kt:'Пориви (kn)',entity_update_time:'Час на обновяване',update_time_prefix:'Префикс за час',entity_uv_today:'UV прогноза (днес)',entity_fire_today:'Опасност от пожар (днес)',entity_observed_max:'Макс. наблюдавана',entity_observed_min:'Мин. наблюдавана',entity_forecast_max:'Макс. прогноза',entity_forecast_max_1:'Макс. прогноза 1',entity_forecast_min:'Мин. прогноза',entity_forecast_min_1:'Мин. прогноза 1',entity_temp_next:'Следваща темп.',entity_temp_next_label:'Етикет следваща темп.',entity_temp_following:'Трета темп.',entity_temp_fol_label:'Етикет трета темп.',entity_fire_danger_1:'Опасност от пожар 1',entity_pop_1:'Вероятност за дъжд 1',entity_pos_1:'Възможни валежи 1',
-      custom1_value:'Перс. 1 стойност',custom2_value:'Перс. 2 стойност',custom3_value:'Перс. 3 стойност',custom4_value:'Перс. 4 стойност',custom1_icon:'Перс. 1 икона',custom2_icon:'Перс. 2 икона',custom3_icon:'Перс. 3 икона',custom4_icon:'Перс. 4 икона',custom1_units:'Перс. 1 единица',custom2_units:'Перс. 2 единица',custom3_units:'Перс. 3 единица',custom4_units:'Перс. 4 единица',custom1_label:'Перс. 1 етикет',custom2_label:'Перс. 2 етикет',custom3_label:'Перс. 3 етикет',custom4_label:'Перс. 4 етикет',
-      weather_entity:'Ентити за прогноза',forecast_type:'Тип прогноза',daily_forecast_layout:'Оформление на прогнозата',daily_forecast_days:'Дни в прогнозата',daily_extended_days:'Дни разширена прогноза',show_forecast_pop:'Вероятност за валежи в прогнозата',show_forecast_wind:'Вятър в прогнозата',show_gust_in_wind:'Пориви в слота за вятър',colour_fire_danger:'Оцветяване — опасност от пожар',include_today:'Включи днес в прогнозата',show_temp_chart:'Покажи температурен чарт',show_precip_chart:'Покажи чарт за валежи',forecast_tooltips:'Tooltip-ове в прогнозата',charts_section:'Секция Чартове',
-      opt_daily:'Дневна',opt_hourly:'Почасова',opt_twice_daily:'Два пъти дневно',opt_horizontal:'Хоризонтална',opt_vertical:'Вертикална',opt_complete:'Пълно',opt_observations:'Наблюдения',opt_forecast:'Прогноза',opt_title_only:'Само заглавие',opt_system:'Системен',opt_12hour:'12-часов',opt_24hour:'24-часов',
-    },
-    da: {
-      wind_bearing_icon:'Pil for vindretning',compact_slots:'Kompakte etiketter',actions:'Handlinger',tap_action:'Tryk-handling',hold_action:'Hold-handling',double_tap_action:'Dobbelttryk-handling',
-    },
-    de: {
-      wind_bearing_icon:'Windrichtungspfeil',compact_slots:'Kompakte Beschriftungen',actions:'Aktionen',tap_action:'Tipp-Aktion',hold_action:'Halte-Aktion',double_tap_action:'Doppeltipp-Aktion',
-    },
-    es: {
-      wind_bearing_icon:'Flecha de dirección del viento',compact_slots:'Etiquetas compactas',actions:'Acciones',tap_action:'Acción al tocar',hold_action:'Acción al mantener',double_tap_action:'Doble toque',
-    },
-    fr: {
-      wind_bearing_icon:'Flèche de direction du vent',compact_slots:'Libellés compacts',actions:'Actions',tap_action:'Action au toucher',hold_action:'Action maintenue',double_tap_action:'Double toucher',
-    },
-    he: {
-      wind_bearing_icon:'חץ כיוון הרוח',compact_slots:'תוויות קומפקטיות',actions:'פעולות',tap_action:'פעולה בלחיצה',hold_action:'פעולה בלחיצה ממושכת',double_tap_action:'פעולה בלחיצה כפולה',
-    },
-    it: {
-      wind_bearing_icon:'Freccia direzione vento',compact_slots:'Etichette compatte',actions:'Azioni',tap_action:'Azione al tocco',hold_action:'Azione prolungata',double_tap_action:'Doppio tocco',
-    },
-    nl: {
-      wind_bearing_icon:'Windrichtingspijl',compact_slots:'Compacte labels',actions:'Acties',tap_action:'Tik-actie',hold_action:'Vasthoudactie',double_tap_action:'Dubbele tik-actie',
-    },
-    pl: {
-      wind_bearing_icon:'Strzałka kierunku wiatru',compact_slots:'Kompaktowe etykiety',actions:'Akcje',tap_action:'Akcja dotknięcia',hold_action:'Akcja przytrzymania',double_tap_action:'Podwójne dotknięcie',
-    },
-    ru: {
-      wind_bearing_icon:'Стрелка направления ветра',compact_slots:'Компактные подписи',actions:'Действия',tap_action:'Действие при нажатии',hold_action:'Действие при удержании',double_tap_action:'Двойное нажатие',
-    },
-    ua: {
-      wind_bearing_icon:'Стрілка напряму вітру',compact_slots:'Компактні підписи',actions:'Дії',tap_action:'Дія при дотику',hold_action:'Дія при утриманні',double_tap_action:'Подвійний дотик',
-    },
-  };
+
 
   private _initialize(): void {
     if (this.hass === undefined) return;
