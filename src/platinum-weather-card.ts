@@ -2140,7 +2140,7 @@ export class PlatinumWeatherCard extends LitElement {
       <li>
         <div class="slot">
           <div class="slot-icon">
-            ${this._windIcon('mdi:weather-windy-variant', this._config.option_gust_bearing_icon)}
+            <ha-icon icon="mdi:weather-windy-variant"></ha-icon>
           </div>
           <div class="slot-text">${this.localeTextGust}&nbsp;</div>
           <div class="slot-text">${this.currentWindGust}</div>${units}

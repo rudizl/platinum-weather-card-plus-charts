@@ -1370,12 +1370,7 @@ get _forecast_type(): string {
               <span class="toggle-label">${this._t("wind_bearing_icon")}</span>
             </div>
         </div>
-        <div>
-          <div class="toggle-row">
-              <ha-icon-button class=${this._config?.option_gust_bearing_icon ? "eye-toggle active" : "eye-toggle"} .path=${this._config?.option_gust_bearing_icon ? mdiLockOpenVariant : mdiLock} .value=${'option_gust_bearing_icon'} .checked=${this._config?.option_gust_bearing_icon === true} @click=${this._toggleVisibility}></ha-icon-button>
-              <span class="toggle-label">${this._t("gust_bearing_icon")}</span>
-            </div>
-        </div>
+        <div></div>
       </div>
     `;
   }
@@ -1859,7 +1854,7 @@ get _forecast_type(): string {
   private static readonly _translations: Record<string, Record<string, string>> = {
     en: {
       global_options:'Global Options',overview_section:'Overview Section',extended_section:'Extended Section',slots_section:'Slots Section',daily_forecast_section:'Daily Forecast Section',
-      wind_bearing_icon:'Wind bearing arrow icon',gust_bearing_icon:'Gust bearing arrow icon',compact_slots:'Compact slot labels',show_static_icons:'Show Static Icons',time_format:'Time Format',locale:'Locale',icon_pack:'Icon Pack',opt_locale_auto:'Auto (browser)',
+      wind_bearing_icon:'Wind bearing arrow icon',compact_slots:'Compact slot labels',show_static_icons:'Show Static Icons',time_format:'Time Format',locale:'Locale',icon_pack:'Icon Pack',opt_locale_auto:'Auto (browser)',
       actions:'Actions',tap_action:'Tap Action',hold_action:'Hold Action',double_tap_action:'Double-tap Action',icon_pack_default:'Default (built-in animated)',icon_pack_met_fill:'Meteocons — Fill (CDN, basmilius)',icon_pack_met_line:'Meteocons — Line (CDN, basmilius)',icon_pack_ammap:'ammap Weather Icons (requires weather-chart-card)',icon_pack_custom:'Custom path...',icon_path:'Icon path',icon_path_hint:'Use {condition} as placeholder — e.g. /local/icons/{condition}.svg',
       overview_layout:'Overview Layout',card_title_1:'Card Title Text Line 1',card_title_2:'Card Title Text Line 2',entity_temperature:'Entity Current Temperature',entity_apparent_temp:'Entity Apparent Temperature',entity_forecast_icon:'Entity Forecast Icon',entity_forecast_icon_1:'Entity Forecast Icon 1',entity_summary:'Entity Forecast Summary',entity_summary_1:'Entity Forecast Summary 1',entity_extended:'Entity Extended Forecast',entity_extended_1:'Entity Extended Forecast 1',use_attribute:'Use Attribute',attribute:'Attribute',
       slot_l1:'Slot Left 1',slot_l2:'Slot Left 2',slot_l3:'Slot Left 3',slot_l4:'Slot Left 4',slot_l5:'Slot Left 5',slot_l6:'Slot Left 6',slot_l7:'Slot Left 7',slot_l8:'Slot Left 8',slot_r1:'Slot Right 1',slot_r2:'Slot Right 2',slot_r3:'Slot Right 3',slot_r4:'Slot Right 4',slot_r5:'Slot Right 5',slot_r6:'Slot Right 6',slot_r7:'Slot Right 7',slot_r8:'Slot Right 8',
@@ -1871,7 +1866,7 @@ get _forecast_type(): string {
     },
     bg: {
       global_options:'Глобални настройки',overview_section:'Секция Преглед',extended_section:'Разширена секция',slots_section:'Секция Слотове',daily_forecast_section:'Секция Прогноза',
-      wind_bearing_icon:'Стрелка за посока на вятъра',gust_bearing_icon:'Стрелка за посока на поривите',compact_slots:'Компактни надписи',show_static_icons:'Статични икони',time_format:'Формат на часа',locale:'Език',icon_pack:'Пакет с икони',opt_locale_auto:'Автоматично (браузър)',
+      wind_bearing_icon:'Стрелка за посока на вятъра',compact_slots:'Компактни надписи',show_static_icons:'Статични икони',time_format:'Формат на часа',locale:'Език',icon_pack:'Пакет с икони',opt_locale_auto:'Автоматично (браузър)',
       actions:'Действия',tap_action:'Действие при натискане',hold_action:'Действие при задържане',double_tap_action:'Двойно натискане',icon_pack_default:'По подразбиране (вградени анимирани)',icon_pack_met_fill:'Meteocons — Запълнен (CDN)',icon_pack_met_line:'Meteocons — Линеен (CDN)',icon_pack_ammap:'ammap икони (изисква weather-chart-card)',icon_pack_custom:'Персонализиран път...',icon_path:'Път до икона',icon_path_hint:'Използвай {condition} като плейсхолър',
       overview_layout:'Оформление на преглед',card_title_1:'Заглавие ред 1',card_title_2:'Заглавие ред 2',entity_temperature:'Текуща температура',entity_apparent_temp:'Усещана температура',entity_forecast_icon:'Икона прогноза',entity_forecast_icon_1:'Икона прогноза 1',entity_summary:'Резюме прогноза',entity_summary_1:'Резюме прогноза 1',entity_extended:'Разширена прогноза',entity_extended_1:'Разширена прогноза 1',use_attribute:'Използвай атрибут',attribute:'Атрибут',
       slot_l1:'Слот Ляво 1',slot_l2:'Слот Ляво 2',slot_l3:'Слот Ляво 3',slot_l4:'Слот Ляво 4',slot_l5:'Слот Ляво 5',slot_l6:'Слот Ляво 6',slot_l7:'Слот Ляво 7',slot_l8:'Слот Ляво 8',slot_r1:'Слот Дясно 1',slot_r2:'Слот Дясно 2',slot_r3:'Слот Дясно 3',slot_r4:'Слот Дясно 4',slot_r5:'Слот Дясно 5',slot_r6:'Слот Дясно 6',slot_r7:'Слот Дясно 7',slot_r8:'Слот Дясно 8',
@@ -1882,34 +1877,34 @@ get _forecast_type(): string {
       opt_daily:'Дневна',opt_hourly:'Почасова',opt_twice_daily:'Два пъти дневно',opt_horizontal:'Хоризонтална',opt_vertical:'Вертикална',opt_complete:'Пълно',opt_observations:'Наблюдения',opt_forecast:'Прогноза',opt_title_only:'Само заглавие',opt_system:'Системен',opt_12hour:'12-часов',opt_24hour:'24-часов',
     },
     da: {
-      wind_bearing_icon:'Pil for vindretning',gust_bearing_icon:'Pil for vindstødsretning',compact_slots:'Kompakte etiketter',actions:'Handlinger',tap_action:'Tryk-handling',hold_action:'Hold-handling',double_tap_action:'Dobbelttryk-handling',
+      wind_bearing_icon:'Pil for vindretning',compact_slots:'Kompakte etiketter',actions:'Handlinger',tap_action:'Tryk-handling',hold_action:'Hold-handling',double_tap_action:'Dobbelttryk-handling',
     },
     de: {
-      wind_bearing_icon:'Windrichtungspfeil',gust_bearing_icon:'Böenrichtungspfeil',compact_slots:'Kompakte Beschriftungen',actions:'Aktionen',tap_action:'Tipp-Aktion',hold_action:'Halte-Aktion',double_tap_action:'Doppeltipp-Aktion',
+      wind_bearing_icon:'Windrichtungspfeil',compact_slots:'Kompakte Beschriftungen',actions:'Aktionen',tap_action:'Tipp-Aktion',hold_action:'Halte-Aktion',double_tap_action:'Doppeltipp-Aktion',
     },
     es: {
-      wind_bearing_icon:'Flecha de dirección del viento',gust_bearing_icon:'Flecha de dirección de rachas',compact_slots:'Etiquetas compactas',actions:'Acciones',tap_action:'Acción al tocar',hold_action:'Acción al mantener',double_tap_action:'Doble toque',
+      wind_bearing_icon:'Flecha de dirección del viento',compact_slots:'Etiquetas compactas',actions:'Acciones',tap_action:'Acción al tocar',hold_action:'Acción al mantener',double_tap_action:'Doble toque',
     },
     fr: {
-      wind_bearing_icon:'Flèche de direction du vent',gust_bearing_icon:'Flèche de direction des rafales',compact_slots:'Libellés compacts',actions:'Actions',tap_action:'Action au toucher',hold_action:'Action maintenue',double_tap_action:'Double toucher',
+      wind_bearing_icon:'Flèche de direction du vent',compact_slots:'Libellés compacts',actions:'Actions',tap_action:'Action au toucher',hold_action:'Action maintenue',double_tap_action:'Double toucher',
     },
     he: {
-      wind_bearing_icon:'חץ כיוון הרוח',gust_bearing_icon:'חץ כיוון המשבים',compact_slots:'תוויות קומפקטיות',actions:'פעולות',tap_action:'פעולה בלחיצה',hold_action:'פעולה בלחיצה ממושכת',double_tap_action:'פעולה בלחיצה כפולה',
+      wind_bearing_icon:'חץ כיוון הרוח',compact_slots:'תוויות קומפקטיות',actions:'פעולות',tap_action:'פעולה בלחיצה',hold_action:'פעולה בלחיצה ממושכת',double_tap_action:'פעולה בלחיצה כפולה',
     },
     it: {
-      wind_bearing_icon:'Freccia direzione vento',gust_bearing_icon:'Freccia direzione raffiche',compact_slots:'Etichette compatte',actions:'Azioni',tap_action:'Azione al tocco',hold_action:'Azione prolungata',double_tap_action:'Doppio tocco',
+      wind_bearing_icon:'Freccia direzione vento',compact_slots:'Etichette compatte',actions:'Azioni',tap_action:'Azione al tocco',hold_action:'Azione prolungata',double_tap_action:'Doppio tocco',
     },
     nl: {
-      wind_bearing_icon:'Windrichtingspijl',gust_bearing_icon:'Windstootrichtingspijl',compact_slots:'Compacte labels',actions:'Acties',tap_action:'Tik-actie',hold_action:'Vasthoudactie',double_tap_action:'Dubbele tik-actie',
+      wind_bearing_icon:'Windrichtingspijl',compact_slots:'Compacte labels',actions:'Acties',tap_action:'Tik-actie',hold_action:'Vasthoudactie',double_tap_action:'Dubbele tik-actie',
     },
     pl: {
-      wind_bearing_icon:'Strzałka kierunku wiatru',gust_bearing_icon:'Strzałka kierunku porywów',compact_slots:'Kompaktowe etykiety',actions:'Akcje',tap_action:'Akcja dotknięcia',hold_action:'Akcja przytrzymania',double_tap_action:'Podwójne dotknięcie',
+      wind_bearing_icon:'Strzałka kierunku wiatru',compact_slots:'Kompaktowe etykiety',actions:'Akcje',tap_action:'Akcja dotknięcia',hold_action:'Akcja przytrzymania',double_tap_action:'Podwójne dotknięcie',
     },
     ru: {
-      wind_bearing_icon:'Стрелка направления ветра',gust_bearing_icon:'Стрелка направления порывов',compact_slots:'Компактные подписи',actions:'Действия',tap_action:'Действие при нажатии',hold_action:'Действие при удержании',double_tap_action:'Двойное нажатие',
+      wind_bearing_icon:'Стрелка направления ветра',compact_slots:'Компактные подписи',actions:'Действия',tap_action:'Действие при нажатии',hold_action:'Действие при удержании',double_tap_action:'Двойное нажатие',
     },
     ua: {
-      wind_bearing_icon:'Стрілка напряму вітру',gust_bearing_icon:'Стрілка напряму поривів',compact_slots:'Компактні підписи',actions:'Дії',tap_action:'Дія при дотику',hold_action:'Дія при утриманні',double_tap_action:'Подвійний дотик',
+      wind_bearing_icon:'Стрілка напряму вітру',compact_slots:'Компактні підписи',actions:'Дії',tap_action:'Дія при дотику',hold_action:'Дія при утриманні',double_tap_action:'Подвійний дотик',
     },
   };
 
