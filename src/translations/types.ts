@@ -3,4 +3,5 @@ export interface Translation {
   card: Record<string, string>;
   moonPhases: Record<string, string>;
   windDirections: string[];
+  units?: Record<string, string>;
 }

@@ -35,6 +35,12 @@ export function tMoonPhase(locale: string | undefined, phase: string): string {
     ?? phase.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
+// Unit label localization (e.g. km/h → км/ч for Cyrillic locales)
+export function tUnit(locale: string | undefined, unit: string): string {
+  const l = (locale || 'en').split('-')[0].toLowerCase();
+  return TRANSLATIONS[l]?.units?.[unit] ?? unit;
+}
+
 export function tWindDirections(locale: string | undefined): string[] {
   const l = (locale || 'en').split('-')[0].toLowerCase();
   const dirs = TRANSLATIONS[l]?.windDirections;

@@ -20,7 +20,7 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
 import { CARD_VERSION } from './const';
-import { tCard, tMoonPhase, tWindDirections } from './translations';
+import { tCard, tMoonPhase, tUnit, tWindDirections } from './translations';
 
 
 /* eslint no-console: 0 */
@@ -1300,15 +1300,8 @@ export class PlatinumWeatherCard extends LitElement {
 
   /** Translates common unit strings to the app language */
   private _localizeUnit(unit: string): string {
-    const lang = (this.hass?.language || 'en').toLowerCase();
-    if (lang.startsWith('bg')) {
-      const map: {[k: string]: string} = {
-        'km/h': 'км/ч', 'kph': 'км/ч', 'm/s': 'м/с', 'mph': 'мph',
-        'mm': 'мм', 'in': 'инч', 'cm': 'см',
-      };
-      return map[unit] || unit;
-    }
-    return unit;
+    // Card locale wins; when Auto, fall back to the HA UI language
+    return tUnit(this.locale || this.hass?.language, unit);
   }
 
   /**

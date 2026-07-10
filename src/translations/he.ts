@@ -180,7 +180,11 @@ const he: Translation = {
     "צפון מערב",
     "צ-צ-מע",
     "צפון"
-  ]
+  ],
+  "units": {
+    "km/h": "קמ\"ש",
+    "mm": "מ\"מ"
+  }
 };
 
 export default he;

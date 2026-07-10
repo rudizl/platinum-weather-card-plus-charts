@@ -180,7 +180,15 @@ const ru: Translation = {
     "СЗ",
     "ССЗ",
     "С"
-  ]
+  ],
+  "units": {
+    "km/h": "км/ч",
+    "kph": "км/ч",
+    "m/s": "м/с",
+    "mm": "мм",
+    "in": "дюйм",
+    "cm": "см"
+  }
 };
 
 export default ru;

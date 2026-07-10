@@ -162,7 +162,15 @@ const ua: Translation = {
     "last_quarter": "Остання чверть",
     "waning_crescent": "Старий місяць"
   },
-  "windDirections": []
+  "windDirections": [],
+  "units": {
+    "km/h": "км/год",
+    "kph": "км/год",
+    "m/s": "м/с",
+    "mm": "мм",
+    "in": "дюйм",
+    "cm": "см"
+  }
 };
 
 export default ua;

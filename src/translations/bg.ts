@@ -182,7 +182,15 @@ const bg: Translation = {
     "СЗ",
     "ССЗ",
     "С"
-  ]
+  ],
+  "units": {
+    "km/h": "км/ч",
+    "kph": "км/ч",
+    "m/s": "м/с",
+    "mm": "мм",
+    "in": "инч",
+    "cm": "см"
+  }
 };
 
 export default bg;
