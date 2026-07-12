@@ -359,6 +359,31 @@ Up to 8 rows of data in 2 columns. The required entities update dynamically base
 | `empty` | Blank slot (preserves space) | |
 | `remove` | Remove slot entirely | |
 
+
+### Pressure trend indicator
+
+If you point `entity_pressure_trend` at a trend sensor, the pressure slot shows a small colored arrow next to the value: ↗ green (rising), → gray (steady), ↘ red (falling). Accepted sensor values: numeric rate of change (± beyond 0.05 counts as rising/falling) or the text states `rising` / `steady` / `falling`.
+
+The easiest source is a **Derivative helper** (Settings → Devices & Services → Helpers → Create helper → Derivative):
+
+- **Source:** your barometric pressure sensor
+- **Time window:** 3 hours (the meteorological standard for pressure tendency)
+- **Time unit:** hours (output becomes hPa/h)
+
+Or in YAML:
+
+```yaml
+sensor:
+  - platform: derivative
+    source: sensor.your_pressure_sensor
+    name: Pressure trend
+    unit_time: h
+    time_window: "03:00:00"
+    round: 2
+```
+
+Then select it in the editor: Slots Section → *Entity Pressure Trend* (the picker appears once a pressure entity is set).
+
 ## Icon Packs
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
@@ -525,6 +550,7 @@ double_tap_action:
 | `entity_rainfall` | String | none | Required for `rainfall` |
 | `entity_humidity` | String | none | Required for `humidity` |
 | `entity_pressure` | String | none | Required for `pressure` |
+| `entity_pressure_trend` | String | none | Optional trend sensor — shows a colored ↗/→/↘ arrow next to the pressure value |
 | `pressure_units` | String | none | Optional pressure unit label |
 | `entity_observed_max` | String | none | Required for `observed_max`, `temp_maximums` |
 | `entity_observed_min` | String | none | Required for `observed_min`, `temp_minimums` |
