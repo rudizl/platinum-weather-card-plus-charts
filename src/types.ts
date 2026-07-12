@@ -131,6 +131,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   summary_1_name_attr?: string;
   option_compact_slots?: boolean;
   option_wind_bearing_icon?: boolean;
+  entity_pressure_trend?: string;
 
   option_today_temperature_decimals?: boolean;
   option_today_rainfall_decimals?: boolean;

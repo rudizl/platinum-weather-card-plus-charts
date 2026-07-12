@@ -62,6 +62,7 @@ const pl: Translation = {
     "show_temp_decimals": "Pokaż miejsca dziesiętne temperatury",
     "entity_humidity": "Wilgotność",
     "entity_pressure": "Ciśnienie atmosferyczne",
+    "entity_pressure_trend": "Encja trendu ciśnienia (opcjonalnie — czujnik derivative/trend)",
     "entity_pop": "Prawdopodobieństwo deszczu",
     "entity_pos": "Możliwy deszcz dziś",
     "entity_2day_pos": "Możliwy deszcz jutro",

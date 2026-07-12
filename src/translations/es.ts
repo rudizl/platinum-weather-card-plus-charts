@@ -62,6 +62,7 @@ const es: Translation = {
     "show_temp_decimals": "Mostrar decimales de temperatura",
     "entity_humidity": "Humedad",
     "entity_pressure": "Presión atmosférica",
+    "entity_pressure_trend": "Entidad tendencia de presión (opcional — sensor derivative/trend)",
     "entity_pop": "Probabilidad de lluvia",
     "entity_pos": "Lluvia posible hoy",
     "entity_2day_pos": "Lluvia posible mañana",

@@ -62,6 +62,7 @@ const da: Translation = {
     "show_temp_decimals": "Vis temperaturdecimaler",
     "entity_humidity": "Luftfugtighed",
     "entity_pressure": "Lufttryk",
+    "entity_pressure_trend": "Entitet tryktendens (valgfri — derivative/trend-sensor)",
     "entity_pop": "Regnsandsynlighed",
     "entity_pos": "Mulig regn i dag",
     "entity_2day_pos": "Mulig regn i morgen",

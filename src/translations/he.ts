@@ -62,6 +62,7 @@ const he: Translation = {
     "show_temp_decimals": "הצג ספרות עשרוניות של טמפרטורה",
     "entity_humidity": "לחות",
     "entity_pressure": "לחץ אטמוספרי",
+    "entity_pressure_trend": "ישות מגמת לחץ (אופציונלי — חיישן derivative/trend)",
     "entity_pop": "סיכוי לגשם",
     "entity_pos": "גשם אפשרי היום",
     "entity_2day_pos": "גשם אפשרי מחר",

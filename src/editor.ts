@@ -413,6 +413,10 @@ export class WeatherCardEditor extends LitElement implements LovelaceCardEditor 
     return this._config?.entity_humidity || '';
   }
 
+  get _entity_pressure_trend(): string {
+    return this._config?.entity_pressure_trend || '';
+  }
+
   get _entity_pressure(): string {
     return this._config?.entity_pressure || '';
   }
@@ -897,6 +901,10 @@ get _forecast_type(): string {
         <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pressure'} .value=${this._entity_pressure} .includeDomains=${['sensor', 'weather']}
           name="entity_pressure" label=${this._t("entity_pressure")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
+        ${this._entity_pressure !== '' ? html`
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pressure_trend'} .value=${this._entity_pressure_trend} .includeDomains=${['sensor', 'binary_sensor']}
+          name="entity_pressure_trend" label=${this._t("entity_pressure_trend")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+        </ha-entity-picker>` : html``}
       ` : '';
 
     const entity_uv_alert_summary = entities.has("entity_uv_alert_summary") ?

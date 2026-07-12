@@ -62,6 +62,7 @@ const ua: Translation = {
     "show_temp_decimals": "Показати десяткові знаки температури",
     "entity_humidity": "Вологість",
     "entity_pressure": "Атмосферний тиск",
+    "entity_pressure_trend": "Сутність тренду тиску (необов’язково — derivative/trend сенсор)",
     "entity_pop": "Ймовірність дощу",
     "entity_pos": "Можливий дощ сьогодні",
     "entity_2day_pos": "Можливий дощ завтра",

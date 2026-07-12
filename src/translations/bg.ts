@@ -62,6 +62,7 @@ const bg: Translation = {
     "show_temp_decimals": "Показвай десетични",
     "entity_humidity": "Влажност",
     "entity_pressure": "Атмосферно налягане",
+    "entity_pressure_trend": "Ентити тренд на налягането (по избор — derivative/trend сензор)",
     "entity_pop": "Вероятност за дъжд",
     "entity_pos": "Възможен дъжд днес",
     "entity_2day_pos": "Възможен дъжд утре",

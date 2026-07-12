@@ -62,6 +62,7 @@ const ru: Translation = {
     "show_temp_decimals": "Показать десятичные знаки температуры",
     "entity_humidity": "Влажность",
     "entity_pressure": "Атмосферное давление",
+    "entity_pressure_trend": "Сущность тренда давления (необязательно — derivative/trend сенсор)",
     "entity_pop": "Вероятность дождя",
     "entity_pos": "Возможный дождь сегодня",
     "entity_2day_pos": "Возможный дождь завтра",

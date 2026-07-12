@@ -62,6 +62,7 @@ const nl: Translation = {
     "show_temp_decimals": "Temperatuurdecimalen tonen",
     "entity_humidity": "Luchtvochtigheid",
     "entity_pressure": "Luchtdruk",
+    "entity_pressure_trend": "Entiteit druktrend (optioneel — derivative/trend-sensor)",
     "entity_pop": "Regenkans",
     "entity_pos": "Mogelijke regen vandaag",
     "entity_2day_pos": "Mogelijke regen morgen",

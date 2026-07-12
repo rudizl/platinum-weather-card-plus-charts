@@ -1876,16 +1876,40 @@ export class PlatinumWeatherCard extends LitElement {
       </li>`;
   }
 
+  // Pressure trend from an optional derivative/trend sensor:
+  // numeric state → sign decides rising/steady/falling (|x| <= 0.05 ≈ steady);
+  // text states 'rising'/'steady'/'falling' (and up/down) also accepted
+  get pressureTrend(): 'rising' | 'steady' | 'falling' | null {
+    const entity = this._config.entity_pressure_trend;
+    if (!entity || !this.hass.states[entity]) return null;
+    const raw = this.hass.states[entity].state;
+    const n = Number(raw);
+    if (!isNaN(n)) {
+      if (n > 0.05) return 'rising';
+      if (n < -0.05) return 'falling';
+      return 'steady';
+    }
+    const s = String(raw).toLowerCase();
+    if (['rising', 'up', 'increasing'].includes(s)) return 'rising';
+    if (['falling', 'down', 'decreasing'].includes(s)) return 'falling';
+    if (['steady', 'stable'].includes(s)) return 'steady';
+    return null;
+  }
+
   get slotPressure(): TemplateResult {
     const pressure = this.currentPressure;
     const units = pressure !== "---" ? html`<div class="slot-text unit">${this._config.pressure_units ? this._config.pressure_units : this.getUOM('air_pressure')}</div>` : html``;
+    const trend = this.pressureTrend;
+    const trendIcon = trend === null ? html`` : html`<div class="slot-text pressure-trend"><ha-icon
+      icon="${trend === 'rising' ? 'mdi:arrow-top-right-thin' : trend === 'falling' ? 'mdi:arrow-bottom-right-thin' : 'mdi:arrow-right-thin'}"
+      style="--mdc-icon-size: 16px; color: ${trend === 'rising' ? 'var(--label-badge-green, #4caf50)' : trend === 'falling' ? 'var(--label-badge-red, #f44336)' : 'var(--secondary-text-color)'};"></ha-icon></div>`;
     return html`
       <li>
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:gauge"></ha-icon>
           </div>
-          <div class="slot-text pressure-text">${this.currentPressure}</div>${units}
+          <div class="slot-text pressure-text">${this.currentPressure}</div>${units}${trendIcon}
         </div>
       </li>
     `;
