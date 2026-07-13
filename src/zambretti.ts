@@ -78,3 +78,13 @@ export function seaLevelPressure(stationHpa: number, altitude: number, temperatu
   const kelvin = temperatureC + 273.15;
   return stationHpa * Math.pow(1 - (0.0065 * altitude) / (kelvin + 0.0065 * altitude), -5.257);
 }
+
+// Convert a wind speed reading to km/h based on its unit of measurement string
+export function windSpeedToKmh(value: number, uom: string | undefined): number {
+  const u = (uom || '').toLowerCase().replace(/\s/g, '');
+  if (u === 'm/s' || u === 'ms') return value * 3.6;
+  if (u === 'mph' || u === 'mi/h') return value * 1.60934;
+  if (u === 'kn' || u === 'kt' || u === 'knots') return value * 1.852;
+  if (u === 'ft/s' || u === 'fps') return value * 1.09728;
+  return value; // km/h or unknown → assume km/h
+}

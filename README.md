@@ -401,6 +401,8 @@ Inputs used:
 
 The hemisphere is detected automatically from your Home Assistant latitude.
 
+To keep the text stable with fast-reporting stations, the card applies three smoothing rules: wind direction is ignored while wind speed is below 2 km/h (direction is noise in calm conditions), the pressure trend uses hysteresis (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08), and a changed forecast text must persist for 5 minutes before it replaces the one on screen.
+
 ```yaml
 type: custom:platinum-weather-card-plus-charts
 entity_pressure: sensor.ws_relative_pressure

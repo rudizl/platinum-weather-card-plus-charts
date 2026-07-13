@@ -21,7 +21,7 @@ import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from
 
 import { CARD_VERSION } from './const';
 import { tCard, tMoonPhase, tUnit, tWindDirections, tZambretti } from './translations';
-import { zambrettiLetter, pressureToHpa, seaLevelPressure } from './zambretti';
+import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh } from './zambretti';
 
 
 /* eslint no-console: 0 */
@@ -73,6 +73,12 @@ export class PlatinumWeatherCard extends LitElement {
   private _resizeObserver!: ResizeObserver;
 
   @state() private _cardWidth = 492;
+
+  // Local forecast smoothing state (not reactive on purpose)
+  private _zamTrendCat: 'rising' | 'steady' | 'falling' = 'steady';
+  private _zamShownKey: string | null = null;
+  private _zamCandidateKey: string | null = null;
+  private _zamCandidateTs = 0;
 
   private _error: string[] = [];
 
@@ -1944,14 +1950,43 @@ export class PlatinumWeatherCard extends LitElement {
     }
     const north = (this.hass.config?.latitude ?? 42) >= 0;
     const month = new Date().getMonth() + 1;
-    const letter = zambrettiLetter(pressure, month, this.windBearingDegrees, trend, north);
-    if (letter === null) return null;
-    if (this._config.option_local_forecast_verbose === true) {
-      const text = tZambretti(this.locale, letter, true);
-      const cat = trend >= 0.1 ? 'rising' : trend <= -0.1 ? 'falling' : this.pressureTrend === null ? null : 'steady';
-      return cat === null ? text : `${text} ${tZambretti(this.locale, cat, true)}`;
+    // Ignore wind direction when the wind is too weak to be meaningful (< 2 km/h)
+    let windDeg = this.windBearingDegrees;
+    const windSpeedEntity = this._config.entity_wind_speed;
+    if (windDeg !== null && windSpeedEntity && this.hass.states[windSpeedEntity]) {
+      const ws = Number(this.hass.states[windSpeedEntity].state);
+      const kmh = windSpeedToKmh(ws, this.hass.states[windSpeedEntity].attributes.unit_of_measurement);
+      if (!isNaN(kmh) && kmh < 2.0) windDeg = null;
     }
-    return tZambretti(this.locale, letter);
+    // Trend hysteresis: enter rising/falling at ±0.12 hPa/h, drop back to steady at ±0.08
+    let cat = this._zamTrendCat;
+    if (trend >= 0.12) cat = 'rising';
+    else if (trend <= -0.12) cat = 'falling';
+    else if (cat === 'rising' && trend < 0.08) cat = 'steady';
+    else if (cat === 'falling' && trend > -0.08) cat = 'steady';
+    this._zamTrendCat = cat;
+    const letter = zambrettiLetter(pressure, month, windDeg, cat === 'rising' ? 0.2 : cat === 'falling' ? -0.2 : 0.0, north);
+    if (letter === null) return null;
+    // Debounce: a changed forecast text must persist for 5 minutes before being shown
+    const hasTrend = this.pressureTrend !== null || (trendEntity && this.hass.states[trendEntity] && !isNaN(Number(this.hass.states[trendEntity].state)));
+    const key = `${letter}|${hasTrend ? cat : ''}`;
+    const now = Date.now();
+    if (this._zamShownKey === null || key === this._zamShownKey) {
+      this._zamShownKey = key;
+      this._zamCandidateKey = null;
+    } else if (key !== this._zamCandidateKey) {
+      this._zamCandidateKey = key;
+      this._zamCandidateTs = now;
+    } else if (now - this._zamCandidateTs >= 300000) {
+      this._zamShownKey = key;
+      this._zamCandidateKey = null;
+    }
+    const [shownLetter, shownCat] = this._zamShownKey.split('|');
+    if (this._config.option_local_forecast_verbose === true) {
+      const text = tZambretti(this.locale, shownLetter, true);
+      return shownCat ? `${text} ${tZambretti(this.locale, shownCat, true)}` : text;
+    }
+    return tZambretti(this.locale, shownLetter);
   }
 
   get slotPressure(): TemplateResult {
