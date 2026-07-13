@@ -390,6 +390,8 @@ The card can compute a short local forecast entirely from your own weather stati
 
 Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
 
+A **Verbose forecast text** toggle expands the short phrase into a full sentence with a pressure-tendency clause, e.g. *"Unsettled weather, with rain expected later. The pressure is falling."*
+
 Inputs used:
 
 - `entity_pressure` — **required.** Sea-level (relative) pressure preferred. Units are auto-converted from the sensor's `unit_of_measurement` (hPa/mbar, inHg, mmHg, kPa, psi, Pa).
@@ -576,6 +578,7 @@ double_tap_action:
 | `entity_pressure` | String | none | Required for `pressure` |
 | `entity_pressure_trend` | String | none | Optional trend sensor — shows a colored ↗/→/↘ arrow next to the pressure value |
 | `option_local_forecast` | Boolean | `false` | Compute a local Zambretti forecast from `entity_pressure` and show it as the overview summary text |
+| `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
 | `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 | `pressure_units` | String | none | Optional pressure unit label |
 | `entity_observed_max` | String | none | Required for `observed_max`, `temp_maximums` |

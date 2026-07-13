@@ -41,10 +41,12 @@ export function tUnit(locale: string | undefined, unit: string): string {
   return TRANSLATIONS[l]?.units?.[unit] ?? unit;
 }
 
-// Zambretti forecast text by letter code 'a'..'z'
-export function tZambretti(locale: string | undefined, letter: string): string {
+// Zambretti forecast text by letter code 'a'..'z' (or 'rising'/'steady'/'falling'
+// clauses in the long set). verbose=true selects the full-sentence variant.
+export function tZambretti(locale: string | undefined, letter: string, verbose = false): string {
   const l = (locale || 'en').split('-')[0].toLowerCase();
-  return TRANSLATIONS[l]?.zambretti?.[letter] ?? TRANSLATIONS.en.zambretti[letter] ?? '';
+  const set = verbose ? 'zambrettiLong' : 'zambretti';
+  return TRANSLATIONS[l]?.[set]?.[letter] ?? TRANSLATIONS.en[set][letter] ?? '';
 }
 
 export function tWindDirections(locale: string | undefined): string[] {

@@ -1946,6 +1946,11 @@ export class PlatinumWeatherCard extends LitElement {
     const month = new Date().getMonth() + 1;
     const letter = zambrettiLetter(pressure, month, this.windBearingDegrees, trend, north);
     if (letter === null) return null;
+    if (this._config.option_local_forecast_verbose === true) {
+      const text = tZambretti(this.locale, letter, true);
+      const cat = trend >= 0.1 ? 'rising' : trend <= -0.1 ? 'falling' : this.pressureTrend === null ? null : 'steady';
+      return cat === null ? text : `${text} ${tZambretti(this.locale, cat, true)}`;
+    }
     return tZambretti(this.locale, letter);
   }
 
