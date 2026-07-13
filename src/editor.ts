@@ -1090,14 +1090,16 @@ get _forecast_type(): string {
   private _optionOverviewEditor(): TemplateResult {
     return html`
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('overview_layout')}</label>
-        <select class='ha-select-compat' .configValue=${'overview_layout'} .value=${this._overview_layout} @change=${this._valueChanged}>
-          <option value=""></option>
-          <option value="complete">${this._t("opt_complete")}</option>
-          <option value="observations">${this._t("opt_observations")}</option>
-          <option value="forecast">${this._t("opt_forecast")}</option>
-          <option value="title only">${this._t("opt_title_only")}</option>
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('overview_layout')}</label>
+          <select class='ha-select-compat' .configValue=${'overview_layout'} .value=${this._overview_layout} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="complete">${this._t("opt_complete")}</option>
+            <option value="observations">${this._t("opt_observations")}</option>
+            <option value="forecast">${this._t("opt_forecast")}</option>
+            <option value="title only">${this._t("opt_title_only")}</option>
+          </select>
+        </div>
         <div></div>
       </div>
       <div class="side-by-side">
@@ -1345,14 +1347,16 @@ get _forecast_type(): string {
               <span class="toggle-label">${this._t("today_temp_decimals")}</span>
             </div>
         </div>
-        <label class='mdc-label'>${this._t('pressure_decimals')}</label>
-        <select class='ha-select-compat' .configValue=${'option_pressure_decimals'} .value=${this._option_pressure_decimals !== null ? String(this._option_pressure_decimals) : ''} @change=${this._valueChanged}>
-          <option value=""></option>
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('pressure_decimals')}</label>
+          <select class='ha-select-compat' .configValue=${'option_pressure_decimals'} .value=${this._option_pressure_decimals !== null ? String(this._option_pressure_decimals) : ''} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
       </div>
       <div class="side-by-side">
         <div>
@@ -1511,15 +1515,18 @@ get _forecast_type(): string {
   private _optionDailyForecastEditor(): TemplateResult {
     return html`
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('daily_forecast_layout')}</label>
-        <select class='ha-select-compat' .configValue=${'daily_forecast_layout'} .value=${this._daily_forecast_layout} @change=${this._valueChanged}>
-          <option value=""></option>
-          <option value="horizontal">${this._t("opt_horizontal")}</option>
-          <option value="vertical">${this._t("opt_vertical")}</option>
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('daily_forecast_layout')}</label>
+          <select class='ha-select-compat' .configValue=${'daily_forecast_layout'} .value=${this._daily_forecast_layout} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="horizontal">${this._t("opt_horizontal")}</option>
+            <option value="vertical">${this._t("opt_vertical")}</option>
+          </select>
+        </div>
         <div></div>
       </div>
       <div class="side-by-side">
+        <div>
         <label class='mdc-label'>${this._t('daily_forecast_days')}</label>
         <select class='ha-select-compat' .configValue=${'daily_forecast_days'} .value=${this._daily_forecast_days !== null ? String(this._daily_forecast_days) : ''} @change=${this._valueChanged}>
           <option value=""></option>
@@ -1532,7 +1539,9 @@ get _forecast_type(): string {
             <option value="6">6</option>
             <option value="7">7</option>` : html``}
         </select>
-        ${this._daily_forecast_layout === 'vertical' ? html`<label class='mdc-label'>${this._t('daily_extended_days')}</label>
+        </div>
+        ${this._daily_forecast_layout === 'vertical' ? html`<div>
+          <label class='mdc-label'>${this._t('daily_extended_days')}</label>
           <select class='ha-select-compat' .configValue=${'daily_extended_forecast_days'} @change=${this._valueChangedNumber}>
           <option value=""></option>
           <option value="0">0</option>
@@ -1543,7 +1552,8 @@ get _forecast_type(): string {
           <option value="5">5</option>
           <option value="6">6</option>
           <option value="7">7</option>
-        </select>` : html`<div></div>`}
+        </select>
+        </div>` : html`<div></div>`}
       </div>
 
         <div class="side-by-side">
@@ -1596,16 +1606,18 @@ get _forecast_type(): string {
               <span class="toggle-label">${this._t("compact_slots")}</span>
             </div>
         </div>
-        <div></div>
       </div>
       <div class="side-by-side">
-        <label class='mdc-label'>${this._t('time_format')}</label>
-        <select class='ha-select-compat' .configValue=${'option_time_format'} .value=${this._option_time_format ?? ''} @change=${this._valueChanged}>
-          <option value=""></option>
-          <option value="system">${this._t("opt_system")}</option>
-          <option value="12hour">${this._t("opt_12hour")}</option>
-          <option value="24hour">${this._t("opt_24hour")}</option>
-        </select>
+        <div>
+          <label class='mdc-label'>${this._t('time_format')}</label>
+          <select class='ha-select-compat' .configValue=${'option_time_format'} .value=${this._option_time_format ?? ''} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="system">${this._t("opt_system")}</option>
+            <option value="12hour">${this._t("opt_12hour")}</option>
+            <option value="24hour">${this._t("opt_24hour")}</option>
+          </select>
+        </div>
+        <div>
         <label class='mdc-label'>${this._t('locale')}</label>
         <select class='ha-select-compat' .configValue=${'option_locale'} .value=${this._option_locale} @change=${this._valueChanged}>
           <option value="">${this._t("opt_locale_auto")}</option>
@@ -1622,6 +1634,7 @@ get _forecast_type(): string {
           <option value="ru">🇷🇺 Русский</option>
           <option value="ua">🇺🇦 Українська</option>
         </select>
+        </div>
       </div>
       <div class="side-by-side">
         <div>
@@ -2044,7 +2057,7 @@ get _forecast_type(): string {
       display: block;
       width: 100%;
       padding: 8px;
-      font-size: 14px;
+      font-size: 13px;
       font-family: inherit;
       border: 1px solid var(--divider-color, #e0e0e0);
       border-radius: 4px;
