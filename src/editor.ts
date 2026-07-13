@@ -4,7 +4,7 @@ import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helper
 
 import { keys } from 'ts-transformer-keys';
 
-import { mdiPencil, mdiArrowDown, mdiArrowUp, mdiApplicationEditOutline, mdiLockOpenVariant, mdiLock } from '@mdi/js';
+import { mdiPencil, mdiArrowDown, mdiArrowUp, mdiApplicationEditOutline } from '@mdi/js';
 
 import { tEditor } from './translations';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
@@ -1054,7 +1054,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._update_time_use_attr !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._update_time_use_attr !== false ? mdiLockOpenVariant : mdiLock} .value=${'update_time_use_attr'} .checked=${this._update_time_use_attr !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._update_time_use_attr !== false ? "pwc-switch active" : "pwc-switch"} .value=${'update_time_use_attr'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("use_attribute")}</span>
             </div>
         </div>
@@ -1105,13 +1105,13 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_show_overview_decimals !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_overview_decimals !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_show_overview_decimals'} .checked=${this._option_show_overview_decimals !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_show_overview_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_overview_decimals'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("show_temp_decimals")}</span>
             </div>
         </div>
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_show_overview_separator !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_overview_separator !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_show_overview_separator'} .checked=${this._option_show_overview_separator !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_show_overview_separator !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_overview_separator'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("show_separator")}</span>
             </div>
         </div>
@@ -1119,7 +1119,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._config?.option_local_forecast ? "eye-toggle active" : "eye-toggle"} .path=${this._config?.option_local_forecast ? mdiLockOpenVariant : mdiLock} .value=${'option_local_forecast'} .checked=${this._config?.option_local_forecast === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._config?.option_local_forecast ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("local_forecast")}</span>
             </div>
         </div>
@@ -1134,7 +1134,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._config?.option_local_forecast_verbose ? "eye-toggle active" : "eye-toggle"} .path=${this._config?.option_local_forecast_verbose ? mdiLockOpenVariant : mdiLock} .value=${'option_local_forecast_verbose'} .checked=${this._config?.option_local_forecast_verbose === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._config?.option_local_forecast_verbose ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast_verbose'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("local_forecast_verbose")}</span>
             </div>
         </div>
@@ -1161,7 +1161,7 @@ get _forecast_type(): string {
         <div class="side-by-side">
           <div>
             <div class="toggle-row">
-              <ha-icon-button class=${this._extended_use_attr !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._extended_use_attr !== false ? mdiLockOpenVariant : mdiLock} .value=${'extended_use_attr'} .checked=${this._extended_use_attr !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._extended_use_attr !== false ? "pwc-switch active" : "pwc-switch"} .value=${'extended_use_attr'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("use_attribute")}</span>
             </div>
           </div>
@@ -1343,7 +1343,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_today_temperature_decimals !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_today_temperature_decimals !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_today_temperature_decimals'} .checked=${this._option_today_temperature_decimals !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_today_temperature_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_temperature_decimals'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("today_temp_decimals")}</span>
             </div>
         </div>
@@ -1361,13 +1361,13 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_today_rainfall_decimals !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_today_rainfall_decimals !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_today_rainfall_decimals'} .checked=${this._option_today_rainfall_decimals !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_today_rainfall_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_rainfall_decimals'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("today_rain_decimals")}</span>
             </div>
         </div>
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_forecast_decimals !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_forecast_decimals !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_forecast_decimals'} .checked=${this._option_forecast_decimals !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_forecast_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_forecast_decimals'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("forecast_temp_decimals")}</span>
             </div>
         </div>
@@ -1375,13 +1375,13 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_show_forecast_pop !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_forecast_pop !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_show_forecast_pop'} .checked=${this._option_show_forecast_pop !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_show_forecast_pop !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_forecast_pop'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("show_forecast_pop")}</span>
             </div>
         </div>
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_show_forecast_wind === true ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_forecast_wind === true ? mdiLockOpenVariant : mdiLock} .value=${'option_show_forecast_wind'} .checked=${this._option_show_forecast_wind === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_show_forecast_wind === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_forecast_wind'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("show_forecast_wind")}</span>
             </div>
         </div>
@@ -1389,13 +1389,13 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_show_gust_in_wind !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_gust_in_wind !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_show_gust_in_wind'} .checked=${this._option_show_gust_in_wind !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_show_gust_in_wind !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_gust_in_wind'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("show_gust_in_wind")}</span>
             </div>
         </div>
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_color_fire_danger !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_color_fire_danger !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_color_fire_danger'} .checked=${this._option_color_fire_danger !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_color_fire_danger'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("colour_fire_danger")}</span>
             </div>
         </div>
@@ -1403,7 +1403,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._config?.option_wind_bearing_icon ? "eye-toggle active" : "eye-toggle"} .path=${this._config?.option_wind_bearing_icon ? mdiLockOpenVariant : mdiLock} .value=${'option_wind_bearing_icon'} .checked=${this._config?.option_wind_bearing_icon === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._config?.option_wind_bearing_icon ? "pwc-switch active" : "pwc-switch"} .value=${'option_wind_bearing_icon'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("wind_bearing_icon")}</span>
             </div>
         </div>
@@ -1445,7 +1445,7 @@ get _forecast_type(): string {
         <div class="side-by-side">
           <div>
             <div class="toggle-row">
-              <ha-icon-button class=${this._summary_1_use_attr ? "eye-toggle active" : "eye-toggle"} .path=${this._summary_1_use_attr ? mdiLockOpenVariant : mdiLock} .value=${'summary_1_use_attr'} .checked=${this._summary_1_use_attr} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._summary_1_use_attr ? "pwc-switch active" : "pwc-switch"} .value=${'summary_1_use_attr'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("use_attribute")}</span>
             </div>
           </div>
@@ -1476,7 +1476,7 @@ get _forecast_type(): string {
           <div class="side-by-side">
             <div>
               <div class="toggle-row">
-              <ha-icon-button class=${this._daily_extended_use_attr !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._daily_extended_use_attr !== false ? mdiLockOpenVariant : mdiLock} .value=${'daily_extended_use_attr'} .checked=${this._daily_extended_use_attr !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._daily_extended_use_attr !== false ? "pwc-switch active" : "pwc-switch"} .value=${'daily_extended_use_attr'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("use_attribute")}</span>
             </div>
             </div>
@@ -1498,13 +1498,13 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-            <ha-icon-button class=${this._option_show_temperature_chart === true ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_temperature_chart === true ? mdiLockOpenVariant : mdiLock} .value=${'option_show_temperature_chart'} .checked=${this._option_show_temperature_chart === true} @click=${this._toggleVisibility}></ha-icon-button>
+            <span class=${this._option_show_temperature_chart === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_temperature_chart'} @click=${this._toggleVisibility}></span>
             <span class="toggle-label">${this._t("show_temp_chart")}</span>
           </div>
         </div>
         <div>
           <div class="toggle-row">
-            <ha-icon-button class=${this._option_show_precipitation_chart === true ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_precipitation_chart === true ? mdiLockOpenVariant : mdiLock} .value=${'option_show_precipitation_chart'} .checked=${this._option_show_precipitation_chart === true} @click=${this._toggleVisibility}></ha-icon-button>
+            <span class=${this._option_show_precipitation_chart === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_precipitation_chart'} @click=${this._toggleVisibility}></span>
             <span class="toggle-label">${this._t("show_precip_chart")}</span>
           </div>
         </div>
@@ -1560,13 +1560,13 @@ get _forecast_type(): string {
           <div>
             ${this._daily_forecast_layout !== 'vertical' ? html`
               <div class="toggle-row">
-              <ha-icon-button class=${this._option_tooltips !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_tooltips !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_tooltips'} .checked=${this._option_tooltips !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_tooltips !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_tooltips'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("forecast_tooltips")}</span>
             </div>` : html``}
           </div>
           <div>
             <div class="toggle-row">
-              <ha-icon-button class=${this._option_show_current_day === true ? "eye-toggle active" : "eye-toggle"} .path=${this._option_show_current_day === true ? mdiLockOpenVariant : mdiLock} .value=${'option_show_current_day'} .checked=${this._option_show_current_day === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_show_current_day === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_current_day'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("include_today")}</span>
             </div>
           </div>
@@ -1575,7 +1575,7 @@ get _forecast_type(): string {
         <div class="side-by-side">
         ${this._daily_forecast_layout === 'vertical' ? html`<div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_daily_color_fire_danger !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_daily_color_fire_danger !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_daily_color_fire_danger'} .checked=${this._option_daily_color_fire_danger !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_daily_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_daily_color_fire_danger'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("colour_fire_danger")}</span>
             </div>
         </div>` : html``}
@@ -1596,13 +1596,13 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._option_static_icons !== false ? "eye-toggle active" : "eye-toggle"} .path=${this._option_static_icons !== false ? mdiLockOpenVariant : mdiLock} .value=${'option_static_icons'} .checked=${this._option_static_icons !== false} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("show_static_icons")}</span>
           </div>
         </div>
         <div>
           <div class="toggle-row">
-              <ha-icon-button class=${this._config?.option_compact_slots ? "eye-toggle active" : "eye-toggle"} .path=${this._config?.option_compact_slots ? mdiLockOpenVariant : mdiLock} .value=${'option_compact_slots'} .checked=${this._config?.option_compact_slots === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class=${this._config?.option_compact_slots ? "pwc-switch active" : "pwc-switch"} .value=${'option_compact_slots'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("compact_slots")}</span>
             </div>
         </div>
@@ -1754,8 +1754,7 @@ get _forecast_type(): string {
         return html`
           <div class="section-flex edit-overview-section">
             <div class="section-label">
-              <ha-icon-button class=${this._show_section_overview !== false ? "visibility-toggle active" : "visibility-toggle"} .path=${this._show_section_overview !== false ? mdiLockOpenVariant : mdiLock} .value=${'show_section_overview'} .checked=${this._show_section_overview !== false} @click=${this._toggleVisibility}>
-              </ha-icon-button>
+              <span class=${this._show_section_overview !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_overview'} @click=${this._toggleVisibility}></span>
               <ha-icon class="section-icon" icon="mdi:eye-outline"></ha-icon>
               <span class="section-title">${this._t("overview_section")}</span>
             </div>
@@ -1775,8 +1774,7 @@ get _forecast_type(): string {
         return html`
           <div class="section-flex edit-extended-section">
             <div class="section-label">
-              <ha-icon-button class=${this._show_section_extended !== false ? "visibility-toggle active" : "visibility-toggle"} .path=${this._show_section_extended !== false ? mdiLockOpenVariant : mdiLock} .value=${'show_section_extended'} .checked=${this._show_section_extended !== false} @click=${this._toggleVisibility}>
-              </ha-icon-button>
+              <span class=${this._show_section_extended !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_extended'} @click=${this._toggleVisibility}></span>
               <ha-icon class="section-icon" icon="mdi:text-box-outline"></ha-icon>
               <span class="section-title">${this._t("extended_section")}</span>
             </div>
@@ -1795,8 +1793,7 @@ get _forecast_type(): string {
         return html`
           <div class="section-flex edit-slots-section">
             <div class="section-label">
-              <ha-icon-button class=${this._show_section_slots !== false ? "visibility-toggle active" : "visibility-toggle"} .path=${this._show_section_slots !== false ? mdiLockOpenVariant : mdiLock} .value=${'show_section_slots'} .checked=${this._show_section_slots !== false} @click=${this._toggleVisibility}>
-              </ha-icon-button>
+              <span class=${this._show_section_slots !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_slots'} @click=${this._toggleVisibility}></span>
               <ha-icon class="section-icon" icon="mdi:view-grid-outline"></ha-icon>
               <span class="section-title">${this._t("slots_section")}</span>
             </div>
@@ -1816,8 +1813,7 @@ get _forecast_type(): string {
         return html`
           <div class="section-flex edit-daily-forecast-section">
             <div class="section-label">
-              <ha-icon-button class=${this._show_section_daily_forecast !== false ? "visibility-toggle active" : "visibility-toggle"} .path=${this._show_section_daily_forecast !== false ? mdiLockOpenVariant : mdiLock} .value=${'show_section_daily_forecast'} .checked=${this._show_section_daily_forecast !== false} @click=${this._toggleVisibility}>
-              </ha-icon-button>
+              <span class=${this._show_section_daily_forecast !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_daily_forecast'} @click=${this._toggleVisibility}></span>
               <ha-icon class="section-icon" icon="mdi:calendar-week"></ha-icon>
               <span class="section-title">${this._t("daily_forecast_section")}</span>
             </div>
@@ -1837,8 +1833,7 @@ get _forecast_type(): string {
         return html`
           <div class="section-flex edit-charts-section">
             <div class="section-label">
-              <ha-icon-button class=${this._show_section_charts !== false ? "visibility-toggle active" : "visibility-toggle"} .path=${this._show_section_charts !== false ? mdiLockOpenVariant : mdiLock} .value=${'show_section_charts'} .checked=${this._show_section_charts !== false} @click=${this._toggleVisibility}>
-              </ha-icon-button>
+              <span class=${this._show_section_charts !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_charts'} @click=${this._toggleVisibility}></span>
               <ha-icon class="section-icon" icon="mdi:chart-line"></ha-icon>
               <span class="section-title">${this._t("charts_section")}</span>
             </div>
@@ -2121,7 +2116,7 @@ get _forecast_type(): string {
     .section-label {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 6px;
     }
     .visibility-spacer {
       width: 32px;
@@ -2143,21 +2138,41 @@ get _forecast_type(): string {
     .toggle-row {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
+      min-height: 28px;
+    }
+    .pwc-switch {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 16px;
+      border-radius: 8px;
+      background: var(--disabled-color, #9e9e9e);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
+    }
+    .pwc-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .pwc-switch.active {
+      background: var(--success-color, #4caf50);
+    }
+    .pwc-switch.active::after {
+      transform: translateX(14px);
     }
     .toggle-label {
       font-size: 13px;
       color: var(--primary-text-color);
-    }
-    .visibility-toggle {
-      --mdc-icon-button-size: 32px;
-      --mdc-icon-size: 18px;
-      color: var(--disabled-color, #9e9e9e);
-      opacity: 0.6;
-    }
-    .visibility-toggle.active {
-      color: var(--primary-color);
-      opacity: 1;
     }
     .side-by-side {
       display: flex;
