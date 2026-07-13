@@ -70,6 +70,7 @@ const ua: Translation = {
     "local_forecast": "Локальний прогноз (Zambretti)",
     "local_forecast_verbose": "Розгорнутий текст прогнозу",
     "forecast_altitude": "Висота станції (м)",
+    "forecast_altitude_hint": "Залиште порожнім, якщо датчик повідомляє відносний тиск (рівень моря)",
     "compact_slots": "Компактні підписи",
     "show_static_icons": "Статичні значки",
     "time_format": "Формат часу",

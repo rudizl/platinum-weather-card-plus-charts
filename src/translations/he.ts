@@ -70,6 +70,7 @@ const he: Translation = {
     "local_forecast": "תחזית מקומית (Zambretti)",
     "local_forecast_verbose": "טקסט תחזית מפורט",
     "forecast_altitude": "גובה התחנה (מ')",
+    "forecast_altitude_hint": "השאר ריק אם החיישן מדווח לחץ יחסי (גובה פני הים)",
     "compact_slots": "תוויות קומפקטיות",
     "show_static_icons": "סמלים סטטיים",
     "time_format": "תבנית שעה",

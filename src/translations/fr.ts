@@ -70,6 +70,7 @@ const fr: Translation = {
     "local_forecast": "Prévision locale (Zambretti)",
     "local_forecast_verbose": "Texte de prévision détaillé",
     "forecast_altitude": "Altitude de la station (m)",
+    "forecast_altitude_hint": "Laisser vide si le capteur fournit une pression relative (niveau de la mer)",
     "compact_slots": "Libellés compacts",
     "show_static_icons": "Icônes statiques",
     "time_format": "Format horaire",

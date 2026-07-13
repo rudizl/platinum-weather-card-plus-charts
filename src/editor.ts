@@ -1122,8 +1122,11 @@ get _forecast_type(): string {
             </div>
         </div>
         ${this._config?.option_local_forecast === true ? html`
-        <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
-        </ha-input>` : html`<div></div>`}
+        <div>
+          <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
+        </div>` : html`<div></div>`}
       </div>
       ${this._config?.option_local_forecast === true ? html`
       <div class="side-by-side">

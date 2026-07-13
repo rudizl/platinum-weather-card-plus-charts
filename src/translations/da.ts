@@ -70,6 +70,7 @@ const da: Translation = {
     "local_forecast": "Lokal vejrudsigt (Zambretti)",
     "local_forecast_verbose": "Udførlig prognosetekst",
     "forecast_altitude": "Stationens højde (m)",
+    "forecast_altitude_hint": "Lad stå tomt, hvis sensoren rapporterer relativt tryk (havniveau)",
     "compact_slots": "Kompakte etiketter",
     "show_static_icons": "Statiske ikoner",
     "time_format": "Tidsformat",
