@@ -1642,7 +1642,7 @@ get _forecast_type(): string {
           <div class="help-text">Use {condition} as placeholder — e.g. /local/icons/{condition}.svg</div>
         </div>` : html``}
       </div>
-      <div class="help-text" style="padding: 8px 0 4px; font-weight: 500;">${this._t("actions")}</div>
+      <div style="padding: 8px 0 4px; font-weight: 500;">${this._t("actions")}</div>
       <hui-action-editor
         .label=${this._t("tap_action")}
         .hass=${this.hass}
@@ -2028,6 +2028,12 @@ get _forecast_type(): string {
   }
 
   static styles: CSSResultGroup = css`
+    .help-text {
+      font-size: 12px;
+      line-height: 1.3;
+      color: var(--secondary-text-color);
+      margin: 2px 0 6px;
+    }
     :host {
       display: block;
               /* --mdc-menu-min-width: var(--parentWidth); */
