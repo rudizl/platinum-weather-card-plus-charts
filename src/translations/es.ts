@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const es: Translation = {
+  "zambretti": {
+    "a": "Estable y despejado",
+    "b": "Buen tiempo",
+    "c": "Mejorando, despejándose",
+    "d": "Bueno, tendiendo a inestable",
+    "e": "Bueno, posibles chubascos",
+    "f": "Bastante bueno, mejorando",
+    "g": "Bastante bueno, posibles chubascos al principio",
+    "h": "Bastante bueno, chubascos más tarde",
+    "i": "Chubascos al principio, mejorando",
+    "j": "Variable, mejorando",
+    "k": "Bastante bueno, chubascos probables",
+    "l": "Algo inestable, despejando más tarde",
+    "m": "Inestable, probable mejora",
+    "n": "Chubascos con claros",
+    "o": "Chubascos, tendiendo a inestable",
+    "p": "Variable, algo de lluvia",
+    "q": "Inestable, breves intervalos buenos",
+    "r": "Inestable, lluvia más tarde",
+    "s": "Inestable, algo de lluvia",
+    "t": "Muy inestable en general",
+    "u": "Lluvia ocasional, empeorando",
+    "v": "Lluvia a ratos, muy inestable",
+    "w": "Lluvia a intervalos frecuentes",
+    "x": "Lluvia, muy inestable",
+    "y": "Tormentoso, posible mejora",
+    "z": "Tormentoso, mucha lluvia"
+  },
   "editor": {
     "global_options": "Opciones globales",
     "overview_section": "Sección de resumen",
@@ -8,6 +36,8 @@ const es: Translation = {
     "slots_section": "Sección de ranuras",
     "daily_forecast_section": "Pronóstico diario",
     "wind_bearing_icon": "Flecha de dirección del viento",
+    "local_forecast": "Pronóstico local (Zambretti)",
+    "forecast_altitude": "Altitud de la estación (m)",
     "compact_slots": "Etiquetas compactas",
     "show_static_icons": "Iconos estáticos",
     "time_format": "Formato de hora",

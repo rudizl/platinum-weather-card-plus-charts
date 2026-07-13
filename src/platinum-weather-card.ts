@@ -20,7 +20,8 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
 import { CARD_VERSION } from './const';
-import { tCard, tMoonPhase, tUnit, tWindDirections } from './translations';
+import { tCard, tMoonPhase, tUnit, tWindDirections, tZambretti } from './translations';
+import { zambrettiLetter, pressureToHpa, seaLevelPressure } from './zambretti';
 
 
 /* eslint no-console: 0 */
@@ -523,7 +524,10 @@ export class PlatinumWeatherCard extends LitElement {
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
-    const forecastText = (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
+    const localForecast = this.localForecastText;
+    const forecastText = localForecast !== null ?
+      html`<div class="forecast-text">${localForecast}</div>` :
+      (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
       html`<div class="forecast-text">${this.hassExtended.formatEntityState(this.hass.states[this._config.entity_summary])}</div>` ?? html`<div class="forecast-text">---</div>` : html``;
     //html`<div class="forecast-text">${entityComputeStateDisplay(this.hass.localize, this.hass.states[this._config.entity_summary], getLocale(this.hass))}</div>` ?? html`<div class="forecast-text">---</div>` : html``;
 
@@ -607,7 +611,10 @@ export class PlatinumWeatherCard extends LitElement {
 
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
-    const forecastText = (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
+    const localForecast = this.localForecastText;
+    const forecastText = localForecast !== null ?
+      html`<div class="forecast-text-right">${localForecast}</div>` :
+      (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
       html`<div class="forecast-text-right">${this.hassExtended.formatEntityState(this.hass.states[this._config.entity_summary])}</div>` ?? html`<div class="forecast-text-right">---</div>` : html``;
 
   //  html`<div class="forecast-text-right">${entityComputeStateDisplay(this.hass.localize, this.hass.states[this._config.entity_summary], getLocale(this.hass))}</div>` ?? html`<div class="forecast-text-right">---</div>` : html``;
@@ -638,7 +645,7 @@ export class PlatinumWeatherCard extends LitElement {
         sectionHeight += this._config.entity_update_time !== undefined ? 20 : 0;
       }
       if (this._config.overview_layout !== 'title only') {
-        sectionHeight += (this._config.overview_layout !== 'forecast') && (this._config.entity_summary !== undefined) ? 145 : 120;
+        sectionHeight += (this._config.overview_layout !== 'forecast') && ((this._config.entity_summary !== undefined) || (this._config.option_local_forecast === true)) ? 145 : 120;
       }
     }
     return sectionHeight;
@@ -1894,6 +1901,52 @@ export class PlatinumWeatherCard extends LitElement {
     if (['falling', 'down', 'decreasing'].includes(s)) return 'falling';
     if (['steady', 'stable'].includes(s)) return 'steady';
     return null;
+  }
+
+  // Local Zambretti nowcast computed from entity_pressure (+trend, +wind bearing).
+  // Returns the localized one-line forecast text, or null when inputs are unusable.
+  get localForecastText(): string | null {
+    const entity = this._config.entity_pressure;
+    if (this._config.option_local_forecast !== true || !entity || !this.hass.states[entity]) return null;
+    const stateObj = this.hass.states[entity];
+    const raw = entity.match('^weather.') === null ? stateObj.state : stateObj.attributes.pressure;
+    const value = Number(raw);
+    if (isNaN(value)) return null;
+    const uom = this._config.pressure_units
+      ? this._config.pressure_units
+      : entity.match('^weather.') === null
+        ? stateObj.attributes.unit_of_measurement
+        : stateObj.attributes.pressure_unit;
+    let pressure = pressureToHpa(value, uom);
+    // Optional station → sea-level correction (skip when the sensor already reports relative pressure)
+    const altitude = Number(this._config.option_forecast_altitude);
+    if (!isNaN(altitude) && altitude > 0) {
+      const tempEntity = this._config.entity_temperature;
+      const tempRaw = tempEntity && this.hass.states[tempEntity]
+        ? (tempEntity.match('^weather.') === null
+          ? this.hass.states[tempEntity].state
+          : this.hass.states[tempEntity].attributes.temperature)
+        : undefined;
+      const tempC = Number(tempRaw);
+      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
+    }
+    // Trend in hPa/h: numeric derivative sensor preferred, categorical mapped to ±0.2
+    let trend = 0.0;
+    const trendEntity = this._config.entity_pressure_trend;
+    if (trendEntity && this.hass.states[trendEntity]) {
+      const n = Number(this.hass.states[trendEntity].state);
+      if (!isNaN(n)) {
+        trend = n;
+      } else {
+        const cat = this.pressureTrend;
+        trend = cat === 'rising' ? 0.2 : cat === 'falling' ? -0.2 : 0.0;
+      }
+    }
+    const north = (this.hass.config?.latitude ?? 42) >= 0;
+    const month = new Date().getMonth() + 1;
+    const letter = zambrettiLetter(pressure, month, this.windBearingDegrees, trend, north);
+    if (letter === null) return null;
+    return tZambretti(this.locale, letter);
   }
 
   get slotPressure(): TemplateResult {

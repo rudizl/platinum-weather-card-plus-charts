@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const nl: Translation = {
+  "zambretti": {
+    "a": "Bestendig mooi",
+    "b": "Mooi weer",
+    "c": "Opklarend",
+    "d": "Mooi, wordt onbestendig",
+    "e": "Mooi, kans op buien",
+    "f": "Vrij mooi, verbeterend",
+    "g": "Vrij mooi, eerst kans op buien",
+    "h": "Vrij mooi, later buien",
+    "i": "Eerst buien, verbeterend",
+    "j": "Wisselvallig, verbeterend",
+    "k": "Vrij mooi, buien waarschijnlijk",
+    "l": "Vrij onbestendig, later opklarend",
+    "m": "Onbestendig, waarschijnlijk verbetering",
+    "n": "Buien met opklaringen",
+    "o": "Buien, wordt onbestendig",
+    "p": "Wisselvallig, wat regen",
+    "q": "Onbestendig, korte mooie perioden",
+    "r": "Onbestendig, later regen",
+    "s": "Onbestendig, wat regen",
+    "t": "Overwegend zeer onbestendig",
+    "u": "Af en toe regen, verslechterend",
+    "v": "Soms regen, zeer onbestendig",
+    "w": "Regen met korte tussenpozen",
+    "x": "Regen, zeer onbestendig",
+    "y": "Stormachtig, mogelijk verbetering",
+    "z": "Stormachtig, veel regen"
+  },
   "editor": {
     "global_options": "Globale opties",
     "overview_section": "Overzichtssectie",
@@ -8,6 +36,8 @@ const nl: Translation = {
     "slots_section": "Slots-sectie",
     "daily_forecast_section": "Dagelijkse voorspelling",
     "wind_bearing_icon": "Windrichtingspijl",
+    "local_forecast": "Lokale voorspelling (Zambretti)",
+    "forecast_altitude": "Hoogte van het station (m)",
     "compact_slots": "Compacte labels",
     "show_static_icons": "Statische pictogrammen",
     "time_format": "Tijdformaat",

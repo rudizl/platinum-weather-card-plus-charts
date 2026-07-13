@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const da: Translation = {
+  "zambretti": {
+    "a": "Stabilt godt vejr",
+    "b": "Godt vejr",
+    "c": "Opklarende",
+    "d": "Godt, bliver ustadigt",
+    "e": "Godt, mulige byger",
+    "f": "Ret godt, i bedring",
+    "g": "Ret godt, mulige byger først",
+    "h": "Ret godt, byger senere",
+    "i": "Byger først, i bedring",
+    "j": "Skiftende, i bedring",
+    "k": "Ret godt, byger sandsynlige",
+    "l": "Ret ustadigt, opklarer senere",
+    "m": "Ustadigt, formentlig bedring",
+    "n": "Byger med solstrejf",
+    "o": "Byger, bliver ustadigt",
+    "p": "Skiftende, lidt regn",
+    "q": "Ustadigt, korte gode perioder",
+    "r": "Ustadigt, regn senere",
+    "s": "Ustadigt, lidt regn",
+    "t": "Overvejende meget ustadigt",
+    "u": "Regn til tider, forværring",
+    "v": "Regn til tider, meget ustadigt",
+    "w": "Regn med hyppige mellemrum",
+    "x": "Regn, meget ustadigt",
+    "y": "Stormfuldt, mulig bedring",
+    "z": "Stormfuldt, megen regn"
+  },
   "editor": {
     "global_options": "Globale indstillinger",
     "overview_section": "Oversigtssektion",
@@ -8,6 +36,8 @@ const da: Translation = {
     "slots_section": "Slot-sektion",
     "daily_forecast_section": "Daglig vejrudsigt",
     "wind_bearing_icon": "Pil for vindretning",
+    "local_forecast": "Lokal vejrudsigt (Zambretti)",
+    "forecast_altitude": "Stationens højde (m)",
     "compact_slots": "Kompakte etiketter",
     "show_static_icons": "Statiske ikoner",
     "time_format": "Tidsformat",

@@ -41,6 +41,12 @@ export function tUnit(locale: string | undefined, unit: string): string {
   return TRANSLATIONS[l]?.units?.[unit] ?? unit;
 }
 
+// Zambretti forecast text by letter code 'a'..'z'
+export function tZambretti(locale: string | undefined, letter: string): string {
+  const l = (locale || 'en').split('-')[0].toLowerCase();
+  return TRANSLATIONS[l]?.zambretti?.[letter] ?? TRANSLATIONS.en.zambretti[letter] ?? '';
+}
+
 export function tWindDirections(locale: string | undefined): string[] {
   const l = (locale || 'en').split('-')[0].toLowerCase();
   const dirs = TRANSLATIONS[l]?.windDirections;

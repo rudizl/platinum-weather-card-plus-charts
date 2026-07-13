@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const it: Translation = {
+  "zambretti": {
+    "a": "Bello stabile",
+    "b": "Bel tempo",
+    "c": "In miglioramento, schiarite",
+    "d": "Bello, tendente a instabile",
+    "e": "Bello, possibili rovesci",
+    "f": "Abbastanza bello, in miglioramento",
+    "g": "Abbastanza bello, possibili rovesci iniziali",
+    "h": "Abbastanza bello, rovesci più tardi",
+    "i": "Rovesci iniziali, in miglioramento",
+    "j": "Variabile, in miglioramento",
+    "k": "Abbastanza bello, rovesci probabili",
+    "l": "Piuttosto instabile, schiarite più tardi",
+    "m": "Instabile, probabile miglioramento",
+    "n": "Rovesci con schiarite",
+    "o": "Rovesci, tendente a instabile",
+    "p": "Variabile, qualche pioggia",
+    "q": "Instabile, brevi schiarite",
+    "r": "Instabile, pioggia più tardi",
+    "s": "Instabile, qualche pioggia",
+    "t": "Prevalentemente molto instabile",
+    "u": "Pioggia occasionale, in peggioramento",
+    "v": "Pioggia a tratti, molto instabile",
+    "w": "Pioggia a intervalli frequenti",
+    "x": "Pioggia, molto instabile",
+    "y": "Tempestoso, possibile miglioramento",
+    "z": "Tempestoso, molta pioggia"
+  },
   "editor": {
     "global_options": "Opzioni globali",
     "overview_section": "Sezione panoramica",
@@ -8,6 +36,8 @@ const it: Translation = {
     "slots_section": "Sezione slot",
     "daily_forecast_section": "Previsioni giornaliere",
     "wind_bearing_icon": "Freccia direzione vento",
+    "local_forecast": "Previsione locale (Zambretti)",
+    "forecast_altitude": "Altitudine della stazione (m)",
     "compact_slots": "Etichette compatte",
     "show_static_icons": "Icone statiche",
     "time_format": "Formato ora",

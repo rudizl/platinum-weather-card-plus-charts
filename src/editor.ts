@@ -1114,6 +1114,17 @@ get _forecast_type(): string {
             </div>
         </div>
       </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <ha-icon-button class=${this._config?.option_local_forecast ? "eye-toggle active" : "eye-toggle"} .path=${this._config?.option_local_forecast ? mdiLockOpenVariant : mdiLock} .value=${'option_local_forecast'} .checked=${this._config?.option_local_forecast === true} @click=${this._toggleVisibility}></ha-icon-button>
+              <span class="toggle-label">${this._t("local_forecast")}</span>
+            </div>
+        </div>
+        ${this._config?.option_local_forecast === true ? html`
+        <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
+        </ha-input>` : html`<div></div>`}
+      </div>
     `;
   }
 

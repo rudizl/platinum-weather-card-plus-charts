@@ -384,6 +384,30 @@ sensor:
 
 Then select it in the editor: Slots Section → *Entity Pressure Trend* (the picker appears once a pressure entity is set).
 
+### Local forecast (Zambretti)
+
+The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which achieves roughly 90% accuracy for the next 12 hours using barometric pressure, its 3-hour trend, wind direction and season.
+
+Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
+
+Inputs used:
+
+- `entity_pressure` — **required.** Sea-level (relative) pressure preferred. Units are auto-converted from the sensor's `unit_of_measurement` (hPa/mbar, inHg, mmHg, kPa, psi, Pa).
+- `entity_pressure_trend` — strongly recommended. A numeric derivative sensor in hPa/h gives the best result (±0.1 hPa/h is the rising/falling threshold); text states `rising`/`steady`/`falling` also work.
+- `entity_wind_bearing` — optional, refines the forecast (degrees or compass text).
+- **Station altitude** — only set this if your pressure sensor reports *absolute* (station) pressure; the card then applies the barometric sea-level correction using the current temperature. Leave empty for relative/sea-level sensors.
+
+The hemisphere is detected automatically from your Home Assistant latitude.
+
+```yaml
+type: custom:platinum-weather-card-plus-charts
+entity_pressure: sensor.ws_relative_pressure
+entity_pressure_trend: sensor.pressure_trend
+entity_wind_bearing: sensor.ws_wind_direction
+option_local_forecast: true
+# option_forecast_altitude: 550   # only for absolute-pressure sensors
+```
+
 ## Icon Packs
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
@@ -551,6 +575,8 @@ double_tap_action:
 | `entity_humidity` | String | none | Required for `humidity` |
 | `entity_pressure` | String | none | Required for `pressure` |
 | `entity_pressure_trend` | String | none | Optional trend sensor — shows a colored ↗/→/↘ arrow next to the pressure value |
+| `option_local_forecast` | Boolean | `false` | Compute a local Zambretti forecast from `entity_pressure` and show it as the overview summary text |
+| `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 | `pressure_units` | String | none | Optional pressure unit label |
 | `entity_observed_max` | String | none | Required for `observed_max`, `temp_maximums` |
 | `entity_observed_min` | String | none | Required for `observed_min`, `temp_minimums` |

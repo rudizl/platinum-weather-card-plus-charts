@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const fr: Translation = {
+  "zambretti": {
+    "a": "Beau temps établi",
+    "b": "Beau temps",
+    "c": "Amélioration, éclaircies",
+    "d": "Beau, devenant instable",
+    "e": "Beau, averses possibles",
+    "f": "Assez beau, en amélioration",
+    "g": "Assez beau, averses possibles au début",
+    "h": "Assez beau, averses plus tard",
+    "i": "Averses au début, amélioration",
+    "j": "Variable, en amélioration",
+    "k": "Assez beau, averses probables",
+    "l": "Plutôt instable, éclaircies plus tard",
+    "m": "Instable, amélioration probable",
+    "n": "Averses, belles éclaircies",
+    "o": "Averses, devenant instable",
+    "p": "Variable, un peu de pluie",
+    "q": "Instable, brèves éclaircies",
+    "r": "Instable, pluie plus tard",
+    "s": "Instable, un peu de pluie",
+    "t": "Très instable dans l'ensemble",
+    "u": "Pluie occasionnelle, dégradation",
+    "v": "Pluie par moments, très instable",
+    "w": "Pluie à intervalles fréquents",
+    "x": "Pluie, très instable",
+    "y": "Orageux, amélioration possible",
+    "z": "Orageux, pluie abondante"
+  },
   "editor": {
     "global_options": "Options globales",
     "overview_section": "Section vue d'ensemble",
@@ -8,6 +36,8 @@ const fr: Translation = {
     "slots_section": "Section des emplacements",
     "daily_forecast_section": "Prévisions quotidiennes",
     "wind_bearing_icon": "Flèche de direction du vent",
+    "local_forecast": "Prévision locale (Zambretti)",
+    "forecast_altitude": "Altitude de la station (m)",
     "compact_slots": "Libellés compacts",
     "show_static_icons": "Icônes statiques",
     "time_format": "Format horaire",

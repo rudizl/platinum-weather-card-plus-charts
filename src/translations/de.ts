@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const de: Translation = {
+  "zambretti": {
+    "a": "Beständig schön",
+    "b": "Schönes Wetter",
+    "c": "Aufheiternd",
+    "d": "Schön, zunehmend unbeständig",
+    "e": "Schön, Schauer möglich",
+    "f": "Recht schön, Besserung",
+    "g": "Recht schön, anfangs Schauer möglich",
+    "h": "Recht schön, später Schauer",
+    "i": "Anfangs Schauer, Besserung",
+    "j": "Wechselhaft, Besserung",
+    "k": "Recht schön, Schauer wahrscheinlich",
+    "l": "Eher unbeständig, später Aufklarung",
+    "m": "Unbeständig, vermutlich Besserung",
+    "n": "Schauer, sonnige Abschnitte",
+    "o": "Schauer, zunehmend unbeständig",
+    "p": "Wechselhaft, etwas Regen",
+    "q": "Unbeständig, kurze schöne Abschnitte",
+    "r": "Unbeständig, später Regen",
+    "s": "Unbeständig, etwas Regen",
+    "t": "Überwiegend sehr unbeständig",
+    "u": "Zeitweise Regen, Verschlechterung",
+    "v": "Zeitweise Regen, sehr unbeständig",
+    "w": "Häufiger Regen",
+    "x": "Regen, sehr unbeständig",
+    "y": "Stürmisch, evtl. Besserung",
+    "z": "Stürmisch, viel Regen"
+  },
   "editor": {
     "global_options": "Globale Optionen",
     "overview_section": "Übersichtsbereich",
@@ -8,6 +36,8 @@ const de: Translation = {
     "slots_section": "Slots-Bereich",
     "daily_forecast_section": "Tagesvorhersage",
     "wind_bearing_icon": "Windrichtungspfeil",
+    "local_forecast": "Lokale Vorhersage (Zambretti)",
+    "forecast_altitude": "Stationshöhe (m, Meereshöhen-Korrektur)",
     "compact_slots": "Kompakte Beschriftungen",
     "show_static_icons": "Statische Icons",
     "time_format": "Zeitformat",

@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const pl: Translation = {
+  "zambretti": {
+    "a": "Trwała ładna pogoda",
+    "b": "Ładna pogoda",
+    "c": "Przejaśnienia, poprawa",
+    "d": "Ładnie, coraz mniej stabilnie",
+    "e": "Ładnie, możliwe przelotne opady",
+    "f": "Dość ładnie, poprawa",
+    "g": "Dość ładnie, początkowo możliwe opady",
+    "h": "Dość ładnie, później przelotne opady",
+    "i": "Początkowo opady, poprawa",
+    "j": "Zmiennie, poprawa",
+    "k": "Dość ładnie, prawdopodobne opady",
+    "l": "Raczej niestabilnie, później przejaśnienia",
+    "m": "Niestabilnie, prawdopodobna poprawa",
+    "n": "Przelotne opady z przejaśnieniami",
+    "o": "Przelotne opady, pogorszenie",
+    "p": "Zmiennie, miejscami deszcz",
+    "q": "Niestabilnie, krótkie przejaśnienia",
+    "r": "Niestabilnie, później deszcz",
+    "s": "Niestabilnie, okresami deszcz",
+    "t": "Przeważnie bardzo niestabilnie",
+    "u": "Okresami deszcz, pogorszenie",
+    "v": "Chwilami deszcz, bardzo niestabilnie",
+    "w": "Częste opady deszczu",
+    "x": "Deszczowo, bardzo niestabilnie",
+    "y": "Burzowo, możliwa poprawa",
+    "z": "Burzowo, obfite opady"
+  },
   "editor": {
     "global_options": "Opcje globalne",
     "overview_section": "Sekcja przeglądu",
@@ -8,6 +36,8 @@ const pl: Translation = {
     "slots_section": "Sekcja slotów",
     "daily_forecast_section": "Prognoza dzienna",
     "wind_bearing_icon": "Strzałka kierunku wiatru",
+    "local_forecast": "Prognoza lokalna (Zambretti)",
+    "forecast_altitude": "Wysokość stacji (m n.p.m.)",
     "compact_slots": "Kompaktowe etykiety",
     "show_static_icons": "Ikony statyczne",
     "time_format": "Format czasu",

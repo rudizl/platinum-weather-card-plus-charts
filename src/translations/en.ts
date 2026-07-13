@@ -1,6 +1,34 @@
 import type { Translation } from './types';
 
 const en: Translation = {
+  "zambretti": {
+    "a": "Settled fine",
+    "b": "Fine weather",
+    "c": "Becoming fine",
+    "d": "Fine, becoming less settled",
+    "e": "Fine, possible showers",
+    "f": "Fairly fine, improving",
+    "g": "Fairly fine, possible showers early",
+    "h": "Fairly fine, showery later",
+    "i": "Showery early, improving",
+    "j": "Changeable, mending",
+    "k": "Fairly fine, showers likely",
+    "l": "Rather unsettled, clearing later",
+    "m": "Unsettled, probably improving",
+    "n": "Showery, bright intervals",
+    "o": "Showery, becoming less settled",
+    "p": "Changeable, some rain",
+    "q": "Unsettled, short fine intervals",
+    "r": "Unsettled, rain later",
+    "s": "Unsettled, some rain",
+    "t": "Mostly very unsettled",
+    "u": "Occasional rain, worsening",
+    "v": "Rain at times, very unsettled",
+    "w": "Rain at frequent intervals",
+    "x": "Rain, very unsettled",
+    "y": "Stormy, may improve",
+    "z": "Stormy, much rain"
+  },
   "editor": {
     "global_options": "Global Options",
     "overview_section": "Overview Section",
@@ -8,6 +36,8 @@ const en: Translation = {
     "slots_section": "Slots Section",
     "daily_forecast_section": "Daily Forecast Section",
     "wind_bearing_icon": "Wind bearing arrow icon",
+    "local_forecast": "Local forecast (Zambretti)",
+    "forecast_altitude": "Station altitude (m, sea-level correction)",
     "compact_slots": "Compact slot labels",
     "show_static_icons": "Show Static Icons",
     "time_format": "Time Format",
