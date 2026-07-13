@@ -68,6 +68,7 @@ const ru: Translation = {
     "daily_forecast_section": "Ежедневный прогноз",
     "wind_bearing_icon": "Стрелка направления ветра",
     "local_forecast": "Локальный прогноз (Zambretti)",
+    "daily_forecast_date": "Дата рядом с днём",
     "local_forecast_verbose": "Развёрнутый текст прогноза",
     "forecast_altitude": "Высота станции (м)",
     "forecast_altitude_hint": "Оставьте пустым, если датчик сообщает относительное давление (уровень моря)",

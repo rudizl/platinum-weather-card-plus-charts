@@ -134,6 +134,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   entity_pressure_trend?: string;
   option_local_forecast?: boolean;
   option_local_forecast_verbose?: boolean;
+  option_daily_forecast_date?: boolean;
   option_forecast_altitude?: number;
 
   option_today_temperature_decimals?: boolean;

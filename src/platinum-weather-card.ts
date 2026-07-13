@@ -981,7 +981,7 @@ export class PlatinumWeatherCard extends LitElement {
       htmlDays.push(html`
         <div class="day-horiz fcasttooltip">
           <ul class="f-slot-horiz">
-            <li class="f-slot-horiz-text"><span class="dayname">${forecastDate ? forecastDate.toLocaleDateString(this.locale, { weekday: 'short' }) : "---"}</span></li>
+            <li class="f-slot-horiz-text"><span class="${this._config.option_daily_forecast_date === true ? 'dayname dayname-with-date' : 'dayname'}">${forecastDate ? forecastDate.toLocaleDateString(this.locale, { weekday: 'short' }) : "---"}${this._config.option_daily_forecast_date === true && forecastDate ? html` ${forecastDate.toLocaleDateString(this.locale, { day: 'numeric', month: 'numeric' })}` : ''}</span></li>
             ${htmlIcon}
             ${this._config.option_show_temperature_chart ? html`` : minMax}
             ${pop}
@@ -1225,7 +1225,7 @@ export class PlatinumWeatherCard extends LitElement {
       htmlDays.push(html`
         <div class="day-vert fcasttooltip">
           <div class="day-vert-top">
-            <div class="dayname-vert">${forecastDate ? forecastDate.toLocaleDateString(this.locale, { weekday: 'short' }) : "---"}</div>
+            <div class="dayname-vert">${forecastDate ? forecastDate.toLocaleDateString(this.locale, { weekday: 'short' }) : "---"}${this._config.option_daily_forecast_date === true && forecastDate ? html` ${forecastDate.toLocaleDateString(this.locale, { day: 'numeric', month: 'numeric' })}` : ''}</div>
             ${summary}
           </div>
           <div>
@@ -3446,6 +3446,11 @@ export class PlatinumWeatherCard extends LitElement {
       }
       .dayname {
         text-transform: uppercase;
+      }
+      .dayname-with-date {
+        font-size: 0.8em;
+        letter-spacing: -0.2px;
+        white-space: nowrap;
       }
       .dayname-vert {
         min-width: 40px;

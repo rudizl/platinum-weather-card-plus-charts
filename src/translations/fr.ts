@@ -68,6 +68,7 @@ const fr: Translation = {
     "daily_forecast_section": "Prévisions quotidiennes",
     "wind_bearing_icon": "Flèche de direction du vent",
     "local_forecast": "Prévision locale (Zambretti)",
+    "daily_forecast_date": "Date à côté du jour",
     "local_forecast_verbose": "Texte de prévision détaillé",
     "forecast_altitude": "Altitude de la station (m)",
     "forecast_altitude_hint": "Laisser vide si le capteur fournit une pression relative (niveau de la mer)",

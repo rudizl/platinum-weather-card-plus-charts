@@ -68,6 +68,7 @@ const de: Translation = {
     "daily_forecast_section": "Tagesvorhersage",
     "wind_bearing_icon": "Windrichtungspfeil",
     "local_forecast": "Lokale Vorhersage (Zambretti)",
+    "daily_forecast_date": "Datum neben dem Tag",
     "local_forecast_verbose": "Ausführlicher Vorhersagetext",
     "forecast_altitude": "Stationshöhe (m)",
     "forecast_altitude_hint": "Leer lassen, wenn der Sensor relativen Druck (Meereshöhe) liefert",

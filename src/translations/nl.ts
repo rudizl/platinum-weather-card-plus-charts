@@ -68,6 +68,7 @@ const nl: Translation = {
     "daily_forecast_section": "Dagelijkse voorspelling",
     "wind_bearing_icon": "Windrichtingspijl",
     "local_forecast": "Lokale voorspelling (Zambretti)",
+    "daily_forecast_date": "Datum naast de dag",
     "local_forecast_verbose": "Uitgebreide voorspellingstekst",
     "forecast_altitude": "Hoogte van het station (m)",
     "forecast_altitude_hint": "Leeg laten als de sensor relatieve druk (zeeniveau) rapporteert",

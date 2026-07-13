@@ -68,6 +68,7 @@ const da: Translation = {
     "daily_forecast_section": "Daglig vejrudsigt",
     "wind_bearing_icon": "Pil for vindretning",
     "local_forecast": "Lokal vejrudsigt (Zambretti)",
+    "daily_forecast_date": "Dato ved siden af dagen",
     "local_forecast_verbose": "Udførlig prognosetekst",
     "forecast_altitude": "Stationens højde (m)",
     "forecast_altitude_hint": "Lad stå tomt, hvis sensoren rapporterer relativt tryk (havniveau)",

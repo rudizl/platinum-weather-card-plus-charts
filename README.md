@@ -581,6 +581,7 @@ double_tap_action:
 | `entity_pressure_trend` | String | none | Optional trend sensor — shows a colored ↗/→/↘ arrow next to the pressure value |
 | `option_local_forecast` | Boolean | `false` | Compute a local Zambretti forecast from `entity_pressure` and show it as the overview summary text |
 | `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
+| `option_daily_forecast_date` | Boolean | `false` | Show a locale-formatted date (e.g. 13.07) next to the day name in the daily forecast |
 | `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 | `pressure_units` | String | none | Optional pressure unit label |
 | `entity_observed_max` | String | none | Required for `observed_max`, `temp_maximums` |

@@ -1571,6 +1571,15 @@ get _forecast_type(): string {
             </div>
           </div>
         </div>
+        <div class="side-by-side">
+          <div>
+            <div class="toggle-row">
+              <span class=${this._config?.option_daily_forecast_date === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_daily_forecast_date'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("daily_forecast_date")}</span>
+            </div>
+          </div>
+          <div></div>
+        </div>
 
         <div class="side-by-side">
         ${this._daily_forecast_layout === 'vertical' ? html`<div>

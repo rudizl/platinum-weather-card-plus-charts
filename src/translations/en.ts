@@ -68,6 +68,7 @@ const en: Translation = {
     "daily_forecast_section": "Daily Forecast Section",
     "wind_bearing_icon": "Wind bearing arrow icon",
     "local_forecast": "Local forecast (Zambretti)",
+    "daily_forecast_date": "Show date next to day",
     "local_forecast_verbose": "Verbose forecast text",
     "forecast_altitude": "Station altitude (m)",
     "forecast_altitude_hint": "Leave empty if the sensor reports relative (sea-level) pressure",

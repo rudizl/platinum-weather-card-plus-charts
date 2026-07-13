@@ -68,6 +68,7 @@ const bg: Translation = {
     "daily_forecast_section": "Секция Прогноза",
     "wind_bearing_icon": "Стрелка за посока на вятъра",
     "local_forecast": "Локална прогноза (Zambretti)",
+    "daily_forecast_date": "Дата до деня",
     "local_forecast_verbose": "Многословна прогноза",
     "forecast_altitude": "Надморска височина (м)",
     "forecast_altitude_hint": "Остави празно, ако сензорът дава относително (sea-level) налягане",
