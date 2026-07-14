@@ -4,13 +4,13 @@ A mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weath
 
 Based on the original Platinum Weather Card by [@makin-things](https://www.github.com/makin-things), extended by [@tommyjlong](https://github.com/tommyjlong). Weather Chart Card by [@mlamberts78](https://github.com/mlamberts78). Maintained and further developed here by [@rudizl](https://github.com/rudizl).
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat)](https://github.com/custom-components/hacs)
 [![GitHub Release][releases-shield]][releases]
 [![License][license-shield]](LICENSE.md)
-![Maintenance](https://img.shields.io/badge/MAINTAINED-YES-green?style=flat-square)
-[![CI](https://img.shields.io/github/actions/workflow/status/rudizl/platinum-weather-card-plus-charts/build.yml?branch=master&style=flat-square&label=CI)](https://github.com/rudizl/platinum-weather-card-plus-charts/actions/workflows/build.yml)
-[![Downloads](https://img.shields.io/github/downloads/rudizl/platinum-weather-card-plus-charts/platinum-weather-card.js?style=flat-square&label=downloads)](https://github.com/rudizl/platinum-weather-card-plus-charts/releases)
-![Last Commit](https://img.shields.io/github/last-commit/rudizl/platinum-weather-card-plus-charts?style=flat-square)
+![Maintenance](https://img.shields.io/badge/MAINTAINED-YES-green?style=flat)
+[![CI](https://img.shields.io/github/actions/workflow/status/rudizl/platinum-weather-card-plus-charts/build.yml?branch=master&style=flat&label=CI)](https://github.com/rudizl/platinum-weather-card-plus-charts/actions/workflows/build.yml)
+[![Downloads](https://img.shields.io/github/downloads/rudizl/platinum-weather-card-plus-charts/platinum-weather-card.js?style=flat&label=downloads)](https://github.com/rudizl/platinum-weather-card-plus-charts/releases)
+![Last Commit](https://img.shields.io/github/last-commit/rudizl/platinum-weather-card-plus-charts?style=flat)
 
 ## Installation
 
@@ -644,6 +644,6 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 
 The chart uses the same `weather_entity` and `daily_forecast_days` settings as the Daily Forecast section. No additional entities are required.
 
-[license-shield]: https://img.shields.io/github/license/rudizl/platinum-weather-card-plus-charts.svg?style=flat-square
-[releases-shield]: https://img.shields.io/github/v/release/rudizl/platinum-weather-card-plus-charts?include_prereleases&style=flat-square
+[license-shield]: https://img.shields.io/github/license/rudizl/platinum-weather-card-plus-charts.svg?style=flat
+[releases-shield]: https://img.shields.io/github/v/release/rudizl/platinum-weather-card-plus-charts?include_prereleases&style=flat
 [releases]: https://github.com/rudizl/platinum-weather-card-plus-charts/releases
