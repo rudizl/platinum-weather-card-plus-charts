@@ -300,6 +300,11 @@ Install via HACS as a custom repository:
 
 </td>
 <td align="center" width="50%">
+
+**Local Zambretti forecast (verbose)**
+
+![Local forecast](images/local-forecast-zambretti.png)
+
 </td>
 </tr>
 </table>
@@ -352,6 +357,10 @@ The card can compute a short local forecast entirely from your own weather stati
 Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
 
 A **Verbose forecast text** toggle expands the short phrase into a full sentence with a pressure-tendency clause, e.g. *"Unsettled weather, with rain expected later. The pressure is falling."*
+
+| Short | Verbose |
+|-------|---------|
+| ![Editor options and short forecast](images/overview-options-zambretti.png) | ![Verbose forecast](images/local-forecast-zambretti.png) |
 
 Inputs used:
 
@@ -489,6 +498,10 @@ Hovering over any forecast day column shows a tooltip with date, weather descrip
 | Include Today in Forecast | Boolean | Start the strip from today instead of tomorrow |
 | Show date next to day | Boolean | Locale-formatted date after the day name (day label font shrinks to fit) |
 | Show forecast wind | Boolean | Wind speed/direction in each forecast column |
+
+With **Show date next to day** enabled:
+
+![Daily forecast with dates](images/daily-forecast-dates.png)
 
 ## Charts Section
 
