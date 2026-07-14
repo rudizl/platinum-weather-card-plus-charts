@@ -9,7 +9,7 @@ Based on the original Platinum Weather Card by [@makin-things](https://www.githu
 [![License][license-shield]](LICENSE.md)
 ![Maintenance](https://img.shields.io/badge/MAINTAINED-YES-green?style=flat)
 [![CI](https://img.shields.io/github/actions/workflow/status/rudizl/platinum-weather-card-plus-charts/build.yml?branch=master&style=flat&label=CI)](https://github.com/rudizl/platinum-weather-card-plus-charts/actions/workflows/build.yml)
-[![Downloads](https://img.shields.io/github/downloads/rudizl/platinum-weather-card-plus-charts/platinum-weather-card.js?style=flat&label=%E2%AC%87)](https://github.com/rudizl/platinum-weather-card-plus-charts/releases)
+[![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Frudizl%2Fplatinum-weather-card-plus-charts%2Fmaster%2Fbadges%2Fdownloads.json&style=flat)](https://github.com/rudizl/platinum-weather-card-plus-charts/releases)
 ![Last Commit](https://img.shields.io/github/last-commit/rudizl/platinum-weather-card-plus-charts?style=flat)
 
 ## Installation
