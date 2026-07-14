@@ -68,6 +68,8 @@ const he: Translation = {
     "daily_forecast_section": "תחזית יומית",
     "wind_bearing_icon": "חץ כיוון הרוח",
     "local_forecast": "תחזית מקומית (Zambretti)",
+    "entity_uv_today": "תחזית UV (היום)",
+    "entity_fire_today": "סכנת שריפה (היום)",
     "daily_forecast_date": "תאריך ליד היום",
     "local_forecast_verbose": "טקסט תחזית מפורט",
     "forecast_altitude": "גובה התחנה (מ')",

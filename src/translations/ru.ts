@@ -68,6 +68,8 @@ const ru: Translation = {
     "daily_forecast_section": "Ежедневный прогноз",
     "wind_bearing_icon": "Стрелка направления ветра",
     "local_forecast": "Локальный прогноз (Zambretti)",
+    "entity_uv_today": "УФ-прогноз (сегодня)",
+    "entity_fire_today": "Пожарная опасность (сегодня)",
     "daily_forecast_date": "Дата рядом с днём",
     "local_forecast_verbose": "Развёрнутый текст прогноза",
     "forecast_altitude": "Высота станции (м)",

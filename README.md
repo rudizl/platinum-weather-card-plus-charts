@@ -26,6 +26,29 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.1.0**
+
+**New: Local forecast (Zambretti)**
+- The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. Classic Zambretti forecaster (1915, ~90% accuracy for the next 12h) using barometric pressure, its trend, wind direction and season
+- Enable via Overview Section → Options; the computed text replaces `entity_summary`. 26 forecast texts fully translated in all 13 languages
+- Optional verbose mode: full-sentence phrasing plus a pressure-tendency clause ("Unsettled weather, with rain expected later. The pressure is falling.")
+- Pressure units auto-converted (hPa/mbar, inHg, mmHg, kPa, psi, Pa); optional station-altitude sea-level correction for absolute-pressure sensors; hemisphere auto-detected from HA latitude
+- Built-in smoothing for fast-reporting stations: wind direction ignored below 2 km/h, trend hysteresis (±0.12 in / ±0.08 out hPa/h), and a 5-minute debounce before the displayed text changes
+
+**New: Date next to day name**
+- Optional locale-formatted date in the daily forecast day labels — "ПН 13.07" (bg), "Mon 7/13" (en-US). Works in both layouts; the day label font shrinks slightly when enabled
+
+**Editor overhaul**
+- All 28 on/off controls replaced: lock icon-buttons → compact toggle switches (gray off / green on, pure CSS, no HA component dependency)
+- Layout consistency pass: labels sit above their dropdowns everywhere, selects match label font size (13px), no more wrapped toggle labels
+- Help-text hints now render at 12px in the secondary text color; new hint under Station altitude
+
+**Fixes**
+- UV forecast / Fire danger entity picker labels in the Extended section were blank in 11 of 13 editor languages
+- Compact Max/Min slot labels now translated in de, es, fr, it, nl, pl, da (previously fell back to English)
+
+---
+
 **v2.0.8**
 
 **Performance: bundle size 508K → 223K (−56%)**
@@ -316,6 +339,39 @@ Four layout options are available:
 | Entity Apparent Temperature | Entity | Apparent / feels-like temperature |
 | Entity Forecast Icon | Entity | Entity whose state drives the condition icon |
 | Entity Forecast Summary | Entity | Entity whose state is shown as the condition text |
+| Show Temperature Decimals | Boolean | 1 decimal on current/apparent temperature |
+| Show Separator | Boolean | Separator line below the overview section |
+| Local forecast (Zambretti) | Boolean | Replace the summary text with a locally computed Zambretti forecast |
+| &nbsp;&nbsp;Verbose forecast text | Boolean | Full-sentence forecast with a pressure-tendency clause |
+| &nbsp;&nbsp;Station altitude (m) | Number | Only for absolute-pressure sensors — leave empty for relative/sea-level |
+
+### Local forecast (Zambretti)
+
+The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which achieves roughly 90% accuracy for the next 12 hours using barometric pressure, its 3-hour trend, wind direction and season.
+
+Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
+
+A **Verbose forecast text** toggle expands the short phrase into a full sentence with a pressure-tendency clause, e.g. *"Unsettled weather, with rain expected later. The pressure is falling."*
+
+Inputs used:
+
+- `entity_pressure` — **required.** Sea-level (relative) pressure preferred. Units are auto-converted from the sensor's `unit_of_measurement` (hPa/mbar, inHg, mmHg, kPa, psi, Pa).
+- `entity_pressure_trend` — strongly recommended. A numeric derivative sensor in hPa/h gives the best result (±0.1 hPa/h is the rising/falling threshold); text states `rising`/`steady`/`falling` also work.
+- `entity_wind_bearing` — optional, refines the forecast (degrees or compass text).
+- **Station altitude** — only set this if your pressure sensor reports *absolute* (station) pressure; the card then applies the barometric sea-level correction using the current temperature. Leave empty for relative/sea-level sensors.
+
+The hemisphere is detected automatically from your Home Assistant latitude.
+
+To keep the text stable with fast-reporting stations, the card applies three smoothing rules: wind direction is ignored while wind speed is below 2 km/h (direction is noise in calm conditions), the pressure trend uses hysteresis (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08), and a changed forecast text must persist for 5 minutes before it replaces the one on screen.
+
+```yaml
+type: custom:platinum-weather-card-plus-charts
+entity_pressure: sensor.ws_relative_pressure
+entity_pressure_trend: sensor.pressure_trend
+entity_wind_bearing: sensor.ws_wind_direction
+option_local_forecast: true
+# option_forecast_altitude: 550   # only for absolute-pressure sensors
+```
 
 ## Extended Section
 
@@ -387,34 +443,6 @@ sensor:
 
 Then select it in the editor: Slots Section → *Entity Pressure Trend* (the picker appears once a pressure entity is set).
 
-### Local forecast (Zambretti)
-
-The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which achieves roughly 90% accuracy for the next 12 hours using barometric pressure, its 3-hour trend, wind direction and season.
-
-Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
-
-A **Verbose forecast text** toggle expands the short phrase into a full sentence with a pressure-tendency clause, e.g. *"Unsettled weather, with rain expected later. The pressure is falling."*
-
-Inputs used:
-
-- `entity_pressure` — **required.** Sea-level (relative) pressure preferred. Units are auto-converted from the sensor's `unit_of_measurement` (hPa/mbar, inHg, mmHg, kPa, psi, Pa).
-- `entity_pressure_trend` — strongly recommended. A numeric derivative sensor in hPa/h gives the best result (±0.1 hPa/h is the rising/falling threshold); text states `rising`/`steady`/`falling` also work.
-- `entity_wind_bearing` — optional, refines the forecast (degrees or compass text).
-- **Station altitude** — only set this if your pressure sensor reports *absolute* (station) pressure; the card then applies the barometric sea-level correction using the current temperature. Leave empty for relative/sea-level sensors.
-
-The hemisphere is detected automatically from your Home Assistant latitude.
-
-To keep the text stable with fast-reporting stations, the card applies three smoothing rules: wind direction is ignored while wind speed is below 2 km/h (direction is noise in calm conditions), the pressure trend uses hysteresis (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08), and a changed forecast text must persist for 5 minutes before it replaces the one on screen.
-
-```yaml
-type: custom:platinum-weather-card-plus-charts
-entity_pressure: sensor.ws_relative_pressure
-entity_pressure_trend: sensor.pressure_trend
-entity_wind_bearing: sensor.ws_wind_direction
-option_local_forecast: true
-# option_forecast_altitude: 550   # only for absolute-pressure sensors
-```
-
 ## Icon Packs
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
@@ -458,6 +486,9 @@ Hovering over any forecast day column shows a tooltip with date, weather descrip
 | Entity Forecast Possible Rain 1 | String | Estimated rainfall amount |
 | Entity Extended Forecast 1 | String | Detailed forecast text (vertical only) |
 | Entity Fire Danger 1 | String | Fire danger forecast (vertical only) |
+| Include Today in Forecast | Boolean | Start the strip from today instead of tomorrow |
+| Show date next to day | Boolean | Locale-formatted date after the day name (day label font shrinks to fit) |
+| Show forecast wind | Boolean | Wind speed/direction in each forecast column |
 
 ## Charts Section
 
@@ -489,7 +520,7 @@ When the **Charts section is enabled**, the same data is rendered visually as te
 | Show Static Icons | Boolean | Disable animated icons |
 | Time Format | String | `system` (follows HA Settings → Profile), `12hour`, or `24hour` |
 | Locale | String | Locale for timestamp and moon phase formatting. Supported: `bg`, `ru`, `ua`, `de`, `fr`, `it`, `nl`, `pl`, `da`, `es`, `he` |
-| Include Today in Forecast | Boolean | Start the daily forecast and chart strips from today instead of tomorrow |
+| Compact slot labels | Boolean | Shorter slot label wording (`option_compact_slots`) |
 
 ---
 
@@ -558,6 +589,9 @@ double_tap_action:
 | `entity_apparent_temp` | String | none | Apparent temperature entity |
 | `entity_forecast_icon` | String | none | Forecast icon entity |
 | `entity_summary` | String | none | Forecast summary entity |
+| `option_local_forecast` | Boolean | `false` | Compute a local Zambretti forecast and show it as the overview summary text (uses `entity_pressure`, `entity_pressure_trend`, `entity_wind_bearing`, `entity_wind_speed`) |
+| `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
+| `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 
 ## Extended Section
 
@@ -582,10 +616,6 @@ double_tap_action:
 | `entity_humidity` | String | none | Required for `humidity` |
 | `entity_pressure` | String | none | Required for `pressure` |
 | `entity_pressure_trend` | String | none | Optional trend sensor — shows a colored ↗/→/↘ arrow next to the pressure value |
-| `option_local_forecast` | Boolean | `false` | Compute a local Zambretti forecast from `entity_pressure` and show it as the overview summary text |
-| `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
-| `option_daily_forecast_date` | Boolean | `false` | Show a locale-formatted date (e.g. 13.07) next to the day name in the daily forecast |
-| `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 | `pressure_units` | String | none | Optional pressure unit label |
 | `entity_observed_max` | String | none | Required for `observed_max`, `temp_maximums` |
 | `entity_observed_min` | String | none | Required for `observed_min`, `temp_minimums` |
@@ -615,6 +645,8 @@ double_tap_action:
 | `option_show_forecast_pop` | Boolean | `true` | Show precipitation probability in forecast |
 | `option_pressure_decimals` | Number | `0` | Decimal places for pressure: `0`–`3` |
 | `option_color_fire_danger` | Boolean | `true` | Colour fire danger by severity |
+| `option_wind_bearing_icon` | Boolean | `false` | Show the wind bearing as a rotating arrow icon instead of compass text |
+| `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |
 
 Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressure`, l5=`sun_next`, l6–l8=`remove`, r1=`popforecast`, r2=`humidity`, r3=`uv_summary`, r4=`moon`, r5=`sun_following`, r6–r8=`remove`.
 
@@ -628,6 +660,8 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 | `daily_forecast_days` | Number | `5` | Days to show: 1–5 (horizontal), 1–7 (vertical) |
 | `option_tooltips` | Boolean | `false` | Enable hover tooltips on horizontal forecast columns |
 | `option_show_current_day` | Boolean | `false` | Include today in forecast strip |
+| `option_daily_forecast_date` | Boolean | `false` | Show a locale-formatted date (e.g. 13.07) next to the day name |
+| `option_show_forecast_wind` | Boolean | `false` | Show forecast wind speed/direction in each column |
 | `entity_summary_1` | String | none | Weather summary sensor for day 1 tooltip (auto-incremented for each day) |
 | `daily_extended_forecast_days` | Number | `7` | Extended forecast days (vertical only, 0–7) |
 | `option_daily_color_fire_danger` | Boolean | `true` | Colour fire danger (vertical only) |
