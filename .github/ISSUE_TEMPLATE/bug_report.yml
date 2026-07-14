@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a problem with the card
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: card-version
+    attributes:
+      label: Card version
+      placeholder: "e.g. v2.0.8"
+    validations:
+      required: true
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant version
+      placeholder: "e.g. 2026.7.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Where does it happen?
+      multiple: true
+      options:
+        - Desktop browser
+        - Mobile browser
+        - HA Companion App (Android)
+        - HA Companion App (iOS)
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: What happened and what did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Card configuration (YAML)
+      render: yaml
+      description: Paste your card config (remove sensitive data)
+  - type: textarea
+    id: logs
+    attributes:
+      label: Browser console errors / screenshots
+      description: Open DevTools (F12) → Console, paste any errors related to the card
