@@ -561,7 +561,11 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 
 ## Actions
 
-The card supports all standard [HA actions](https://www.home-assistant.io/dashboards/actions/). Some examples:
+The card supports all standard [HA actions](https://www.home-assistant.io/dashboards/actions/), configurable from **Global Options → Actions** in the editor:
+
+![Editor actions](images/editor-actions.png)
+
+Some YAML examples:
 
 ```yaml
 # Tap — show more-info for a specific entity
