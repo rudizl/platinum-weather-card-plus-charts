@@ -38,6 +38,17 @@ Install via HACS as a custom repository:
 **New: Date next to day name**
 - Optional locale-formatted date in the daily forecast day labels — "ПН 13.07" (bg), "Mon 7/13" (en-US). Works in both layouts; the day label font shrinks slightly when enabled
 
+**New: Barometric pressure trend indicator** (#7)
+- Point `entity_pressure_trend` at a trend sensor and the pressure slot shows a colored arrow next to the value: ↗ green (rising), → gray (steady), ↘ red (falling)
+- Accepts a numeric rate of change (hPa/h, e.g. a Derivative helper — recipe in the README) or the text states `rising`/`steady`/`falling`
+
+**New: Wind bearing arrow** (#7)
+- `option_wind_bearing_icon` — the wind slot shows a rotating arrow (pointing where the wind blows) instead of compass text; works with both degree and compass-text sensors
+
+**Translation system rework**
+- All strings extracted to per-language files (`src/translations/`) — contributions are now a single-file edit
+- Editor fully translated in all 12 non-English languages; unit labels moved into the translation system
+
 **Editor overhaul**
 - All 28 on/off controls replaced: lock icon-buttons → compact toggle switches (gray off / green on, pure CSS, no HA component dependency)
 - Layout consistency pass: labels sit above their dropdowns everywhere, selects match label font size (13px), no more wrapped toggle labels
@@ -46,6 +57,10 @@ Install via HACS as a custom repository:
 **Fixes**
 - UV forecast / Fire danger entity picker labels in the Extended section were blank in 11 of 13 editor languages
 - Compact Max/Min slot labels now translated in de, es, fr, it, nl, pl, da (previously fell back to English)
+- Wind bearing arrow rotation not applied in some setups; gust arrow toggle removed (gusts have no direction data)
+- bg: "полумесец" → "луна" for crescent moon phases
+
+**Want the forecasts to sound right in your language?** Native-speaker review is very welcome — see [issue #8](https://github.com/rudizl/platinum-weather-card-plus-charts/issues/8)
 
 ---
 
