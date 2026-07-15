@@ -67,6 +67,7 @@ const nl: Translation = {
     "slots_section": "Slots-sectie",
     "daily_forecast_section": "Dagelijkse voorspelling",
     "wind_bearing_icon": "Windrichtingspijl",
+    "slot_tap_more_info": "Tik op waarde opent geschiedenis",
     "local_forecast": "Lokale voorspelling (Zambretti)",
     "entity_uv_today": "UV-verwachting (vandaag)",
     "entity_fire_today": "Brandgevaar (vandaag)",

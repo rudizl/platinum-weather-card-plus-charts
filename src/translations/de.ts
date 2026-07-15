@@ -67,6 +67,7 @@ const de: Translation = {
     "slots_section": "Slots-Bereich",
     "daily_forecast_section": "Tagesvorhersage",
     "wind_bearing_icon": "Windrichtungspfeil",
+    "slot_tap_more_info": "Tippen auf Wert öffnet Verlauf",
     "local_forecast": "Lokale Vorhersage (Zambretti)",
     "entity_uv_today": "UV-Vorhersage (heute)",
     "entity_fire_today": "Waldbrandgefahr (heute)",
