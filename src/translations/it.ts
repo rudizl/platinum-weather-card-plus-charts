@@ -68,6 +68,7 @@ const it: Translation = {
     "daily_forecast_section": "Previsioni giornaliere",
     "wind_bearing_icon": "Freccia direzione vento",
     "slot_tap_more_info": "Tocca un valore per aprire la cronologia",
+    "moon_icon_only": "Fase lunare: solo icona",
     "local_forecast": "Previsione locale (Zambretti)",
     "entity_uv_today": "Previsione UV (oggi)",
     "entity_fire_today": "Pericolo di incendio (oggi)",

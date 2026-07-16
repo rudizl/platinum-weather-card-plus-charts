@@ -68,6 +68,7 @@ const en: Translation = {
     "daily_forecast_section": "Daily Forecast Section",
     "wind_bearing_icon": "Wind bearing arrow icon",
     "slot_tap_more_info": "Tap on value opens history",
+    "moon_icon_only": "Moon phase: icon only",
     "local_forecast": "Local forecast (Zambretti)",
     "entity_uv_today": "UV forecast (today)",
     "entity_fire_today": "Fire danger (today)",

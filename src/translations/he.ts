@@ -68,6 +68,7 @@ const he: Translation = {
     "daily_forecast_section": "תחזית יומית",
     "wind_bearing_icon": "חץ כיוון הרוח",
     "slot_tap_more_info": "הקשה על ערך פותחת היסטוריה",
+    "moon_icon_only": "מופע הירח: סמל בלבד",
     "local_forecast": "תחזית מקומית (Zambretti)",
     "entity_uv_today": "תחזית UV (היום)",
     "entity_fire_today": "סכנת שריפה (היום)",

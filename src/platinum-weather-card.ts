@@ -2357,7 +2357,7 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="slot-icon">
             <ha-icon icon="${this.moonPhaseIcon(phase)}"></ha-icon>
           </div>
-          <div class="slot-text">${this.localeTextMoonPhase(phase)}</div>
+          ${this._config.option_moon_icon_only === true ? html`` : html`<div class="slot-text" title="${this.localeTextMoonPhase(phase)}">${this.localeTextMoonPhase(phase)}</div>`}
         </div>
       </li>
     `;

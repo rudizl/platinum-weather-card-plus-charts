@@ -11,10 +11,11 @@ import nl from './nl';
 import pl from './pl';
 import ru from './ru';
 import ua from './ua';
+import cs from './cs';
 
 export type { Translation };
 
-export const TRANSLATIONS: Record<string, Translation> = { en, bg, da, de, es, fr, he, it, nl, pl, ru, ua };
+export const TRANSLATIONS: Record<string, Translation> = { en, bg, da, de, es, fr, he, it, nl, pl, ru, ua, cs };
 
 // Editor string: keyed by HA UI language, falls back to English, then the key itself
 export function tEditor(lang: string, key: string): string {

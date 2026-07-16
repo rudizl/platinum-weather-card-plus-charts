@@ -68,6 +68,7 @@ const ru: Translation = {
     "daily_forecast_section": "Ежедневный прогноз",
     "wind_bearing_icon": "Стрелка направления ветра",
     "slot_tap_more_info": "Нажатие на значение открывает историю",
+    "moon_icon_only": "Фаза луны: только значок",
     "local_forecast": "Локальный прогноз (Zambretti)",
     "entity_uv_today": "УФ-прогноз (сегодня)",
     "entity_fire_today": "Пожарная опасность (сегодня)",

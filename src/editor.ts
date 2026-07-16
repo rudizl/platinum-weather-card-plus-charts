@@ -1409,8 +1409,19 @@ get _forecast_type(): string {
         </div>
         <div>
           <div class="toggle-row">
+              <span class=${this._config?.option_moon_icon_only ? "pwc-switch active" : "pwc-switch"} .value=${'option_moon_icon_only'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("moon_icon_only")}</span>
+            </div>
+        </div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
               <span class=${this._config?.option_slot_tap_more_info !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_slot_tap_more_info'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("slot_tap_more_info")}</span>
+            </div>
+        </div>
+        <div></div>
             </div>
         </div>
       </div>
@@ -1636,6 +1647,7 @@ get _forecast_type(): string {
         <select class='ha-select-compat' .configValue=${'option_locale'} .value=${this._option_locale} @change=${this._valueChanged}>
           <option value="">${this._t("opt_locale_auto")}</option>
           <option value="bg">🇧🇬 Български</option>
+          <option value="cs">🇨🇿 Čeština</option>
           <option value="da">🇩🇰 Dansk</option>
           <option value="de">🇩🇪 Deutsch</option>
           <option value="en">🇬🇧 English</option>

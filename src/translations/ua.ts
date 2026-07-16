@@ -68,6 +68,7 @@ const ua: Translation = {
     "daily_forecast_section": "Щоденний прогноз",
     "wind_bearing_icon": "Стрілка напряму вітру",
     "slot_tap_more_info": "Натискання на значення відкриває історію",
+    "moon_icon_only": "Фаза місяця: лише значок",
     "local_forecast": "Локальний прогноз (Zambretti)",
     "entity_uv_today": "УФ-прогноз (сьогодні)",
     "entity_fire_today": "Пожежна небезпека (сьогодні)",

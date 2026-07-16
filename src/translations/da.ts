@@ -68,6 +68,7 @@ const da: Translation = {
     "daily_forecast_section": "Daglig vejrudsigt",
     "wind_bearing_icon": "Pil for vindretning",
     "slot_tap_more_info": "Tryk på værdi åbner historik",
+    "moon_icon_only": "Månefase: kun ikon",
     "local_forecast": "Lokal vejrudsigt (Zambretti)",
     "entity_uv_today": "UV-prognose (i dag)",
     "entity_fire_today": "Brandfare (i dag)",
