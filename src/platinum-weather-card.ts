@@ -2231,7 +2231,7 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-sunny"></ha-icon>
           </div>
-          <div class="slot-text daytime-uv-text">${this.localeTextUVRating} ${uv}</div>
+          <div class="slot-text trim daytime-uv-text" title="${this.localeTextUVRating} ${uv}">${this.localeTextUVRating} ${uv}</div>
         </div>
       </li>
     `;
@@ -2248,7 +2248,7 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="slot-icon">
             <ha-icon icon="mdi:fire"></ha-icon>
           </div>
-          <div class="slot-text fire-danger-text" style="${fireStyle}">${fire} </div>
+          <div class="slot-text trim fire-danger-text" style="${fireStyle}">${fire} </div>
         </div>
       </li>`;
     } else {
@@ -2261,7 +2261,7 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="slot-icon">
             <ha-icon icon="mdi:fire"></ha-icon>
           </div>
-          <div class="slot-text fire-danger-text">
+          <div class="slot-text trim fire-danger-text">
             <p class="fire-danger-text-color" style="${fireStyle}">${fire}</p>
           </div>
         </div>
@@ -2357,7 +2357,7 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="slot-icon">
             <ha-icon icon="${this.moonPhaseIcon(phase)}"></ha-icon>
           </div>
-          ${this._config.option_moon_icon_only === true ? html`` : html`<div class="slot-text" title="${this.localeTextMoonPhase(phase)}">${this.localeTextMoonPhase(phase)}</div>`}
+          ${this._config.option_moon_icon_only === true ? html`` : html`<div class="slot-text trim" title="${this.localeTextMoonPhase(phase)}">${this.localeTextMoonPhase(phase)}</div>`}
         </div>
       </li>
     `;
@@ -2390,7 +2390,7 @@ export class PlatinumWeatherCard extends LitElement {
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-1-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-1-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -2406,7 +2406,7 @@ export class PlatinumWeatherCard extends LitElement {
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-2-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-2-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -2422,7 +2422,7 @@ export class PlatinumWeatherCard extends LitElement {
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-3-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-3-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -2438,7 +2438,7 @@ export class PlatinumWeatherCard extends LitElement {
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-4-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-4-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -3368,6 +3368,9 @@ export class PlatinumWeatherCard extends LitElement {
       }
       .slot-list li {
         height:24px;
+        display: flex;
+        align-items: center;
+        min-width: 0;
       }
       .variations-ugly {
         display: flex;
@@ -3391,7 +3394,10 @@ export class PlatinumWeatherCard extends LitElement {
         padding-left: 1px;
       }
       .slot {
-        display: table-row;
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        width: 100%;
       }
       li.slot-tappable {
         cursor: pointer;
@@ -3402,19 +3408,30 @@ export class PlatinumWeatherCard extends LitElement {
         background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
       }
       .slot-icon {
-        display: table-cell;
+        display: block;
+        flex: 0 0 auto;
         position: relative;
         height: 18px;
         padding-right: 5px;
         color: var(--paper-item-icon-color);
       }
       .slot-text {
-        display: table-cell;
+        display: block;
+        flex: 0 0 auto;
         position: relative;
+        white-space: nowrap;
+      }
+      .slot-text.trim {
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .label-text {
-        display: table-cell;
+        display: block;
+        flex: 0 0 auto;
         position: relative;
+        white-space: nowrap;
         font-size: 0.85em;
         color: var(--secondary-text-color);
         padding-right: 4px;

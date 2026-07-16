@@ -414,7 +414,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-sunny"></ha-icon>
           </div>
-          <div class="slot-text daytime-uv-text">${this.localeTextUVRating} ${t}</div>
+          <div class="slot-text trim daytime-uv-text" title="${this.localeTextUVRating} ${t}">${this.localeTextUVRating} ${t}</div>
         </div>
       </li>
     `}get slotFireDanger(){const t=this._config.entity_fire_danger,e=t&&void 0!==this.hass.states[t]?"unknown"!==this.hass.states[t].state?!1===this._config.option_color_fire_danger?this.hass.states[t].state:this.hass.states[t].state.toLocaleUpperCase():"Not Applicable":"---";var i=t&&!1!==this._config.option_color_fire_danger&&this.hass.states[t].attributes.color_fill?`background-color:${this.hass.states[t].attributes.color_fill}; color:${this.hass.states[t].attributes.color_text};`:"";return!1===this._config.option_color_fire_danger?F`
@@ -423,7 +423,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <div class="slot-icon">
             <ha-icon icon="mdi:fire"></ha-icon>
           </div>
-          <div class="slot-text fire-danger-text" style="${i}">${e} </div>
+          <div class="slot-text trim fire-danger-text" style="${i}">${e} </div>
         </div>
       </li>`:(""===i&&(i="font-weight:300; padding-left:0px;"),F`
       <li>
@@ -431,7 +431,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <div class="slot-icon">
             <ha-icon icon="mdi:fire"></ha-icon>
           </div>
-          <div class="slot-text fire-danger-text">
+          <div class="slot-text trim fire-danger-text">
             <p class="fire-danger-text-color" style="${i}">${e}</p>
           </div>
         </div>
@@ -479,7 +479,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <div class="slot-icon">
             <ha-icon icon="${this.moonPhaseIcon(e)}"></ha-icon>
           </div>
-          ${!0===this._config.option_moon_icon_only?F``:F`<div class="slot-text" title="${this.localeTextMoonPhase(e)}">${this.localeTextMoonPhase(e)}</div>`}
+          ${!0===this._config.option_moon_icon_only?F``:F`<div class="slot-text trim" title="${this.localeTextMoonPhase(e)}">${this.localeTextMoonPhase(e)}</div>`}
         </div>
       </li>
     `}moonPhaseIcon(t){switch(t){case"new_moon":return"mdi:moon-new";case"waxing_crescent":return"mdi:moon-waxing-crescent";case"first_quarter":return"mdi:moon-first-quarter";case"waxing_gibbous":return"mdi:moon-waxing-gibbous";case"full_moon":default:return"mdi:moon-full";case"waning_gibbous":return"mdi:moon-waning-gibbous";case"last_quarter":return"mdi:moon-last-quarter";case"waning_crescent":return"mdi:moon-waning-crescent"}}localeTextMoonPhase(t){return function(t,e){var i,s,o;const n=(t||"en").split("-")[0].toLowerCase();return null!==(o=null!==(s=null===(i=St[n])||void 0===i?void 0:i.moonPhases[e])&&void 0!==s?s:St.en.moonPhases[e])&&void 0!==o?o:e.split("_").map(t=>t.charAt(0).toUpperCase()+t.slice(1)).join(" ")}(this.locale,t)}get slotCustom1(){var t=this._config.custom1_icon?this._config.custom1_icon:"mdi:help-box",e=this._config.custom1_value&&void 0!==this.hass.states[this._config.custom1_value]?this.hass.states[this._config.custom1_value].state:"unknown",i=this._config.custom1_units?this._config.custom1_units:"",s=this._config.custom1_label?this._config.custom1_label:"";return F`
@@ -488,7 +488,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <ha-icon icon=${t}></ha-icon>
         </div>
         ${s?F`<div class="slot-text label-text">${s}</div>`:F``}
-        <div class="slot-text custom-1-text">${e}</div><div class="slot-text unit">${i}</div>
+        <div class="slot-text trim custom-1-text" title="${e}">${e}</div><div class="slot-text unit">${i}</div>
       </li>
     `}get slotCustom2(){var t=this._config.custom2_icon?this._config.custom2_icon:"mdi:help-box",e=this._config.custom2_value&&void 0!==this.hass.states[this._config.custom2_value]?this.hass.states[this._config.custom2_value].state:"unknown",i=this._config.custom2_units?this._config.custom2_units:"",s=this._config.custom2_label?this._config.custom2_label:"";return F`
       <li data-slot="custom2">
@@ -496,7 +496,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <ha-icon icon=${t}></ha-icon>
         </div>
         ${s?F`<div class="slot-text label-text">${s}</div>`:F``}
-        <div class="slot-text custom-2-text">${e}</div><div class="slot-text unit">${i}</div>
+        <div class="slot-text trim custom-2-text" title="${e}">${e}</div><div class="slot-text unit">${i}</div>
       </li>
     `}get slotCustom3(){var t=this._config.custom3_icon?this._config.custom3_icon:"mdi:help-box",e=this._config.custom3_value&&void 0!==this.hass.states[this._config.custom3_value]?this.hass.states[this._config.custom3_value].state:"unknown",i=this._config.custom3_units?this._config.custom3_units:"",s=this._config.custom3_label?this._config.custom3_label:"";return F`
       <li data-slot="custom3">
@@ -504,7 +504,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <ha-icon icon=${t}></ha-icon>
         </div>
         ${s?F`<div class="slot-text label-text">${s}</div>`:F``}
-        <div class="slot-text custom-3-text">${e}</div><div class="slot-text unit">${i}</div>
+        <div class="slot-text trim custom-3-text" title="${e}">${e}</div><div class="slot-text unit">${i}</div>
       </li>
     `}get slotCustom4(){var t=this._config.custom4_icon?this._config.custom4_icon:"mdi:help-box",e=this._config.custom4_value&&void 0!==this.hass.states[this._config.custom4_value]?this.hass.states[this._config.custom4_value].state:"unknown",i=this._config.custom4_units?this._config.custom4_units:"",s=this._config.custom4_label?this._config.custom4_label:"";return F`
       <li data-slot="custom4">
@@ -512,7 +512,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <ha-icon icon=${t}></ha-icon>
         </div>
         ${s?F`<div class="slot-text label-text">${s}</div>`:F``}
-        <div class="slot-text custom-4-text">${e}</div><div class="slot-text unit">${i}</div>
+        <div class="slot-text trim custom-4-text" title="${e}">${e}</div><div class="slot-text unit">${i}</div>
       </li>
     `}get forecastIcon(){const t=this._config.entity_forecast_icon;return t&&this.hass.states[t]?this.hass.states[t].state:"---"}get currentTemperature(){const t=this._config.entity_temperature,e=!0===this._config.option_show_overview_decimals?1:0;return t&&this.hass.states[t]?null===t.match("^weather.")?Number(this.hass.states[t].state).toLocaleString(this.locale,{minimumFractionDigits:e,maximumFractionDigits:e}):void 0!==this.hass.states[t].attributes.temperature?Number(this.hass.states[t].attributes.temperature).toLocaleString(this.locale,{minimumFractionDigits:e,maximumFractionDigits:e}):"---":"---"}get currentApparentTemperature(){const t=this._config.entity_apparent_temp,e=!0===this._config.option_show_overview_decimals?1:0;return t&&this.hass.states[t]?t&&this.hass.states[t]?null===t.match("^weather.")?Number(this.hass.states[t].state).toLocaleString(this.locale,{minimumFractionDigits:e,maximumFractionDigits:e}):void 0!==this.hass.states[t].attributes.apparent_temperature?Number(this.hass.states[t].attributes.apparent_temperature).toLocaleString(this.locale,{minimumFractionDigits:e,maximumFractionDigits:e}):"---":"---":""}get currentHumidity(){const t=this._config.entity_humidity;return t&&this.hass.states[t]?null===t.match("^weather.")?"unknown"===this.hass.states[t].state||"unavailable"===this.hass.states[t].state?"---":Number(this.hass.states[t].state).toLocaleString(this.locale):void 0!==this.hass.states[t].attributes.humidity?Number(this.hass.states[t].attributes.humidity).toLocaleString(this.locale):"---":"---"}get currentRainfall(){const t=this._config.entity_rainfall,e=!0===this._config.option_today_rainfall_decimals?1:0;return t&&this.hass.states[t]?"unknown"===this.hass.states[t].state||"unavailable"===this.hass.states[t].state?"---":Number(this.hass.states[t].state).toLocaleString(this.locale,{minimumFractionDigits:e,maximumFractionDigits:e}):"---"}get currentPressure(){const t=this._config.entity_pressure;var e=this._config.option_pressure_decimals?Math.max(Math.min(this._config.option_pressure_decimals,3),0):0;return t&&this.hass.states[t]?null===t.match("^weather.")?"unknown"===this.hass.states[t].state||"unavailable"===this.hass.states[t].state?"---":Number(this.hass.states[t].state).toLocaleString(this.locale,{minimumFractionDigits:e,maximumFractionDigits:e}):void 0!==this.hass.states[t].attributes.pressure?Number(this.hass.states[t].attributes.pressure).toLocaleString(this.locale):"---":"---"}get currentVisibility(){const t=this._config.entity_visibility;return t&&this.hass.states[t]?null===t.match("^weather.")?"unknown"===this.hass.states[t].state||"unavailable"===this.hass.states[t].state?"---":Number(this.hass.states[t].state).toLocaleString(this.locale):void 0!==this.hass.states[t].attributes.visibility?Number(this.hass.states[t].attributes.visibility).toLocaleString(this.locale):"---":"---"}get windBearingDegrees(){const t=this._config.entity_wind_bearing;if(!t||!this.hass.states[t])return null;const e=null===t.match("^weather.")?this.hass.states[t].state:this.hass.states[t].attributes.wind_bearing;if(null==e||""===e)return null;const i=Number(e);if(!isNaN(i))return i;const s=this.constructor.COMPASS_DEG[String(e).toUpperCase().trim()];return void 0!==s?s:null}_windIcon(t,e){const i=this.windBearingDegrees;return!0===e&&null!==i?F`<ha-icon icon="mdi:arrow-up" style="display:inline-block; transform: rotate(${(i+180)%360}deg);"></ha-icon>`:F`<ha-icon icon="${t}"></ha-icon>`}get currentWindBearing(){const t=this._config.entity_wind_bearing;return t&&this.hass.states[t]?null===t.match("^weather.")?isNaN(Number(this.hass.states[t].state))?this.hass.states[t].state:this.windDirections[Math.round(Number(this.hass.states[t].state)/360*16)]:void 0!==this.hass.states[t].attributes.wind_bearing?isNaN(Number(this.hass.states[t].attributes.wind_bearing))?this.hass.states[t].attributes.wind_bearing:this.windDirections[Math.round(Number(this.hass.states[t].attributes.wind_bearing)/360*16)]:"---":"---"}get currentWindSpeed(){const t=this._config.entity_wind_speed;return t&&this.hass.states[t]?null===t.match("^weather.")?Math.round(Number(this.hass.states[t].state)).toLocaleString(this.locale):void 0!==this.hass.states[t].attributes.wind_speed?Math.round(Number(this.hass.states[t].attributes.wind_speed)).toLocaleString(this.locale):"---":"---"}get currentWindSpeedUnit(){const t=this._config.entity_wind_speed;if(!t||!this.hass.states[t])return this.getUOM("length")+"/h";if(null!==t.match("^weather.")){const e=this.hass.states[t].attributes.wind_speed_unit;return void 0!==e?e:this.getUOM("length")+"/h"}return this.getUOM("length")+"/h"}get currentWindGust(){const t=this._config.entity_wind_gust;return t&&this.hass.states[t]?null===t.match("^weather.")?Math.round(Number(this.hass.states[t].state)).toLocaleString(this.locale):void 0!==this.hass.states[t].attributes.wind_gust_speed?Math.round(Number(this.hass.states[t].attributes.wind_gust_speed)).toLocaleString(this.locale):"---":"---"}get currentWindSpeedKt(){const t=this._config.entity_wind_speed_kt;return t&&this.hass.states[t]?null===t.match("^weather.")?Math.round(Number(this.hass.states[t].state)).toLocaleString(this.locale):void 0!==this.hass.states[t].attributes.wind_speed?Math.round(Number(this.hass.states[t].attributes.wind_speed)).toLocaleString(this.locale):"---":"---"}get currentWindGustKt(){const t=this._config.entity_wind_gust_kt;return t&&this.hass.states[t]?Math.round(Number(this.hass.states[t].state)).toLocaleString(this.locale):"---"}get windDirections(){return function(t){var e;const i=(t||"en").split("-")[0].toLowerCase(),s=null===(e=St[i])||void 0===e?void 0:e.windDirections;return s&&s.length?s:St.en.windDirections}(this.locale)}get currentBeaufort(){const t=this._config.entity_wind_speed;if(t&&this.hass.states[t]&&!isNaN(Number(this.hass.states[t].state))){const e=Number(this.hass.states[t].state);switch(this.hass.states[t].attributes.unit_of_measurement){case"mph":return e>=73?"12":e>=64?"11":e>=55?"10":e>=47?"9":e>=39?"8":e>=32?"7":e>=25?"6":e>=19?"5":e>=13?"4":e>=8?"3":e>=4?"2":e>=1?"1":"0";case"m/s":return e>=32.7?"12":e>=28.5?"11":e>=24.5?"10":e>=20.8?"9":e>=17.2?"8":e>=13.9?"7":e>=10.8?"6":e>=8?"5":e>=5.5?"4":e>=3.4?"3":e>=1.6?"2":e>=.5?"1":"0";default:return e>=118?"12":e>=103?"11":e>=89?"10":e>=75?"9":e>=62?"8":e>=50?"7":e>=39?"6":e>=29?"5":e>=20?"4":e>=12?"3":e>=6?"2":e>=2?"1":"0"}}return"---"}get currentBeaufortKt(){const t=this._config.entity_wind_speed_kt;if(t&&this.hass.states[t]&&!isNaN(Number(this.hass.states[t].state))){const e=Number(this.hass.states[t].state);return e>=64?"12":e>=56?"11":e>=48?"10":e>=41?"9":e>=34?"8":e>=28?"7":e>=22?"6":e>=17?"5":e>=11?"4":e>=7?"3":e>=4?"2":e>=1?"1":"0"}return"---"}get sunSet(){var t,e,i;switch(this.timeFormat){case"12hour":e=this._config.entity_sun&&void 0!==this.hass.states[this._config.entity_sun]?new Date(this.hass.states[this._config.entity_sun].attributes.next_setting).toLocaleTimeString(this.locale,{hour:"numeric",minute:"2-digit",hour12:!0}).replace(" am","am").replace(" pm","pm"):"",i=this._config.entity_sun&&void 0!==this.hass.states[this._config.entity_sun]?new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(this.locale,{hour:"numeric",minute:"2-digit",hour12:!0}).replace(" am","am").replace(" pm","pm"):"";break;case"24hour":e=this._config.entity_sun&&void 0!==this.hass.states[this._config.entity_sun]?new Date(this.hass.states[this._config.entity_sun].attributes.next_setting).toLocaleTimeString(this.locale,{hour:"2-digit",minute:"2-digit",hour12:!1}):"",i=this._config.entity_sun&&void 0!==this.hass.states[this._config.entity_sun]?new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(this.locale,{hour:"2-digit",minute:"2-digit",hour12:!1}):"";break;case"system":e=this._config.entity_sun&&void 0!==this.hass.states[this._config.entity_sun]?new Date(this.hass.states[this._config.entity_sun].attributes.next_setting).toLocaleTimeString(navigator.language,{timeStyle:"short"}).replace(" am","am").replace(" pm","pm"):"",i=this._config.entity_sun&&void 0!==this.hass.states[this._config.entity_sun]?new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(navigator.language,{timeStyle:"short"}).replace(" am","am").replace(" pm","pm"):""}var s=new Date;if(s.setDate(s.getDate()+1),this._config.entity_sun&&void 0!==this.hass.states[this._config.entity_sun]){const o=null===(t=this.hass.states[this._config.entity_sun].attributes)||void 0===t?void 0:t.elevation;return(void 0!==o?o>0:"above_horizon"===this.hass.states[this._config.entity_sun].state)?(i=s.toLocaleDateString(this.locale,{weekday:"short"})+" "+i,{next:F`
             <li>
@@ -687,6 +687,9 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
       }
       .slot-list li {
         height:24px;
+        display: flex;
+        align-items: center;
+        min-width: 0;
       }
       .variations-ugly {
         display: flex;
@@ -710,7 +713,10 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         padding-left: 1px;
       }
       .slot {
-        display: table-row;
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        width: 100%;
       }
       li.slot-tappable {
         cursor: pointer;
@@ -721,19 +727,30 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
       }
       .slot-icon {
-        display: table-cell;
+        display: block;
+        flex: 0 0 auto;
         position: relative;
         height: 18px;
         padding-right: 5px;
         color: var(--paper-item-icon-color);
       }
       .slot-text {
-        display: table-cell;
+        display: block;
+        flex: 0 0 auto;
         position: relative;
+        white-space: nowrap;
+      }
+      .slot-text.trim {
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .label-text {
-        display: table-cell;
+        display: block;
+        flex: 0 0 auto;
         position: relative;
+        white-space: nowrap;
         font-size: 0.85em;
         color: var(--secondary-text-color);
         padding-right: 4px;
