@@ -1632,6 +1632,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         <select class='ha-select-compat' .configValue=${"option_locale"} .value=${this._option_locale} @change=${this._valueChanged}>
           <option value="">${this._t("opt_locale_auto")}</option>
           <option value="bg">🇧🇬 Български</option>
+          <option value="cs">🇨🇿 Čeština</option>
           <option value="da">🇩🇰 Dansk</option>
           <option value="de">🇩🇪 Deutsch</option>
           <option value="en">🇬🇧 English</option>

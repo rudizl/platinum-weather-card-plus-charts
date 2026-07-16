@@ -36,7 +36,7 @@ Install via HACS as a custom repository:
 
 **New: Local forecast (Zambretti)**
 - The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. Classic Zambretti forecaster (1915, ~90% accuracy for the next 12h) using barometric pressure, its trend, wind direction and season
-- Enable via Overview Section → Options; the computed text replaces `entity_summary`. 26 forecast texts fully translated in all 13 languages
+- Enable via Overview Section → Options; the computed text replaces `entity_summary`. 26 forecast texts fully translated in all 14 languages
 - Optional verbose mode: full-sentence phrasing plus a pressure-tendency clause ("Unsettled weather, with rain expected later. The pressure is falling.")
 - Pressure units auto-converted (hPa/mbar, inHg, mmHg, kPa, psi, Pa); optional station-altitude sea-level correction for absolute-pressure sensors; hemisphere auto-detected from HA latitude
 - Built-in smoothing for fast-reporting stations: wind direction ignored below 2 km/h, trend hysteresis (±0.12 in / ±0.08 out hPa/h), and a 5-minute debounce before the displayed text changes
@@ -53,7 +53,7 @@ Install via HACS as a custom repository:
 
 **Translation system rework**
 - All strings extracted to per-language files (`src/translations/`) — contributions are now a single-file edit
-- Editor fully translated in all 12 non-English languages; unit labels moved into the translation system
+- Editor fully translated in all 13 non-English languages; unit labels moved into the translation system
 
 **Editor overhaul**
 - All 28 on/off controls replaced: lock icon-buttons → compact toggle switches (gray off / green on, pure CSS, no HA component dependency)
