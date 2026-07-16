@@ -3356,8 +3356,15 @@ export class PlatinumWeatherCard extends LitElement {
         padding-inline-start: 8px;
       }
       .slot-list-item-1 {
-        min-width:50%;
         padding-right: 8px;
+      }
+      .variations > li,
+      .variations-ugly > li {
+        flex: 0 0 50%;
+        min-width: 0;
+        max-width: 50%;
+        box-sizing: border-box;
+        overflow: hidden;
       }
       .slot-list {
         list-style: none;
