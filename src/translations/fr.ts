@@ -67,6 +67,7 @@ const fr: Translation = {
     "slots_section": "Section des emplacements",
     "daily_forecast_section": "Prévisions quotidiennes",
     "wind_bearing_icon": "Flèche de direction du vent",
+    "moon_icon_only": "Phase de lune : icône seule",
     "local_forecast": "Prévision locale (Zambretti)",
     "entity_uv_today": "Prévision UV (aujourd'hui)",
     "entity_fire_today": "Danger d'incendie (aujourd'hui)",

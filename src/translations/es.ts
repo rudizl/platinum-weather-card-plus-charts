@@ -67,6 +67,7 @@ const es: Translation = {
     "slots_section": "Sección de ranuras",
     "daily_forecast_section": "Pronóstico diario",
     "wind_bearing_icon": "Flecha de dirección del viento",
+    "moon_icon_only": "Fase lunar: solo icono",
     "local_forecast": "Pronóstico local (Zambretti)",
     "entity_uv_today": "Pronóstico UV (hoy)",
     "entity_fire_today": "Peligro de incendio (hoy)",

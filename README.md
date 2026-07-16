@@ -26,6 +26,12 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.1.1**
+- New option **"Moon phase: icon only"** (`option_moon_icon_only`) — hides the moon phase text, keeping just the icon. Long phase names (e.g. German "Zunehmender Dreiviertelmond") could force the slot section into a single column (#10, thanks @00pi)
+- Moon phase text now shows the full name as a tooltip on hover
+
+---
+
 **v2.1.0**
 
 **New: Local forecast (Zambretti)**
@@ -679,6 +685,7 @@ double_tap_action:
 | `option_color_fire_danger` | Boolean | `true` | Colour fire danger by severity |
 | `option_wind_bearing_icon` | Boolean | `false` | Show the wind bearing as a rotating arrow icon instead of compass text |
 | `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |
+| `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 
 Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressure`, l5=`sun_next`, l6–l8=`remove`, r1=`popforecast`, r2=`humidity`, r3=`uv_summary`, r4=`moon`, r5=`sun_following`, r6–r8=`remove`.
 

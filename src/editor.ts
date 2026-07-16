@@ -1407,7 +1407,12 @@ get _forecast_type(): string {
               <span class="toggle-label">${this._t("wind_bearing_icon")}</span>
             </div>
         </div>
-        <div></div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_moon_icon_only ? "pwc-switch active" : "pwc-switch"} .value=${'option_moon_icon_only'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("moon_icon_only")}</span>
+            </div>
+        </div>
       </div>
     `;
   }

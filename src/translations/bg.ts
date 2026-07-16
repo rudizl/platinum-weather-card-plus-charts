@@ -67,6 +67,7 @@ const bg: Translation = {
     "slots_section": "Секция Слотове",
     "daily_forecast_section": "Секция Прогноза",
     "wind_bearing_icon": "Стрелка за посока на вятъра",
+    "moon_icon_only": "Лунна фаза: само икона",
     "local_forecast": "Локална прогноза (Zambretti)",
     "daily_forecast_date": "Дата до деня",
     "local_forecast_verbose": "Многословна прогноза",
