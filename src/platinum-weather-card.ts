@@ -330,18 +330,15 @@ export class PlatinumWeatherCard extends LitElement {
     return changedProps.has('config');
   }
 
-  //tjl from bramkragten's weather-card
-  updated(changedProps) {
+  //tjl from bramkragten's weather-card (forecast subscription) + slot tap marking
+  protected updated(changedProps: PropertyValues): void {
+    super.updated(changedProps);
     if (!this.hass || !this._config) {
       return;
     }
     if (changedProps.has("_config") || !this._subscribed) {
       this._subscribeForecastEvents();
     }
-  }
-
-  protected updated(changedProps: PropertyValues): void {
-    super.updated(changedProps);
     // mark tappable slots so CSS can show a pointer cursor only where a tap will work
     this.renderRoot.querySelectorAll('li[data-slot]').forEach((el) => {
       const li = el as HTMLElement;
