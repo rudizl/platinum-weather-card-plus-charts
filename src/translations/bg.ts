@@ -204,6 +204,7 @@ const bg: Translation = {
     "opt_24hour": "24-часов"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "Усеща се като",
     "observed_max": "Наблюдавано макс.",
     "observed_min": "Наблюдавано мин.",

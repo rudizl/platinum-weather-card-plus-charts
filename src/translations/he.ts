@@ -204,6 +204,7 @@ const he: Translation = {
     "opt_24hour": "24 שעות"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "מרגיש כמו",
     "observed_max": "נצפה מקסימום",
     "observed_min": "נצפה מינימום",

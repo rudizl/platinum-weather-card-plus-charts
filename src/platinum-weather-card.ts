@@ -3397,7 +3397,7 @@ export class PlatinumWeatherCard extends LitElement {
         display: table-cell;
         padding-left: 1px;
       }
-      .slot {
+      .slot-list .slot {
         display: flex;
         align-items: center;
         min-width: 0;
@@ -3411,7 +3411,7 @@ export class PlatinumWeatherCard extends LitElement {
       li.slot-tappable:hover {
         background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
       }
-      .slot-icon {
+      .slot-list .slot-icon {
         display: block;
         flex: 0 0 auto;
         position: relative;
@@ -3420,25 +3420,31 @@ export class PlatinumWeatherCard extends LitElement {
         color: var(--paper-item-icon-color);
       }
       .slot-text {
+        display: table-cell;
+        position: relative;
+      }
+      .slot-list .slot-text {
         display: block;
         flex: 0 0 auto;
-        position: relative;
         white-space: nowrap;
       }
-      .slot-text.trim {
+      .slot-list .slot-text.trim {
         flex: 0 1 auto;
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
       }
       .label-text {
-        display: block;
-        flex: 0 0 auto;
+        display: table-cell;
         position: relative;
-        white-space: nowrap;
         font-size: 0.85em;
         color: var(--secondary-text-color);
         padding-right: 4px;
+      }
+      .slot-list .label-text {
+        display: block;
+        flex: 0 0 auto;
+        white-space: nowrap;
       }
       .fire-danger-text-color {
         display: inline-block;

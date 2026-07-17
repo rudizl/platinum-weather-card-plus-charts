@@ -204,6 +204,7 @@ const ru: Translation = {
     "opt_24hour": "24 часа"
   },
   "card": {
+    "uv_rating": "УФ",
     "feels_like": "Ощущается как",
     "observed_max": "Наблюдаемый макс.",
     "observed_min": "Наблюдаемый мин.",

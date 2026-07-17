@@ -204,6 +204,7 @@ const ua: Translation = {
     "opt_24hour": "24 години"
   },
   "card": {
+    "uv_rating": "УФ",
     "feels_like": "Відчувається як",
     "observed_max": "Спостережуваний макс.",
     "observed_min": "Спостережуваний мін.",

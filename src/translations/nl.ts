@@ -204,6 +204,7 @@ const nl: Translation = {
     "opt_24hour": "24 uur"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "Voelt als",
     "observed_max": "Opgemerkt Max",
     "observed_min": "Opgemerkt Min",
