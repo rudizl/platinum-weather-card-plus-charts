@@ -3117,9 +3117,9 @@ export class PlatinumWeatherCard extends LitElement {
   get locale(): string | undefined {
     try {
       Intl.NumberFormat(this._config.option_locale);
-      return this._config.option_locale;
+      return this._config.option_locale ?? this.hass?.locale?.language;
     } catch (e) {
-      return undefined;
+      return this.hass?.locale?.language;
     }
   }
 
