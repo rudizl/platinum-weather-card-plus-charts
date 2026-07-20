@@ -67,6 +67,7 @@ const cs: Translation = {
     "slots_section": "Sekce slotů",
     "daily_forecast_section": "Denní předpověď",
     "wind_bearing_icon": "Ikona směru větru",
+    "slot_tap_more_info": "Klepnutí na hodnotu otevře historii",
     "moon_icon_only": "Fáze měsíce: pouze ikona",
     "local_forecast": "Místní předpověď (Zambretti)",
     "entity_uv_today": "UV předpověď (dnes)",
@@ -203,6 +204,7 @@ const cs: Translation = {
     "opt_24hour": "24 hodin"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "Pocitově",
     "observed_max": "Pozorované maximum",
     "observed_min": "Pozorované minimum",

@@ -67,6 +67,7 @@ const bg: Translation = {
     "slots_section": "Секция Слотове",
     "daily_forecast_section": "Секция Прогноза",
     "wind_bearing_icon": "Стрелка за посока на вятъра",
+    "slot_tap_more_info": "Клик върху стойност отваря историята",
     "moon_icon_only": "Лунна фаза: само икона",
     "local_forecast": "Локална прогноза (Zambretti)",
     "daily_forecast_date": "Дата до деня",
@@ -203,6 +204,7 @@ const bg: Translation = {
     "opt_24hour": "24-часов"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "Усеща се като",
     "observed_max": "Наблюдавано макс.",
     "observed_min": "Наблюдавано мин.",

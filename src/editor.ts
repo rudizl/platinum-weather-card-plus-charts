@@ -1414,6 +1414,17 @@ get _forecast_type(): string {
             </div>
         </div>
       </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_slot_tap_more_info !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_slot_tap_more_info'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("slot_tap_more_info")}</span>
+            </div>
+        </div>
+        <div></div>
+            </div>
+        </div>
+      </div>
     `;
   }
 

@@ -67,6 +67,7 @@ const ua: Translation = {
     "slots_section": "Розділ слотів",
     "daily_forecast_section": "Щоденний прогноз",
     "wind_bearing_icon": "Стрілка напряму вітру",
+    "slot_tap_more_info": "Натискання на значення відкриває історію",
     "moon_icon_only": "Фаза місяця: лише значок",
     "local_forecast": "Локальний прогноз (Zambretti)",
     "entity_uv_today": "УФ-прогноз (сьогодні)",
@@ -203,6 +204,7 @@ const ua: Translation = {
     "opt_24hour": "24 години"
   },
   "card": {
+    "uv_rating": "УФ",
     "feels_like": "Відчувається як",
     "observed_max": "Спостережуваний макс.",
     "observed_min": "Спостережуваний мін.",

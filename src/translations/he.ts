@@ -67,6 +67,7 @@ const he: Translation = {
     "slots_section": "מקטע משבצות",
     "daily_forecast_section": "תחזית יומית",
     "wind_bearing_icon": "חץ כיוון הרוח",
+    "slot_tap_more_info": "הקשה על ערך פותחת היסטוריה",
     "moon_icon_only": "מופע הירח: סמל בלבד",
     "local_forecast": "תחזית מקומית (Zambretti)",
     "entity_uv_today": "תחזית UV (היום)",
@@ -203,6 +204,7 @@ const he: Translation = {
     "opt_24hour": "24 שעות"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "מרגיש כמו",
     "observed_max": "נצפה מקסימום",
     "observed_min": "נצפה מינימום",

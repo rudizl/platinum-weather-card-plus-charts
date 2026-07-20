@@ -67,6 +67,7 @@ const nl: Translation = {
     "slots_section": "Slots-sectie",
     "daily_forecast_section": "Dagelijkse voorspelling",
     "wind_bearing_icon": "Windrichtingspijl",
+    "slot_tap_more_info": "Tik op waarde opent geschiedenis",
     "moon_icon_only": "Maanfase: alleen pictogram",
     "local_forecast": "Lokale voorspelling (Zambretti)",
     "entity_uv_today": "UV-verwachting (vandaag)",
@@ -203,6 +204,7 @@ const nl: Translation = {
     "opt_24hour": "24 uur"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "Voelt als",
     "observed_max": "Opgemerkt Max",
     "observed_min": "Opgemerkt Min",

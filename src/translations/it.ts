@@ -67,6 +67,7 @@ const it: Translation = {
     "slots_section": "Sezione slot",
     "daily_forecast_section": "Previsioni giornaliere",
     "wind_bearing_icon": "Freccia direzione vento",
+    "slot_tap_more_info": "Tocca un valore per aprire la cronologia",
     "moon_icon_only": "Fase lunare: solo icona",
     "local_forecast": "Previsione locale (Zambretti)",
     "entity_uv_today": "Previsione UV (oggi)",
@@ -203,6 +204,7 @@ const it: Translation = {
     "opt_24hour": "24 ore"
   },
   "card": {
+    "uv_rating": "UV",
     "feels_like": "Percepito",
     "observed_max": "Osservata Max",
     "observed_min": "Osservata Min",

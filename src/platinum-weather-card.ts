@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, PropertyValues, CSSResult, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators';
-import { HomeAssistant, LovelaceCardEditor, getLovelace, debounce, hasAction, handleAction } from 'custom-card-helpers';
+import { HomeAssistant, LovelaceCardEditor, getLovelace, debounce, hasAction, handleAction, fireEvent } from 'custom-card-helpers';
 import { stringComputeStateDisplay } from './compute_state_display';
 
 //tjl add ifDefined in support of tap action
@@ -330,14 +330,20 @@ export class PlatinumWeatherCard extends LitElement {
     return changedProps.has('config');
   }
 
-  //tjl from bramkragten's weather-card
-  updated(changedProps) {
+  //tjl from bramkragten's weather-card (forecast subscription) + slot tap marking
+  protected updated(changedProps: PropertyValues): void {
+    super.updated(changedProps);
     if (!this.hass || !this._config) {
       return;
     }
     if (changedProps.has("_config") || !this._subscribed) {
       this._subscribeForecastEvents();
     }
+    // mark tappable slots so CSS can show a pointer cursor only where a tap will work
+    this.renderRoot.querySelectorAll('li[data-slot]').forEach((el) => {
+      const li = el as HTMLElement;
+      li.classList.toggle('slot-tappable', this._slotTapEntity(li.dataset.slot || '') !== null);
+    });
   }
 
   protected firstUpdated(): void {
@@ -776,10 +782,10 @@ export class PlatinumWeatherCard extends LitElement {
       <div>
         <ul class="variations-ugly">
           <li>
-            <ul class="slot-list">${this.slotL1}${this.slotL2}${this.slotL3}${this.slotL4}${this.slotL5}${this.slotL6}${this.slotL7}${this.slotL8}</ul>
+            <ul class="slot-list" @click=${this._slotClick}>${this.slotL1}${this.slotL2}${this.slotL3}${this.slotL4}${this.slotL5}${this.slotL6}${this.slotL7}${this.slotL8}</ul>
           </li>
           <li>
-            <ul class="slot-list">${this.slotR1}${this.slotR2}${this.slotR3}${this.slotR4}${this.slotR5}${this.slotR6}${this.slotR7}${this.slotR8}</ul>
+            <ul class="slot-list" @click=${this._slotClick}>${this.slotR1}${this.slotR2}${this.slotR3}${this.slotR4}${this.slotR5}${this.slotR6}${this.slotR7}${this.slotR8}</ul>
           </li>
         </ul>
       </div>
@@ -787,12 +793,12 @@ export class PlatinumWeatherCard extends LitElement {
       <div>
         <ul class="variations">
           <li class="slot-list-item-1">
-            <ul class="slot-list">
+            <ul class="slot-list" @click=${this._slotClick}>
               ${this.slotL1}${this.slotL2}${this.slotL3}${this.slotL4}${this.slotL5}${this.slotL6}${this.slotL7}${this.slotL8}
             </ul>
           </li>
           <li>
-            <ul class="slot-list">
+            <ul class="slot-list" @click=${this._slotClick}>
               ${this.slotR1}${this.slotR2}${this.slotR3}${this.slotR4}${this.slotR5}${this.slotR6}${this.slotR7}${this.slotR8}
             </ul>
           </li>
@@ -1772,7 +1778,7 @@ export class PlatinumWeatherCard extends LitElement {
       : "---";
     const pos_units = pos !== "---" ? html`<div class="slot-text unit">${this.getUOM('precipitation')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="popforecast">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-rainy"></ha-icon>
@@ -1799,7 +1805,7 @@ export class PlatinumWeatherCard extends LitElement {
       : "---";
     const pop_units = pop !== "---" ? html`<div class="slot-text unit">%</div>` : html``;
     return html`
-      <li>
+      <li data-slot="pop">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-rainy"></ha-icon>
@@ -1825,7 +1831,7 @@ export class PlatinumWeatherCard extends LitElement {
       : "---";
     const units = pos !== "---" ? html`<div class="slot-text unit">${this.getUOM('precipitation')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="possible_today">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-rainy"></ha-icon>
@@ -1850,7 +1856,7 @@ export class PlatinumWeatherCard extends LitElement {
       : "---";
     const units = pos !== "---" ? html`<div class="slot-text unit">${this.getUOM('precipitation')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="possible_tomorrow">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-rainy"></ha-icon>
@@ -1864,7 +1870,7 @@ export class PlatinumWeatherCard extends LitElement {
     const rainfall = this.currentRainfall;
     const units = rainfall !== "---" ? html`<div class="slot-text unit"></span>${this.getUOM('precipitation')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="rainfall">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-rainy"></ha-icon>
@@ -1879,7 +1885,7 @@ export class PlatinumWeatherCard extends LitElement {
     const humidity = this.currentHumidity;
     const units = humidity !== '---' ? html`<div class="slot-text unit">%</div>` : html``;
     return html`
-      <li>
+      <li data-slot="humidity">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:water-percent"></ha-icon>
@@ -1989,6 +1995,40 @@ export class PlatinumWeatherCard extends LitElement {
     return tZambretti(this.locale, shownLetter);
   }
 
+  // Which entity a slot's tap should open in the more-info dialog. Returns null
+  // for slots that should not be clickable: unconfigured, unavailable, weather
+  // domain entities (their dialog shows a forecast, not the sensor history), or
+  // when the feature is disabled.
+  private _slotTapEntity(slot: string): string | null {
+    if (this._config.option_slot_tap_more_info === false) return null;
+    const c = this._config;
+    const map: Record<string, string | undefined> = {
+      pop: c.entity_pop, popforecast: c.entity_pop, possible_today: c.entity_pos,
+      possible_tomorrow: c.entity_possible_tomorrow, rainfall: c.entity_rainfall,
+      humidity: c.entity_humidity, pressure: c.entity_pressure,
+      observed_max: c.entity_observed_max, observed_min: c.entity_observed_min,
+      forecast_max: c.entity_forecast_max, forecast_min: c.entity_forecast_min,
+      temp_next: c.entity_temp_next, temp_following: c.entity_temp_following,
+      temp_maximums: c.entity_forecast_max, temp_minimums: c.entity_forecast_min,
+      uv_summary: c.entity_uv_alert_summary, fire_danger: c.entity_fire_danger,
+      wind: c.entity_wind_speed, wind_gust: c.entity_wind_gust, wind_kt: c.entity_wind_speed_kt,
+      visibility: c.entity_visibility, moon: c.entity_moon,
+      custom1: c.custom1_value, custom2: c.custom2_value, custom3: c.custom3_value, custom4: c.custom4_value,
+    };
+    const entity = map[slot];
+    if (!entity || !this.hass.states[entity] || entity.startsWith('weather.')) return null;
+    return entity;
+  }
+
+  private _slotClick(ev: Event): void {
+    const li = (ev.target as HTMLElement).closest('li[data-slot]') as HTMLElement | null;
+    if (!li || !li.dataset.slot) return;
+    const entity = this._slotTapEntity(li.dataset.slot);
+    if (entity === null) return;
+    ev.stopPropagation();
+    fireEvent(this, 'hass-more-info', { entityId: entity });
+  }
+
   get slotPressure(): TemplateResult {
     const pressure = this.currentPressure;
     const units = pressure !== "---" ? html`<div class="slot-text unit">${this._config.pressure_units ? this._config.pressure_units : this.getUOM('air_pressure')}</div>` : html``;
@@ -1997,7 +2037,7 @@ export class PlatinumWeatherCard extends LitElement {
       icon="${trend === 'rising' ? 'mdi:arrow-top-right-thin' : trend === 'falling' ? 'mdi:arrow-bottom-right-thin' : 'mdi:arrow-right-thin'}"
       style="--mdc-icon-size: 16px; color: ${trend === 'rising' ? 'var(--label-badge-green, #4caf50)' : trend === 'falling' ? 'var(--label-badge-red, #f44336)' : 'var(--secondary-text-color)'};"></ha-icon></div>`;
     return html`
-      <li>
+      <li data-slot="pressure">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:gauge"></ha-icon>
@@ -2013,7 +2053,7 @@ export class PlatinumWeatherCard extends LitElement {
     const temp = this._config.entity_observed_max && this.hass.states[this._config.entity_observed_max] !== undefined ? (Number(this.hass.states[this._config.entity_observed_max].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }) : "---";
     const units = temp !== "---" ? html`<div class="unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="observed_max">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:thermometer-high"></ha-icon>
@@ -2030,7 +2070,7 @@ export class PlatinumWeatherCard extends LitElement {
     const temp = this._config.entity_observed_min && this.hass.states[this._config.entity_observed_min] !== undefined ? (Number(this.hass.states[this._config.entity_observed_min].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }) : "---";
     const units = temp !== "---" ? html`<div class="unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="observed_min">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:thermometer-low"></ha-icon>
@@ -2060,7 +2100,7 @@ export class PlatinumWeatherCard extends LitElement {
 
     const units = temp !== "---" ? html`<div class="unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="forecast_max">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:thermometer-high"></ha-icon>
@@ -2088,7 +2128,7 @@ export class PlatinumWeatherCard extends LitElement {
       : "---";
     const units = temp !== "---" ? html`<div class="unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="forecast_min">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:thermometer-low"></ha-icon>
@@ -2107,7 +2147,7 @@ export class PlatinumWeatherCard extends LitElement {
     const label = this._config.entity_temp_next_label && this.hass.states[this._config.entity_temp_next_label] !== undefined ? this.hass.states[this._config.entity_temp_next_label].state : "";
     const units = temp !== "---" ? html`<div class="slot-text unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="temp_next">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="${icon}"></ha-icon>
@@ -2126,7 +2166,7 @@ export class PlatinumWeatherCard extends LitElement {
     const label = this._config.entity_temp_following_label && this.hass.states[this._config.entity_temp_following_label] !== undefined ? this.hass.states[this._config.entity_temp_following_label].state : "";
     const units = temp !== "---" ? html`<div class="slot-text unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="temp_following">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="${icon}"></ha-icon>
@@ -2144,7 +2184,7 @@ export class PlatinumWeatherCard extends LitElement {
     const temp_for = this._config.entity_forecast_max && this.hass.states[this._config.entity_forecast_max] !== undefined ? (Number(this.hass.states[this._config.entity_forecast_max].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }) : "---";
     const units = temp_obs !== "---" ? html`<div class="unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="temp_maximums">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:thermometer-high"></ha-icon>
@@ -2165,7 +2205,7 @@ export class PlatinumWeatherCard extends LitElement {
     const temp_for = this._config.entity_forecast_min && this.hass.states[this._config.entity_forecast_min] !== undefined ? (Number(this.hass.states[this._config.entity_forecast_min].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }) : "---";
     const units = temp_obs !== "---" ? html`<div class="unit-temp-small">${this.getUOM('temperature')}</div>` : html``;
     return html`
-      <li>
+      <li data-slot="temp_minimums">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:thermometer-low"></ha-icon>
@@ -2183,12 +2223,12 @@ export class PlatinumWeatherCard extends LitElement {
   get slotUvSummary(): TemplateResult {
     const uv = this._config.entity_uv_alert_summary && this.hass.states[this._config.entity_uv_alert_summary] !== undefined ? this.hass.states[this._config.entity_uv_alert_summary].state !== "unknown" ? this.hass.states[this._config.entity_uv_alert_summary].state : "Not Applicable" : "---";
     return html`
-      <li>
+      <li data-slot="uv_summary">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-sunny"></ha-icon>
           </div>
-          <div class="slot-text daytime-uv-text">${this.localeTextUVRating} ${uv}</div>
+          <div class="slot-text trim daytime-uv-text" title="${this.localeTextUVRating} ${uv}">${this.localeTextUVRating} ${uv}</div>
         </div>
       </li>
     `;
@@ -2200,12 +2240,12 @@ export class PlatinumWeatherCard extends LitElement {
     var fireStyle = entity && this._config.option_color_fire_danger !== false && this.hass.states[entity].attributes.color_fill ? `background-color:${this.hass.states[entity].attributes.color_fill}; color:${this.hass.states[entity].attributes.color_text};` : "";
     if (this._config.option_color_fire_danger === false) {
       return html`
-      <li>
+      <li data-slot="fire_danger">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:fire"></ha-icon>
           </div>
-          <div class="slot-text fire-danger-text" style="${fireStyle}">${fire} </div>
+          <div class="slot-text trim fire-danger-text" style="${fireStyle}">${fire} </div>
         </div>
       </li>`;
     } else {
@@ -2218,7 +2258,7 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="slot-icon">
             <ha-icon icon="mdi:fire"></ha-icon>
           </div>
-          <div class="slot-text fire-danger-text">
+          <div class="slot-text trim fire-danger-text">
             <p class="fire-danger-text-color" style="${fireStyle}">${fire}</p>
           </div>
         </div>
@@ -2233,7 +2273,7 @@ export class PlatinumWeatherCard extends LitElement {
     const speed = this._config.entity_wind_speed ? html`<div class="slot-text">${this.currentWindSpeed}</div>${units}&nbsp;` : "";
     const gust = this._config.entity_wind_gust && this._config.option_show_gust_in_wind !== false ? html`<div class="slot-text">(${this.localeTextGust} ${this.currentWindGust}</div>${units})` : "";
     return html`
-      <li>
+      <li data-slot="wind">
         <div class="slot">
           <div class="slot-icon">
             ${this._windIcon('mdi:weather-windy', this._config.option_wind_bearing_icon)}
@@ -2248,7 +2288,7 @@ export class PlatinumWeatherCard extends LitElement {
     if (!this._config.entity_wind_gust) return html``;
     const units = html`<div class="slot-text unit">${this.currentWindSpeedUnit}</div>`;
     return html`
-      <li>
+      <li data-slot="wind_gust">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-windy-variant"></ha-icon>
@@ -2267,7 +2307,7 @@ export class PlatinumWeatherCard extends LitElement {
     const speed = this._config.entity_wind_speed_kt ? html`<div class="slot-text">${this.currentWindSpeedKt}</div>${units}&nbsp;` : "";
     const gust = this._config.entity_wind_gust_kt ? html`<div class="slot-text">(${this.localeTextGust} ${this.currentWindGustKt}</div>${units})` : "";
     return html`
-      <li>
+      <li data-slot="wind_kt">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-windy"></ha-icon>
@@ -2282,7 +2322,7 @@ export class PlatinumWeatherCard extends LitElement {
     const vis = this.currentVisibility;
     const units = vis !== "---" ? this.getUOM('length') : "";
     return html`
-      <li>
+      <li data-slot="visibility">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-fog"></ha-icon>
@@ -2309,12 +2349,12 @@ export class PlatinumWeatherCard extends LitElement {
     if (!state) return html``;
     const phase = state.state;
     return html`
-      <li>
+      <li data-slot="moon">
         <div class="slot">
           <div class="slot-icon">
             <ha-icon icon="${this.moonPhaseIcon(phase)}"></ha-icon>
           </div>
-          ${this._config.option_moon_icon_only === true ? html`` : html`<div class="slot-text" title="${this.localeTextMoonPhase(phase)}">${this.localeTextMoonPhase(phase)}</div>`}
+          ${this._config.option_moon_icon_only === true ? html`` : html`<div class="slot-text trim" title="${this.localeTextMoonPhase(phase)}">${this.localeTextMoonPhase(phase)}</div>`}
         </div>
       </li>
     `;
@@ -2342,12 +2382,12 @@ export class PlatinumWeatherCard extends LitElement {
     var unit = this._config.custom1_units ? this._config.custom1_units : '';
     var label = this._config.custom1_label ? this._config.custom1_label : '';
     return html`
-      <li>
+      <li data-slot="custom1">
         <div class="slot-icon">
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-1-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-1-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -2358,12 +2398,12 @@ export class PlatinumWeatherCard extends LitElement {
     var unit = this._config.custom2_units ? this._config.custom2_units : '';
     var label = this._config.custom2_label ? this._config.custom2_label : '';
     return html`
-      <li>
+      <li data-slot="custom2">
         <div class="slot-icon">
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-2-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-2-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -2374,12 +2414,12 @@ export class PlatinumWeatherCard extends LitElement {
     var unit = this._config.custom3_units ? this._config.custom3_units : '';
     var label = this._config.custom3_label ? this._config.custom3_label : '';
     return html`
-      <li>
+      <li data-slot="custom3">
         <div class="slot-icon">
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-3-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-3-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -2390,12 +2430,12 @@ export class PlatinumWeatherCard extends LitElement {
     var unit = this._config.custom4_units ? this._config.custom4_units : '';
     var label = this._config.custom4_label ? this._config.custom4_label : '';
     return html`
-      <li>
+      <li data-slot="custom4">
         <div class="slot-icon">
           <ha-icon icon=${icon}></ha-icon>
         </div>
         ${label ? html`<div class="slot-text label-text">${label}</div>` : html``}
-        <div class="slot-text custom-4-text">${value}</div><div class="slot-text unit">${unit}</div>
+        <div class="slot-text trim custom-4-text" title="${value}">${value}</div><div class="slot-text unit">${unit}</div>
       </li>
     `;
   }
@@ -3077,9 +3117,9 @@ export class PlatinumWeatherCard extends LitElement {
   get locale(): string | undefined {
     try {
       Intl.NumberFormat(this._config.option_locale);
-      return this._config.option_locale;
+      return this._config.option_locale ?? this.hass?.locale?.language;
     } catch (e) {
-      return undefined;
+      return this.hass?.locale?.language;
     }
   }
 
@@ -3316,8 +3356,15 @@ export class PlatinumWeatherCard extends LitElement {
         padding-inline-start: 8px;
       }
       .slot-list-item-1 {
-        min-width:50%;
         padding-right: 8px;
+      }
+      .variations > li,
+      .variations-ugly > li {
+        flex: 0 0 50%;
+        min-width: 0;
+        max-width: 50%;
+        box-sizing: border-box;
+        overflow: hidden;
       }
       .slot-list {
         list-style: none;
@@ -3325,6 +3372,9 @@ export class PlatinumWeatherCard extends LitElement {
       }
       .slot-list li {
         height:24px;
+        display: flex;
+        align-items: center;
+        min-width: 0;
       }
       .variations-ugly {
         display: flex;
@@ -3347,11 +3397,23 @@ export class PlatinumWeatherCard extends LitElement {
         display: table-cell;
         padding-left: 1px;
       }
-      .slot {
-        display: table-row;
+      .slot-list .slot {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        width: 100%;
       }
-      .slot-icon {
-        display: table-cell;
+      li.slot-tappable {
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.15s ease;
+      }
+      li.slot-tappable:hover {
+        background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
+      }
+      .slot-list .slot-icon {
+        display: block;
+        flex: 0 0 auto;
         position: relative;
         height: 18px;
         padding-right: 5px;
@@ -3361,12 +3423,28 @@ export class PlatinumWeatherCard extends LitElement {
         display: table-cell;
         position: relative;
       }
+      .slot-list .slot-text {
+        display: block;
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+      .slot-list .slot-text.trim {
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .label-text {
         display: table-cell;
         position: relative;
         font-size: 0.85em;
         color: var(--secondary-text-color);
         padding-right: 4px;
+      }
+      .slot-list .label-text {
+        display: block;
+        flex: 0 0 auto;
+        white-space: nowrap;
       }
       .fire-danger-text-color {
         display: inline-block;

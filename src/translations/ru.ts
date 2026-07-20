@@ -67,6 +67,7 @@ const ru: Translation = {
     "slots_section": "Раздел слотов",
     "daily_forecast_section": "Ежедневный прогноз",
     "wind_bearing_icon": "Стрелка направления ветра",
+    "slot_tap_more_info": "Нажатие на значение открывает историю",
     "moon_icon_only": "Фаза луны: только значок",
     "local_forecast": "Локальный прогноз (Zambretti)",
     "entity_uv_today": "УФ-прогноз (сегодня)",
@@ -203,6 +204,7 @@ const ru: Translation = {
     "opt_24hour": "24 часа"
   },
   "card": {
+    "uv_rating": "УФ",
     "feels_like": "Ощущается как",
     "observed_max": "Наблюдаемый макс.",
     "observed_min": "Наблюдаемый мин.",
