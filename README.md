@@ -26,6 +26,30 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.2.0**
+
+**New: Tap on slot value opens history** (#9)
+- Tap any slot value (humidity, pressure, wind, ...) and the native more-info dialog opens with the history/statistics graph. Only sensor-backed slots are tappable (pointer cursor + hover highlight); weather-attribute slots stay inert. Card-level tap/hold actions unaffected. `option_slot_tap_more_info`, on by default
+
+**New: Long text can no longer break the slot layout** (#10 follow-up)
+- Slot columns are pinned 50/50; long texts (moon phase, UV, fire danger, custom values) truncate with an ellipsis and a hover tooltip instead of collapsing the section to a single column
+- Slot layout converted from CSS tables to flex, scoped to the slots section
+
+**New: HA interface language as default** (#8 discussion)
+- When Locale is left empty, the card now follows the Home Assistant interface language for texts and dates (previously: English texts + browser-language dates). The Locale dropdown remains a full override
+
+**Translations**
+- 🇨🇿 Czech — thanks @VlastiBroucek (#11), the card's first community translation; selectable in the editor dropdown
+- English Zambretti texts modernized per @jerrymjones's native review: "fine" → "fair", "Fairly fine" → "Mostly fair", "Changeable, mending" → "Changeable, improving", "Very unsettled" (short + verbose sets)
+- German reviewed by a native speaker (@00pi) — no changes needed
+
+**Fixes**
+- "uv_rating 6" instead of "UV 6" — translation key lost in the v2.1.0 i18n rework, added in all 13 languages (thanks @00pi)
+- Forecast column numbers overlapping (beta regression, caught by @00pi)
+- Language count corrected in docs (13)
+
+---
+
 **v2.1.1**
 - New option **"Moon phase: icon only"** (`option_moon_icon_only`) — hides the moon phase text, keeping just the icon. Long phase names (e.g. German "Zunehmender Dreiviertelmond") could force the slot section into a single column (#10, thanks @00pi)
 - Moon phase text now shows the full name as a tooltip on hover
@@ -371,6 +395,10 @@ Four layout options are available:
 | &nbsp;&nbsp;Verbose forecast text | Boolean | Full-sentence forecast with a pressure-tendency clause |
 | &nbsp;&nbsp;Station altitude (m) | Number | Only for absolute-pressure sensors — leave empty for relative/sea-level |
 
+### Tap on a value → history
+
+Tapping a slot value (humidity, pressure, wind, ...) opens the native more-info dialog with the history/statistics graph. Only slots backed by a real sensor are tappable — a pointer cursor and a subtle hover highlight show where. Slots reading attributes of a `weather.*` entity stay inert (their dialog would show a forecast, not history). The card-level tap/hold actions are unaffected. Controlled by `option_slot_tap_more_info` (Slots section toggle, on by default).
+
 ### Local forecast (Zambretti)
 
 The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which achieves roughly 90% accuracy for the next 12 hours using barometric pressure, its 3-hour trend, wind direction and season.
@@ -553,7 +581,7 @@ When the **Charts section is enabled**, the same data is rendered visually as te
 | Icon Pack Path | String | Path template for `custom` icon pack (e.g. `/local/icons/{condition}.svg`) |
 | Show Static Icons | Boolean | Disable animated icons |
 | Time Format | String | `system` (follows HA Settings → Profile), `12hour`, or `24hour` |
-| Locale | String | Locale for timestamp and moon phase formatting. Supported: `bg`, `ru`, `ua`, `de`, `fr`, `it`, `nl`, `pl`, `da`, `es`, `he` |
+| Locale | String | Locale for timestamp and moon phase formatting. Supported: `bg`, `ru`, `ua`, `de`, `fr`, `it`, `nl`, `pl`, `da`, `es`, `he` — when empty, the card follows the Home Assistant interface language |
 | Compact slot labels | Boolean | Shorter slot label wording (`option_compact_slots`) |
 
 ---
@@ -686,6 +714,7 @@ double_tap_action:
 | `option_wind_bearing_icon` | Boolean | `false` | Show the wind bearing as a rotating arrow icon instead of compass text |
 | `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
+| `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
 
 Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressure`, l5=`sun_next`, l6–l8=`remove`, r1=`popforecast`, r2=`humidity`, r3=`uv_summary`, r4=`moon`, r5=`sun_following`, r6–r8=`remove`.
 
