@@ -1369,24 +1369,32 @@ export class PlatinumWeatherCard extends LitElement {
     if (!showTemp && !showPrecip) return html``;
     if (!this.forecast1 || this.forecast1.length === 0) return html``;
 
-    const days     = Math.min(this._config.daily_forecast_days || 5, this.forecast1.length);
-    const startIdx = this._config.option_show_current_day ? 0 : 1;
+    const days = this._config.daily_forecast_days || 5;
 
     const compassMapC = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
     const data: { maxT: number; minT: number; precip: number; windSpeed: number | null; windBear: number | null; datetime: string }[] = [];
+    // Resolve each day by date, exactly like the daily forecast strip does, so the
+    // chart can never plot a day the strip is not showing (indices and dates drift
+    // apart when the provider's forecast array starts on a different day).
     for (let i = 0; i < days; i++) {
-      const f = this.forecast1[startIdx + i];
-      if (!f) break;
-      const wbRawC = f.wind_bearing;
+      const forecastDate = new Date();
+      forecastDate.setDate(forecastDate.getDate() + i + (this._config.option_show_current_day ? 0 : 1));
+      const prop = (key: string): string | undefined => this._getForecastPropFromWeather(this.forecast1, forecastDate, key);
+      // same cut-off rule as the strip: no condition for this day means no day
+      if (prop('condition') === undefined) break;
+      const maxS = prop('temperature');
+      const minS = prop('templow');
+      const wsS  = prop('wind_speed');
+      const wbRawC = prop('wind_bearing');
       let wbDegC: number | null = null;
-      if (wbRawC !== undefined && wbRawC !== null) { const nc = Number(wbRawC); wbDegC = !isNaN(nc) ? nc : (compassMapC[String(wbRawC).toUpperCase().trim()] ?? null); }
+      if (wbRawC !== undefined) { const nc = Number(wbRawC); wbDegC = !isNaN(nc) ? nc : (compassMapC[String(wbRawC).toUpperCase().trim()] ?? null); }
       data.push({
-        maxT:      Number(f.temperature   ?? 0),
-        minT:      Number(f.templow       ?? f.temperature ?? 0),
-        precip:    Number(f.precipitation ?? 0),
-        windSpeed: f.wind_speed !== undefined ? Math.round(Number(f.wind_speed)) : null,
+        maxT:      Number(maxS ?? 0),
+        minT:      Number(minS ?? maxS ?? 0),
+        precip:    Number(prop('precipitation') ?? 0),
+        windSpeed: wsS !== undefined ? Math.round(Number(wsS)) : null,
         windBear:  wbDegC,
-        datetime:  String(f.datetime ?? ''),
+        datetime:  String(prop('datetime') ?? ''),
       });
     }
     if (data.length === 0) return html``;
