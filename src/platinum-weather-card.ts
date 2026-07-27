@@ -955,7 +955,7 @@ export class PlatinumWeatherCard extends LitElement {
       //const tooltipData = this._getForecastPropFromWeather(this.hass.states[tooltipEntity].attributes.forecast, forecastDate, 'detailed_description') ?? this._getForecastPropFromWeather(this.hass.states[tooltipEntity].attributes.forecast, forecastDate, 'condition');
           const _fi = (this._config.option_show_current_day ? 0 : 1) + i;
           const _fe = this.forecast1 && this.forecast1[_fi];
-          const _cMapW: {[k:string]:number} = {N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337};
+          const _cMapW: {[k:string]:number} = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
           const _wbRawW = _fe?.wind_bearing;
           let _wbDegW: number | null = null;
           if (_wbRawW !== undefined && _wbRawW !== null) { const _nW = Number(_wbRawW); _wbDegW = !isNaN(_nW) ? _nW : (_cMapW[String(_wbRawW).toUpperCase().trim()] ?? null); }
@@ -969,7 +969,7 @@ export class PlatinumWeatherCard extends LitElement {
         const tooltipEntity = start && this._config.entity_summary_1 ? this._config.entity_summary_1.replace(/(\d+)(?!.*\d)/g, String(Number(start) + i)) : undefined;
           const _fi2b = (this._config.option_show_current_day ? 0 : 1) + i;
           const _fe2b = this.forecast1 && this.forecast1[_fi2b];
-          const _cMap2b: {[k:string]:number} = {N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337};
+          const _cMap2b: {[k:string]:number} = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
           const _wb2b = _fe2b?.wind_bearing;
           let _wbDeg2b: number | null = null;
           if (_wb2b !== undefined && _wb2b !== null) { const _n2b = Number(_wb2b); _wbDeg2b = !isNaN(_n2b) ? _n2b : (_cMap2b[String(_wb2b).toUpperCase().trim()] ?? null); }
@@ -998,10 +998,7 @@ export class PlatinumWeatherCard extends LitElement {
               if (!fe || fe.wind_speed === undefined) return html``;
               const wSpeed = Math.round(Number(fe.wind_speed));
               // Convert bearing: numeric degrees OR compass string → degrees
-              const compassMap: {[k:string]:number} = {
-                N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,
-                S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337
-              };
+              const compassMap: {[k:string]:number} = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
               let wBear: number | null = null;
               if (fe.wind_bearing !== undefined && fe.wind_bearing !== null) {
                 const asNum = Number(fe.wind_bearing);
