@@ -2542,6 +2542,15 @@ export class PlatinumWeatherCard extends LitElement {
   private static readonly COMPASS_DEG: { [k: string]: number } = {
     N: 0, NNE: 22.5, NE: 45, ENE: 67.5, E: 90, ESE: 112.5, SE: 135, SSE: 157.5,
     S: 180, SSW: 202.5, SW: 225, WSW: 247.5, W: 270, WNW: 292.5, NW: 315, NNW: 337.5,
+    // Cyrillic abbreviations — some providers (e.g. Weather Underground) return
+    // wind bearings localized, mixed in with the Latin ones. Without these the
+    // bearing resolves to null: no arrow in the forecast columns, and the local
+    // Zambretti forecast silently drops its wind correction.
+    // Bulgarian: С=север, И=изток, Ю=юг, З=запад
+    'С': 0, 'ССИ': 22.5, 'СИ': 45, 'ИСИ': 67.5, 'И': 90, 'ИЮИ': 112.5, 'ЮИ': 135, 'ЮЮИ': 157.5,
+    'Ю': 180, 'ЮЮЗ': 202.5, 'ЮЗ': 225, 'ЗЮЗ': 247.5, 'З': 270, 'ЗСЗ': 292.5, 'СЗ': 315, 'ССЗ': 337.5,
+    // Russian / Ukrainian: восток / схід = В (С, Ю, З and the combinations match above)
+    'В': 90, 'ССВ': 22.5, 'СВ': 45, 'ВСВ': 67.5, 'ВЮВ': 112.5, 'ЮВ': 135, 'ЮЮВ': 157.5,
   };
 
   // Numeric wind bearing in degrees (direction wind comes FROM), or null.
