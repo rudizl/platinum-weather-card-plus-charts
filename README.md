@@ -26,6 +26,18 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.2.1**
+
+**Fixes**
+- Chart and daily forecast strip could show a different number of days, with the chart's points landing under the wrong columns. The strip resolves each day by date and stops when one is missing; the chart used plain array indices, so whenever the provider's forecast array had not rolled over yet (just after midnight) the two drifted apart. The chart now walks dates with the same lookup and cut-off rule
+- Wind bearings returned as Cyrillic abbreviations were not recognised — Weather Underground mixes them with the Latin ones in the same response (`Ю`, `NNE`, `ESE`, `SE`, `И`). Those days showed no wind arrow, and the local Zambretti forecast silently dropped its wind correction. All 16 Bulgarian abbreviations plus the Russian/Ukrainian `В` family are now parsed
+- Three inline copies of the compass table (forecast arrow, both tooltip builders) replaced by the shared one, so a fix in one place can no longer miss the others
+
+**Docs**
+- The Zambretti section now warns that the local forecast needs sea-level (relative) pressure, with a ten-second check for an uncalibrated station and the two places the correction can be made
+
+---
+
 **v2.2.0**
 
 **New: Tap on slot value opens history** (#9)
