@@ -79,6 +79,7 @@ export class PlatinumWeatherCard extends LitElement {
   private _zamShownKey: string | null = null;
   private _zamCandidateKey: string | null = null;
   private _zamCandidateTs = 0;
+  private _windSamples: { t: number; deg: number }[] = [];
 
   private _error: string[] = [];
 
@@ -1961,15 +1962,15 @@ export class PlatinumWeatherCard extends LitElement {
     }
     const north = (this.hass.config?.latitude ?? 42) >= 0;
     const month = new Date().getMonth() + 1;
-    // Ignore wind direction when the wind is too weak to be meaningful (< 2 km/h)
-    let windDeg = this.windBearingDegrees;
-    const windSpeedEntity = this._config.entity_wind_speed;
-    if (windDeg !== null && windSpeedEntity && this.hass.states[windSpeedEntity]) {
-      const ws = Number(this.hass.states[windSpeedEntity].state);
-      const kmh = windSpeedToKmh(ws, this.hass.states[windSpeedEntity].attributes.unit_of_measurement);
-      if (!isNaN(kmh) && kmh < 2.0) windDeg = null;
-    }
-    // Trend hysteresis: enter rising/falling at ±0.12 hPa/h, drop back to steady at ±0.08
+    // Wind direction only counts when it is both strong enough and steady enough.
+    // A vane in light air wanders across the whole compass — professional stations
+    // report VRB for exactly this reason, and aviation reports state a range
+    // (e.g. "08009KT 040V120": an 80° spread at 9 knots) rather than a direction.
+    // Zambretti applies up to ±8.35 hPa from the bearing, so a wandering reading
+    // can move the forecast several categories on its own.
+    const windDeg = this.forecastWindBearing;
+    // Trend hysteresis for the letter only: enter rising/falling at ±0.12 hPa/h,
+    // drop back to steady at ±0.08, so the forecast phrase does not flap.
     let cat = this._zamTrendCat;
     if (trend >= 0.12) cat = 'rising';
     else if (trend <= -0.12) cat = 'falling';
@@ -1978,26 +1979,57 @@ export class PlatinumWeatherCard extends LitElement {
     this._zamTrendCat = cat;
     const letter = zambrettiLetter(pressure, month, windDeg, cat === 'rising' ? 0.2 : cat === 'falling' ? -0.2 : 0.0, north);
     if (letter === null) return null;
-    // Debounce: a changed forecast text must persist for 5 minutes before being shown
-    const hasTrend = this.pressureTrend !== null || (trendEntity && this.hass.states[trendEntity] && !isNaN(Number(this.hass.states[trendEntity].state)));
-    const key = `${letter}|${hasTrend ? cat : ''}`;
+    // Debounce the letter only: a changed forecast phrase must persist for 5
+    // minutes before it replaces the shown one.
     const now = Date.now();
-    if (this._zamShownKey === null || key === this._zamShownKey) {
-      this._zamShownKey = key;
+    if (this._zamShownKey === null || letter === this._zamShownKey) {
+      this._zamShownKey = letter;
       this._zamCandidateKey = null;
-    } else if (key !== this._zamCandidateKey) {
-      this._zamCandidateKey = key;
+    } else if (letter !== this._zamCandidateKey) {
+      this._zamCandidateKey = letter;
       this._zamCandidateTs = now;
     } else if (now - this._zamCandidateTs >= 300000) {
-      this._zamShownKey = key;
+      this._zamShownKey = letter;
       this._zamCandidateKey = null;
     }
-    const [shownLetter, shownCat] = this._zamShownKey.split('|');
     if (this._config.option_local_forecast_verbose === true) {
-      const text = tZambretti(this.locale, shownLetter, true);
+      const text = tZambretti(this.locale, this._zamShownKey, true);
+      // The tendency clause is read live from the same source as the pressure
+      // slot's arrow, so the two can never contradict each other on screen.
+      const shownCat = this.pressureTrend;
       return shownCat ? `${text} ${tZambretti(this.locale, shownCat, true)}` : text;
     }
-    return tZambretti(this.locale, shownLetter);
+    return tZambretti(this.locale, this._zamShownKey);
+  }
+
+  // Wind bearing for the local forecast: the current bearing in degrees, or null
+  // when the wind is too light or too variable for the direction to mean anything.
+  get forecastWindBearing(): number | null {
+    const deg = this.windBearingDegrees;
+    if (deg === null) return null;
+    const speedEntity = this._config.entity_wind_speed;
+    if (speedEntity && this.hass.states[speedEntity]) {
+      const kmh = windSpeedToKmh(
+        Number(this.hass.states[speedEntity].state),
+        this.hass.states[speedEntity].attributes.unit_of_measurement,
+      );
+      if (!isNaN(kmh) && kmh < 8.0) return null;
+    }
+    // Steadiness over the last 15 minutes: R is the circular concentration of the
+    // samples, 1 = all pointing the same way, 0 = scattered around the compass.
+    const now = Date.now();
+    this._windSamples.push({ t: now, deg });
+    this._windSamples = this._windSamples.filter((x) => now - x.t <= 900000);
+    if (this._windSamples.length >= 6) {
+      let sx = 0, cx = 0;
+      for (const x of this._windSamples) {
+        sx += Math.sin((x.deg * Math.PI) / 180);
+        cx += Math.cos((x.deg * Math.PI) / 180);
+      }
+      const R = Math.hypot(sx, cx) / this._windSamples.length;
+      if (R < 0.7) return null;
+    }
+    return deg;
   }
 
   // Which entity a slot's tap should open in the more-info dialog. Returns null

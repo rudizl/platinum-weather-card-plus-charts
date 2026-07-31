@@ -449,7 +449,11 @@ The hemisphere is detected automatically from your Home Assistant latitude.
 >
 > To verify, compare the corrected value with the QNH from a nearby airport METAR — they should agree within a hPa or two.
 
-To keep the text stable with fast-reporting stations, the card applies three smoothing rules: wind direction is ignored while wind speed is below 2 km/h (direction is noise in calm conditions), the pressure trend uses hysteresis (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08), and a changed forecast text must persist for 5 minutes before it replaces the one on screen.
+To keep the text stable and honest about its inputs, the card applies three rules:
+
+- **Wind direction is used only when it means something** — the reading is dropped below 8 km/h, and also whenever the bearing has been wandering over the last 15 minutes (measured as circular concentration, R < 0.7). A vane in light air sweeps the whole compass; professional stations report `VRB` for the same reason, and aviation reports state a range such as `040V120` — an 80° spread at 9 knots. Since Zambretti applies up to ±8.35 hPa based on the bearing, an unsteady reading alone can move the forecast several categories.
+- **The forecast phrase uses hysteresis on the pressure trend** (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08) and a changed phrase must persist for 5 minutes before it replaces the one on screen.
+- **The pressure-tendency clause is read live** from the same source as the pressure slot's arrow, so the sentence and the arrow can never contradict each other.
 
 ```yaml
 type: custom:platinum-weather-card-plus-charts
