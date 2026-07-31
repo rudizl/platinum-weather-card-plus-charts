@@ -26,6 +26,17 @@ Install via HACS as a custom repository:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.2.2**
+
+**Fixes**
+- **Charts and daily forecast disappeared** when both sections were enabled (v2.2.1 only). The chart's tooltip code still referenced a variable removed by the v2.2.1 date-alignment fix, throwing `ReferenceError: startIdx is not defined` and aborting the render of both sections. Reported by @jerrymjones (#13)
+- **Security: tooltip contents are now escaped.** The chart and forecast tooltips are assembled as HTML strings and passed through `unsafeHTML`. Forecast descriptions and unit strings taken from entity attributes were interpolated unescaped, so crafted attribute data could inject markup into the dashboard. All string values are now HTML-escaped and numeric values are validated before they reach a style attribute. Reported by @frenck during HACS review
+
+**Build**
+- Type checking is now part of `npm run build`. It had been silently broken: syntax errors inside `@types/node` aborted `tsc` before it ever reached the card's sources, so the missing variable above shipped without a warning. Node types are excluded and the twenty-one type errors this exposed are fixed
+
+---
+
 **v2.2.1**
 
 **Fixes**
