@@ -88,3 +88,36 @@ export function windSpeedToKmh(value: number, uom: string | undefined): number {
   if (u === 'ft/s' || u === 'fps') return value * 1.09728;
   return value; // km/h or unknown → assume km/h
 }
+
+// Expected rate of change of the semidiurnal atmospheric tide, in hPa/hour.
+//
+// Atmospheric pressure breathes twice a day: maxima near 10:00 and 22:00 local
+// solar time, minima near 04:00 and 16:00. The amplitude scales with latitude,
+// roughly 1.16·cos²(lat) hPa — about ±0.6 hPa at 43°N, which means a slope of
+// up to 0.32 hPa/h. That is several times the threshold a naive implementation
+// uses to call the pressure "falling", so without this correction the forecast
+// deteriorates every afternoon and improves every morning on its own, whatever
+// the weather is doing.
+//
+// date      — the moment to evaluate
+// latitude  — station latitude in degrees
+// longitude — station longitude in degrees (used to convert clock time to solar time)
+// windowHours must match the averaging window of the trend sensor: the tidal
+// slope swings from -0.32 to -0.02 hPa/h within three hours, so the instantaneous
+// value would be the wrong thing to subtract from an hour-averaged trend.
+export function tidalTrendHpaPerHour(
+  date: Date,
+  latitude: number,
+  longitude: number,
+  windowHours = 1,
+): number {
+  const amplitude = 1.16 * Math.pow(Math.cos((latitude * Math.PI) / 180), 2);
+  const utcOffsetHours = -date.getTimezoneOffset() / 60;
+  const solarHoursAt = (d: Date): number =>
+    d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600 - utcOffsetHours + longitude / 15;
+  // P(t) = A·cos(2π(t − 10)/12); the mean slope over the window is simply the
+  // pressure difference across it divided by its length.
+  const tideAt = (t: number): number => amplitude * Math.cos((2 * Math.PI * (t - 10)) / 12);
+  const now = solarHoursAt(date);
+  return (tideAt(now) - tideAt(now - windowHours)) / windowHours;
+}

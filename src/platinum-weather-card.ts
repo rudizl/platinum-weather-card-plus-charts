@@ -21,7 +21,7 @@ import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from
 
 import { CARD_VERSION } from './const';
 import { tCard, tMoonPhase, tUnit, tWindDirections, tZambretti } from './translations';
-import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh } from './zambretti';
+import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour } from './zambretti';
 
 
 /* eslint no-console: 0 */
@@ -1969,13 +1969,22 @@ export class PlatinumWeatherCard extends LitElement {
     // Zambretti applies up to ±8.35 hPa from the bearing, so a wandering reading
     // can move the forecast several categories on its own.
     const windDeg = this.forecastWindBearing;
-    // Trend hysteresis for the letter only: enter rising/falling at ±0.12 hPa/h,
-    // drop back to steady at ±0.08, so the forecast phrase does not flap.
+    // Remove the semidiurnal atmospheric tide before judging the trend: it can
+    // reach 0.32 hPa/h on its own at mid latitudes, which would otherwise make
+    // the forecast deteriorate every afternoon and recover every morning.
+    const lat = this.hass.config?.latitude;
+    const lon = this.hass.config?.longitude;
+    const synopticTrend = (lat !== undefined && lon !== undefined)
+      ? trend - tidalTrendHpaPerHour(new Date(), lat, lon)
+      : trend;
+    // Trend hysteresis for the letter only: enter rising/falling at ±0.30 hPa/h
+    // (≈0.9 hPa over three hours, the scale the original algorithm was built
+    // around), drop back to steady at ±0.20, so the forecast phrase does not flap.
     let cat = this._zamTrendCat;
-    if (trend >= 0.12) cat = 'rising';
-    else if (trend <= -0.12) cat = 'falling';
-    else if (cat === 'rising' && trend < 0.08) cat = 'steady';
-    else if (cat === 'falling' && trend > -0.08) cat = 'steady';
+    if (synopticTrend >= 0.30) cat = 'rising';
+    else if (synopticTrend <= -0.30) cat = 'falling';
+    else if (cat === 'rising' && synopticTrend < 0.20) cat = 'steady';
+    else if (cat === 'falling' && synopticTrend > -0.20) cat = 'steady';
     this._zamTrendCat = cat;
     const letter = zambrettiLetter(pressure, month, windDeg, cat === 'rising' ? 0.2 : cat === 'falling' ? -0.2 : 0.0, north);
     if (letter === null) return null;
