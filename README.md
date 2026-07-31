@@ -395,6 +395,8 @@ Four layout options are available:
 | &nbsp;&nbsp;Verbose forecast text | Boolean | Full-sentence forecast with a pressure-tendency clause |
 | &nbsp;&nbsp;Station altitude (m) | Number | Only for absolute-pressure sensors — leave empty for relative/sea-level |
 
+Wind bearing sensors may report either numeric degrees or compass text. Both Latin (`NW`, `SSE`) and Cyrillic (`СЗ`, `ЮЮИ`, and the Russian/Ukrainian `В` for east) abbreviations are recognised — some providers return them localized, or mixed in with the Latin ones.
+
 ### Tap on a value → history
 
 Tapping a slot value (humidity, pressure, wind, ...) opens the native more-info dialog with the history/statistics graph. Only slots backed by a real sensor are tappable — a pointer cursor and a subtle hover highlight show where. Slots reading attributes of a `weather.*` entity stay inert (their dialog would show a forecast, not history). The card-level tap/hold actions are unaffected. Controlled by `option_slot_tap_more_info` (Slots section toggle, on by default).
@@ -419,6 +421,21 @@ Inputs used:
 - **Station altitude** — only set this if your pressure sensor reports *absolute* (station) pressure; the card then applies the barometric sea-level correction using the current temperature. Leave empty for relative/sea-level sensors.
 
 The hemisphere is detected automatically from your Home Assistant latitude.
+
+> **Your pressure sensor must report sea-level (relative) pressure — check this first.**
+> Zambretti reads the absolute pressure level, so an uncalibrated station throws the forecast off by several categories, permanently. A station at 150 m altitude reads roughly 18 hPa below sea level: the algorithm sees 1002 hPa ("changeable, some rain") when the real sea-level pressure is 1020 hPa ("settled fair"), and the card then predicts rain on a cloudless day.
+>
+> **Ten-second check:** compare your absolute and relative pressure sensors. If they read *exactly* the same, the station is not applying any correction and you are feeding the card raw station pressure.
+>
+> Fix it in **one** of these two places, never both:
+>
+> - **In the station (recommended)** — Ecowitt/WSView Plus → Calibration → **Altitude for REL** (leave *Abs Offset* at 0.0, that field corrects the absolute reading, which is already right). This also fixes what the station uploads to Weather Underground and the like.
+>
+>   ![Ecowitt calibration](images/ecowitt-altitude-calibration.png)
+>
+> - **In the card** — fill the *Station altitude (m)* field, and the card applies the barometric correction itself using the current temperature.
+>
+> To verify, compare the corrected value with the QNH from a nearby airport METAR — they should agree within a hPa or two.
 
 To keep the text stable with fast-reporting stations, the card applies three smoothing rules: wind direction is ignored while wind speed is below 2 km/h (direction is noise in calm conditions), the pressure trend uses hysteresis (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08), and a changed forecast text must persist for 5 minutes before it replaces the one on screen.
 

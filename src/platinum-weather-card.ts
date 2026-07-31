@@ -955,7 +955,7 @@ export class PlatinumWeatherCard extends LitElement {
       //const tooltipData = this._getForecastPropFromWeather(this.hass.states[tooltipEntity].attributes.forecast, forecastDate, 'detailed_description') ?? this._getForecastPropFromWeather(this.hass.states[tooltipEntity].attributes.forecast, forecastDate, 'condition');
           const _fi = (this._config.option_show_current_day ? 0 : 1) + i;
           const _fe = this.forecast1 && this.forecast1[_fi];
-          const _cMapW: {[k:string]:number} = {N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337};
+          const _cMapW: {[k:string]:number} = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
           const _wbRawW = _fe?.wind_bearing;
           let _wbDegW: number | null = null;
           if (_wbRawW !== undefined && _wbRawW !== null) { const _nW = Number(_wbRawW); _wbDegW = !isNaN(_nW) ? _nW : (_cMapW[String(_wbRawW).toUpperCase().trim()] ?? null); }
@@ -969,7 +969,7 @@ export class PlatinumWeatherCard extends LitElement {
         const tooltipEntity = start && this._config.entity_summary_1 ? this._config.entity_summary_1.replace(/(\d+)(?!.*\d)/g, String(Number(start) + i)) : undefined;
           const _fi2b = (this._config.option_show_current_day ? 0 : 1) + i;
           const _fe2b = this.forecast1 && this.forecast1[_fi2b];
-          const _cMap2b: {[k:string]:number} = {N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337};
+          const _cMap2b: {[k:string]:number} = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
           const _wb2b = _fe2b?.wind_bearing;
           let _wbDeg2b: number | null = null;
           if (_wb2b !== undefined && _wb2b !== null) { const _n2b = Number(_wb2b); _wbDeg2b = !isNaN(_n2b) ? _n2b : (_cMap2b[String(_wb2b).toUpperCase().trim()] ?? null); }
@@ -998,10 +998,7 @@ export class PlatinumWeatherCard extends LitElement {
               if (!fe || fe.wind_speed === undefined) return html``;
               const wSpeed = Math.round(Number(fe.wind_speed));
               // Convert bearing: numeric degrees OR compass string → degrees
-              const compassMap: {[k:string]:number} = {
-                N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,
-                S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337
-              };
+              const compassMap: {[k:string]:number} = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
               let wBear: number | null = null;
               if (fe.wind_bearing !== undefined && fe.wind_bearing !== null) {
                 const asNum = Number(fe.wind_bearing);
@@ -1369,24 +1366,32 @@ export class PlatinumWeatherCard extends LitElement {
     if (!showTemp && !showPrecip) return html``;
     if (!this.forecast1 || this.forecast1.length === 0) return html``;
 
-    const days     = Math.min(this._config.daily_forecast_days || 5, this.forecast1.length);
-    const startIdx = this._config.option_show_current_day ? 0 : 1;
+    const days = this._config.daily_forecast_days || 5;
 
     const compassMapC = (this.constructor as typeof PlatinumWeatherCard).COMPASS_DEG;
     const data: { maxT: number; minT: number; precip: number; windSpeed: number | null; windBear: number | null; datetime: string }[] = [];
+    // Resolve each day by date, exactly like the daily forecast strip does, so the
+    // chart can never plot a day the strip is not showing (indices and dates drift
+    // apart when the provider's forecast array starts on a different day).
     for (let i = 0; i < days; i++) {
-      const f = this.forecast1[startIdx + i];
-      if (!f) break;
-      const wbRawC = f.wind_bearing;
+      const forecastDate = new Date();
+      forecastDate.setDate(forecastDate.getDate() + i + (this._config.option_show_current_day ? 0 : 1));
+      const prop = (key: string): string | undefined => this._getForecastPropFromWeather(this.forecast1, forecastDate, key);
+      // same cut-off rule as the strip: no condition for this day means no day
+      if (prop('condition') === undefined) break;
+      const maxS = prop('temperature');
+      const minS = prop('templow');
+      const wsS  = prop('wind_speed');
+      const wbRawC = prop('wind_bearing');
       let wbDegC: number | null = null;
-      if (wbRawC !== undefined && wbRawC !== null) { const nc = Number(wbRawC); wbDegC = !isNaN(nc) ? nc : (compassMapC[String(wbRawC).toUpperCase().trim()] ?? null); }
+      if (wbRawC !== undefined) { const nc = Number(wbRawC); wbDegC = !isNaN(nc) ? nc : (compassMapC[String(wbRawC).toUpperCase().trim()] ?? null); }
       data.push({
-        maxT:      Number(f.temperature   ?? 0),
-        minT:      Number(f.templow       ?? f.temperature ?? 0),
-        precip:    Number(f.precipitation ?? 0),
-        windSpeed: f.wind_speed !== undefined ? Math.round(Number(f.wind_speed)) : null,
+        maxT:      Number(maxS ?? 0),
+        minT:      Number(minS ?? maxS ?? 0),
+        precip:    Number(prop('precipitation') ?? 0),
+        windSpeed: wsS !== undefined ? Math.round(Number(wsS)) : null,
         windBear:  wbDegC,
-        datetime:  String(f.datetime ?? ''),
+        datetime:  String(prop('datetime') ?? ''),
       });
     }
     if (data.length === 0) return html``;
@@ -2534,6 +2539,15 @@ export class PlatinumWeatherCard extends LitElement {
   private static readonly COMPASS_DEG: { [k: string]: number } = {
     N: 0, NNE: 22.5, NE: 45, ENE: 67.5, E: 90, ESE: 112.5, SE: 135, SSE: 157.5,
     S: 180, SSW: 202.5, SW: 225, WSW: 247.5, W: 270, WNW: 292.5, NW: 315, NNW: 337.5,
+    // Cyrillic abbreviations — some providers (e.g. Weather Underground) return
+    // wind bearings localized, mixed in with the Latin ones. Without these the
+    // bearing resolves to null: no arrow in the forecast columns, and the local
+    // Zambretti forecast silently drops its wind correction.
+    // Bulgarian: С=север, И=изток, Ю=юг, З=запад
+    'С': 0, 'ССИ': 22.5, 'СИ': 45, 'ИСИ': 67.5, 'И': 90, 'ИЮИ': 112.5, 'ЮИ': 135, 'ЮЮИ': 157.5,
+    'Ю': 180, 'ЮЮЗ': 202.5, 'ЮЗ': 225, 'ЗЮЗ': 247.5, 'З': 270, 'ЗСЗ': 292.5, 'СЗ': 315, 'ССЗ': 337.5,
+    // Russian / Ukrainian: восток / схід = В (С, Ю, З and the combinations match above)
+    'В': 90, 'ССВ': 22.5, 'СВ': 45, 'ВСВ': 67.5, 'ВЮВ': 112.5, 'ЮВ': 135, 'ЮЮВ': 157.5,
   };
 
   // Numeric wind bearing in degrees (direction wind comes FROM), or null.
