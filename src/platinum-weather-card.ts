@@ -2870,7 +2870,16 @@ export class PlatinumWeatherCard extends LitElement {
   // get the icon that matches the current conditions
   private _getIconUrl(iconName: string, forForecast = false): string {
     const pack = this._config?.icon_pack ?? 'default';
-    const adjusted = forForecast ? iconName.replace('-night', '-day') : iconName;
+    let adjusted = forForecast ? iconName.replace('-night', '-day') : iconName;
+    // Providers can insist on a day/night variant that contradicts the sky — some
+    // switch to their night daypart in mid-afternoon and report "clear-night" with
+    // the sun 35° up. When a sun entity is configured, its elevation wins.
+    if (!forForecast && this._config?.option_sun_overrides_icon !== false
+        && this._config?.entity_sun && this.hass?.states[this._config.entity_sun]) {
+      adjusted = this.dayOrNight === 'day'
+        ? adjusted.replace('-night', '-day')
+        : adjusted.replace('-day', '-night');
+    }
 
     if (pack === 'default') {
       const prefix = this._config?.option_static_icons ? 's-' : 'a-';

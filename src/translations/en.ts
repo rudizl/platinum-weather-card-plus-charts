@@ -77,6 +77,7 @@ const en: Translation = {
     "forecast_altitude": "Station altitude (m)",
     "forecast_altitude_hint": "Leave empty if the sensor reports relative (sea-level) pressure",
     "compact_slots": "Compact slot labels",
+    "sun_overrides_icon": "Sun position decides day/night icons",
     "show_static_icons": "Show Static Icons",
     "time_format": "Time Format",
     "locale": "Locale",

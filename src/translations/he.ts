@@ -77,6 +77,7 @@ const he: Translation = {
     "forecast_altitude": "גובה התחנה (מ')",
     "forecast_altitude_hint": "השאר ריק אם החיישן מדווח לחץ יחסי (גובה פני הים)",
     "compact_slots": "תוויות קומפקטיות",
+    "sun_overrides_icon": "מיקום השמש קובע סמל יום/לילה",
     "show_static_icons": "סמלים סטטיים",
     "time_format": "תבנית שעה",
     "locale": "שפה",

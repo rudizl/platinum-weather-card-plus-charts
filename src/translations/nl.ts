@@ -77,6 +77,7 @@ const nl: Translation = {
     "forecast_altitude": "Hoogte van het station (m)",
     "forecast_altitude_hint": "Leeg laten als de sensor relatieve druk (zeeniveau) rapporteert",
     "compact_slots": "Compacte labels",
+    "sun_overrides_icon": "Zonnestand bepaalt dag/nacht-pictogram",
     "show_static_icons": "Statische pictogrammen",
     "time_format": "Tijdformaat",
     "locale": "Taal",

@@ -77,6 +77,7 @@ const cs: Translation = {
     "forecast_altitude": "Nadmořská výška stanice (m)",
     "forecast_altitude_hint": "Nechte prázdné, pokud senzor hlásí relativní tlak (k hladině moře)",
     "compact_slots": "Kompaktní popisky slotů",
+    "sun_overrides_icon": "Poloha slunce určuje ikonu den/noc",
     "show_static_icons": "Zobrazit statické ikony",
     "time_format": "Formát času",
     "locale": "Jazyk",

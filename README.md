@@ -746,6 +746,7 @@ double_tap_action:
 | `option_color_fire_danger` | Boolean | `true` | Colour fire danger by severity |
 | `option_wind_bearing_icon` | Boolean | `false` | Show the wind bearing as a rotating arrow icon instead of compass text |
 | `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |
+| `option_sun_overrides_icon` | Boolean | `true` | Force the day/night variant of the current condition icon from the sun's elevation, overriding the provider |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
 

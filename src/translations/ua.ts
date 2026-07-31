@@ -77,6 +77,7 @@ const ua: Translation = {
     "forecast_altitude": "Висота станції (м)",
     "forecast_altitude_hint": "Залиште порожнім, якщо датчик повідомляє відносний тиск (рівень моря)",
     "compact_slots": "Компактні підписи",
+    "sun_overrides_icon": "Положення сонця визначає значок день/ніч",
     "show_static_icons": "Статичні значки",
     "time_format": "Формат часу",
     "locale": "Мова",

@@ -1634,6 +1634,15 @@ get _forecast_type(): string {
       </div>
       <div class="side-by-side">
         <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_sun_overrides_icon !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_sun_overrides_icon'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("sun_overrides_icon")}</span>
+            </div>
+        </div>
+        <div></div>
+      </div>
+      <div class="side-by-side">
+        <div>
           <label class='mdc-label'>${this._t('time_format')}</label>
           <select class='ha-select-compat' .configValue=${'option_time_format'} .value=${this._option_time_format ?? ''} @change=${this._valueChanged}>
             <option value=""></option>

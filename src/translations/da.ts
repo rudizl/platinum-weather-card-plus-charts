@@ -77,6 +77,7 @@ const da: Translation = {
     "forecast_altitude": "Stationens højde (m)",
     "forecast_altitude_hint": "Lad stå tomt, hvis sensoren rapporterer relativt tryk (havniveau)",
     "compact_slots": "Kompakte etiketter",
+    "sun_overrides_icon": "Solens position bestemmer dag/nat-ikon",
     "show_static_icons": "Statiske ikoner",
     "time_format": "Tidsformat",
     "locale": "Sprog",
