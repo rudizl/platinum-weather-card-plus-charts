@@ -77,7 +77,7 @@ const de: Translation = {
     "forecast_altitude": "Stationshöhe (m)",
     "forecast_altitude_hint": "Leer lassen, wenn der Sensor relativen Druck (Meereshöhe) liefert",
     "compact_slots": "Kompakte Beschriftungen",
-    "sun_overrides_icon": "Sonnenstand bestimmt Tag/Nacht-Symbol",
+    "sun_overrides_icon": "Tag/Nacht-Symbol per Sonnenstand",
     "show_static_icons": "Statische Icons",
     "time_format": "Zeitformat",
     "locale": "Sprache",

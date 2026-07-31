@@ -75,7 +75,7 @@ const bg: Translation = {
     "forecast_altitude": "Надморска височина (м)",
     "forecast_altitude_hint": "Остави празно, ако сензорът дава относително (sea-level) налягане",
     "compact_slots": "Компактни надписи",
-    "sun_overrides_icon": "Слънцето определя дневна/нощна икона",
+    "sun_overrides_icon": "Икона ден/нощ по слънцето",
     "show_static_icons": "Статични икони",
     "time_format": "Формат на часа",
     "locale": "Език",

@@ -77,7 +77,7 @@ const ru: Translation = {
     "forecast_altitude": "Высота станции (м)",
     "forecast_altitude_hint": "Оставьте пустым, если датчик сообщает относительное давление (уровень моря)",
     "compact_slots": "Компактные подписи",
-    "sun_overrides_icon": "Положение солнца определяет значок день/ночь",
+    "sun_overrides_icon": "Значок день/ночь по солнцу",
     "show_static_icons": "Статичные значки",
     "time_format": "Формат времени",
     "locale": "Язык",

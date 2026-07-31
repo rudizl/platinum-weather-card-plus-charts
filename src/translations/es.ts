@@ -77,7 +77,7 @@ const es: Translation = {
     "forecast_altitude": "Altitud de la estación (m)",
     "forecast_altitude_hint": "Dejar vacío si el sensor informa presión relativa (nivel del mar)",
     "compact_slots": "Etiquetas compactas",
-    "sun_overrides_icon": "La posición del sol decide el icono día/noche",
+    "sun_overrides_icon": "Icono día/noche según el sol",
     "show_static_icons": "Iconos estáticos",
     "time_format": "Formato de hora",
     "locale": "Idioma",
