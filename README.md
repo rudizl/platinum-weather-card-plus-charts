@@ -422,6 +422,21 @@ Inputs used:
 
 The hemisphere is detected automatically from your Home Assistant latitude.
 
+> **Your pressure sensor must report sea-level (relative) pressure — check this first.**
+> Zambretti reads the absolute pressure level, so an uncalibrated station throws the forecast off by several categories, permanently. A station at 150 m altitude reads roughly 18 hPa below sea level: the algorithm sees 1002 hPa ("changeable, some rain") when the real sea-level pressure is 1020 hPa ("settled fair"), and the card then predicts rain on a cloudless day.
+>
+> **Ten-second check:** compare your absolute and relative pressure sensors. If they read *exactly* the same, the station is not applying any correction and you are feeding the card raw station pressure.
+>
+> Fix it in **one** of these two places, never both:
+>
+> - **In the station (recommended)** — Ecowitt/WSView Plus → Calibration → **Altitude for REL** (leave *Abs Offset* at 0.0, that field corrects the absolute reading, which is already right). This also fixes what the station uploads to Weather Underground and the like.
+>
+>   ![Ecowitt calibration](images/ecowitt-altitude-calibration.png)
+>
+> - **In the card** — fill the *Station altitude (m)* field, and the card applies the barometric correction itself using the current temperature.
+>
+> To verify, compare the corrected value with the QNH from a nearby airport METAR — they should agree within a hPa or two.
+
 To keep the text stable with fast-reporting stations, the card applies three smoothing rules: wind direction is ignored while wind speed is below 2 km/h (direction is noise in calm conditions), the pressure trend uses hysteresis (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08), and a changed forecast text must persist for 5 minutes before it replaces the one on screen.
 
 ```yaml
