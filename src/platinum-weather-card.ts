@@ -53,7 +53,7 @@ export class PlatinumWeatherCard extends LitElement {
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     await import('./editor');
-    return document.createElement('platinum-weather-card-plus-charts-editor');
+    return document.createElement('platinum-weather-card-plus-charts-editor') as LovelaceCardEditor;
   }
 
   public static getStubConfig(): Record<string, unknown> {
@@ -490,7 +490,7 @@ export class PlatinumWeatherCard extends LitElement {
               case '24hour':
                 return html`${d.toLocaleString(this.locale || navigator.language, { hour: '2-digit', minute: '2-digit', hour12: false }) + ", " + this._formatDate(d)}`;
               case 'system':
-                return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' }).replace(" ", "") + ", " + this._formatDate(d)}`;
+                return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" ", "") + ", " + this._formatDate(d)}`;
             }
           }
         }
@@ -502,7 +502,7 @@ export class PlatinumWeatherCard extends LitElement {
           case '24hour':
             return html`${d.toLocaleString(this.locale || navigator.language, { hour: '2-digit', minute: '2-digit', hour12: false }) + ", " + this._formatDate(d)}`;
           case 'system':
-            return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' }).replace(" ", "") + ", " + this._formatDate(d)}`;
+            return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" ", "") + ", " + this._formatDate(d)}`;
         }
       }
     }
@@ -1009,8 +1009,8 @@ export class PlatinumWeatherCard extends LitElement {
                   wBear = compassMap[key] ?? null;
                 }
               }
-              const arrowSvg = wBear !== null
-                ? `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 10 10" style="transform:rotate(${(wBear + 180) % 360}deg);display:inline-block;vertical-align:middle;margin-right:1px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
+              const arrowSvg = wBear !== null && isFinite(Number(wBear))
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 10 10" style="transform:rotate(${(Number(wBear) + 180) % 360}deg);display:inline-block;vertical-align:middle;margin-right:1px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
                 : '';
               return html`<li class="f-slot-horiz-text"><span>${unsafeHTML(arrowSvg)}${wSpeed}</span></li>`;
             })() : html``}
@@ -1261,7 +1261,8 @@ export class PlatinumWeatherCard extends LitElement {
     `;
   }
 
-  private _getForecastPropFromWeather(forecast: Array<any>, date: Date, propKey: string): string | undefined {
+  private _getForecastPropFromWeather(forecast: Array<any> | undefined, date: Date, propKey: string): string | undefined {
+    if (!forecast) return undefined;
     const day = date.toDateString();
     const forecastForThisDay = forecast.filter(o => new Date(o.datetime).toDateString() === day);
     if (forecastForThisDay.length === 1) {
@@ -1324,6 +1325,18 @@ export class PlatinumWeatherCard extends LitElement {
    * Builds unified tooltip row HTML used by both forecast and chart tooltips.
    * Returns an HTML string ready for insertion into a fcasttooltipblock.
    */
+  // Anything interpolated into an HTML string that later reaches unsafeHTML must
+  // pass through here. Entity attributes and forecast descriptions are attacker-
+  // influenced data (a crafted attribute could otherwise inject markup or script).
+  private static _escapeHtml(value: unknown): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   private _buildTooltipRows(opts: {
     date?: string;
     condition?: string;
@@ -1338,23 +1351,24 @@ export class PlatinumWeatherCard extends LitElement {
     const { date, condition, maxT, minT, precip, windSpeed, windBearDeg, uomPrecip = '', uomWind = '' } = opts;
     let rows = '';
 
+    const esc = (v: unknown): string => (this.constructor as typeof PlatinumWeatherCard)._escapeHtml(v);
     if (date) {
-      rows += `<div class="fcasttooltiptext" style="color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.25);padding-bottom:3px;margin-bottom:4px;">${date}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.25);padding-bottom:3px;margin-bottom:4px;">${esc(date)}</div>`;
     }
     if (condition) {
-      rows += `<div class="fcasttooltiptext" style="color:#fff;margin-bottom:2px;">${condition}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;margin-bottom:2px;">${esc(condition)}</div>`;
     }
     if (maxT !== undefined && maxT !== null) {
       rows += `<div class="fcasttooltiptext" style="color:#fff;margin-top:2px;"><b style="color:#ef5350;">↑ ${Math.round(maxT)}°</b>&nbsp;&nbsp;<b style="color:#90caf9;">↓ ${minT !== undefined && minT !== null ? Math.round(minT) + '°' : '---'}</b></div>`;
     }
     if (precip !== undefined && precip !== null && precip > 0) {
-      rows += `<div class="fcasttooltiptext" style="color:#fff;">💧 ${precip.toFixed(1)} ${this._localizeUnit(uomPrecip)}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;">💧 ${precip.toFixed(1)} ${esc(this._localizeUnit(uomPrecip))}</div>`;
     }
     if (windSpeed !== undefined && windSpeed !== null) {
-      const arrow = windBearDeg !== null && windBearDeg !== undefined
-        ? `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" style="transform:rotate(${(windBearDeg+180)%360}deg);display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
+      const arrow = windBearDeg !== null && windBearDeg !== undefined && isFinite(Number(windBearDeg))
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" style="transform:rotate(${(Number(windBearDeg)+180)%360}deg);display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
         : '';
-      rows += `<div class="fcasttooltiptext" style="color:#fff;">${arrow}${windSpeed} ${this._localizeUnit(uomWind)}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;">${arrow}${windSpeed} ${esc(this._localizeUnit(uomWind))}</div>`;
     }
     return rows;
   }
@@ -1461,7 +1475,7 @@ export class PlatinumWeatherCard extends LitElement {
         if (d.precip > 0) {
           const bH    = Math.max((d.precip / pMax) * maxBarH, 2);
           const bTop  = tempH - bH;
-          const label = (d.precip % 1 === 0 ? String(d.precip) : d.precip.toFixed(1)) + ' ' + _precipUnit;
+          const label = (this.constructor as typeof PlatinumWeatherCard)._escapeHtml((d.precip % 1 === 0 ? String(d.precip) : d.precip.toFixed(1)) + ' ' + _precipUnit);
           // Bar behind everything (z-index 0), rising from bottom of temp area
           colHtml = `<div style="position:absolute;top:${bTop}px;left:0;right:0;height:${bH}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>` + colHtml;
           // Label centered ON the baseline
@@ -1480,8 +1494,11 @@ export class PlatinumWeatherCard extends LitElement {
       const _summaryStart = this._config.entity_summary_1 ? this._config.entity_summary_1.match(/(\d+)(?!.*\d)/g) : false;
       let _chartCond = '';
       if (this._config.entity_summary_1?.match('^weather.')) {
-        const _chartForecast = this.forecast1 && this.forecast1[startIdx + i];
-        _chartCond = _chartForecast ? String(_chartForecast.detailed_description ?? _chartForecast.condition ?? '') : '';
+        // resolve by date, consistent with how this chart's data rows were built
+        const _chartDate = d.datetime ? new Date(d.datetime) : null;
+        const _chartProp = (key: string): string | undefined =>
+          _chartDate ? this._getForecastPropFromWeather(this.forecast1, _chartDate, key) : undefined;
+        _chartCond = String(_chartProp('detailed_description') ?? _chartProp('condition') ?? '');
       } else if (_summaryStart && this._config.entity_summary_1) {
         const _summaryEntity = this._config.entity_summary_1.replace(/(\d+)(?!.*\d)/g, String(Number(_summaryStart) + i));
         _chartCond = this.hass.states[_summaryEntity] ? this.hass.states[_summaryEntity].state : '';
@@ -2738,8 +2755,8 @@ export class PlatinumWeatherCard extends LitElement {
         nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(this.locale, { hour: '2-digit', minute: '2-digit', hour12: false }) : "";
         break;
       case 'system':
-        nextSunSet = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_setting).toLocaleTimeString(navigator.language, { timeStyle: 'short' }).replace(" am", "am").replace(" pm", "pm") : "";
-        nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(navigator.language, { timeStyle: 'short' }).replace(" am", "am").replace(" pm", "pm") : "";
+        nextSunSet = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_setting).toLocaleTimeString(navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" am", "am").replace(" pm", "pm") : "";
+        nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" am", "am").replace(" pm", "pm") : "";
         break;
     }
     var nextDate = new Date();
