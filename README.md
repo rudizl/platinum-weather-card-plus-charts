@@ -451,7 +451,7 @@ Tapping a slot value (humidity, pressure, wind, ...) — or the big current temp
 
 ### Local forecast (Zambretti)
 
-The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which achieves roughly 90% accuracy for the next 12 hours using barometric pressure, its 3-hour trend, wind direction and season.
+The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which reads barometric pressure, its trend, wind direction and season. It is reported to be right around 90% of the time for the next 12 hours — but that figure comes from the frontal weather it was designed for, and there are conditions it cannot see at all (see *What it can and cannot do* below).
 
 Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
 
@@ -469,6 +469,20 @@ Inputs used:
 - **Station altitude** — only set this if your pressure sensor reports *absolute* (station) pressure; the card then applies the barometric sea-level correction using the current temperature. Leave empty for relative/sea-level sensors.
 
 The hemisphere is detected automatically from your Home Assistant latitude.
+
+#### What it can and cannot do
+
+Zambretti is **purely barometric**. It infers the weather from the pressure level, which way the pressure is moving, and where the wind is coming from. That works because in the mid-latitude frontal weather it was built for — Britain in 1915 — pressure genuinely leads the weather: fronts announce themselves in the barometer hours before they arrive.
+
+It follows that the algorithm is blind to anything that does not move the barometer:
+
+- **Summer convective storms.** Thunderstorms often form under high pressure with no barometric signature whatsoever. The card can read *"fine weather"* while a storm is building overhead, and it is not wrong about the pressure — it simply has no way to see instability, moisture or lift. In a convective climate, treat the local forecast as one input among several rather than the authority.
+- **Fog, frost, and anything driven by radiation or humidity.** No input, no output.
+- **Terrain effects.** Sea breezes, valley winds, lake effect — all invisible to it.
+
+Where it does well is the thing your forecast provider is often slowest on: a front arriving earlier or later than the model said. The barometer at your own location knows before the model updates.
+
+None of this is fixable within Zambretti; the missing input is cloud cover, which is what later algorithms such as Sager (1942) use alongside pressure and wind change. If your station has a pyranometer, that data exists — it is simply not something this card computes today.
 
 > **Your pressure sensor must report sea-level (relative) pressure — check this first.**
 > Zambretti reads the absolute pressure level, so an uncalibrated station throws the forecast off by several categories, permanently. A station at 150 m altitude reads roughly 18 hPa below sea level: the algorithm sees 1002 hPa ("changeable, some rain") when the real sea-level pressure is 1020 hPa ("settled fair"), and the card then predicts rain on a cloudless day.
