@@ -109,7 +109,7 @@ export function tidalTrendHpaPerHour(
   date: Date,
   latitude: number,
   longitude: number,
-  windowHours = 1,
+  windowHours = 3,
 ): number {
   const amplitude = 1.16 * Math.pow(Math.cos((latitude * Math.PI) / 180), 2);
   const utcOffsetHours = -date.getTimezoneOffset() / 60;

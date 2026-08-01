@@ -76,6 +76,8 @@ const nl: Translation = {
     "local_forecast_verbose": "Uitgebreide voorspellingstekst",
     "forecast_altitude": "Hoogte van het station (m)",
     "forecast_altitude_hint": "Leeg laten als de sensor relatieve druk (zeeniveau) rapporteert",
+    "trend_window": "Trendvenster (u)",
+    "trend_window_hint": "Moet overeenkomen met het tijdvenster van je Derivative-helper — standaard 3",
     "compact_slots": "Compacte labels",
     "sun_overrides_icon": "Dag/nacht-pictogram via zon",
     "show_static_icons": "Statische pictogrammen",

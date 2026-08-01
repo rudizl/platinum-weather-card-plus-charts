@@ -1133,6 +1133,15 @@ get _forecast_type(): string {
       ${this._config?.option_local_forecast === true ? html`
       <div class="side-by-side">
         <div>
+          <ha-input type="number" label=${this._t("trend_window")} .value=${this._config?.option_trend_window_hours ?? ''} .configValue=${'option_trend_window_hours'} @input=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("trend_window_hint")}</div>
+        </div>
+        <div></div>
+      </div>` : html``}
+      ${this._config?.option_local_forecast === true ? html`
+      <div class="side-by-side">
+        <div>
           <div class="toggle-row">
               <span class=${this._config?.option_local_forecast_verbose ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast_verbose'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("local_forecast_verbose")}</span>

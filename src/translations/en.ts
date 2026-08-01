@@ -76,6 +76,8 @@ const en: Translation = {
     "local_forecast_verbose": "Verbose forecast text",
     "forecast_altitude": "Station altitude (m)",
     "forecast_altitude_hint": "Leave empty if the sensor reports relative (sea-level) pressure",
+    "trend_window": "Pressure trend window (h)",
+    "trend_window_hint": "Must match the time window of your Derivative helper — default 3",
     "compact_slots": "Compact slot labels",
     "sun_overrides_icon": "Day/night icon from sun",
     "show_static_icons": "Show Static Icons",

@@ -76,6 +76,8 @@ const de: Translation = {
     "local_forecast_verbose": "Ausführlicher Vorhersagetext",
     "forecast_altitude": "Stationshöhe (m)",
     "forecast_altitude_hint": "Leer lassen, wenn der Sensor relativen Druck (Meereshöhe) liefert",
+    "trend_window": "Trendfenster (h)",
+    "trend_window_hint": "Muss dem Zeitfenster Ihres Derivative-Helfers entsprechen — Standard 3",
     "compact_slots": "Kompakte Beschriftungen",
     "sun_overrides_icon": "Tag/Nacht-Symbol per Sonnenstand",
     "show_static_icons": "Statische Icons",

@@ -76,6 +76,8 @@ const pl: Translation = {
     "local_forecast_verbose": "Rozbudowany tekst prognozy",
     "forecast_altitude": "Wysokość stacji (m)",
     "forecast_altitude_hint": "Pozostaw puste, jeśli czujnik podaje ciśnienie względne (poziom morza)",
+    "trend_window": "Okno trendu (godz.)",
+    "trend_window_hint": "Musi odpowiadać oknu czasowemu pomocnika Derivative — domyślnie 3",
     "compact_slots": "Kompaktowe etykiety",
     "sun_overrides_icon": "Ikona dzień/noc wg słońca",
     "show_static_icons": "Ikony statyczne",

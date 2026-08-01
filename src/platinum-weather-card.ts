@@ -2000,8 +2000,13 @@ export class PlatinumWeatherCard extends LitElement {
     // the forecast deteriorate every afternoon and recover every morning.
     const lat = this.hass.config?.latitude;
     const lon = this.hass.config?.longitude;
+    // The correction must be averaged over the same window the trend sensor uses;
+    // at three hours versus one the two differ by up to 0.16 hPa/h, over half the
+    // threshold for calling the pressure falling. A Derivative helper's window is
+    // not exposed on the entity, so it has to be configured here.
+    const trendWindow = Number(this._config.option_trend_window_hours);
     const synopticTrend = (lat !== undefined && lon !== undefined)
-      ? trend - tidalTrendHpaPerHour(new Date(), lat, lon)
+      ? trend - tidalTrendHpaPerHour(new Date(), lat, lon, isNaN(trendWindow) || trendWindow <= 0 ? 3 : trendWindow)
       : trend;
     // Trend hysteresis for the letter only: enter rising/falling at ±0.30 hPa/h
     // (≈0.9 hPa over three hours, the scale the original algorithm was built

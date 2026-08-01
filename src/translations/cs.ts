@@ -76,6 +76,8 @@ const cs: Translation = {
     "local_forecast_verbose": "Podrobný text předpovědi",
     "forecast_altitude": "Nadmořská výška stanice (m)",
     "forecast_altitude_hint": "Nechte prázdné, pokud senzor hlásí relativní tlak (k hladině moře)",
+    "trend_window": "Okno trendu (h)",
+    "trend_window_hint": "Musí odpovídat časovému oknu pomocníka Derivative — výchozí 3",
     "compact_slots": "Kompaktní popisky slotů",
     "sun_overrides_icon": "Ikona den/noc podle slunce",
     "show_static_icons": "Zobrazit statické ikony",

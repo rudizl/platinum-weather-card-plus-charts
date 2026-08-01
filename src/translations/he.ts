@@ -76,6 +76,8 @@ const he: Translation = {
     "local_forecast_verbose": "טקסט תחזית מפורט",
     "forecast_altitude": "גובה התחנה (מ')",
     "forecast_altitude_hint": "השאר ריק אם החיישן מדווח לחץ יחסי (גובה פני הים)",
+    "trend_window": "חלון מגמה (שעות)",
+    "trend_window_hint": "חייב להתאים לחלון הזמן של עוזר ה-Derivative — ברירת מחדל 3",
     "compact_slots": "תוויות קומפקטיות",
     "sun_overrides_icon": "סמל יום/לילה לפי השמש",
     "show_static_icons": "סמלים סטטיים",

@@ -74,6 +74,8 @@ const bg: Translation = {
     "local_forecast_verbose": "Многословна прогноза",
     "forecast_altitude": "Надморска височина (м)",
     "forecast_altitude_hint": "Остави празно, ако сензорът дава относително (sea-level) налягане",
+    "trend_window": "Прозорец на тренда (ч)",
+    "trend_window_hint": "Трябва да съвпада с времевия прозорец на Derivative помощника — по подразбиране 3",
     "compact_slots": "Компактни надписи",
     "sun_overrides_icon": "Икона ден/нощ по слънцето",
     "show_static_icons": "Статични икони",

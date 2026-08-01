@@ -76,6 +76,8 @@ const ru: Translation = {
     "local_forecast_verbose": "Развёрнутый текст прогноза",
     "forecast_altitude": "Высота станции (м)",
     "forecast_altitude_hint": "Оставьте пустым, если датчик сообщает относительное давление (уровень моря)",
+    "trend_window": "Окно тренда (ч)",
+    "trend_window_hint": "Должно совпадать с временным окном помощника Derivative — по умолчанию 3",
     "compact_slots": "Компактные подписи",
     "sun_overrides_icon": "Значок день/ночь по солнцу",
     "show_static_icons": "Статичные значки",

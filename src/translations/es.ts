@@ -76,6 +76,8 @@ const es: Translation = {
     "local_forecast_verbose": "Texto de pronóstico detallado",
     "forecast_altitude": "Altitud de la estación (m)",
     "forecast_altitude_hint": "Dejar vacío si el sensor informa presión relativa (nivel del mar)",
+    "trend_window": "Ventana de tendencia (h)",
+    "trend_window_hint": "Debe coincidir con la ventana temporal de tu ayudante Derivative — por defecto 3",
     "compact_slots": "Etiquetas compactas",
     "sun_overrides_icon": "Icono día/noche según el sol",
     "show_static_icons": "Iconos estáticos",

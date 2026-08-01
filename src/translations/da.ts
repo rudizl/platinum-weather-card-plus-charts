@@ -76,6 +76,8 @@ const da: Translation = {
     "local_forecast_verbose": "Udførlig prognosetekst",
     "forecast_altitude": "Stationens højde (m)",
     "forecast_altitude_hint": "Lad stå tomt, hvis sensoren rapporterer relativt tryk (havniveau)",
+    "trend_window": "Trendvindue (t)",
+    "trend_window_hint": "Skal matche tidsvinduet for din Derivative-hjælper — standard 3",
     "compact_slots": "Kompakte etiketter",
     "sun_overrides_icon": "Dag/nat-ikon efter solen",
     "show_static_icons": "Statiske ikoner",

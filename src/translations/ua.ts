@@ -76,6 +76,8 @@ const ua: Translation = {
     "local_forecast_verbose": "Розгорнутий текст прогнозу",
     "forecast_altitude": "Висота станції (м)",
     "forecast_altitude_hint": "Залиште порожнім, якщо датчик повідомляє відносний тиск (рівень моря)",
+    "trend_window": "Вікно тренду (год)",
+    "trend_window_hint": "Має збігатися з часовим вікном помічника Derivative — типово 3",
     "compact_slots": "Компактні підписи",
     "sun_overrides_icon": "Значок день/ніч за сонцем",
     "show_static_icons": "Статичні значки",

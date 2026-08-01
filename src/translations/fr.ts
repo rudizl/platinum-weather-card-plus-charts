@@ -76,6 +76,8 @@ const fr: Translation = {
     "local_forecast_verbose": "Texte de prévision détaillé",
     "forecast_altitude": "Altitude de la station (m)",
     "forecast_altitude_hint": "Laisser vide si le capteur fournit une pression relative (niveau de la mer)",
+    "trend_window": "Fenêtre de tendance (h)",
+    "trend_window_hint": "Doit correspondre à la fenêtre temporelle de votre assistant Derivative — 3 par défaut",
     "compact_slots": "Libellés compacts",
     "sun_overrides_icon": "Icône jour/nuit selon le soleil",
     "show_static_icons": "Icônes statiques",
