@@ -2627,7 +2627,10 @@ export class PlatinumWeatherCard extends LitElement {
     const entity = this._config.entity_wind_bearing;
     return entity && this.hass.states[entity]
       ? entity.match('^weather.') === null
-        ? isNaN(Number(this.hass.states[entity].state))
+        ? (this.hass.states[entity].state === 'unknown' || this.hass.states[entity].state === 'unavailable')
+          ? '---'
+          : isNaN(Number(this.hass.states[entity].state))
+          // a non-numeric state is legitimate here: compass text such as "NNE" or "ЮИ"
           ? this.hass.states[entity].state
           : this.windDirections[(Math.round((Number(this.hass.states[entity].state) / 360) * 16))]
         : this.hass.states[entity].attributes.wind_bearing !== undefined
@@ -2642,7 +2645,9 @@ export class PlatinumWeatherCard extends LitElement {
     const entity = this._config.entity_wind_speed;
     return entity && this.hass.states[entity]
       ? entity.match('^weather.') === null
-        ? Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale)
+        ? (this.hass.states[entity].state === 'unknown' || this.hass.states[entity].state === 'unavailable')
+          ? '---'
+          : Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale)
         : this.hass.states[entity].attributes.wind_speed !== undefined
           ? Math.round(Number(this.hass.states[entity].attributes.wind_speed)).toLocaleString(this.locale)
           : '---'
@@ -2665,7 +2670,9 @@ export class PlatinumWeatherCard extends LitElement {
     //tjl Feature Add - Add capability to get current Wind Gust from weather entity attribute
     return entity && this.hass.states[entity]
       ? entity.match('^weather.') === null
-        ? Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale)
+        ? (this.hass.states[entity].state === 'unknown' || this.hass.states[entity].state === 'unavailable')
+          ? '---'
+          : Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale)
         : this.hass.states[entity].attributes.wind_gust_speed !== undefined
           ? Math.round(Number(this.hass.states[entity].attributes.wind_gust_speed)).toLocaleString(this.locale)
           : '---'
