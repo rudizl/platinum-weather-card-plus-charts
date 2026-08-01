@@ -942,11 +942,11 @@ export class PlatinumWeatherCard extends LitElement {
           posData = this._getForecastPropFromWeather(this.forecast1, forecastDate, 'precipitation');
         }
       //const posData = this._getForecastPropFromWeather(this.hass.states[posEntity].attributes.forecast, forecastDate, 'precipitation');
-        pos = posEntity ? html`<li class="f-slot-horiz-text"><span><div class="pos">${this.hass.states[posEntity] && posData !== undefined ? posData : "---"}</div><div class="unit">${this.getUOM('precipitation')}</div></span></li>` : html``;
+        pos = posEntity ? html`<li class="f-slot-horiz-text"><span><div class="pos">${this.hass.states[posEntity] && posData !== undefined ? posData : "---"}</div><div class="unit">${this._precipUnit(posEntity)}</div></span></li>` : html``;
       } else {
         start = this._config.entity_pos_1 ? this._config.entity_pos_1.match(/(\d+)(?!.*\d)/g) : false;
         const posEntity = start && this._config.entity_pos_1 ? this._config.entity_pos_1.replace(/(\d+)(?!.*\d)/g, String(Number(start) + i)) : undefined;
-        pos = start ? html`<li class="f-slot-horiz-text"><span><div class="pos">${posEntity && this.hass.states[posEntity] ? this.hass.states[posEntity].state : "---"}</div><div class="unit">${this.getUOM('precipitation')}</div></span></li>` : html``;
+        pos = start ? html`<li class="f-slot-horiz-text"><span><div class="pos">${posEntity && this.hass.states[posEntity] ? this.hass.states[posEntity].state : "---"}</div><div class="unit">${this._precipUnit(posEntity)}</div></span></li>` : html``;
       }
       if (this._config.entity_summary_1?.match('^weather.')) {
         const tooltipEntity = this._config.entity_summary_1;
@@ -1160,7 +1160,7 @@ export class PlatinumWeatherCard extends LitElement {
         }
       //const posData = this._getForecastPropFromWeather(this.hass.states[posEntity].attributes.forecast, forecastDate, 'precipitation');
         pos = posEntity ? html`<div class="f-slot-vert"><div class="f-label">Possible rain </div>
-        <div class="pos">${this.hass.states[posEntity] && posData !== undefined ? posData : "---"}</div><div class="unit">${this.getUOM('precipitation')}</div></div>` : html``;
+        <div class="pos">${this.hass.states[posEntity] && posData !== undefined ? posData : "---"}</div><div class="unit">${this._precipUnit(posEntity)}</div></div>` : html``;
       } else {
         start = this._config.entity_pos_1 ? this._config.entity_pos_1.match(/(\d+)(?!.*\d)/g) : false;
         const posEntity = start && this._config.entity_pos_1 ? this._config.entity_pos_1.replace(/(\d+)(?!.*\d)/g, String(Number(start) + i)) : undefined;
@@ -1807,7 +1807,7 @@ export class PlatinumWeatherCard extends LitElement {
           : this.hass.states[this._config.entity_pos].state
         : forecast_pos !== undefined ? forecast_pos : '---'
       : "---";
-    const pos_units = pos !== "---" ? html`<div class="slot-text unit">${this.getUOM('precipitation')}</div>` : html``;
+    const pos_units = pos !== "---" ? html`<div class="slot-text unit">${this._precipUnit(this._config.entity_pos)}</div>` : html``;
     return html`
       <li data-slot="popforecast">
         <div class="slot">
@@ -1860,7 +1860,7 @@ export class PlatinumWeatherCard extends LitElement {
         //? this.hass.states[this._config.entity_pos].attributes.forecast[0].precipitation
           : '---'
       : "---";
-    const units = pos !== "---" ? html`<div class="slot-text unit">${this.getUOM('precipitation')}</div>` : html``;
+    const units = pos !== "---" ? html`<div class="slot-text unit">${this._precipUnit(this._config.entity_pos)}</div>` : html``;
     return html`
       <li data-slot="possible_today">
         <div class="slot">
@@ -1885,7 +1885,7 @@ export class PlatinumWeatherCard extends LitElement {
         //? this.hass.states[this._config.entity_possible_tomorrow].attributes.forecast[1].precipitation
           : '---'
       : "---";
-    const units = pos !== "---" ? html`<div class="slot-text unit">${this.getUOM('precipitation')}</div>` : html``;
+    const units = pos !== "---" ? html`<div class="slot-text unit">${this._precipUnit(this._config.entity_possible_tomorrow)}</div>` : html``;
     return html`
       <li data-slot="possible_tomorrow">
         <div class="slot">
@@ -1899,7 +1899,7 @@ export class PlatinumWeatherCard extends LitElement {
 
   get slotRainfall(): TemplateResult {
     const rainfall = this.currentRainfall;
-    const units = rainfall !== "---" ? html`<div class="slot-text unit"></span>${this.getUOM('precipitation')}</div>` : html``;
+    const units = rainfall !== "---" ? html`<div class="slot-text unit"></span>${this._precipUnit(this._config.entity_rainfall)}</div>` : html``;
     return html`
       <li data-slot="rainfall">
         <div class="slot">
@@ -3217,6 +3217,19 @@ export class PlatinumWeatherCard extends LitElement {
   get localeTextFireDanger(): string { return tCard(this.locale, 'fire_danger'); }
 
   get localeTextGust(): string { return tCard(this.locale, 'gust'); }
+
+  // Unit for a precipitation reading. Prefers the sensor's own unit_of_measurement,
+  // because getUOM('precipitation') can only answer mm-or-inches from the system's
+  // length unit — wrong whenever a sensor reports something else (snow in cm, or a
+  // rain gauge in inches on a metric system). Falls back to the old behaviour when
+  // the entity has no unit, so nothing changes for anyone whose sensor is silent.
+  private _precipUnit(entityId: string | undefined): string {
+    if (entityId && entityId.match('^weather.') === null) {
+      const uom = this.hass.states[entityId]?.attributes?.unit_of_measurement;
+      if (typeof uom === 'string' && uom.length > 0) return uom;
+    }
+    return this.getUOM('precipitation');
+  }
 
   getUOM(measure: string): string {
     const lengthUnit = this.hass.config.unit_system.length;
