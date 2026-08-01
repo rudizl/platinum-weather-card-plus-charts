@@ -1611,6 +1611,11 @@ export class PlatinumWeatherCard extends LitElement {
   private _onPointerDown(e: PointerEvent): void {
     // Only primary pointer (ignore multi-touch)
     if (!e.isPrimary) return;
+    // A press that starts on a tappable reading belongs to that reading, not to the
+    // card: its click handler calls stopPropagation, but pointerdown has already
+    // travelled, so without this the card's hold action would still fire.
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('li.slot-tappable, .overview-tappable')) return;
     this._pHoldFired = false;
     clearTimeout(this._pHoldTimer);
     if (this.hass && this._config && hasAction(this._config?.hold_action)) {
