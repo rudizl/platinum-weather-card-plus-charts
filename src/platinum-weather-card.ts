@@ -519,7 +519,8 @@ export class PlatinumWeatherCard extends LitElement {
     const biggerIcon = html`<div class="big-icon"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
 
     const currentTemp = html`
-      <div class="current-temp">
+      <div class="current-temp${this._overviewTapEntity('temperature') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="temperature">
         <div class="temp" id="current-temp-text">${this.currentTemperature}</div>
         <div class="unit-temp-big">${this.getUOM('temperature')}</div>
       </div>
@@ -527,7 +528,8 @@ export class PlatinumWeatherCard extends LitElement {
 
     const apparent = this.currentApparentTemperature;
     const apparentTemp = apparent != '' ? html`
-      <div class="apparent-temp">
+      <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
@@ -564,7 +566,8 @@ export class PlatinumWeatherCard extends LitElement {
     const stack = (this._cardWidth >= 344) ? ' stacked' : '';
 
     const currentTemp = html`
-      <div class="current-temp">
+      <div class="current-temp${this._overviewTapEntity('temperature') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="temperature">
         <div class="temp" id="current-temp-text">${this.currentTemperature}</div>
         <div class="unit-temp-big">${this.getUOM('temperature')}</div>
       </div>
@@ -572,7 +575,8 @@ export class PlatinumWeatherCard extends LitElement {
 
     const apparent = this.currentApparentTemperature;
     const apparentTemp = apparent != '' ? html`
-      <div class="apparent-temp">
+      <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
@@ -2042,6 +2046,28 @@ export class PlatinumWeatherCard extends LitElement {
     return entity;
   }
 
+  // Which entity the big current-temperature / apparent-temperature readings open.
+  // Same rules as the slots: real sensor only, weather-domain entities stay inert
+  // (their dialog shows a forecast, not this reading's history).
+  private _overviewTapEntity(which: 'temperature' | 'apparent'): string | null {
+    if (this._config.option_slot_tap_more_info === false) return null;
+    const entity = which === 'temperature'
+      ? this._config.entity_temperature
+      : this._config.entity_apparent_temp;
+    if (!entity || !this.hass.states[entity] || entity.startsWith('weather.')) return null;
+    return entity;
+  }
+
+  private _overviewClick(ev: Event): void {
+    const el = (ev.currentTarget as HTMLElement);
+    const which = el.dataset.overview as 'temperature' | 'apparent' | undefined;
+    if (!which) return;
+    const entity = this._overviewTapEntity(which);
+    if (entity === null) return;
+    ev.stopPropagation();
+    fireEvent(this, 'hass-more-info', { entityId: entity });
+  }
+
   private _slotClick(ev: Event): void {
     const li = (ev.target as HTMLElement).closest('li[data-slot]') as HTMLElement | null;
     if (!li || !li.dataset.slot) return;
@@ -3433,6 +3459,14 @@ export class PlatinumWeatherCard extends LitElement {
         align-items: center;
         min-width: 0;
         width: 100%;
+      }
+      .overview-tappable {
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.15s ease;
+      }
+      .overview-tappable:hover {
+        background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
       }
       li.slot-tappable {
         cursor: pointer;
