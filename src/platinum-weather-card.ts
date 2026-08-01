@@ -53,7 +53,7 @@ export class PlatinumWeatherCard extends LitElement {
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     await import('./editor');
-    return document.createElement('platinum-weather-card-plus-charts-editor');
+    return document.createElement('platinum-weather-card-plus-charts-editor') as LovelaceCardEditor;
   }
 
   public static getStubConfig(): Record<string, unknown> {
@@ -491,7 +491,7 @@ export class PlatinumWeatherCard extends LitElement {
               case '24hour':
                 return html`${d.toLocaleString(this.locale || navigator.language, { hour: '2-digit', minute: '2-digit', hour12: false }) + ", " + this._formatDate(d)}`;
               case 'system':
-                return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' }).replace(" ", "") + ", " + this._formatDate(d)}`;
+                return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" ", "") + ", " + this._formatDate(d)}`;
             }
           }
         }
@@ -503,7 +503,7 @@ export class PlatinumWeatherCard extends LitElement {
           case '24hour':
             return html`${d.toLocaleString(this.locale || navigator.language, { hour: '2-digit', minute: '2-digit', hour12: false }) + ", " + this._formatDate(d)}`;
           case 'system':
-            return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' }).replace(" ", "") + ", " + this._formatDate(d)}`;
+            return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" ", "") + ", " + this._formatDate(d)}`;
         }
       }
     }
@@ -520,7 +520,8 @@ export class PlatinumWeatherCard extends LitElement {
     const biggerIcon = html`<div class="big-icon"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
 
     const currentTemp = html`
-      <div class="current-temp">
+      <div class="current-temp${this._overviewTapEntity('temperature') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="temperature">
         <div class="temp" id="current-temp-text">${this.currentTemperature}</div>
         <div class="unit-temp-big">${this.getUOM('temperature')}</div>
       </div>
@@ -528,7 +529,8 @@ export class PlatinumWeatherCard extends LitElement {
 
     const apparent = this.currentApparentTemperature;
     const apparentTemp = apparent != '' ? html`
-      <div class="apparent-temp">
+      <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
@@ -565,7 +567,8 @@ export class PlatinumWeatherCard extends LitElement {
     const stack = (this._cardWidth >= 344) ? ' stacked' : '';
 
     const currentTemp = html`
-      <div class="current-temp">
+      <div class="current-temp${this._overviewTapEntity('temperature') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="temperature">
         <div class="temp" id="current-temp-text">${this.currentTemperature}</div>
         <div class="unit-temp-big">${this.getUOM('temperature')}</div>
       </div>
@@ -573,7 +576,8 @@ export class PlatinumWeatherCard extends LitElement {
 
     const apparent = this.currentApparentTemperature;
     const apparentTemp = apparent != '' ? html`
-      <div class="apparent-temp">
+      <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
+           @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
@@ -1010,8 +1014,8 @@ export class PlatinumWeatherCard extends LitElement {
                   wBear = compassMap[key] ?? null;
                 }
               }
-              const arrowSvg = wBear !== null
-                ? `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 10 10" style="transform:rotate(${(wBear + 180) % 360}deg);display:inline-block;vertical-align:middle;margin-right:1px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
+              const arrowSvg = wBear !== null && isFinite(Number(wBear))
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 10 10" style="transform:rotate(${(Number(wBear) + 180) % 360}deg);display:inline-block;vertical-align:middle;margin-right:1px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
                 : '';
               return html`<li class="f-slot-horiz-text"><span>${unsafeHTML(arrowSvg)}${wSpeed}</span></li>`;
             })() : html``}
@@ -1262,7 +1266,8 @@ export class PlatinumWeatherCard extends LitElement {
     `;
   }
 
-  private _getForecastPropFromWeather(forecast: Array<any>, date: Date, propKey: string): string | undefined {
+  private _getForecastPropFromWeather(forecast: Array<any> | undefined, date: Date, propKey: string): string | undefined {
+    if (!forecast) return undefined;
     const day = date.toDateString();
     const forecastForThisDay = forecast.filter(o => new Date(o.datetime).toDateString() === day);
     if (forecastForThisDay.length === 1) {
@@ -1325,6 +1330,18 @@ export class PlatinumWeatherCard extends LitElement {
    * Builds unified tooltip row HTML used by both forecast and chart tooltips.
    * Returns an HTML string ready for insertion into a fcasttooltipblock.
    */
+  // Anything interpolated into an HTML string that later reaches unsafeHTML must
+  // pass through here. Entity attributes and forecast descriptions are attacker-
+  // influenced data (a crafted attribute could otherwise inject markup or script).
+  private static _escapeHtml(value: unknown): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   private _buildTooltipRows(opts: {
     date?: string;
     condition?: string;
@@ -1339,23 +1356,24 @@ export class PlatinumWeatherCard extends LitElement {
     const { date, condition, maxT, minT, precip, windSpeed, windBearDeg, uomPrecip = '', uomWind = '' } = opts;
     let rows = '';
 
+    const esc = (v: unknown): string => (this.constructor as typeof PlatinumWeatherCard)._escapeHtml(v);
     if (date) {
-      rows += `<div class="fcasttooltiptext" style="color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.25);padding-bottom:3px;margin-bottom:4px;">${date}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.25);padding-bottom:3px;margin-bottom:4px;">${esc(date)}</div>`;
     }
     if (condition) {
-      rows += `<div class="fcasttooltiptext" style="color:#fff;margin-bottom:2px;">${condition}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;margin-bottom:2px;">${esc(condition)}</div>`;
     }
     if (maxT !== undefined && maxT !== null) {
       rows += `<div class="fcasttooltiptext" style="color:#fff;margin-top:2px;"><b style="color:#ef5350;">↑ ${Math.round(maxT)}°</b>&nbsp;&nbsp;<b style="color:#90caf9;">↓ ${minT !== undefined && minT !== null ? Math.round(minT) + '°' : '---'}</b></div>`;
     }
     if (precip !== undefined && precip !== null && precip > 0) {
-      rows += `<div class="fcasttooltiptext" style="color:#fff;">💧 ${precip.toFixed(1)} ${this._localizeUnit(uomPrecip)}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;">💧 ${precip.toFixed(1)} ${esc(this._localizeUnit(uomPrecip))}</div>`;
     }
     if (windSpeed !== undefined && windSpeed !== null) {
-      const arrow = windBearDeg !== null && windBearDeg !== undefined
-        ? `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" style="transform:rotate(${(windBearDeg+180)%360}deg);display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
+      const arrow = windBearDeg !== null && windBearDeg !== undefined && isFinite(Number(windBearDeg))
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" style="transform:rotate(${(Number(windBearDeg)+180)%360}deg);display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`
         : '';
-      rows += `<div class="fcasttooltiptext" style="color:#fff;">${arrow}${windSpeed} ${this._localizeUnit(uomWind)}</div>`;
+      rows += `<div class="fcasttooltiptext" style="color:#fff;">${arrow}${windSpeed} ${esc(this._localizeUnit(uomWind))}</div>`;
     }
     return rows;
   }
@@ -1462,7 +1480,7 @@ export class PlatinumWeatherCard extends LitElement {
         if (d.precip > 0) {
           const bH    = Math.max((d.precip / pMax) * maxBarH, 2);
           const bTop  = tempH - bH;
-          const label = (d.precip % 1 === 0 ? String(d.precip) : d.precip.toFixed(1)) + ' ' + _precipUnit;
+          const label = (this.constructor as typeof PlatinumWeatherCard)._escapeHtml((d.precip % 1 === 0 ? String(d.precip) : d.precip.toFixed(1)) + ' ' + _precipUnit);
           // Bar behind everything (z-index 0), rising from bottom of temp area
           colHtml = `<div style="position:absolute;top:${bTop}px;left:0;right:0;height:${bH}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>` + colHtml;
           // Label centered ON the baseline
@@ -1481,8 +1499,11 @@ export class PlatinumWeatherCard extends LitElement {
       const _summaryStart = this._config.entity_summary_1 ? this._config.entity_summary_1.match(/(\d+)(?!.*\d)/g) : false;
       let _chartCond = '';
       if (this._config.entity_summary_1?.match('^weather.')) {
-        const _chartForecast = this.forecast1 && this.forecast1[startIdx + i];
-        _chartCond = _chartForecast ? String(_chartForecast.detailed_description ?? _chartForecast.condition ?? '') : '';
+        // resolve by date, consistent with how this chart's data rows were built
+        const _chartDate = d.datetime ? new Date(d.datetime) : null;
+        const _chartProp = (key: string): string | undefined =>
+          _chartDate ? this._getForecastPropFromWeather(this.forecast1, _chartDate, key) : undefined;
+        _chartCond = String(_chartProp('detailed_description') ?? _chartProp('condition') ?? '');
       } else if (_summaryStart && this._config.entity_summary_1) {
         const _summaryEntity = this._config.entity_summary_1.replace(/(\d+)(?!.*\d)/g, String(Number(_summaryStart) + i));
         _chartCond = this.hass.states[_summaryEntity] ? this.hass.states[_summaryEntity].state : '';
@@ -1591,6 +1612,11 @@ export class PlatinumWeatherCard extends LitElement {
   private _onPointerDown(e: PointerEvent): void {
     // Only primary pointer (ignore multi-touch)
     if (!e.isPrimary) return;
+    // A press that starts on a tappable reading belongs to that reading, not to the
+    // card: its click handler calls stopPropagation, but pointerdown has already
+    // travelled, so without this the card's hold action would still fire.
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('li.slot-tappable, .overview-tappable')) return;
     this._pHoldFired = false;
     clearTimeout(this._pHoldTimer);
     if (this.hass && this._config && hasAction(this._config?.hold_action)) {
@@ -2064,6 +2090,28 @@ export class PlatinumWeatherCard extends LitElement {
     const entity = map[slot];
     if (!entity || !this.hass.states[entity] || entity.startsWith('weather.')) return null;
     return entity;
+  }
+
+  // Which entity the big current-temperature / apparent-temperature readings open.
+  // Same rules as the slots: real sensor only, weather-domain entities stay inert
+  // (their dialog shows a forecast, not this reading's history).
+  private _overviewTapEntity(which: 'temperature' | 'apparent'): string | null {
+    if (this._config.option_slot_tap_more_info === false) return null;
+    const entity = which === 'temperature'
+      ? this._config.entity_temperature
+      : this._config.entity_apparent_temp;
+    if (!entity || !this.hass.states[entity] || entity.startsWith('weather.')) return null;
+    return entity;
+  }
+
+  private _overviewClick(ev: Event): void {
+    const el = (ev.currentTarget as HTMLElement);
+    const which = el.dataset.overview as 'temperature' | 'apparent' | undefined;
+    if (!which) return;
+    const entity = this._overviewTapEntity(which);
+    if (entity === null) return;
+    ev.stopPropagation();
+    fireEvent(this, 'hass-more-info', { entityId: entity });
   }
 
   private _slotClick(ev: Event): void {
@@ -2779,8 +2827,8 @@ export class PlatinumWeatherCard extends LitElement {
         nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(this.locale, { hour: '2-digit', minute: '2-digit', hour12: false }) : "";
         break;
       case 'system':
-        nextSunSet = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_setting).toLocaleTimeString(navigator.language, { timeStyle: 'short' }).replace(" am", "am").replace(" pm", "pm") : "";
-        nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(navigator.language, { timeStyle: 'short' }).replace(" am", "am").replace(" pm", "pm") : "";
+        nextSunSet = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_setting).toLocaleTimeString(navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" am", "am").replace(" pm", "pm") : "";
+        nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" am", "am").replace(" pm", "pm") : "";
         break;
     }
     var nextDate = new Date();
@@ -3466,6 +3514,14 @@ export class PlatinumWeatherCard extends LitElement {
         align-items: center;
         min-width: 0;
         width: 100%;
+      }
+      .overview-tappable {
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.15s ease;
+      }
+      .overview-tappable:hover {
+        background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
       }
       li.slot-tappable {
         cursor: pointer;

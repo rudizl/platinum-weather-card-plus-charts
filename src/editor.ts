@@ -559,15 +559,15 @@ get _forecast_type(): string {
   }
 
   get _tap_action(): Record<string, unknown> | undefined {
-    return this._config?.tap_action;
+    return this._config?.tap_action as Record<string, unknown> | undefined;
   }
 
   get _hold_action(): Record<string, unknown> | undefined {
-    return this._config?.hold_action;
+    return this._config?.hold_action as Record<string, unknown> | undefined;
   }
 
   get _double_tap_action(): Record<string, unknown> | undefined {
-    return this._config?.double_tap_action;
+    return this._config?.double_tap_action as Record<string, unknown> | undefined;
   }
 
   get _summary_1_use_attr(): boolean {
@@ -1964,8 +1964,8 @@ get _forecast_type(): string {
   private _valueChangedAction(configKey: string, ev): void {
     const value = ev.detail.value;
     if (value === undefined || value === null) return; // ignore init/reset fires
-    this._config = { ...this._config, [configKey]: value };
-    fireEvent(this, 'config-changed', { config: this.sortObjectByKeys(this._config) });
+    this._config = { ...this._config, [configKey]: value } as WeatherCardConfig;
+    fireEvent(this, 'config-changed', { config: this.sortObjectByKeys(this._config as Record<string, unknown>) });
   }
 
   private _editSubmenu(ev): void {
@@ -2020,8 +2020,8 @@ get _forecast_type(): string {
     const btn = ev.currentTarget as any;
     const key = btn.value as string;
     const currentlyActive: boolean = btn.classList.contains('active');
-    this._config = { ...this._config, [key]: !currentlyActive };
-    fireEvent(this, 'config-changed', { config: this.sortObjectByKeys(this._config) });
+    this._config = { ...this._config, [key]: !currentlyActive } as WeatherCardConfig;
+    fireEvent(this, 'config-changed', { config: this.sortObjectByKeys(this._config as Record<string, unknown>) });
   }
 
   private _valueChanged(ev): void {

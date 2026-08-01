@@ -72,6 +72,7 @@ export interface ForecastAttribute {
   is_daytime?: boolean;
   pressure?: number;
   wind_speed?: string;
+  wind_bearing?: number | string;
   //tjl add
   detailed_description?: string;
 }
