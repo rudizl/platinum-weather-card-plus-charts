@@ -4,7 +4,7 @@ A mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weath
 
 Based on the original Platinum Weather Card by [@makin-things](https://www.github.com/makin-things), extended by [@tommyjlong](https://github.com/tommyjlong). Weather Chart Card by [@mlamberts78](https://github.com/mlamberts78). Maintained and further developed here by [@rudizl](https://github.com/rudizl).
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-blue.svg?style=flat)](https://github.com/hacs/default)
 [![GitHub Release][releases-shield]][releases]
 [![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Frudizl%2Fplatinum-weather-card-plus-charts%2Fmaster%2Fbadges%2Fdownloads.json&style=flat)](https://github.com/rudizl/platinum-weather-card-plus-charts/releases)
 ![Maintenance](https://img.shields.io/badge/MAINTAINED-YES-green?style=flat)
@@ -14,17 +14,42 @@ Based on the original Platinum Weather Card by [@makin-things](https://www.githu
 
 ## Installation
 
-Install via HACS as a custom repository:
+The card is in the HACS default store:
 
-1. In HACS → Frontend → ⋮ → Custom Repositories
+1. HACS → search for **Platinum Weather Card Plus Charts**
+2. Download
+3. Hard-refresh your browser
+
+<details>
+<summary>Installing as a custom repository (no longer needed)</summary>
+
+If you installed the card before it was added to the default store, nothing breaks — updates come through the catalog either way, and you can remove the custom repository entry at your convenience.
+
+1. HACS → ⋮ → Custom Repositories
 2. Add `https://github.com/rudizl/platinum-weather-card-plus-charts` → type **Dashboard**
-3. Install **Platinum Weather Card Plus Charts**
-4. Hard-refresh your browser
+3. Download **Platinum Weather Card Plus Charts**
+
+</details>
 
 ---
 
 <details>
 <summary><strong>Changelog</strong></summary>
+
+**v2.2.3**
+
+The card is now available in the **HACS default store** — no custom repository needed.
+
+**New**
+- The current temperature and the apparent ("feels like") temperature open their history in the more-info dialog when tapped, matching the slot values. Requested by @blaal02
+
+**Fixes**
+- A long press on a tappable reading also fired the card's own hold action. The tap handlers stop the click, but the card starts its hold timer on `pointerdown`, which has already propagated by then. Affects the slot taps introduced in v2.2.0
+
+**Docs**
+- `option_show_gust_in_wind` and `option_show_beaufort` were working but undocumented
+
+---
 
 **v2.2.2**
 
@@ -623,6 +648,8 @@ When the **Charts section is enabled**, the same data is rendered visually as te
 | Time Format | String | `system` (follows HA Settings → Profile), `12hour`, or `24hour` |
 | Locale | String | Locale for timestamp and moon phase formatting. Supported: `bg`, `ru`, `ua`, `de`, `fr`, `it`, `nl`, `pl`, `da`, `es`, `he` — when empty, the card follows the Home Assistant interface language |
 | Compact slot labels | Boolean | Shorter slot label wording (`option_compact_slots`) |
+| Show Gust in Wind Slot | Boolean | Append the gust value to the wind slot |
+| Show Beaufort | Boolean | Prefix the wind slot with the Beaufort force |
 
 ---
 
@@ -755,6 +782,8 @@ double_tap_action:
 | `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
+| `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |
+| `option_show_beaufort` | Boolean | `false` | Prefix the wind slot with the Beaufort force, e.g. "BFT: 4 - SE 12 km/h" |
 
 Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressure`, l5=`sun_next`, l6–l8=`remove`, r1=`popforecast`, r2=`humidity`, r3=`uv_summary`, r4=`moon`, r5=`sun_following`, r6–r8=`remove`.
 
