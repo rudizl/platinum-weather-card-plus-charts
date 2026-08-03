@@ -107,7 +107,7 @@ export class WeatherCardEditor extends LitElement implements LovelaceCardEditor 
     }
 
     if (tmpConfig.entity_daytime_high) {
-      tmpConfig['Entity_forecast_max'] = tmpConfig.entity_daytime_high;
+      tmpConfig['entity_forecast_max'] = tmpConfig.entity_daytime_high;
       delete tmpConfig['entity_daytime_high'];
     }
 

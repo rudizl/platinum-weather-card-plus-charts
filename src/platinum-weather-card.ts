@@ -1420,10 +1420,13 @@ export class PlatinumWeatherCard extends LitElement {
     if (condition) {
       rows += `<div class="fcasttooltiptext" style="color:#fff;margin-bottom:2px;">${esc(condition)}</div>`;
     }
-    if (maxT !== undefined && maxT !== null) {
-      rows += `<div class="fcasttooltiptext" style="color:#fff;margin-top:2px;"><b style="color:#ef5350;">↑ ${Math.round(maxT)}°</b>&nbsp;&nbsp;<b style="color:#90caf9;">↓ ${minT !== undefined && minT !== null ? Math.round(minT) + '°' : '---'}</b></div>`;
+    // A missing value can arrive as null from the provider or as NaN after
+    // conversion, so test for a usable number rather than for null alone.
+    const usable = (v: unknown): v is number => typeof v === 'number' && isFinite(v);
+    if (usable(maxT)) {
+      rows += `<div class="fcasttooltiptext" style="color:#fff;margin-top:2px;"><b style="color:#ef5350;">↑ ${Math.round(maxT)}°</b>&nbsp;&nbsp;<b style="color:#90caf9;">↓ ${usable(minT) ? Math.round(minT) + '°' : '---'}</b></div>`;
     }
-    if (precip !== undefined && precip !== null && precip > 0) {
+    if (usable(precip) && precip > 0) {
       rows += `<div class="fcasttooltiptext" style="color:#fff;">💧 ${precip.toFixed(1)} ${esc(this._localizeUnit(uomPrecip))}</div>`;
     }
     if (windSpeed !== undefined && windSpeed !== null) {
@@ -1478,9 +1481,12 @@ export class PlatinumWeatherCard extends LitElement {
     const MIN_SEP = BH + 5;
 
     // ── Pre-calculate y positions with min separation ──────────────────────
-    const tAll = showTemp ? data.flatMap(d => [d.maxT, d.minT]) : [];
-    const tMax2 = showTemp ? Math.max(...tAll) : 0;
-    const tMin2 = showTemp ? Math.min(...tAll) : 0;
+    // A provider that omits a day sends null, which becomes NaN here — and a
+    // single NaN inside Math.max poisons the scale, so every point in the chart
+    // turns into NaN and the whole line disappears rather than just a gap.
+    const tAll = showTemp ? data.flatMap(d => [d.maxT, d.minT]).filter(t => isFinite(t)) : [];
+    const tMax2 = showTemp && tAll.length ? Math.max(...tAll) : 0;
+    const tMin2 = showTemp && tAll.length ? Math.min(...tAll) : 0;
     const tRng2 = tMax2 - tMin2 || 1;
     const tTop2 = 16;
     const tBot2 = tempH - 16;
@@ -1503,8 +1509,10 @@ export class PlatinumWeatherCard extends LitElement {
     const cw = 100 / n;
     const cx2 = (i: number) => (i + 0.5) * cw;
     const linesSvg = showTemp ? (() => {
-      const maxPts = tempYs.map((y, i) => `${cx2(i)},${y.maxY}`).join(' ');
-      const minPts = tempYs.map((y, i) => `${cx2(i)},${y.minY}`).join(' ');
+      const maxPts = tempYs.map((y, i) => isFinite(y.maxY) ? `${cx2(i)},${y.maxY}` : '')
+        .filter(Boolean).join(' ');
+      const minPts = tempYs.map((y, i) => isFinite(y.minY) ? `${cx2(i)},${y.minY}` : '')
+        .filter(Boolean).join(' ');
       return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${totalH}" preserveAspectRatio="none"` +
         ` style="position:absolute;top:0;left:0;width:100%;height:${totalH}px;overflow:visible;pointer-events:none;">` +
         `<polyline points="${maxPts}" fill="none" stroke="rgba(255,152,0,0.9)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>` +
@@ -1525,7 +1533,9 @@ export class PlatinumWeatherCard extends LitElement {
     // ── Per-column HTML ────────────────────────────────────────────────────
     const colItems = data.map((d, i) => {
       let colHtml = '';
-      if (showTemp) {
+      // A day the provider left empty has no position on the scale; drawing its
+      // label at top:NaNpx puts it in an arbitrary place, so omit it instead.
+      if (showTemp && isFinite(tempYs[i].maxY) && isFinite(tempYs[i].minY)) {
         const maxTop = tempYs[i].maxY - BH / 2;
         const minTop = tempYs[i].minY - BH / 2;
         colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:rgba(10,14,24,0.85);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${Math.round(d.maxT)}°</div>`;

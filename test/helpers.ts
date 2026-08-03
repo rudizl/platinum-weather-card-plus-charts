@@ -39,7 +39,20 @@ export function makeHass(states: Record<string, FakeState> = {}, overrides: Reco
     formatEntityAttributeValue: (_s: FakeState, _a: string) => '',
     callWS: async () => ({}),
     connection: {
-      subscribeMessage: async () => () => undefined,
+      // The card subscribes to weather/subscribe_forecast and renders from what
+      // comes back. Handing the callback a forecast lets the chart and the strip
+      // be tested the way they actually work.
+      subscribeMessage: async (
+        callback: (e: { type: string; forecast: unknown[] }) => void,
+        msg: { type: string; forecast_type?: string },
+      ) => {
+        if (msg.type === 'weather/subscribe_forecast') {
+          const forecast = (overrides.forecast as unknown[]) ?? [];
+          // deliver on a later turn, as a real subscription would
+          setTimeout(() => callback({ type: msg.forecast_type ?? 'daily', forecast }), 0);
+        }
+        return () => undefined;
+      },
     },
     ...overrides,
   };
@@ -66,7 +79,10 @@ export async function renderCard(config: WeatherCardConfig, hass: ReturnType<typ
   el.hass = hass;
   document.body.appendChild(el);
   await el.updateComplete;
-  // a second turn lets any state set during the first update settle
+  // Forecast data arrives through a subscription callback, i.e. after the first
+  // render. Give the timers a turn, then let Lit render again.
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await el.updateComplete;
   await el.updateComplete;
   return el;
 }
@@ -88,6 +104,28 @@ export function query(el: HTMLElement, selector: string): Element | null {
 
 export function queryAll(el: HTMLElement, selector: string): Element[] {
   return Array.from(el.shadowRoot?.querySelectorAll(selector) ?? []);
+}
+
+// Builds a daily forecast array in the shape Home Assistant delivers, starting
+// today unless told otherwise.
+export function makeForecast(days: number, startOffset = 0) {
+  const out = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date();
+    d.setHours(12, 0, 0, 0);
+    d.setDate(d.getDate() + startOffset + i);
+    out.push({
+      datetime: d.toISOString(),
+      condition: 'sunny',
+      temperature: 20 + i,
+      templow: 10 + i,
+      precipitation: i,
+      precipitation_probability: i * 5,
+      wind_speed: 10 + i,
+      wind_bearing: 180,
+    });
+  }
+  return out;
 }
 
 export function warnings(el: HTMLElement): string[] {
