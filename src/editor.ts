@@ -2160,9 +2160,20 @@ get _forecast_type(): string {
     ha-input {
       display: block;
     }
+    /* Three 48px buttons plus a spacer is 192px, which leaves nothing for a
+       translated section name on a phone. */
+    .section-flex .edit-icon,
+    .section-flex .up-icon,
+    .section-flex .down-icon,
+    .section-flex .option-icon {
+      --mdc-icon-button-size: 36px;
+      --mdc-icon-size: 20px;
+      flex: 0 0 auto;
+    }
     .no-icon {
       display: inline-flex;
-      width: 48px;
+      width: 36px;
+      flex: 0 0 auto;
     }
     /* .option {
       cursor: pointer;
