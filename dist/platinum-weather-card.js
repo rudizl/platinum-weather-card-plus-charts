@@ -1215,7 +1215,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <ha-entity-picker .hass=${this.hass} .configValue=${"entity_summary"} .value=${this._entity_summary} .includeDomains=${["sensor","weather"]}
             name="entity_summary" label=${this._t("entity_summary")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
           </ha-entity-picker>`:F``}
-    `}_optionOverviewEditor(){var t,e,i,s,o,n,a,r,l;return F`
+    `}_optionOverviewEditor(){var t,e,i,s,o,n,a,r;return F`
       <div class="side-by-side">
         <div>
           <label class='mdc-label'>${this._t("overview_layout")}</label>
@@ -1252,29 +1252,24 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         </div>
         ${!0===(null===(e=this._config)||void 0===e?void 0:e.option_local_forecast)?F`
         <div>
-          <ha-input type="number" label=${this._t("forecast_altitude")} .value=${null!==(s=null===(i=this._config)||void 0===i?void 0:i.option_forecast_altitude)&&void 0!==s?s:""} .configValue=${"option_forecast_altitude"} @input=${this._valueChangedNumber}>
-          </ha-input>
-          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
+          <div class="toggle-row">
+              <span class=${(null===(i=this._config)||void 0===i?void 0:i.option_local_forecast_verbose)?"pwc-switch active":"pwc-switch"} .value=${"option_local_forecast_verbose"} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("local_forecast_verbose")}</span>
+            </div>
         </div>`:F`<div></div>`}
       </div>
-      ${!0===(null===(o=this._config)||void 0===o?void 0:o.option_local_forecast)?F`
+      ${!0===(null===(s=this._config)||void 0===s?void 0:s.option_local_forecast)?F`
       <div class="side-by-side">
         <div>
-          <ha-input type="number" label=${this._t("trend_window")} .value=${null!==(a=null===(n=this._config)||void 0===n?void 0:n.option_trend_window_hours)&&void 0!==a?a:""} .configValue=${"option_trend_window_hours"} @input=${this._valueChangedNumber}>
+          <ha-input type="number" label=${this._t("forecast_altitude")} .value=${null!==(n=null===(o=this._config)||void 0===o?void 0:o.option_forecast_altitude)&&void 0!==n?n:""} .configValue=${"option_forecast_altitude"} @input=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
+        </div>
+        <div>
+          <ha-input type="number" label=${this._t("trend_window")} .value=${null!==(r=null===(a=this._config)||void 0===a?void 0:a.option_trend_window_hours)&&void 0!==r?r:""} .configValue=${"option_trend_window_hours"} @input=${this._valueChangedNumber}>
           </ha-input>
           <div class="help-text">${this._t("trend_window_hint")}</div>
         </div>
-        <div></div>
-      </div>`:F``}
-      ${!0===(null===(r=this._config)||void 0===r?void 0:r.option_local_forecast)?F`
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${(null===(l=this._config)||void 0===l?void 0:l.option_local_forecast_verbose)?"pwc-switch active":"pwc-switch"} .value=${"option_local_forecast_verbose"} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("local_forecast_verbose")}</span>
-            </div>
-        </div>
-        <div></div>
       </div>`:F``}
     `}_sectionExtendedEditor(){return!0===this._extended_use_attr&&(void 0===this.hass||void 0===this.hass.states[this._entity_extended]||this.hass.states[this._entity_extended].attributes),F`
       <ha-entity-picker .hass=${this.hass} .configValue=${"entity_extended"} .value=${this._entity_extended} .includeDomains=${["sensor","weather"]}
