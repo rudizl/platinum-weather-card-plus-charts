@@ -61,6 +61,7 @@
     "rollup": "rollup -c",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:release": "npm run lint && npm run typecheck && npm run rollup"
   }
 }

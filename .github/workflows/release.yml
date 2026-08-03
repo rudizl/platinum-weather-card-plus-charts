@@ -20,8 +20,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
       - name: Build
-        run: npm run build
+        run: npm run build:release
 
       - name: Verify dist
         run: ls -lh dist/platinum-weather-card.js
