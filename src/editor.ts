@@ -2088,9 +2088,6 @@ get _forecast_type(): string {
     }
     :host {
       display: block;
-              /* --mdc-menu-min-width: var(--parentWidth); */
-      --mdc-menu-item-height: 36px;
-      --mdc-typography-subtitle1-font-size: 13px;
     }
     .ha-select-compat {
       display: block;
@@ -2119,16 +2116,9 @@ get _forecast_type(): string {
     ha-input {
       display: block;
     }
-    ha-switch {
-      --ha-switch-checked-background-color: var(--primary-color);
-      --ha-switch-checked-thumb-background-color: var(--primary-text-color);
-    }
-    ha-formfield {
-      height: 56px;
-    }
     .no-icon {
       display: inline-flex;
-      width: var(--mds-icon-button-size, 48px);
+      width: 48px;
     }
     /* .option {
       cursor: pointer;
@@ -2173,6 +2163,8 @@ get _forecast_type(): string {
       margin-left: 2px;
     }
     .section-icon {
+      /* ha-icon reads --mdc-icon-size today; keep the Material token until
+         Home Assistant settles on a replacement in its Web Awesome migration */
       --mdc-icon-size: 20px;
       color: var(--secondary-text-color);
       opacity: 0.9;
