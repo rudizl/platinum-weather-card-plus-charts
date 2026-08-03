@@ -7,6 +7,8 @@ export default defineConfig({
       // The card imports 'lit/decorators', which Rollup resolves but Vite does
       // not — lit's exports map only lists the .js specifier. Aliasing here keeps
       // the production imports untouched.
+      // see the shim for why this is needed
+      'ts-transformer-keys': new URL('./test/ts-transformer-keys-shim.ts', import.meta.url).pathname,
       'lit/decorators': 'lit/decorators.js',
       'lit/directives/if-defined': 'lit/directives/if-defined.js',
       'lit/directives/unsafe-html': 'lit/directives/unsafe-html.js',
