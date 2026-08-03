@@ -811,6 +811,9 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 | `option_daily_forecast_date` | Boolean | `false` | Show a locale-formatted date (e.g. 13.07) next to the day name |
 | `option_show_forecast_wind` | Boolean | `false` | Show forecast wind speed/direction in each column |
 | `entity_summary_1` | String | none | Weather summary sensor for day 1 tooltip (auto-incremented for each day) |
+| `entity_extended_1` | String | none | Extended forecast text for day 1, vertical layout (auto-incremented for each day) |
+| `daily_extended_use_attr` | Boolean | `false` | Read the extended forecast text from an attribute of `entity_extended_1` instead of its state |
+| `daily_extended_name_attr` | String | none | Name of that attribute |
 | `daily_extended_forecast_days` | Number | `7` | Extended forecast days (vertical only, 0–7) |
 | `option_daily_color_fire_danger` | Boolean | `true` | Colour fire danger (vertical only) |
 | `old_daily_format` | Boolean | `false` | Stack max/min vertically instead of side by side |
