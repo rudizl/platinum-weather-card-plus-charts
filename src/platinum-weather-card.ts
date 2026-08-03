@@ -140,7 +140,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
 
     // ── section_order: only valid section names ────────────────────────────
-    const validSections = ['overview', 'warnings', 'extended', 'slots', 'daily_forecast', 'charts'];
+    const validSections = ['warnings', 'overview', 'extended', 'slots', 'daily_forecast', 'charts'];
     if (config.section_order) {
       if (!Array.isArray(config.section_order)) {
         throw new Error('platinum-weather-card: section_order must be an array.');
@@ -713,7 +713,13 @@ export class PlatinumWeatherCard extends LitElement {
     const typeNum = String(a.awareness_type ?? '').split(';')[0].trim();
     const levelParts = String(a.awareness_level ?? '').split(';').map((s: string) => s.trim());
     const levelNum = levelParts[0];
+    // Visual weight follows severity: a yellow heat warning in August is routine and
+    // should not shout every day, while a red warning must be impossible to miss.
     const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum] ?? 'var(--warning-color, #ffc107)';
+    const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum] ?? '255, 193, 7';
+    const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum] ?? '0.16';
+    const levelClass = levelNum === '4' ? 'warning-row level-red'
+      : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
     const icon = ({
       '1': 'mdi:weather-windy', '2': 'mdi:snowflake', '3': 'mdi:weather-lightning',
       '4': 'mdi:weather-fog', '5': 'mdi:thermometer-high', '6': 'mdi:thermometer-low',
@@ -739,7 +745,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
 
     return html`
-      <div class="warning-row" style="border-left-color: ${colour};"
+      <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});"
            title="${String(a.description ?? a.instruction ?? '')}">
         <ha-icon class="warning-icon" style="color: ${colour};" icon="${icon}"></ha-icon>
         <div class="warning-text">${headline}</div>
@@ -3596,7 +3602,25 @@ export class PlatinumWeatherCard extends LitElement {
         margin: 0 0 4px;
         border-left: 4px solid;
         border-radius: 4px;
-        background: rgba(127, 127, 127, 0.12);
+        /* background is set inline: a tint of the severity colour */
+      }
+      .warning-row.level-orange {
+        padding: 8px 10px;
+        border-left-width: 5px;
+      }
+      .warning-row.level-orange .warning-text {
+        font-weight: 600;
+      }
+      .warning-row.level-red {
+        padding: 10px;
+        border-left-width: 6px;
+      }
+      .warning-row.level-red .warning-text {
+        font-weight: 700;
+        font-size: 1.05em;
+      }
+      .warning-row.level-red .warning-icon {
+        --mdc-icon-size: 24px;
       }
       .warning-icon {
         flex: 0 0 auto;
