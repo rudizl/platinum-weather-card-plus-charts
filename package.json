@@ -63,5 +63,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:release": "npm run lint && npm run typecheck && npm run rollup"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
