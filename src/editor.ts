@@ -2031,6 +2031,10 @@ get _forecast_type(): string {
       const target = ev.currentTarget;
       if (this._config.section_order) {
         const slot = this._config.section_order.findIndex(t => t === target.value);
+        // The arrows are disabled at the ends, but that is only the UI: a swap
+        // past the start would write undefined into the list and the section
+        // would vanish from the card.
+        if (slot <= 0) return;
         const tmp_section_order = [...this._config.section_order];
         [tmp_section_order[slot], tmp_section_order[slot - 1]] = [this._config.section_order[slot - 1], this._config.section_order[slot]];
         this._config = {
@@ -2051,6 +2055,7 @@ get _forecast_type(): string {
       const target = ev.currentTarget;
       if (this._config.section_order) {
         const slot = this._config.section_order.findIndex(t => t === target.value);
+        if (slot === -1 || slot >= this._config.section_order.length - 1) return;
         const tmp_section_order = [...this._config.section_order];
         [tmp_section_order[slot], tmp_section_order[slot + 1]] = [this._config.section_order[slot + 1], this._config.section_order[slot]]
         this._config = {
