@@ -86,7 +86,7 @@ export class WeatherCardEditor extends LitElement implements LovelaceCardEditor 
       delete tmpConfig['locale'];
     }
 
-    if (tmpConfig.option_today_temperature_decimals) {
+    if (tmpConfig.show_today_decimals !== undefined) {
       tmpConfig['option_today_temperature_decimals'] = tmpConfig.show_today_decimals;
       delete tmpConfig['show_today_decimals'];
     }

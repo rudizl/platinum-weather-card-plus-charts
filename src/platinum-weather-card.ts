@@ -2767,7 +2767,10 @@ export class PlatinumWeatherCard extends LitElement {
       const unit = this.hass.states[entity].attributes.wind_speed_unit;
       return unit !== undefined ? unit : this.getUOM('length') + '/h';
     }
-    return this.getUOM('length') + '/h';
+    // A plain sensor states its own unit; assuming km/h from the system's length
+    // unit mislabels a station reporting m/s, kn or ft/s.
+    const uom = this.hass.states[entity].attributes.unit_of_measurement;
+    return typeof uom === 'string' && uom.length > 0 ? uom : this.getUOM('length') + '/h';
   }
 
   get currentWindGust(): string {
