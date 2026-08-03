@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const da: Translation = {
+  "warning": {
+    "type_1": "Vind",
+    "type_2": "Sne og is",
+    "type_3": "Tordenvejr",
+    "type_4": "Tåge",
+    "type_5": "Høje temperaturer",
+    "type_6": "Lave temperaturer",
+    "type_7": "Kysthændelse",
+    "type_8": "Skovbrand",
+    "type_9": "Laviner",
+    "type_10": "Regn",
+    "type_11": "Oversvømmelse",
+    "type_12": "Oversvømmelse",
+    "type_13": "Regn og oversvømmelse",
+    "type_14": "Fare til søs",
+    "type_15": "Tørke",
+    "level_2": "Gult varsel",
+    "level_3": "Orange varsel",
+    "level_4": "Rødt varsel",
+    "until": "indtil"
+  },
   "zambrettiLong": {
     "a": "Vejret forbliver stabilt og godt.",
     "b": "Der forventes godt vejr.",
@@ -64,6 +85,10 @@ const da: Translation = {
     "global_options": "Globale indstillinger",
     "overview_section": "Oversigtssektion",
     "extended_section": "Udvidet sektion",
+    "warnings_section": "Varsler",
+    "entity_warning": "Varslingsentitet",
+    "entity_warning_hint": "En MeteoAlarm-kompatibel binær sensor — rækken vises kun ved aktivt varsel",
+    "warning_show_expiry": "Vis gyldighed",
     "slots_section": "Slot-sektion",
     "daily_forecast_section": "Daglig vejrudsigt",
     "wind_bearing_icon": "Pil for vindretning",

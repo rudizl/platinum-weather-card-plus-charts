@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const cs: Translation = {
+  "warning": {
+    "type_1": "Silný vítr",
+    "type_2": "Sníh a led",
+    "type_3": "Bouřky",
+    "type_4": "Mlha",
+    "type_5": "Vysoké teploty",
+    "type_6": "Nízké teploty",
+    "type_7": "Pobřežní jev",
+    "type_8": "Lesní požár",
+    "type_9": "Laviny",
+    "type_10": "Déšť",
+    "type_11": "Povodeň",
+    "type_12": "Povodeň",
+    "type_13": "Déšť a povodně",
+    "type_14": "Nebezpečí na moři",
+    "type_15": "Sucho",
+    "level_2": "Žlutá výstraha",
+    "level_3": "Oranžová výstraha",
+    "level_4": "Červená výstraha",
+    "until": "do"
+  },
   "zambrettiLong": {
     "a": "Počasí zůstane ustálené a pěkné.",
     "b": "Očekává se pěkné počasí.",
@@ -64,6 +85,10 @@ const cs: Translation = {
     "global_options": "Globální nastavení",
     "overview_section": "Sekce přehledu",
     "extended_section": "Rozšířená sekce",
+    "warnings_section": "Výstrahy",
+    "entity_warning": "Entita výstrah",
+    "entity_warning_hint": "Binární senzor MeteoAlarm (nebo kompatibilní) — řádek se zobrazí jen při aktivní výstraze",
+    "warning_show_expiry": "Zobrazit platnost",
     "slots_section": "Sekce slotů",
     "daily_forecast_section": "Denní předpověď",
     "wind_bearing_icon": "Ikona směru větru",

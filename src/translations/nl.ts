@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const nl: Translation = {
+  "warning": {
+    "type_1": "Wind",
+    "type_2": "Sneeuw en ijzel",
+    "type_3": "Onweer",
+    "type_4": "Mist",
+    "type_5": "Hoge temperaturen",
+    "type_6": "Lage temperaturen",
+    "type_7": "Kustverschijnsel",
+    "type_8": "Bosbrand",
+    "type_9": "Lawines",
+    "type_10": "Regen",
+    "type_11": "Overstroming",
+    "type_12": "Overstroming",
+    "type_13": "Regen en overstroming",
+    "type_14": "Gevaar op zee",
+    "type_15": "Droogte",
+    "level_2": "Code geel",
+    "level_3": "Code oranje",
+    "level_4": "Code rood",
+    "until": "tot"
+  },
   "zambrettiLong": {
     "a": "Het weer blijft bestendig en mooi.",
     "b": "Er wordt mooi weer verwacht.",
@@ -64,6 +85,10 @@ const nl: Translation = {
     "global_options": "Globale opties",
     "overview_section": "Overzichtssectie",
     "extended_section": "Uitgebreide sectie",
+    "warnings_section": "Waarschuwingen",
+    "entity_warning": "Waarschuwingsentiteit",
+    "entity_warning_hint": "Een MeteoAlarm-compatibele binaire sensor — de regel verschijnt alleen bij een actieve waarschuwing",
+    "warning_show_expiry": "Geldigheid tonen",
     "slots_section": "Slots-sectie",
     "daily_forecast_section": "Dagelijkse voorspelling",
     "wind_bearing_icon": "Windrichtingspijl",

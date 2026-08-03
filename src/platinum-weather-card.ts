@@ -20,7 +20,7 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
 import { CARD_VERSION } from './const';
-import { tCard, tMoonPhase, tUnit, tWindDirections, tZambretti } from './translations';
+import { tCard, tMoonPhase, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour } from './zambretti';
 
 
@@ -140,7 +140,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
 
     // ── section_order: only valid section names ────────────────────────────
-    const validSections = ['overview', 'extended', 'slots', 'daily_forecast', 'charts'];
+    const validSections = ['overview', 'warnings', 'extended', 'slots', 'daily_forecast', 'charts'];
     if (config.section_order) {
       if (!Array.isArray(config.section_order)) {
         throw new Error('platinum-weather-card: section_order must be an array.');
@@ -695,6 +695,57 @@ export class PlatinumWeatherCard extends LitElement {
       sectionHeight += (this._config.entity_todays_uv_forecast !== undefined) || (this._config.entity_todays_fire_danger !== undefined) ? 20 : 0;
     }
     return sectionHeight;
+  }
+
+  // MeteoAlarm and compatible integrations expose the hazard as two numbered
+  // strings: awareness_type "5; high-temperature" and awareness_level
+  // "2; yellow; Moderate". The numbers are the stable part of the EUMETNET CAP
+  // profile, so the card keys off those and renders its own translated wording
+  // rather than the provider's English text.
+  private _renderWarningsSection(): TemplateResult {
+    if (this._config?.show_section_warnings === false) return html``;
+    const entity = this._config.entity_warning;
+    if (!entity) return html``;
+    const stateObj = this.hass.states[entity];
+    if (!stateObj || stateObj.state !== 'on') return html``;
+
+    const a = stateObj.attributes;
+    const typeNum = String(a.awareness_type ?? '').split(';')[0].trim();
+    const levelParts = String(a.awareness_level ?? '').split(';').map((s: string) => s.trim());
+    const levelNum = levelParts[0];
+    const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum] ?? 'var(--warning-color, #ffc107)';
+    const icon = ({
+      '1': 'mdi:weather-windy', '2': 'mdi:snowflake', '3': 'mdi:weather-lightning',
+      '4': 'mdi:weather-fog', '5': 'mdi:thermometer-high', '6': 'mdi:thermometer-low',
+      '7': 'mdi:waves', '8': 'mdi:fire', '9': 'mdi:image-filter-hdr',
+      '10': 'mdi:weather-pouring', '11': 'mdi:home-flood', '12': 'mdi:home-flood',
+      '13': 'mdi:home-flood', '14': 'mdi:sail-boat', '15': 'mdi:water-off',
+    })[typeNum] ?? 'mdi:alert';
+
+    // Fall back to the provider's own wording when the type is unknown to us
+    const hazard = tWarning(this.locale, `type_${typeNum}`)
+      || String(a.event ?? a.headline ?? stateObj.state);
+    const level = tWarning(this.locale, `level_${levelNum}`) || levelParts[1] || '';
+    const headline = level ? `${level}: ${hazard}` : hazard;
+
+    let expiry = '';
+    if (this._config.option_warning_show_expiry !== false && a.expires) {
+      const d = new Date(a.expires);
+      if (!isNaN(d.getTime())) {
+        expiry = `${tWarning(this.locale, 'until')} ${d.toLocaleString(this.locale, {
+          weekday: 'short', hour: '2-digit', minute: '2-digit',
+        } as Intl.DateTimeFormatOptions)}`;
+      }
+    }
+
+    return html`
+      <div class="warning-row" style="border-left-color: ${colour};"
+           title="${String(a.description ?? a.instruction ?? '')}">
+        <ha-icon class="warning-icon" style="color: ${colour};" icon="${icon}"></ha-icon>
+        <div class="warning-text">${headline}</div>
+        ${expiry ? html`<div class="warning-expiry">${expiry}</div>` : html``}
+      </div>
+    `;
   }
 
   private _renderExtendedSection(): TemplateResult {
@@ -1565,6 +1616,9 @@ export class PlatinumWeatherCard extends LitElement {
         switch (section) {
           case 'overview':
             sections.push(this._renderOverviewSection());
+            break;
+          case 'warnings':
+            sections.push(this._renderWarningsSection());
             break;
           case 'extended':
             sections.push(this._renderExtendedSection());
@@ -3533,6 +3587,34 @@ export class PlatinumWeatherCard extends LitElement {
         font-size: 0.8em;
         display: table-cell;
         padding-left: 1px;
+      }
+      .warning-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        margin: 0 0 4px;
+        border-left: 4px solid;
+        border-radius: 4px;
+        background: rgba(127, 127, 127, 0.12);
+      }
+      .warning-icon {
+        flex: 0 0 auto;
+        --mdc-icon-size: 20px;
+      }
+      .warning-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .warning-expiry {
+        flex: 0 0 auto;
+        font-size: 0.85em;
+        color: var(--secondary-text-color);
+        white-space: nowrap;
       }
       .slot-list .slot {
         display: flex;

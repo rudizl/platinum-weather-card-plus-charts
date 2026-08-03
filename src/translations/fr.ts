@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const fr: Translation = {
+  "warning": {
+    "type_1": "Vent",
+    "type_2": "Neige et verglas",
+    "type_3": "Orages",
+    "type_4": "Brouillard",
+    "type_5": "Fortes chaleurs",
+    "type_6": "Grand froid",
+    "type_7": "Phénomène côtier",
+    "type_8": "Feu de forêt",
+    "type_9": "Avalanches",
+    "type_10": "Pluie",
+    "type_11": "Inondation",
+    "type_12": "Inondation",
+    "type_13": "Pluie et inondation",
+    "type_14": "Danger maritime",
+    "type_15": "Sécheresse",
+    "level_2": "Vigilance jaune",
+    "level_3": "Vigilance orange",
+    "level_4": "Vigilance rouge",
+    "until": "jusqu'à"
+  },
   "zambrettiLong": {
     "a": "Le temps restera stable et beau.",
     "b": "Du beau temps est attendu.",
@@ -64,6 +85,10 @@ const fr: Translation = {
     "global_options": "Options globales",
     "overview_section": "Section vue d'ensemble",
     "extended_section": "Section étendue",
+    "warnings_section": "Vigilance",
+    "entity_warning": "Entité de vigilance",
+    "entity_warning_hint": "Un capteur binaire MeteoAlarm (ou compatible) — la ligne n'apparaît qu'en cas de vigilance active",
+    "warning_show_expiry": "Afficher la fin de validité",
     "slots_section": "Section des emplacements",
     "daily_forecast_section": "Prévisions quotidiennes",
     "wind_bearing_icon": "Flèche de direction du vent",

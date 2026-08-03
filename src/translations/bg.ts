@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const bg: Translation = {
+  "warning": {
+    "type_1": "Силен вятър",
+    "type_2": "Сняг и лед",
+    "type_3": "Гръмотевични бури",
+    "type_4": "Мъгла",
+    "type_5": "Високи температури",
+    "type_6": "Ниски температури",
+    "type_7": "Крайбрежно явление",
+    "type_8": "Горски пожар",
+    "type_9": "Лавини",
+    "type_10": "Дъжд",
+    "type_11": "Наводнение",
+    "type_12": "Наводнение",
+    "type_13": "Дъжд и наводнение",
+    "type_14": "Опасност в морето",
+    "type_15": "Суша",
+    "level_2": "Жълт код",
+    "level_3": "Оранжев код",
+    "level_4": "Червен код",
+    "until": "до"
+  },
   "zambrettiLong": {
     "a": "Времето ще остане устойчиво и хубаво.",
     "b": "Очаква се хубаво време.",
@@ -64,6 +85,10 @@ const bg: Translation = {
     "global_options": "Глобални настройки",
     "overview_section": "Секция Преглед",
     "extended_section": "Разширена секция",
+    "warnings_section": "Предупреждения",
+    "entity_warning": "Сензор за предупреждения",
+    "entity_warning_hint": "Binary sensor от MeteoAlarm (или съвместим) — редът се показва само при активно предупреждение",
+    "warning_show_expiry": "Показвай докога важи",
     "slots_section": "Секция Слотове",
     "daily_forecast_section": "Секция Прогноза",
     "wind_bearing_icon": "Стрелка за посока на вятъра",

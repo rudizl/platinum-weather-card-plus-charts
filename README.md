@@ -575,6 +575,30 @@ sensor:
 
 Then select it in the editor: Slots Section → *Entity Pressure Trend* (the picker appears once a pressure entity is set).
 
+## Warnings Section
+
+Shows an active severe-weather warning as a coloured row. Point it at a [MeteoAlarm](https://www.home-assistant.io/integrations/meteoalarm/) binary sensor (or any integration exposing the same CAP attributes) and the row appears only while a warning is in force — the rest of the time the section takes no space at all.
+
+The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers. So a Bulgarian card reads *"Жълт код: Високи температури · до сб 00:00"* even though the feed itself is in English. All fifteen hazard types are translated in every language the card supports; unknown types fall back to the provider's own `event` text.
+
+The colour of the row follows the warning level — yellow, orange or red.
+
+| Option | Type | Description |
+| ------ | ---- | ----------- |
+| Warning entity | Entity | MeteoAlarm-compatible binary sensor |
+| Show expiry time | Boolean | Append when the warning ends |
+
+```yaml
+type: custom:platinum-weather-card-plus-charts
+section_order:
+  - overview
+  - warnings
+  - slots
+entity_warning: binary_sensor.meteoalarm_varna
+```
+
+> The MeteoAlarm integration reports only the first warning when several are active for the same region at once. That is a limitation of the integration rather than the card; a template sensor can work around it if you need every warning.
+
 ## Icon Packs
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
@@ -793,6 +817,8 @@ double_tap_action:
 | `option_sun_overrides_icon` | Boolean | `true` | Force the day/night variant of the current condition icon from the sun's elevation, overriding the provider |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
+| `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
+| `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |
 | `option_show_beaufort` | Boolean | `false` | Prefix the wind slot with the Beaufort force, e.g. "BFT: 4 - SE 12 km/h" |
 

@@ -20,7 +20,7 @@ export interface HassCustomElement extends CustomElementConstructor {
   getConfigElement(): Promise<unknown>;
 }
 
-export const sectionNames = ['overview', 'extended', 'slots', 'daily_forecast', 'charts'];
+export const sectionNames = ['overview', 'warnings', 'extended', 'slots', 'daily_forecast', 'charts'];
 export type sectionType = typeof sectionNames[number];
 
 export type layoutOverview = "complete" | "observations" | "forecast" | "title only";
@@ -35,6 +35,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   card_config_version?: number;
   section_order: sectionType[];
   show_section_overview?: boolean;
+  show_section_warnings?: boolean;
   show_section_extended?: boolean;
   show_section_slots?: boolean;
   show_section_daily_forecast?: boolean;
@@ -139,6 +140,8 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_moon_icon_only?: boolean;
   option_sun_overrides_icon?: boolean;
   option_trend_window_hours?: number;
+  entity_warning?: string;
+  option_warning_show_expiry?: boolean;
   option_forecast_altitude?: number;
 
   option_today_temperature_decimals?: boolean;

@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const de: Translation = {
+  "warning": {
+    "type_1": "Wind",
+    "type_2": "Schnee und Eis",
+    "type_3": "Gewitter",
+    "type_4": "Nebel",
+    "type_5": "Hohe Temperaturen",
+    "type_6": "Tiefe Temperaturen",
+    "type_7": "Küstenereignis",
+    "type_8": "Waldbrand",
+    "type_9": "Lawinen",
+    "type_10": "Regen",
+    "type_11": "Überschwemmung",
+    "type_12": "Überschwemmung",
+    "type_13": "Regen und Überschwemmung",
+    "type_14": "Seegefahr",
+    "type_15": "Dürre",
+    "level_2": "Warnstufe Gelb",
+    "level_3": "Warnstufe Orange",
+    "level_4": "Warnstufe Rot",
+    "until": "bis"
+  },
   "zambrettiLong": {
     "a": "Das Wetter bleibt beständig und schön.",
     "b": "Es wird schönes Wetter erwartet.",
@@ -64,6 +85,10 @@ const de: Translation = {
     "global_options": "Globale Optionen",
     "overview_section": "Übersichtsbereich",
     "extended_section": "Erweiterter Bereich",
+    "warnings_section": "Warnungen",
+    "entity_warning": "Warnungs-Entität",
+    "entity_warning_hint": "Ein MeteoAlarm-kompatibler Binärsensor — die Zeile erscheint nur bei aktiver Warnung",
+    "warning_show_expiry": "Gültigkeitsende anzeigen",
     "slots_section": "Slots-Bereich",
     "daily_forecast_section": "Tagesvorhersage",
     "wind_bearing_icon": "Windrichtungspfeil",

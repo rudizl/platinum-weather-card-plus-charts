@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const pl: Translation = {
+  "warning": {
+    "type_1": "Silny wiatr",
+    "type_2": "Śnieg i gołoledź",
+    "type_3": "Burze",
+    "type_4": "Mgła",
+    "type_5": "Wysokie temperatury",
+    "type_6": "Niskie temperatury",
+    "type_7": "Zjawisko przybrzeżne",
+    "type_8": "Pożar lasu",
+    "type_9": "Lawiny",
+    "type_10": "Deszcz",
+    "type_11": "Powódź",
+    "type_12": "Powódź",
+    "type_13": "Deszcz i powódź",
+    "type_14": "Zagrożenie morskie",
+    "type_15": "Susza",
+    "level_2": "Alert żółty",
+    "level_3": "Alert pomarańczowy",
+    "level_4": "Alert czerwony",
+    "until": "do"
+  },
   "zambrettiLong": {
     "a": "Pogoda pozostanie stabilna i ładna.",
     "b": "Oczekiwana jest ładna pogoda.",
@@ -64,6 +85,10 @@ const pl: Translation = {
     "global_options": "Opcje globalne",
     "overview_section": "Sekcja przeglądu",
     "extended_section": "Sekcja rozszerzona",
+    "warnings_section": "Ostrzeżenia",
+    "entity_warning": "Encja ostrzeżeń",
+    "entity_warning_hint": "Czujnik binarny MeteoAlarm (lub zgodny) — wiersz pojawia się tylko przy aktywnym ostrzeżeniu",
+    "warning_show_expiry": "Pokaż do kiedy",
     "slots_section": "Sekcja slotów",
     "daily_forecast_section": "Prognoza dzienna",
     "wind_bearing_icon": "Strzałka kierunku wiatru",

@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const en: Translation = {
+  "warning": {
+    "type_1": "Wind",
+    "type_2": "Snow and ice",
+    "type_3": "Thunderstorms",
+    "type_4": "Fog",
+    "type_5": "High temperatures",
+    "type_6": "Low temperatures",
+    "type_7": "Coastal event",
+    "type_8": "Forest fire",
+    "type_9": "Avalanches",
+    "type_10": "Rain",
+    "type_11": "Flooding",
+    "type_12": "Flooding",
+    "type_13": "Rain and flooding",
+    "type_14": "Marine hazard",
+    "type_15": "Drought",
+    "level_2": "Yellow warning",
+    "level_3": "Orange warning",
+    "level_4": "Red warning",
+    "until": "until"
+  },
   "zambrettiLong": {
     "a": "The weather will remain settled and fair.",
     "b": "Fair weather is expected.",
@@ -64,6 +85,10 @@ const en: Translation = {
     "global_options": "Global Options",
     "overview_section": "Overview Section",
     "extended_section": "Extended Section",
+    "warnings_section": "Warnings",
+    "entity_warning": "Warning entity",
+    "entity_warning_hint": "A MeteoAlarm (or compatible) binary sensor — the row appears only while a warning is active",
+    "warning_show_expiry": "Show expiry time",
     "slots_section": "Slots Section",
     "daily_forecast_section": "Daily Forecast Section",
     "wind_bearing_icon": "Wind bearing arrow icon",

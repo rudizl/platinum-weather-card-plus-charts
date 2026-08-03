@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const es: Translation = {
+  "warning": {
+    "type_1": "Viento",
+    "type_2": "Nieve y hielo",
+    "type_3": "Tormentas",
+    "type_4": "Niebla",
+    "type_5": "Temperaturas altas",
+    "type_6": "Temperaturas bajas",
+    "type_7": "Fenómeno costero",
+    "type_8": "Incendio forestal",
+    "type_9": "Aludes",
+    "type_10": "Lluvia",
+    "type_11": "Inundación",
+    "type_12": "Inundación",
+    "type_13": "Lluvia e inundación",
+    "type_14": "Peligro marítimo",
+    "type_15": "Sequía",
+    "level_2": "Aviso amarillo",
+    "level_3": "Aviso naranja",
+    "level_4": "Aviso rojo",
+    "until": "hasta"
+  },
   "zambrettiLong": {
     "a": "El tiempo se mantendrá estable y despejado.",
     "b": "Se espera buen tiempo.",
@@ -64,6 +85,10 @@ const es: Translation = {
     "global_options": "Opciones globales",
     "overview_section": "Sección de resumen",
     "extended_section": "Sección extendida",
+    "warnings_section": "Avisos",
+    "entity_warning": "Entidad de avisos",
+    "entity_warning_hint": "Un sensor binario de MeteoAlarm (o compatible) — la fila solo aparece con un aviso activo",
+    "warning_show_expiry": "Mostrar hasta cuándo",
     "slots_section": "Sección de ranuras",
     "daily_forecast_section": "Pronóstico diario",
     "wind_bearing_icon": "Flecha de dirección del viento",

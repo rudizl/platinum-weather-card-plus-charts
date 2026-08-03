@@ -1147,6 +1147,28 @@ get _forecast_type(): string {
     `;
   }
 
+  private _sectionWarningsEditor(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_warning || ''}
+          .configValue=${'entity_warning'} @value-changed=${this._valueChangedPicker}
+          .includeDomains=${['binary_sensor']}
+          name="entity_warning" label=${this._t("entity_warning")} allow-custom-entity>
+        </ha-entity-picker>
+      </div>
+      <div class="help-text">${this._t("entity_warning_hint")}</div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_warning_show_expiry !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_warning_show_expiry'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("warning_show_expiry")}</span>
+            </div>
+        </div>
+        <div></div>
+      </div>
+    `;
+  }
+
   private _sectionExtendedEditor(): TemplateResult {
     const attr_names: TemplateResult[] = [];
     if (this._extended_use_attr === true) {
@@ -1738,6 +1760,9 @@ get _forecast_type(): string {
       case 'option_overview':
         subel.push(this._optionOverviewEditor());
         break;
+      case 'section_warnings':
+        subel.push(this._sectionWarningsEditor());
+        break;
       case 'section_extended':
         subel.push(this._sectionExtendedEditor());
         break;
@@ -1806,6 +1831,25 @@ get _forecast_type(): string {
               </ha-icon-button>
               <ha-icon-button class="option-icon" .value=${'option_overview'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
               </ha-icon-button>
+            </div>
+          </div>
+        `;
+      case 'warnings':
+        return html`
+          <div class="section-flex edit-warnings-section">
+            <div class="section-label">
+              <span class=${this._config?.show_section_warnings !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_warnings'} @click=${this._toggleVisibility}></span>
+              <ha-icon class="section-icon" icon="mdi:alert-outline"></ha-icon>
+              <span class="section-title">${this._t("warnings_section")}</span>
+            </div>
+            <div>
+              <ha-icon-button class="down-icon" .value=${'warnings'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
+              </ha-icon-button>
+              <ha-icon-button class="up-icon" .value=${'warnings'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
+              </ha-icon-button>
+              <ha-icon-button class="edit-icon" .value=${'section_warnings'} .path=${mdiPencil} @click="${this._editSubmenu}">
+              </ha-icon-button>
+              <div class="no-icon"></div>
             </div>
           </div>
         `;

@@ -50,6 +50,13 @@ export function tZambretti(locale: string | undefined, letter: string, verbose =
   return TRANSLATIONS[l]?.[set]?.[letter] ?? TRANSLATIONS.en[set][letter] ?? '';
 }
 
+// Weather-warning wording by key ('type_5', 'level_2', 'until'). Returns an empty
+// string for unknown keys so the caller can fall back to the provider's own text.
+export function tWarning(locale: string | undefined, key: string): string {
+  const l = (locale || 'en').split('-')[0].toLowerCase();
+  return TRANSLATIONS[l]?.warning?.[key] ?? TRANSLATIONS.en.warning[key] ?? '';
+}
+
 export function tWindDirections(locale: string | undefined): string[] {
   const l = (locale || 'en').split('-')[0].toLowerCase();
   const dirs = TRANSLATIONS[l]?.windDirections;

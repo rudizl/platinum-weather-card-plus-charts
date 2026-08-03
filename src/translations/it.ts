@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const it: Translation = {
+  "warning": {
+    "type_1": "Vento",
+    "type_2": "Neve e ghiaccio",
+    "type_3": "Temporali",
+    "type_4": "Nebbia",
+    "type_5": "Temperature elevate",
+    "type_6": "Temperature rigide",
+    "type_7": "Fenomeno costiero",
+    "type_8": "Incendio boschivo",
+    "type_9": "Valanghe",
+    "type_10": "Pioggia",
+    "type_11": "Alluvione",
+    "type_12": "Alluvione",
+    "type_13": "Pioggia e alluvione",
+    "type_14": "Pericolo marittimo",
+    "type_15": "Siccità",
+    "level_2": "Allerta gialla",
+    "level_3": "Allerta arancione",
+    "level_4": "Allerta rossa",
+    "until": "fino alle"
+  },
   "zambrettiLong": {
     "a": "Il tempo rimarrà stabile e bello.",
     "b": "È previsto bel tempo.",
@@ -64,6 +85,10 @@ const it: Translation = {
     "global_options": "Opzioni globali",
     "overview_section": "Sezione panoramica",
     "extended_section": "Sezione estesa",
+    "warnings_section": "Allerte",
+    "entity_warning": "Entità di allerta",
+    "entity_warning_hint": "Un sensore binario MeteoAlarm (o compatibile) — la riga appare solo con un'allerta attiva",
+    "warning_show_expiry": "Mostra fino a quando",
     "slots_section": "Sezione slot",
     "daily_forecast_section": "Previsioni giornaliere",
     "wind_bearing_icon": "Freccia direzione vento",

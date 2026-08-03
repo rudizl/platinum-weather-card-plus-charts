@@ -1,6 +1,27 @@
 import type { Translation } from './types';
 
 const he: Translation = {
+  "warning": {
+    "type_1": "רוחות עזות",
+    "type_2": "שלג וקרח",
+    "type_3": "סופות רעמים",
+    "type_4": "ערפל",
+    "type_5": "טמפרטורות גבוהות",
+    "type_6": "טמפרטורות נמוכות",
+    "type_7": "תופעה חופית",
+    "type_8": "שריפת יער",
+    "type_9": "מפולות שלגים",
+    "type_10": "גשם",
+    "type_11": "הצפה",
+    "type_12": "הצפה",
+    "type_13": "גשם והצפות",
+    "type_14": "סכנה ימית",
+    "type_15": "בצורת",
+    "level_2": "התרעה צהובה",
+    "level_3": "התרעה כתומה",
+    "level_4": "התרעה אדומה",
+    "until": "עד"
+  },
   "zambrettiLong": {
     "a": "מזג האוויר יישאר יציב ונאה.",
     "b": "צפוי מזג אוויר נאה.",
@@ -64,6 +85,10 @@ const he: Translation = {
     "global_options": "הגדרות כלליות",
     "overview_section": "מקטע סקירה",
     "extended_section": "מקטע מורחב",
+    "warnings_section": "התרעות",
+    "entity_warning": "ישות התרעות",
+    "entity_warning_hint": "חיישן בינארי של MeteoAlarm (או תואם) — השורה מופיעה רק כשיש התרעה פעילה",
+    "warning_show_expiry": "הצג עד מתי",
     "slots_section": "מקטע משבצות",
     "daily_forecast_section": "תחזית יומית",
     "wind_bearing_icon": "חץ כיוון הרוח",
