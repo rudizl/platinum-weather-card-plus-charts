@@ -20,17 +20,6 @@ The card is in the HACS default store:
 2. Download
 3. Hard-refresh your browser
 
-<details>
-<summary>Installing as a custom repository (no longer needed)</summary>
-
-If you installed the card before it was added to the default store, nothing breaks — updates come through the catalog either way, and you can remove the custom repository entry at your convenience.
-
-1. HACS → ⋮ → Custom Repositories
-2. Add `https://github.com/rudizl/platinum-weather-card-plus-charts` → type **Dashboard**
-3. Download **Platinum Weather Card Plus Charts**
-
-</details>
-
 ---
 
 <details>
