@@ -1091,6 +1091,18 @@ get _forecast_type(): string {
     return html`
       <div class="side-by-side">
         <div>
+          <label class='mdc-label'>${this._t('condition_alignment')}</label>
+          <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._config?.forecast_text_alignment ?? ''} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="left">${this._t("align_left")}</option>
+            <option value="center">${this._t("align_center")}</option>
+            <option value="right">${this._t("align_right")}</option>
+          </select>
+        </div>
+        <div></div>
+      </div>
+      <div class="side-by-side">
+        <div>
           <label class='mdc-label'>${this._t('overview_layout')}</label>
           <select class='ha-select-compat' .configValue=${'overview_layout'} .value=${this._overview_layout} @change=${this._valueChanged}>
             <option value=""></option>
@@ -1206,6 +1218,16 @@ get _forecast_type(): string {
         name="entity_todays_fire_danger" label=${this._t("entity_fire_today")} allow-custom-entity
         @value-changed=${this._valueChangedPicker}>
       </ha-entity-picker>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_extended_separator !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_extended_separator'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("extended_separator")}</span>
+            </div>
+          <div class="help-text">${this._t("extended_separator_hint")}</div>
+        </div>
+        <div></div>
+      </div>
     `;
   }
 
@@ -1383,6 +1405,19 @@ get _forecast_type(): string {
             <option value="3">3</option>
           </select>
         </div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <label class='mdc-label'>${this._t('wind_decimals')}</label>
+          <select class='ha-select-compat' .configValue=${'option_wind_decimals'} .value=${this._config?.option_wind_decimals !== undefined ? String(this._config.option_wind_decimals) : ''} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          <div class="help-text">${this._t('wind_decimals_hint')}</div>
+        </div>
+        <div></div>
       </div>
       <div class="side-by-side">
         <div>

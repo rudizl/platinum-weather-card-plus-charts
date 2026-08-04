@@ -28,6 +28,7 @@ export type layoutOrientation = "horizontal" | "vertical";
 export type layoutDays = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type extendedDays = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type pressureDecimals = 0 | 1 | 2 | 3;
+export type windDecimals = 0 | 1 | 2;
 export type timeFormat = 'system' | '12hour' | '24hour';
 
 export interface WeatherCardConfig extends LovelaceCardConfig {
@@ -156,6 +157,9 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_show_forecast_wind?: boolean;
   option_show_forecast_pop?: boolean;
   option_pressure_decimals?: pressureDecimals;
+  option_wind_decimals?: windDecimals;
+  option_extended_separator?: boolean;
+  forecast_text_alignment?: 'left' | 'center' | 'right';
   option_color_fire_danger?: boolean;
 
   option_locale?: string;

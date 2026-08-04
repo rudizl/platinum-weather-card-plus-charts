@@ -755,6 +755,7 @@ double_tap_action:
 | `entity_apparent_temp` | String | none | Apparent temperature entity |
 | `entity_forecast_icon` | String | none | Forecast icon entity |
 | `entity_summary` | String | none | Forecast summary entity |
+| `forecast_text_alignment` | String | `center` | `left`, `center` or `right` for the condition text |
 | `option_local_forecast` | Boolean | `false` | Compute a local Zambretti forecast and show it as the overview summary text (uses `entity_pressure`, `entity_pressure_trend`, `entity_wind_bearing`, `entity_wind_speed`) |
 | `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
 | `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
@@ -767,6 +768,7 @@ double_tap_action:
 | `entity_extended` | String | none | Extended forecast entity |
 | `extended_use_attr` | Boolean | `false` | Use attribute of the entity |
 | `extended_name_attr` | String | none | Attribute name |
+| `option_extended_separator` | Boolean | `true` | Put each source on its own line instead of running them together |
 | `entity_todays_uv_forecast` | String | none | UV forecast entity |
 | `entity_todays_fire_danger` | String | none | Fire danger entity |
 
@@ -811,6 +813,7 @@ double_tap_action:
 | `option_forecast_decimals` | Boolean | `false` | 1 decimal on forecast temperatures |
 | `option_show_forecast_pop` | Boolean | `true` | Show precipitation probability in forecast |
 | `option_pressure_decimals` | Number | `0` | Decimal places for pressure: `0`–`3` |
+| `option_wind_decimals` | Number | `0` | Decimals on wind speed and gust (0–2) — worth setting in m/s, where whole numbers are coarse |
 | `option_color_fire_danger` | Boolean | `true` | Colour fire danger by severity |
 | `option_wind_bearing_icon` | Boolean | `false` | Show the wind bearing as a rotating arrow icon instead of compass text |
 | `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |

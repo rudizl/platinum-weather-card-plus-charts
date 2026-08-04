@@ -794,17 +794,29 @@ export class PlatinumWeatherCard extends LitElement {
         }
       }
     }
-    extended.push(html`${this._config.entity_todays_uv_forecast && this.hass.states[this._config.entity_todays_uv_forecast] &&
-      this.hass.states[this._config.entity_todays_uv_forecast].state !== "unknown" ? " " +
-    this.hass.states[this._config.entity_todays_uv_forecast].state : ""}`);
-    extended.push(html`${this._config.entity_todays_fire_danger && this.hass.states[this._config.entity_todays_fire_danger] &&
-      this.hass.states[this._config.entity_todays_fire_danger].state !== "unknown" ? " " +
-    this.hass.states[this._config.entity_todays_fire_danger].state : ""}`);
+    const uvEntity = this._config.entity_todays_uv_forecast;
+    const uvState = uvEntity && this.hass.states[uvEntity] ? this.hass.states[uvEntity].state : undefined;
+    if (uvState !== undefined && uvState !== 'unknown' && uvState !== 'unavailable') {
+      extended.push(html`${uvState}`);
+    }
+    const fireEntity = this._config.entity_todays_fire_danger;
+    const fireState = fireEntity && this.hass.states[fireEntity] ? this.hass.states[fireEntity].state : undefined;
+    if (fireState !== undefined && fireState !== 'unknown' && fireState !== 'unavailable') {
+      extended.push(html`${fireState}`);
+    }
+
+    // Several sources used to run together into one unbroken paragraph:
+    // "...mild for October,Largely dry and sunny this afternoon". Separate them,
+    // either onto their own lines or with a space, according to preference.
+    const separate = this._config.option_extended_separator !== false;
+    const parts = separate
+      ? extended.flatMap((part, i) => (i === 0 ? [part] : [html`<br>`, part]))
+      : extended.flatMap((part, i) => (i === 0 ? [part] : [html` `, part]));
 
     return html`
       <div class="extended-section section">
         <div class="f-extended">
-          ${extended}
+          ${parts}
         </div>
       </div>
     `;
@@ -2766,14 +2778,15 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get currentWindSpeed(): string {
+    const digits = Math.max(Math.min(Number(this._config.option_wind_decimals ?? 0), 2), 0);
     const entity = this._config.entity_wind_speed;
     return entity && this.hass.states[entity]
       ? entity.match('^weather.') === null
         ? (this.hass.states[entity].state === 'unknown' || this.hass.states[entity].state === 'unavailable')
           ? '---'
-          : Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale)
+          : (Number(this.hass.states[entity].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
         : this.hass.states[entity].attributes.wind_speed !== undefined
-          ? Math.round(Number(this.hass.states[entity].attributes.wind_speed)).toLocaleString(this.locale)
+          ? (Number(this.hass.states[entity].attributes.wind_speed)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
           : '---'
       : '---';
   }
@@ -2792,6 +2805,7 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get currentWindGust(): string {
+    const digits = Math.max(Math.min(Number(this._config.option_wind_decimals ?? 0), 2), 0);
     const entity = this._config.entity_wind_gust;
 
     //tjl Feature Add - Add capability to get current Wind Gust from weather entity attribute
@@ -2799,31 +2813,33 @@ export class PlatinumWeatherCard extends LitElement {
       ? entity.match('^weather.') === null
         ? (this.hass.states[entity].state === 'unknown' || this.hass.states[entity].state === 'unavailable')
           ? '---'
-          : Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale)
+          : (Number(this.hass.states[entity].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
         : this.hass.states[entity].attributes.wind_gust_speed !== undefined
-          ? Math.round(Number(this.hass.states[entity].attributes.wind_gust_speed)).toLocaleString(this.locale)
+          ? (Number(this.hass.states[entity].attributes.wind_gust_speed)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
           : '---'
       : '---';
 
   //return entity && this.hass.states[entity]
-  //  ? Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale) : '---';
+  //  ? (Number(this.hass.states[entity].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '---';
   }
 
   get currentWindSpeedKt(): string {
+    const digits = Math.max(Math.min(Number(this._config.option_wind_decimals ?? 0), 2), 0);
     const entity = this._config.entity_wind_speed_kt;
     return entity && this.hass.states[entity]
       ? entity.match('^weather.') === null
-        ? Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale)
+        ? (Number(this.hass.states[entity].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
         : this.hass.states[entity].attributes.wind_speed !== undefined
-          ? Math.round(Number(this.hass.states[entity].attributes.wind_speed)).toLocaleString(this.locale)
+          ? (Number(this.hass.states[entity].attributes.wind_speed)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
           : '---'
       : '---';
   }
 
   get currentWindGustKt(): string {
+    const digits = Math.max(Math.min(Number(this._config.option_wind_decimals ?? 0), 2), 0);
     const entity = this._config.entity_wind_gust_kt;
     return entity && this.hass.states[entity]
-      ? Math.round(Number(this.hass.states[entity].state)).toLocaleString(this.locale) : '---';
+      ? (Number(this.hass.states[entity].state)).toLocaleString(this.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '---';
   }
 
   // windDirections - returns set of possible wind directions by specified language
