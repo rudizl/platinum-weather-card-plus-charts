@@ -3871,7 +3871,9 @@ export class PlatinumWeatherCard extends LitElement {
         padding: 4px 0;
       }
       .f-extended {
-        display: inline-table;
+        /* block, not inline-table: the latter swallows the line breaks that
+           separate one forecast source from the next */
+        display: block;
         font-size: 13px;
         font-weight: 300;
         padding-top: 8px;
