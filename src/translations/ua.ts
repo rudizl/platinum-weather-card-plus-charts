@@ -89,6 +89,10 @@ const ua: Translation = {
     "extended_separator_hint": "Інакше кілька джерел зливаються в один абзац",
     "warnings_section": "Попередження",
     "entity_warning": "Сутність попереджень",
+    "entity_solar_radiation": "Сонячна радіація",
+    "entity_solar_radiation_hint": "Піранометр у Вт/м² — удень хмарність обчислюється з нього",
+    "entity_cloud_cover": "Хмарність (вночі)",
+    "cloud_cover_oktas": "Октанти замість відсотків",
     "entity_warning_hint": "Бінарний сенсор MeteoAlarm (або сумісний) — рядок з'являється лише за активного попередження",
     "warning_show_expiry": "Показувати термін дії",
     "slots_section": "Слоти",
@@ -240,6 +244,8 @@ const ua: Translation = {
     "opt_24hour": "24 години"
   },
   "card": {
+    "cloud_cover": "Хмарність",
+    "cloud_compact": "Хмар.",
     "uv_rating": "УФ",
     "feels_like": "Відчувається як",
     "observed_max": "Спостережуваний макс.",

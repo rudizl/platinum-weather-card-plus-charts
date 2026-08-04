@@ -160,6 +160,9 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_wind_decimals?: windDecimals;
   option_extended_separator?: boolean;
   forecast_text_alignment?: 'left' | 'center' | 'right';
+  entity_solar_radiation?: string;
+  entity_cloud_cover?: string;
+  option_cloud_cover_oktas?: boolean;
   option_color_fire_danger?: boolean;
 
   option_locale?: string;

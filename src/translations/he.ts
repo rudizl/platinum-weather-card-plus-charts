@@ -89,6 +89,10 @@ const he: Translation = {
     "extended_separator_hint": "אחרת מספר מקורות נדבקים לפסקה אחת",
     "warnings_section": "התרעות",
     "entity_warning": "ישות התרעות",
+    "entity_solar_radiation": "קרינת שמש",
+    "entity_solar_radiation_hint": "פירנומטר ב-W/m² — כיסוי העננים מחושב ממנו בשעות היום",
+    "entity_cloud_cover": "כיסוי עננים (בלילה)",
+    "cloud_cover_oktas": "אוקטות במקום אחוזים",
     "entity_warning_hint": "חיישן בינארי של MeteoAlarm (או תואם) — השורה מופיעה רק כשיש התרעה פעילה",
     "warning_show_expiry": "הצג עד מתי",
     "slots_section": "משבצות",
@@ -240,6 +244,8 @@ const he: Translation = {
     "opt_24hour": "24 שעות"
   },
   "card": {
+    "cloud_cover": "כיסוי עננים",
+    "cloud_compact": "עננים",
     "uv_rating": "UV",
     "feels_like": "מרגיש כמו",
     "observed_max": "נצפה מקסימום",

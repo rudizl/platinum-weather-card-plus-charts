@@ -89,6 +89,10 @@ const da: Translation = {
     "extended_separator_hint": "Ellers løber flere kilder sammen i ét afsnit",
     "warnings_section": "Varsler",
     "entity_warning": "Varslingsentitet",
+    "entity_solar_radiation": "Solstråling",
+    "entity_solar_radiation_hint": "Pyranometer i W/m² — skydækket udledes heraf om dagen",
+    "entity_cloud_cover": "Skydække (om natten)",
+    "cloud_cover_oktas": "Okta i stedet for procent",
     "entity_warning_hint": "En MeteoAlarm-kompatibel binær sensor — rækken vises kun ved aktivt varsel",
     "warning_show_expiry": "Vis gyldighed",
     "slots_section": "Slots",
@@ -240,6 +244,8 @@ const da: Translation = {
     "opt_24hour": "24 timer"
   },
   "card": {
+    "cloud_cover": "Skydække",
+    "cloud_compact": "Sky",
     "uv_rating": "UV",
     "feels_like": "Føles som",
     "observed_max": "Observeret Max",

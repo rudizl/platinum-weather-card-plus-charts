@@ -89,6 +89,10 @@ const de: Translation = {
     "extended_separator_hint": "Sonst laufen mehrere Quellen zu einem Absatz zusammen",
     "warnings_section": "Warnungen",
     "entity_warning": "Warnungs-Entität",
+    "entity_solar_radiation": "Sonnenstrahlung",
+    "entity_solar_radiation_hint": "Pyranometer in W/m² — daraus wird tagsüber die Bewölkung berechnet",
+    "entity_cloud_cover": "Bewölkung (nachts)",
+    "cloud_cover_oktas": "Okta statt Prozent",
     "entity_warning_hint": "Ein MeteoAlarm-kompatibler Binärsensor — die Zeile erscheint nur bei aktiver Warnung",
     "warning_show_expiry": "Gültigkeitsende anzeigen",
     "slots_section": "Slots",
@@ -240,6 +244,8 @@ const de: Translation = {
     "opt_24hour": "24 Stunden"
   },
   "card": {
+    "cloud_cover": "Bewölkung",
+    "cloud_compact": "Bew.",
     "uv_rating": "UV",
     "feels_like": "Gefühlt",
     "observed_max": "Beobachtet Max",

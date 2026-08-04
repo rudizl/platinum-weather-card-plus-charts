@@ -89,6 +89,10 @@ const pl: Translation = {
     "extended_separator_hint": "Inaczej kilka źródeł zlewa się w jeden akapit",
     "warnings_section": "Ostrzeżenia",
     "entity_warning": "Encja ostrzeżeń",
+    "entity_solar_radiation": "Promieniowanie słoneczne",
+    "entity_solar_radiation_hint": "Piranometr w W/m² — w dzień na jego podstawie liczone jest zachmurzenie",
+    "entity_cloud_cover": "Zachmurzenie (w nocy)",
+    "cloud_cover_oktas": "Oktanty zamiast procentów",
     "entity_warning_hint": "Czujnik binarny MeteoAlarm (lub zgodny) — wiersz pojawia się tylko przy aktywnym ostrzeżeniu",
     "warning_show_expiry": "Pokaż do kiedy",
     "slots_section": "Sloty",
@@ -240,6 +244,8 @@ const pl: Translation = {
     "opt_24hour": "24 godziny"
   },
   "card": {
+    "cloud_cover": "Zachmurzenie",
+    "cloud_compact": "Zachm.",
     "uv_rating": "UV",
     "feels_like": "Odczuwalne",
     "observed_max": "Zaobserwowany Max",

@@ -89,6 +89,10 @@ const bg: Translation = {
     "extended_separator_hint": "Иначе няколко източника се сливат в един абзац",
     "warnings_section": "Предупреждения",
     "entity_warning": "Сензор за предупреждения",
+    "entity_solar_radiation": "Сензор за слънчева радиация",
+    "entity_solar_radiation_hint": "Пиранометър в W/m² — облачността се изчислява от него през деня",
+    "entity_cloud_cover": "Сензор за облачност (нощем)",
+    "cloud_cover_oktas": "Октаси вместо проценти",
     "entity_warning_hint": "Binary sensor от MeteoAlarm (или съвместим) — редът се показва само при активно предупреждение",
     "warning_show_expiry": "Показвай докога важи",
     "slots_section": "Слотове",
@@ -240,6 +244,8 @@ const bg: Translation = {
     "opt_24hour": "24-часов"
   },
   "card": {
+    "cloud_cover": "Облачност",
+    "cloud_compact": "Обл.",
     "uv_rating": "UV",
     "feels_like": "Усеща се като",
     "observed_max": "Наблюдавано макс.",

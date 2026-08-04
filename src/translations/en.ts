@@ -89,6 +89,10 @@ const en: Translation = {
     "extended_separator_hint": "Otherwise several sources run together into one paragraph",
     "warnings_section": "Warnings",
     "entity_warning": "Warning entity",
+    "entity_solar_radiation": "Solar radiation entity",
+    "entity_solar_radiation_hint": "Pyranometer in W/m² — cloud cover is derived from it during daylight",
+    "entity_cloud_cover": "Cloud cover entity (night fallback)",
+    "cloud_cover_oktas": "Show oktas instead of percent",
     "entity_warning_hint": "A MeteoAlarm (or compatible) binary sensor — the row appears only while a warning is active",
     "warning_show_expiry": "Show expiry time",
     "slots_section": "Slots",
@@ -240,6 +244,8 @@ const en: Translation = {
     "opt_24hour": "24 hour"
   },
   "card": {
+    "cloud_cover": "Cloud",
+    "cloud_compact": "Cloud",
     "uv_rating": "UV",
     "feels_like": "Feels like",
     "observed_max": "Observed Max",

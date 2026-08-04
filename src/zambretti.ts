@@ -121,3 +121,51 @@ export function tidalTrendHpaPerHour(
   const now = solarHoursAt(date);
   return (tideAt(now) - tideAt(now - windowHours)) / windowHours;
 }
+
+// Clear-sky irradiance on a horizontal surface, in W/m². Depends only on where
+// the sun is and how much atmosphere its light crosses, so it can be computed
+// without any external data.
+//
+// The 0.7 transmittance is the standard clear-atmosphere constant. Real skies
+// vary with aerosol and humidity, so this reads slightly high in hazy places and
+// slightly low in very clean air; good enough to tell clear from overcast, not a
+// radiometric instrument.
+export function clearSkyIrradiance(sunElevationDeg: number, altitudeM = 0): number {
+  if (sunElevationDeg <= 0) return 0;
+  const zenithRad = ((90 - sunElevationDeg) * Math.PI) / 180;
+  // Kasten-Young air mass: the plain 1/cos(z) blows up near the horizon
+  const airMass =
+    1 / (Math.cos(zenithRad) + 0.50572 * Math.pow(96.07995 - (90 - sunElevationDeg), -1.6364));
+  const solarConstant = 1367;
+  return (
+    solarConstant *
+    Math.pow(0.7, Math.pow(airMass, 0.678)) *
+    Math.cos(zenithRad) *
+    (1 + altitudeM * 0.00008)
+  );
+}
+
+// Cloud cover as a fraction from 0 (clear) to 1 (overcast), or null when the sun
+// is too low for the measurement to mean anything — below about 10° the air mass
+// model softens and morning haze distorts the reading, and at night there is no
+// signal at all.
+export function cloudCoverFraction(
+  measuredWm2: number,
+  sunElevationDeg: number,
+  altitudeM = 0,
+  minElevationDeg = 10,
+): number | null {
+  if (!isFinite(measuredWm2) || measuredWm2 < 0) return null;
+  if (sunElevationDeg < minElevationDeg) return null;
+  const clear = clearSkyIrradiance(sunElevationDeg, altitudeM);
+  if (clear <= 0) return null;
+  const ratio = measuredWm2 / clear;
+  // Thin cloud can scatter more onto a horizontal surface than a clear sky
+  // delivers, so a ratio slightly above 1 is normal rather than an error.
+  return Math.min(Math.max(1 - ratio, 0), 1);
+}
+
+// Cloud cover in oktas, the eighths meteorologists report.
+export function cloudCoverOktas(fraction: number): number {
+  return Math.round(Math.min(Math.max(fraction, 0), 1) * 8);
+}

@@ -714,6 +714,11 @@ get _forecast_type(): string {
         case 'moon':
           entities.add('entity_moon');
           break;
+        case 'cloud_cover':
+          entities.add('entity_solar_radiation');
+          entities.add('entity_sun');
+          entities.add('entity_cloud_cover');
+          break;
         case 'pop':
           entities.add('entity_pop');
           break;
@@ -859,6 +864,30 @@ get _forecast_type(): string {
         <ha-entity-picker .hass=${this.hass} .configValue=${'entity_sun'} .value=${this._entity_sun} .includeDomains=${['sun', 'sensor']}
           name="entity_sun" label=${this._t("entity_sun")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
+      ` : '';
+
+    const entity_solar_radiation = entities.has("entity_solar_radiation") ?
+      html`
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']}
+          name="entity_solar_radiation" label=${this._t("entity_solar_radiation")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+        </ha-entity-picker>
+        <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
+      ` : '';
+
+    const entity_cloud_cover = entities.has("entity_cloud_cover") ?
+      html`
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_cloud_cover'} .value=${this._config?.entity_cloud_cover || ''} .includeDomains=${['sensor']}
+          name="entity_cloud_cover" label=${this._t("entity_cloud_cover")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+        </ha-entity-picker>
+        <div class="side-by-side">
+          <div>
+            <div class="toggle-row">
+                <span class=${this._config?.option_cloud_cover_oktas ? "pwc-switch active" : "pwc-switch"} .value=${'option_cloud_cover_oktas'} @click=${this._toggleVisibility}></span>
+                <span class="toggle-label">${this._t("cloud_cover_oktas")}</span>
+              </div>
+          </div>
+          <div></div>
+        </div>
       ` : '';
 
     const entity_moon = entities.has("entity_moon") ?
@@ -1008,6 +1037,8 @@ get _forecast_type(): string {
       ${entity_wind_gust_kt}
       ${entity_visibility}
       ${entity_sun}
+      ${entity_solar_radiation}
+      ${entity_cloud_cover}
       ${entity_moon}
       ${entity_pop}
       ${entity_pos}
@@ -1251,6 +1282,7 @@ get _forecast_type(): string {
       ['sun_next',          'Next sun rise/set time'],
       ['sun_following',     'Following sun rise/set time'],
       ['moon',              'Moon phase'],
+      ['cloud_cover',       'Cloud cover'],
       ['pop',               'Chance of rain'],
       ['popforecast',       'Rainfall forecast'],
       ['possible_today',    "Today's forecast rainfall"],

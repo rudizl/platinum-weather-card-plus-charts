@@ -89,6 +89,10 @@ const ru: Translation = {
     "extended_separator_hint": "Иначе несколько источников сливаются в один абзац",
     "warnings_section": "Предупреждения",
     "entity_warning": "Сущность предупреждений",
+    "entity_solar_radiation": "Солнечная радиация",
+    "entity_solar_radiation_hint": "Пиранометр в Вт/м² — днём облачность вычисляется из него",
+    "entity_cloud_cover": "Облачность (ночью)",
+    "cloud_cover_oktas": "Октанты вместо процентов",
     "entity_warning_hint": "Бинарный сенсор MeteoAlarm (или совместимый) — строка появляется только при активном предупреждении",
     "warning_show_expiry": "Показывать срок действия",
     "slots_section": "Слоты",
@@ -240,6 +244,8 @@ const ru: Translation = {
     "opt_24hour": "24 часа"
   },
   "card": {
+    "cloud_cover": "Облачность",
+    "cloud_compact": "Обл.",
     "uv_rating": "УФ",
     "feels_like": "Ощущается как",
     "observed_max": "Наблюдаемый макс.",

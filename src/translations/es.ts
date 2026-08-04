@@ -89,6 +89,10 @@ const es: Translation = {
     "extended_separator_hint": "De lo contrario, varias fuentes se juntan en un párrafo",
     "warnings_section": "Avisos",
     "entity_warning": "Entidad de avisos",
+    "entity_solar_radiation": "Radiación solar",
+    "entity_solar_radiation_hint": "Piranómetro en W/m² — de ahí se deriva la nubosidad de día",
+    "entity_cloud_cover": "Nubosidad (de noche)",
+    "cloud_cover_oktas": "Octas en vez de porcentaje",
     "entity_warning_hint": "Un sensor binario de MeteoAlarm (o compatible) — la fila solo aparece con un aviso activo",
     "warning_show_expiry": "Mostrar hasta cuándo",
     "slots_section": "Ranuras",
@@ -240,6 +244,8 @@ const es: Translation = {
     "opt_24hour": "24 horas"
   },
   "card": {
+    "cloud_cover": "Nubosidad",
+    "cloud_compact": "Nub.",
     "uv_rating": "UV",
     "feels_like": "Sensación",
     "observed_max": "Observado Max",

@@ -89,6 +89,10 @@ const fr: Translation = {
     "extended_separator_hint": "Sinon plusieurs sources se confondent en un paragraphe",
     "warnings_section": "Vigilance",
     "entity_warning": "Entité de vigilance",
+    "entity_solar_radiation": "Rayonnement solaire",
+    "entity_solar_radiation_hint": "Pyranomètre en W/m² — la nébulosité en est déduite de jour",
+    "entity_cloud_cover": "Nébulosité (la nuit)",
+    "cloud_cover_oktas": "Octas au lieu de pourcentage",
     "entity_warning_hint": "Un capteur binaire MeteoAlarm (ou compatible) — la ligne n'apparaît qu'en cas de vigilance active",
     "warning_show_expiry": "Afficher la fin de validité",
     "slots_section": "Emplacements",
@@ -240,6 +244,8 @@ const fr: Translation = {
     "opt_24hour": "24 heures"
   },
   "card": {
+    "cloud_cover": "Nébulosité",
+    "cloud_compact": "Néb.",
     "uv_rating": "UV",
     "feels_like": "Ressenti",
     "observed_max": "Observé Max",

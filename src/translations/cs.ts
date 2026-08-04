@@ -89,6 +89,10 @@ const cs: Translation = {
     "extended_separator_hint": "Jinak se více zdrojů slije do jednoho odstavce",
     "warnings_section": "Výstrahy",
     "entity_warning": "Entita výstrah",
+    "entity_solar_radiation": "Sluneční záření",
+    "entity_solar_radiation_hint": "Pyranometr ve W/m² — přes den se z něj počítá oblačnost",
+    "entity_cloud_cover": "Oblačnost (v noci)",
+    "cloud_cover_oktas": "Okty místo procent",
     "entity_warning_hint": "Binární senzor MeteoAlarm (nebo kompatibilní) — řádek se zobrazí jen při aktivní výstraze",
     "warning_show_expiry": "Zobrazit platnost",
     "slots_section": "Sloty",
@@ -240,6 +244,8 @@ const cs: Translation = {
     "opt_24hour": "24 hodin"
   },
   "card": {
+    "cloud_cover": "Oblačnost",
+    "cloud_compact": "Obl.",
     "uv_rating": "UV",
     "feels_like": "Pocitově",
     "observed_max": "Pozorované maximum",

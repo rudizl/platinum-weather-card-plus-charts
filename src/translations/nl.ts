@@ -89,6 +89,10 @@ const nl: Translation = {
     "extended_separator_hint": "Anders lopen meerdere bronnen samen in één alinea",
     "warnings_section": "Waarschuwingen",
     "entity_warning": "Waarschuwingsentiteit",
+    "entity_solar_radiation": "Zonnestraling",
+    "entity_solar_radiation_hint": "Pyranometer in W/m² — overdag wordt de bewolking hieruit afgeleid",
+    "entity_cloud_cover": "Bewolking (’s nachts)",
+    "cloud_cover_oktas": "Okta in plaats van procent",
     "entity_warning_hint": "Een MeteoAlarm-compatibele binaire sensor — de regel verschijnt alleen bij een actieve waarschuwing",
     "warning_show_expiry": "Geldigheid tonen",
     "slots_section": "Slots",
@@ -240,6 +244,8 @@ const nl: Translation = {
     "opt_24hour": "24 uur"
   },
   "card": {
+    "cloud_cover": "Bewolking",
+    "cloud_compact": "Bew.",
     "uv_rating": "UV",
     "feels_like": "Voelt als",
     "observed_max": "Opgemerkt Max",

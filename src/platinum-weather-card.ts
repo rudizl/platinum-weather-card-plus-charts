@@ -21,7 +21,7 @@ import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from
 
 import { CARD_VERSION } from './const';
 import { tCard, tMoonPhase, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
-import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour } from './zambretti';
+import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas } from './zambretti';
 
 
 /* eslint no-console: 0 */
@@ -1829,6 +1829,7 @@ export class PlatinumWeatherCard extends LitElement {
       case 'sun_next': return this.slotSunNext;
       case 'sun_following': return this.slotSunFollowing;
       case 'moon': return this.slotMoon;
+      case 'cloud_cover': return this.slotCloudCover;
       case 'custom1': return this.slotCustom1;
       case 'custom2': return this.slotCustom2;
       case 'custom3': return this.slotCustom3;
@@ -2531,6 +2532,60 @@ export class PlatinumWeatherCard extends LitElement {
     return this._config.entity_sun ? this.sunSet.following : html``;
   }
 
+
+  // Cloud cover measured rather than forecast: the ratio of what the pyranometer
+  // reports to what a clear sky would deliver at this sun elevation. Daylight
+  // only — at night there is no signal, so the slot falls back to a configured
+  // provider value if there is one, and to '---' otherwise.
+  get slotCloudCover(): TemplateResult {
+    const solarEntity = this._config.entity_solar_radiation;
+    const sunEntity = this._config.entity_sun;
+    let display = '---';
+    let icon = 'mdi:weather-cloudy';
+
+    const elevation = sunEntity && this.hass.states[sunEntity]
+      ? Number(this.hass.states[sunEntity].attributes?.elevation)
+      : NaN;
+    const measured = solarEntity && this.hass.states[solarEntity]
+      ? Number(this.hass.states[solarEntity].state)
+      : NaN;
+
+    const fraction = (!isNaN(elevation) && !isNaN(measured))
+      ? cloudCoverFraction(measured, elevation, Number(this._config.option_forecast_altitude) || 0)
+      : null;
+
+    if (fraction !== null) {
+      const oktas = cloudCoverOktas(fraction);
+      display = this._config.option_cloud_cover_oktas === true
+        ? `${oktas}/8`
+        : `${Math.round(fraction * 100)}%`;
+      icon = oktas <= 1 ? 'mdi:weather-sunny'
+        : oktas <= 3 ? 'mdi:weather-partly-cloudy'
+        : oktas <= 6 ? 'mdi:weather-cloudy'
+        : 'mdi:weather-cloudy';
+    } else {
+      // no usable measurement: show the provider's value if one is configured
+      const fallback = this._config.entity_cloud_cover;
+      if (fallback && this.hass.states[fallback]) {
+        const state = this.hass.states[fallback].state;
+        if (state !== 'unknown' && state !== 'unavailable') {
+          display = `${Math.round(Number(state))}%`;
+        }
+      }
+    }
+
+    return html`
+      <li data-slot="cloud_cover">
+        <div class="slot">
+          <div class="slot-icon">
+            <ha-icon icon="${icon}"></ha-icon>
+          </div>
+          <div class="slot-text">${this.localeTextCloudCover}&nbsp;</div>
+          <div class="slot-text cloud-cover-text">${display}</div>
+        </div>
+      </li>
+    `;
+  }
 
   get slotMoon(): TemplateResult {
     if (!this._config.entity_moon) return html``;
@@ -3345,6 +3400,8 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   get localeTextFeelsLike(): string { return tCard(this.locale, 'feels_like'); }
+
+  get localeTextCloudCover(): string { return tCard(this.locale, this.compact ? 'cloud_compact' : 'cloud_cover'); }
 
   get localeTextObservedMax(): string { return tCard(this.locale, this.compact ? 'obs_max' : 'observed_max'); }
 

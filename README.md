@@ -599,6 +599,19 @@ entity_warning: binary_sensor.meteoalarm_varna
 
 > The MeteoAlarm integration reports only the first warning when several are active for the same region at once. That is a limitation of the integration rather than the card; a template sensor can work around it if you need every warning.
 
+### Cloud cover from a pyranometer
+
+If your station measures solar radiation, the card can work out the cloud cover from it. How much sunlight *would* arrive under a clear sky depends only on the sun's elevation, the day of year and your altitude — pure geometry, no external data — so the ratio between that and what the sensor actually reports is the cloud cover.
+
+Add the **Cloud cover** slot and point *Solar radiation entity* at your pyranometer (W/m²). A sun entity is required as well, since the calculation needs the sun's elevation. Shown as a percentage by default, or in oktas — the eighths meteorologists use — if you prefer.
+
+Worth knowing about its limits:
+
+- **Daylight only.** At night there is no signal at all. The slot falls back to a provider's cloud cover entity if you configure one, and shows `---` otherwise.
+- **It stops below 10° of elevation**, where the air-mass model softens and morning haze distorts the reading, rather than reporting confident nonsense at dawn and dusk.
+- **The clear-sky model uses a fixed atmospheric transmittance**, so it reads a little high in hazy or dusty air and a little low in very clean air. Good enough to tell clear from overcast; not a radiometric instrument.
+- **The sensor must be clean, level and unshaded.** A pyranometer that catches a roof edge each morning will report cloud that isn't there, every morning.
+
 ## Icon Packs
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
@@ -819,6 +832,9 @@ double_tap_action:
 | `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |
 | `option_sun_overrides_icon` | Boolean | `true` | Force the day/night variant of the current condition icon from the sun's elevation, overriding the provider |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
+| `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
+| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help |
+| `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
 | `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |

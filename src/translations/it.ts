@@ -89,6 +89,10 @@ const it: Translation = {
     "extended_separator_hint": "Altrimenti più fonti si uniscono in un unico paragrafo",
     "warnings_section": "Allerte",
     "entity_warning": "Entità di allerta",
+    "entity_solar_radiation": "Radiazione solare",
+    "entity_solar_radiation_hint": "Piranometro in W/m² — di giorno la nuvolosità si ricava da questo",
+    "entity_cloud_cover": "Nuvolosità (di notte)",
+    "cloud_cover_oktas": "Okta invece di percentuale",
     "entity_warning_hint": "Un sensore binario MeteoAlarm (o compatibile) — la riga appare solo con un'allerta attiva",
     "warning_show_expiry": "Mostra fino a quando",
     "slots_section": "Slot",
@@ -240,6 +244,8 @@ const it: Translation = {
     "opt_24hour": "24 ore"
   },
   "card": {
+    "cloud_cover": "Nuvolosità",
+    "cloud_compact": "Nuv.",
     "uv_rating": "UV",
     "feels_like": "Percepito",
     "observed_max": "Osservata Max",
