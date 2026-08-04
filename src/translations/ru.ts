@@ -93,6 +93,8 @@ const ru: Translation = {
     "entity_solar_radiation_hint": "Пиранометр в Вт/м² — днём облачность вычисляется из него",
     "entity_cloud_cover": "Облачность (ночью)",
     "cloud_cover_oktas": "Октанты вместо процентов",
+    "cloud_overrides_icon": "Измерение исправляет значок",
+    "cloud_overrides_icon_hint": "Только при явном противоречии — ясно при плотной облачности или наоборот",
     "entity_warning_hint": "Бинарный сенсор MeteoAlarm (или совместимый) — строка появляется только при активном предупреждении",
     "warning_show_expiry": "Показывать срок действия",
     "slots_section": "Слоты",

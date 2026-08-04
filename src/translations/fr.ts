@@ -93,6 +93,8 @@ const fr: Translation = {
     "entity_solar_radiation_hint": "Pyranomètre en W/m² — la nébulosité en est déduite de jour",
     "entity_cloud_cover": "Nébulosité (la nuit)",
     "cloud_cover_oktas": "Octas au lieu de pourcentage",
+    "cloud_overrides_icon": "La mesure corrige l'icône",
+    "cloud_overrides_icon_hint": "Uniquement en cas de contradiction flagrante — ciel clair annoncé sous couverture dense",
     "entity_warning_hint": "Un capteur binaire MeteoAlarm (ou compatible) — la ligne n'apparaît qu'en cas de vigilance active",
     "warning_show_expiry": "Afficher la fin de validité",
     "slots_section": "Emplacements",

@@ -886,8 +886,14 @@ get _forecast_type(): string {
                 <span class="toggle-label">${this._t("cloud_cover_oktas")}</span>
               </div>
           </div>
-          <div></div>
+          <div>
+            <div class="toggle-row">
+                <span class=${this._config?.option_cloud_overrides_icon ? "pwc-switch active" : "pwc-switch"} .value=${'option_cloud_overrides_icon'} @click=${this._toggleVisibility}></span>
+                <span class="toggle-label">${this._t("cloud_overrides_icon")}</span>
+              </div>
+          </div>
         </div>
+        <div class="help-text">${this._t("cloud_overrides_icon_hint")}</div>
       ` : '';
 
     const entity_moon = entities.has("entity_moon") ?

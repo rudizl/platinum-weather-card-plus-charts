@@ -116,3 +116,42 @@ describe('cloudCoverOktas', () => {
     expect(cloudCoverOktas(2)).toBe(8);
   });
 });
+
+describe('the icon correction is deliberately reluctant', () => {
+  // Wide margins on purpose: the clear-sky model is approximate, and a dirty or
+  // partly shaded pyranometer must not be able to rewrite the sky.
+  const CLEAR_THRESHOLD = 0.8;
+  const OVERCAST_THRESHOLD = 0.15;
+
+  it('leaves a disagreement inside the margins alone', () => {
+    // Provider says clear, measurement says half cloudy: not enough to act on.
+    for (const cloud of [0.3, 0.5, 0.7, 0.79]) {
+      expect(cloud >= CLEAR_THRESHOLD, `${cloud} should not trigger`).toBe(false);
+    }
+    for (const cloud of [0.16, 0.3, 0.5]) {
+      expect(cloud <= OVERCAST_THRESHOLD, `${cloud} should not trigger`).toBe(false);
+    }
+  });
+
+  it('acts only on a flat contradiction', () => {
+    expect(0.85 >= CLEAR_THRESHOLD).toBe(true);
+    expect(0.05 <= OVERCAST_THRESHOLD).toBe(true);
+  });
+
+  it('cannot be triggered by a plausible sensor error', () => {
+    // A pyranometer reading 30% low — dust, or an imperfect level — under a
+    // genuinely clear sky still reports well under the threshold.
+    const elev = 45;
+    const clear = clearSkyIrradiance(elev);
+    const degraded = cloudCoverFraction(clear * 0.7, elev)!;
+    expect(degraded).toBeLessThan(CLEAR_THRESHOLD);
+  });
+
+  it('does trigger when the sky is genuinely overcast', () => {
+    const elev = 45;
+    const clear = clearSkyIrradiance(elev);
+    // Heavy overcast passes roughly a tenth of the light through.
+    const overcast = cloudCoverFraction(clear * 0.1, elev)!;
+    expect(overcast).toBeGreaterThan(CLEAR_THRESHOLD);
+  });
+});

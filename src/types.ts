@@ -163,6 +163,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   entity_solar_radiation?: string;
   entity_cloud_cover?: string;
   option_cloud_cover_oktas?: boolean;
+  option_cloud_overrides_icon?: boolean;
   option_color_fire_danger?: boolean;
 
   option_locale?: string;

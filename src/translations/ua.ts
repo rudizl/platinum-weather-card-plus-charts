@@ -93,6 +93,8 @@ const ua: Translation = {
     "entity_solar_radiation_hint": "Піранометр у Вт/м² — удень хмарність обчислюється з нього",
     "entity_cloud_cover": "Хмарність (вночі)",
     "cloud_cover_oktas": "Октанти замість відсотків",
+    "cloud_overrides_icon": "Вимірювання виправляє значок",
+    "cloud_overrides_icon_hint": "Лише за явної суперечності — ясно за щільної хмарності чи навпаки",
     "entity_warning_hint": "Бінарний сенсор MeteoAlarm (або сумісний) — рядок з'являється лише за активного попередження",
     "warning_show_expiry": "Показувати термін дії",
     "slots_section": "Слоти",

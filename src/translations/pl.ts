@@ -93,6 +93,8 @@ const pl: Translation = {
     "entity_solar_radiation_hint": "Piranometr w W/m² — w dzień na jego podstawie liczone jest zachmurzenie",
     "entity_cloud_cover": "Zachmurzenie (w nocy)",
     "cloud_cover_oktas": "Oktanty zamiast procentów",
+    "cloud_overrides_icon": "Pomiar koryguje ikonę",
+    "cloud_overrides_icon_hint": "Tylko przy jawnej sprzeczności — bezchmurnie przy gęstym zachmurzeniu",
     "entity_warning_hint": "Czujnik binarny MeteoAlarm (lub zgodny) — wiersz pojawia się tylko przy aktywnym ostrzeżeniu",
     "warning_show_expiry": "Pokaż do kiedy",
     "slots_section": "Sloty",

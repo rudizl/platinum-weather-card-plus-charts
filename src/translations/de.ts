@@ -93,6 +93,8 @@ const de: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — daraus wird tagsüber die Bewölkung berechnet",
     "entity_cloud_cover": "Bewölkung (nachts)",
     "cloud_cover_oktas": "Okta statt Prozent",
+    "cloud_overrides_icon": "Messung korrigiert das Symbol",
+    "cloud_overrides_icon_hint": "Nur bei klarem Widerspruch — heiter gemeldet bei dichter Bewölkung oder umgekehrt",
     "entity_warning_hint": "Ein MeteoAlarm-kompatibler Binärsensor — die Zeile erscheint nur bei aktiver Warnung",
     "warning_show_expiry": "Gültigkeitsende anzeigen",
     "slots_section": "Slots",

@@ -93,6 +93,8 @@ const he: Translation = {
     "entity_solar_radiation_hint": "פירנומטר ב-W/m² — כיסוי העננים מחושב ממנו בשעות היום",
     "entity_cloud_cover": "כיסוי עננים (בלילה)",
     "cloud_cover_oktas": "אוקטות במקום אחוזים",
+    "cloud_overrides_icon": "המדידה מתקנת את הסמל",
+    "cloud_overrides_icon_hint": "רק בסתירה בולטת — שמים בהירים מדווחים תחת עננות כבדה",
     "entity_warning_hint": "חיישן בינארי של MeteoAlarm (או תואם) — השורה מופיעה רק כשיש התרעה פעילה",
     "warning_show_expiry": "הצג עד מתי",
     "slots_section": "משבצות",

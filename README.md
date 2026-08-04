@@ -612,6 +612,8 @@ Worth knowing about its limits:
 - **The clear-sky model uses a fixed atmospheric transmittance**, so it reads a little high in hazy or dusty air and a little low in very clean air. Good enough to tell clear from overcast; not a radiometric instrument.
 - **The sensor must be clean, level and unshaded.** A pyranometer that catches a roof edge each morning will report cloud that isn't there, every morning.
 
+The measurement can also correct the condition icon, under **Measurement corrects the icon**. It intervenes only when the two flatly disagree — a claim of clear sky under 80% cloud, or of overcast under a sun delivering nearly everything it could. The margins are wide on purpose: the clear-sky model is approximate, and a pyranometer reading 30% low through dust still stays well inside them, so a dirty sensor cannot rewrite the sky. Off by default.
+
 ## Icon Packs
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.

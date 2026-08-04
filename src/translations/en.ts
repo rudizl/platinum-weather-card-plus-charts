@@ -93,6 +93,8 @@ const en: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — cloud cover is derived from it during daylight",
     "entity_cloud_cover": "Cloud cover entity (night fallback)",
     "cloud_cover_oktas": "Show oktas instead of percent",
+    "cloud_overrides_icon": "Measurement corrects the icon",
+    "cloud_overrides_icon_hint": "Only when the two flatly disagree — clear sky claimed under heavy cloud, or overcast under full sun",
     "entity_warning_hint": "A MeteoAlarm (or compatible) binary sensor — the row appears only while a warning is active",
     "warning_show_expiry": "Show expiry time",
     "slots_section": "Slots",

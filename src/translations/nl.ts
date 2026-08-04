@@ -93,6 +93,8 @@ const nl: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — overdag wordt de bewolking hieruit afgeleid",
     "entity_cloud_cover": "Bewolking (’s nachts)",
     "cloud_cover_oktas": "Okta in plaats van procent",
+    "cloud_overrides_icon": "Meting corrigeert het pictogram",
+    "cloud_overrides_icon_hint": "Alleen bij duidelijke tegenspraak — helder gemeld bij dichte bewolking",
     "entity_warning_hint": "Een MeteoAlarm-compatibele binaire sensor — de regel verschijnt alleen bij een actieve waarschuwing",
     "warning_show_expiry": "Geldigheid tonen",
     "slots_section": "Slots",

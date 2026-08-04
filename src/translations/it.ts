@@ -93,6 +93,8 @@ const it: Translation = {
     "entity_solar_radiation_hint": "Piranometro in W/m² — di giorno la nuvolosità si ricava da questo",
     "entity_cloud_cover": "Nuvolosità (di notte)",
     "cloud_cover_oktas": "Okta invece di percentuale",
+    "cloud_overrides_icon": "La misura corregge l'icona",
+    "cloud_overrides_icon_hint": "Solo in caso di palese contraddizione — sereno dichiarato con cielo coperto",
     "entity_warning_hint": "Un sensore binario MeteoAlarm (o compatibile) — la riga appare solo con un'allerta attiva",
     "warning_show_expiry": "Mostra fino a quando",
     "slots_section": "Slot",

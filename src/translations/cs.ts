@@ -93,6 +93,8 @@ const cs: Translation = {
     "entity_solar_radiation_hint": "Pyranometr ve W/m² — přes den se z něj počítá oblačnost",
     "entity_cloud_cover": "Oblačnost (v noci)",
     "cloud_cover_oktas": "Okty místo procent",
+    "cloud_overrides_icon": "Měření opravuje ikonu",
+    "cloud_overrides_icon_hint": "Jen při zjevném rozporu — jasno hlášeno při husté oblačnosti",
     "entity_warning_hint": "Binární senzor MeteoAlarm (nebo kompatibilní) — řádek se zobrazí jen při aktivní výstraze",
     "warning_show_expiry": "Zobrazit platnost",
     "slots_section": "Sloty",

@@ -93,6 +93,8 @@ const da: Translation = {
     "entity_solar_radiation_hint": "Pyranometer i W/m² — skydækket udledes heraf om dagen",
     "entity_cloud_cover": "Skydække (om natten)",
     "cloud_cover_oktas": "Okta i stedet for procent",
+    "cloud_overrides_icon": "Måling retter ikonet",
+    "cloud_overrides_icon_hint": "Kun ved klar modstrid — klart vejr meldt under tæt skydække",
     "entity_warning_hint": "En MeteoAlarm-kompatibel binær sensor — rækken vises kun ved aktivt varsel",
     "warning_show_expiry": "Vis gyldighed",
     "slots_section": "Slots",

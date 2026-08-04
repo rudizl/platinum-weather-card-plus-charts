@@ -2537,22 +2537,27 @@ export class PlatinumWeatherCard extends LitElement {
   // reports to what a clear sky would deliver at this sun elevation. Daylight
   // only — at night there is no signal, so the slot falls back to a configured
   // provider value if there is one, and to '---' otherwise.
-  get slotCloudCover(): TemplateResult {
+  // Cloud cover from the pyranometer as a fraction, or null when the sun is too
+  // low, the sensor is missing, or its reading is unusable.
+  get measuredCloudFraction(): number | null {
     const solarEntity = this._config.entity_solar_radiation;
     const sunEntity = this._config.entity_sun;
+    if (!solarEntity || !sunEntity) return null;
+    const solarState = this.hass.states[solarEntity];
+    const sunState = this.hass.states[sunEntity];
+    if (!solarState || !sunState) return null;
+    if (solarState.state === 'unknown' || solarState.state === 'unavailable') return null;
+    const measured = Number(solarState.state);
+    const elevation = Number(sunState.attributes?.elevation);
+    if (isNaN(measured) || isNaN(elevation)) return null;
+    return cloudCoverFraction(measured, elevation, Number(this._config.option_forecast_altitude) || 0);
+  }
+
+  get slotCloudCover(): TemplateResult {
     let display = '---';
     let icon = 'mdi:weather-cloudy';
 
-    const elevation = sunEntity && this.hass.states[sunEntity]
-      ? Number(this.hass.states[sunEntity].attributes?.elevation)
-      : NaN;
-    const measured = solarEntity && this.hass.states[solarEntity]
-      ? Number(this.hass.states[solarEntity].state)
-      : NaN;
-
-    const fraction = (!isNaN(elevation) && !isNaN(measured))
-      ? cloudCoverFraction(measured, elevation, Number(this._config.option_forecast_altitude) || 0)
-      : null;
+    const fraction = this.measuredCloudFraction;
 
     if (fraction !== null) {
       const oktas = cloudCoverOktas(fraction);
@@ -3100,6 +3105,24 @@ export class PlatinumWeatherCard extends LitElement {
       adjusted = this.dayOrNight === 'day'
         ? adjusted.replace('-night', '-day')
         : adjusted.replace('-day', '-night');
+    }
+
+    // A pyranometer sees the sky the provider is only predicting. Correct the
+    // icon when the two flatly disagree — a claim of clear sky under 80% cloud,
+    // or of overcast under a sun delivering nearly everything it could.
+    if (!forForecast && this._config?.option_cloud_overrides_icon === true) {
+      const cloud = this.measuredCloudFraction;
+      if (cloud !== null) {
+        const isClearIcon = /^(clear|cloudy-1)/.test(adjusted);
+        const isOvercastIcon = /^(cloudy-3|cloudy$)/.test(adjusted);
+        // Deliberately wide margins: the model is approximate and a dirty or
+        // partly shaded sensor should not be able to rewrite the sky.
+        if (isClearIcon && cloud >= 0.8) {
+          adjusted = `cloudy-3-${this.dayOrNight}`;
+        } else if (isOvercastIcon && cloud <= 0.15) {
+          adjusted = `clear-${this.dayOrNight}`;
+        }
+      }
     }
 
     if (pack === 'default') {

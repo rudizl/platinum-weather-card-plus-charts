@@ -93,6 +93,8 @@ const bg: Translation = {
     "entity_solar_radiation_hint": "Пиранометър в W/m² — облачността се изчислява от него през деня",
     "entity_cloud_cover": "Сензор за облачност (нощем)",
     "cloud_cover_oktas": "Октаси вместо проценти",
+    "cloud_overrides_icon": "Измереното коригира иконата",
+    "cloud_overrides_icon_hint": "Само при явно несъгласие — ясно при плътна облачност или обратно",
     "entity_warning_hint": "Binary sensor от MeteoAlarm (или съвместим) — редът се показва само при активно предупреждение",
     "warning_show_expiry": "Показвай докога важи",
     "slots_section": "Слотове",
