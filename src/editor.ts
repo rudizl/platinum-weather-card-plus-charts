@@ -2294,10 +2294,20 @@ get _forecast_type(): string {
       justify-content: space-between;
       align-items: center;
     }
+    /* The buttons are fixed furniture; only the label may give way. Without this
+       a long translated name pushes the submenu button onto its own line. */
+    .section-flex > div:last-child {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
     .section-label {
       display: flex;
       align-items: center;
       gap: 6px;
+      flex: 1 1 auto;
+      min-width: 0;
     }
     .visibility-spacer {
       width: 32px;
@@ -2308,6 +2318,13 @@ get _forecast_type(): string {
       font-weight: 500;
       color: var(--primary-text-color);
       margin-left: 2px;
+      /* The label is the only part of the row allowed to give way; without this
+         a two-word name wraps and pushes the buttons out of alignment with
+         every other row. */
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     /* Global Options is not a section row but sits in the same list, so it must
        match: same icon size, same button size, same right-hand alignment. */

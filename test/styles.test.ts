@@ -198,6 +198,31 @@ describe('every section row is the same width', () => {
   });
 });
 
+describe('the section list holds its shape', () => {
+  it('keeps the label from wrapping', () => {
+    // Without nowrap a two-word name like 'Глобални настройки' breaks onto a
+    // second line and pushes the row's buttons out of line with every other
+    // row. The label is the only part allowed to give way, by truncating.
+    const rule = /\.section-title\s*\{([^}]*)\}/.exec(editor);
+    expect(rule, '.section-title rule missing').not.toBeNull();
+    const body = rule![1];
+    expect(body, 'section title may wrap').toContain('white-space: nowrap');
+    expect(body, 'section title cannot shrink').toContain('min-width: 0');
+    expect(body, 'a long name would be cut off rather than ellipsised')
+      .toContain('text-overflow: ellipsis');
+  });
+
+  it('lets the label shrink while the buttons stay put', () => {
+    const label = /\.section-label\s*\{([^}]*)\}/.exec(editor);
+    expect(label![1], 'label cannot shrink').toContain('min-width: 0');
+    const buttons = /\.section-flex > div:last-child\s*\{([^}]*)\}/.exec(editor);
+    expect(buttons, 'no rule pinning the button group').not.toBeNull();
+    expect(buttons![1], 'buttons may be squeezed').toMatch(/flex:\s*0 0 auto/);
+    expect(buttons![1], 'the button group may wrap onto a second line')
+      .toContain('white-space: nowrap');
+  });
+});
+
 describe('markup patterns stay consistent', () => {
   it('gives every select the shared class', () => {
     const total = (editor.match(/<select /g) ?? []).length;
