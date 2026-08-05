@@ -1317,9 +1317,6 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
             <option value="right">${this._t("align_right")}</option>
           </select>
         </div>
-        <div></div>
-      </div>
-      <div class="side-by-side">
         <div>
           <label class='mdc-label'>${this._t("overview_layout")}</label>
           <select class='ha-select-compat' .configValue=${"overview_layout"} .value=${this._overview_layout} @change=${this._valueChanged}>
@@ -1330,8 +1327,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
             <option value="title only">${this._t("opt_title_only")}</option>
           </select>
         </div>
-        <div></div>
-      </div>
+        </div>
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
@@ -1574,9 +1570,6 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           </select>
           <div class="help-text">${this._t("wind_decimals_hint")}</div>
         </div>
-        <div></div>
-      </div>
-      <div class="side-by-side">
         <div>
           <div class="toggle-row">
               <span class=${!1!==this._option_today_rainfall_decimals?"pwc-switch active":"pwc-switch"} .value=${"option_today_rainfall_decimals"} @click=${this._toggleVisibility}></span>
@@ -1639,8 +1632,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
               <span class="toggle-label">${this._t("slot_tap_more_info")}</span>
             </div>
         </div>
-        <div></div>
-            </div>
+        </div>
         </div>
       </div>
     `}_sectionDailyForecastEditor(){return!0===this._daily_extended_use_attr&&(void 0===this.hass||void 0===this.hass.states[this._entity_extended_1]||this.hass.states[this._entity_extended_1].attributes),L`
@@ -1737,11 +1729,8 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
             <option value="vertical">${this._t("opt_vertical")}</option>
           </select>
         </div>
-        <div></div>
-      </div>
-      <div class="side-by-side">
         <div>
-        <label class='mdc-label'>${this._t("daily_forecast_days")}</label>
+          <label class='mdc-label'>${this._t("daily_forecast_days")}</label>
         <select class='ha-select-compat' .configValue=${"daily_forecast_days"} .value=${null!==this._daily_forecast_days?String(this._daily_forecast_days):""} @change=${this._valueChanged}>
           <option value=""></option>
           <option value="1">1</option>
@@ -1792,8 +1781,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
               <span class="toggle-label">${this._t("daily_forecast_date")}</span>
             </div>
           </div>
-          <div></div>
-        </div>
+          </div>
 
         <div class="side-by-side">
         ${"vertical"===this._daily_forecast_layout?L`<div>
@@ -1981,7 +1969,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
               </ha-icon-button>
               <ha-icon-button class="edit-icon" .value=${"section_slots"} .path=${Mt} @click="${this._editSubmenu}">
               </ha-icon-button>
-              <ha-icon-button class="options-icon" .value=${"option_slots"} .path=${Vt} @click="${this._editSubmenu}">
+              <ha-icon-button class="option-icon" .value=${"option_slots"} .path=${Vt} @click="${this._editSubmenu}">
               </ha-icon-button>
             </div>
           </div>
@@ -1999,7 +1987,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
               </ha-icon-button>
               <ha-icon-button class="edit-icon" .value=${"section_daily_forecast"} .path=${Mt} @click="${this._editSubmenu}">
               </ha-icon-button>
-              <ha-icon-button class="options-icon" .value=${"option_daily_forecast"} .path=${Vt} @click="${this._editSubmenu}">
+              <ha-icon-button class="option-icon" .value=${"option_daily_forecast"} .path=${Vt} @click="${this._editSubmenu}">
               </ha-icon-button>
             </div>
           </div>
@@ -2028,6 +2016,8 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
               <span class="section-title">${this._t("global_options")}</span>
             </div>
             <div>
+              <div class="no-icon"></div>
+              <div class="no-icon"></div>
               <div class="no-icon"></div>
               <ha-icon-button class="edit-icon" .value=${"option_global_options"} .path=${Vt} @click="${this._editSubmenu}">
               </ha-icon-button>
@@ -2086,7 +2076,8 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
     .section-flex .edit-icon,
     .section-flex .up-icon,
     .section-flex .down-icon,
-    .section-flex .option-icon {
+    .section-flex .option-icon,
+    .option-icon {
       --mdc-icon-button-size: 36px;
       --mdc-icon-size: 20px;
       flex: 0 0 auto;
@@ -2118,6 +2109,8 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
       padding-left: 16px;
       background: var(--secondary-background-color);
     } */
+    /* Each row also carries an .edit-<name>-section class with no rule of its
+       own: intentional, as a stable hook for anyone styling the editor. */
     .section-flex {
       display: flex;
       justify-content: space-between;
@@ -2137,6 +2130,33 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
       font-weight: 500;
       color: var(--primary-text-color);
       margin-left: 2px;
+    }
+    /* Global Options is not a section row but sits in the same list, so it must
+       match: same icon size, same button size, same right-hand alignment. */
+    /* The sub-editor's back button: styled here for the first time — it had a
+       class but no rule, so it sat flush against the fields below. */
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .back-title {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+    }
+    .back-title mwc-icon-button {
+      --mdc-icon-button-size: 36px;
+      --mdc-icon-size: 22px;
+    }
+    .global-options-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .global-options-flex .settings-icon {
+      --mdc-icon-size: 20px;
     }
     .section-icon {
       /* ha-icon reads --mdc-icon-size today; keep the Material token until
