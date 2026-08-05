@@ -1923,6 +1923,7 @@ get _forecast_type(): string {
               <ha-icon-button class="edit-icon" .value=${'section_warnings'} .path=${mdiPencil} @click="${this._editSubmenu}">
               </ha-icon-button>
               <div class="no-icon"></div>
+              <div class="no-icon"></div>
             </div>
           </div>
         `;
@@ -2197,8 +2198,17 @@ get _forecast_type(): string {
   }
 
   static styles: CSSResultGroup = css`
+    ha-input,
+    ha-entity-picker,
+    ha-icon-picker,
+    ha-selector {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
     .help-text {
       font-size: 12px;
+      overflow-wrap: anywhere;
       line-height: 1.3;
       color: var(--secondary-text-color);
       margin: 2px 0 6px;
@@ -2209,6 +2219,8 @@ get _forecast_type(): string {
     .ha-select-compat {
       display: block;
       width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       padding: 8px;
       font-size: 13px;
       font-family: inherit;
@@ -2338,14 +2350,21 @@ get _forecast_type(): string {
       font-size: 13px;
       color: var(--primary-text-color);
     }
+    /* A real two-column grid rather than a bare flex row: equal halves that
+       cannot overflow, and rows whose height is set by the taller column, so a
+       field with a hint underneath no longer drags its neighbour out of line. */
     .side-by-side {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
+      align-items: start;
     }
     .side-by-side > * {
-      flex: 1;
+      min-width: 0;
     }
-    .side-by-side :not(:last-child) {
-      padding-right: 4px;
+    /* Anything the editor puts in a full-width row of its own */
+    .side-by-side > .full-width {
+      grid-column: 1 / -1;
     }
     .icon-side-by-side {
       display: flex;
