@@ -2387,11 +2387,24 @@ get _forecast_type(): string {
     /* A real two-column grid rather than a bare flex row: equal halves that
        cannot overflow, and rows whose height is set by the taller column, so a
        field with a hint underneath no longer drags its neighbour out of line. */
+    /* Each row is its own grid, so a tall left-hand cell in one row does not
+       push the next row's right-hand cell out of line — but the columns of
+       adjacent rows must still agree, hence the shared fraction and gap. Rows
+       are also given a consistent bottom margin so a control with a hint under
+       it does not appear to belong to the row below. */
     .side-by-side {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 4px 8px;
       align-items: start;
+      margin-bottom: 8px;
+    }
+    .side-by-side:last-child {
+      margin-bottom: 0;
+    }
+    /* The hint belongs to the control above it, not to whatever follows */
+    .side-by-side > div > .help-text {
+      margin-bottom: 0;
     }
     .side-by-side > * {
       min-width: 0;
