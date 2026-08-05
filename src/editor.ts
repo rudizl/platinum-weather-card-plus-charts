@@ -626,6 +626,14 @@ get _forecast_type(): string {
     return this._config?.option_pressure_decimals || null;
   }
 
+  get _option_wind_decimals(): number | null {
+    return this._config?.option_wind_decimals ?? null;
+  }
+
+  get _forecast_text_alignment(): string {
+    return this._config?.forecast_text_alignment || '';
+  }
+
   get _option_color_fire_danger(): boolean {
     return this._config?.option_color_fire_danger !== false; // default on
   }
@@ -1129,7 +1137,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <label class='mdc-label'>${this._t('condition_alignment')}</label>
-          <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._config?.forecast_text_alignment ?? ''} @change=${this._valueChanged}>
+          <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._forecast_text_alignment} @change=${this._valueChanged}>
             <option value=""></option>
             <option value="left">${this._t("align_left")}</option>
             <option value="center">${this._t("align_center")}</option>
@@ -1443,7 +1451,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <label class='mdc-label'>${this._t('wind_decimals')}</label>
-          <select class='ha-select-compat' .configValue=${'option_wind_decimals'} .value=${this._config?.option_wind_decimals !== undefined ? String(this._config.option_wind_decimals) : ''} @change=${this._valueChanged}>
+          <select class='ha-select-compat' .configValue=${'option_wind_decimals'} .value=${this._option_wind_decimals !== null ? String(this._option_wind_decimals) : ''} @change=${this._valueChanged}>
             <option value=""></option>
             <option value="0">0</option>
             <option value="1">1</option>
@@ -1910,7 +1918,6 @@ get _forecast_type(): string {
               </ha-icon-button>
               <ha-icon-button class="edit-icon" .value=${'section_warnings'} .path=${mdiPencil} @click="${this._editSubmenu}">
               </ha-icon-button>
-              <div class="no-icon"></div>
               <div class="no-icon"></div>
             </div>
           </div>

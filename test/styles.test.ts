@@ -149,6 +149,50 @@ describe('editor rows use both their columns', () => {
   });
 });
 
+describe('selects can show their stored value', () => {
+  it('backs every select with a getter of the matching name', () => {
+    // _valueChanged compares the incoming value against `this[_<configValue>]`.
+    // Without that getter the comparison reads undefined, the update is skipped,
+    // and the field renders blank however the config is set — which is exactly
+    // what happened to the wind-decimals and text-alignment selects.
+    const configValues = Array.from(
+      editor.matchAll(/<select[^>]*\.configValue=\$\{'(\w+)'\}/g),
+    ).map((m) => m[1]);
+    expect(configValues.length).toBeGreaterThan(5);
+    const missing = configValues.filter(
+      (key) => !new RegExp(`get _${key}\\s*\\(`).test(editor),
+    );
+    expect(missing, 'selects whose value getter is missing').toEqual([]);
+  });
+
+  it('passes a string to every select, since a number matches no option', () => {
+    for (const m of editor.matchAll(/<select[^>]*\.value=\$\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/g)) {
+      const expr = m[1];
+      const safe = expr.includes('String(') || expr.includes("|| ''")
+        || expr.includes("?? ''") || expr.includes("? '' :")
+        || /^this\._\w+$/.test(expr.trim());
+      expect(safe, `select value not coerced to string: ${expr.slice(0, 70)}`).toBe(true);
+    }
+  });
+});
+
+describe('every section row is the same width', () => {
+  it('gives each row four button slots', () => {
+    // Rows differ in which buttons they need — Extended has no submenu, Charts
+    // has no per-section editor — so without spacers their icons land in
+    // different columns and the list looks ragged.
+    const rows = ['overview', 'warnings', 'extended', 'slots', 'daily_forecast', 'charts', 'global_options'];
+    for (const row of rows) {
+      const m = new RegExp(`case '${row}':([\\s\\S]*?)(?=\\n      case '|\\n    \\})`).exec(editor);
+      expect(m, `row ${row} not found`).not.toBeNull();
+      const body = m![1];
+      const buttons = (body.match(/<ha-icon-button/g) ?? []).length;
+      const spacers = (body.match(/<div class="no-icon"><\/div>/g) ?? []).length;
+      expect(buttons + spacers, `${row}: ${buttons} buttons + ${spacers} spacers`).toBe(4);
+    }
+  });
+});
+
 describe('markup patterns stay consistent', () => {
   it('gives every select the shared class', () => {
     const total = (editor.match(/<select /g) ?? []).length;
