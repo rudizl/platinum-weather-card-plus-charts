@@ -1459,6 +1459,9 @@ get _forecast_type(): string {
           </select>
           <div class="help-text">${this._t('wind_decimals_hint')}</div>
         </div>
+        <div></div>
+      </div>
+      <div class="side-by-side">
         <div>
           <div class="toggle-row">
               <span class=${this._option_today_rainfall_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_rainfall_decimals'} @click=${this._toggleVisibility}></span>
@@ -1652,7 +1655,10 @@ get _forecast_type(): string {
             <option value="7">7</option>` : html``}
         </select>
         </div>
-        ${this._daily_forecast_layout === 'vertical' ? html`<div>
+      </div>
+      ${this._daily_forecast_layout === 'vertical' ? html`
+      <div class="side-by-side">
+        <div>
           <label class='mdc-label'>${this._t('daily_extended_days')}</label>
           <select class='ha-select-compat' .configValue=${'daily_extended_forecast_days'} @change=${this._valueChangedNumber}>
           <option value=""></option>
@@ -1665,8 +1671,9 @@ get _forecast_type(): string {
           <option value="6">6</option>
           <option value="7">7</option>
         </select>
-        </div>` : html`<div></div>`}
-      </div>
+        </div>
+        <div></div>
+      </div>` : html``}
 
         <div class="side-by-side">
           <div>

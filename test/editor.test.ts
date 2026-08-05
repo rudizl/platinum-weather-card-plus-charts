@@ -181,3 +181,37 @@ describe('toggles are wired to real config keys', () => {
     }
   });
 });
+
+describe('editor rows hold at most two columns', () => {
+  // Counting columns by pattern-matching the source proved unreliable: nested
+  // blocks and conditional templates confuse any regex. Open each sub-editor
+  // and ask the DOM instead, where the answer is exact.
+  const panels = [
+    'option_global_options', 'section_overview', 'option_overview',
+    'section_warnings', 'section_extended', 'section_slots', 'option_slots',
+    'section_daily_forecast', 'option_daily_forecast', 'option_charts',
+  ];
+
+  for (const panel of panels) {
+    it(`${panel} has no row with a third control`, async () => {
+      const el = await editor({
+        option_local_forecast: true,
+        entity_warning: 'binary_sensor.warn',
+        entity_solar_radiation: 'sensor.solar',
+        slot_l1: 'cloud_cover',
+      });
+      // open the sub-editor the way the edit button does
+      (el as unknown as { _editSubmenu: (ev: unknown) => void })._editSubmenu({
+        currentTarget: { value: panel },
+      });
+      await el.updateComplete;
+      const rows = Array.from(el.shadowRoot?.querySelectorAll('.side-by-side') ?? []);
+      for (const row of rows) {
+        expect(
+          row.children.length,
+          `${panel}: a row with ${row.children.length} columns — ${row.textContent?.replace(/\s+/g, ' ').slice(0, 70)}`,
+        ).toBeLessThanOrEqual(2);
+      }
+    });
+  }
+});
