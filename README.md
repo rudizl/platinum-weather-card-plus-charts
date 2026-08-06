@@ -117,7 +117,7 @@ The card is now available in the **HACS default store** — no custom repository
 
 **Fixes**
 - "uv_rating 6" instead of "UV 6" — translation key lost in the v2.1.0 i18n rework, added in all 13 languages (thanks @00pi)
-- Forecast column numbers overlapping (beta regression, caught by @00pi)
+- Forecast column numbers could overlap (caught by @00pi)
 - Language count corrected in docs (13)
 
 ---
@@ -296,37 +296,16 @@ The card is now available in the **HACS default store** — no custom repository
 
 **Older releases**
 
-**v1.3.1-beta.13**
-- Hide `unknown`/`unavailable` state in the extended forecast section — was showing raw `unknown` text below the separator line when the entity was unavailable
+**v1.3.1** — the changes below were released across a series of betas and are collected here
 
-**v1.3.1-beta.12**
-- Fix false-positive errors for sensor entities with multi-digit numbers in their names (e.g. `sensor.ivarna103_*`) — the card no longer checks if an auto-incremented entity name exists, eliminating spurious `'entity_pop'+'1'=...not found` warnings
-- Add optional label field to custom slots (custom1–4) — set `custom1_label: 'My label'` to display a small secondary text before the entity value; configurable via the editor
-
-**v1.3.1-beta.11**
-- Add `option_show_current_day` — new toggle **"Include Today in Forecast"** in the editor (Daily Forecast section); when enabled, the forecast strip starts from today instead of tomorrow
-
-**v1.3.1-beta.9**
-- Show `---` instead of `NaN%` / `unknownmm` when a sensor entity returns `unknown` or `unavailable` — affects humidity, rainfall, pressure, visibility, wind speed/gust, and precipitation slots
-
-**v1.3.1-beta.4**
-- Add `getEntitySuggestion` — card appears in the HA 2026.6+ card picker under "Community" when a `weather.*` entity is selected, pre-filling `weather_entity` in the config
-
-**v1.3.1-beta.3**
-- Fix `fireDanger` variable scoping in vertical forecast layout
-- Add `check: false` to TypeScript plugin to resolve build-time redeclaration error
-
-**v1.3.1-beta.2**
-- Remove `resize-observer-polyfill` dependency (~30KB bundle saving; all HA-supported browsers have had native `ResizeObserver` since 2020)
-- Add missing `entity_moon` to TypeScript `WeatherCardConfig` interface
-- Remove `ha-textfield` from editor CSS (officially removed in HA 2026.5)
-- Remove stale TODO comments and old attribution comments
-
-**v1.3.1-beta.1**
-- Fix editor switch color — replace removed HA 2026.5 MDC tokens (`--mdc-theme-secondary`, `--switch-checked-color`) with new WebAwesome tokens (`--ha-switch-checked-background-color`, `--ha-switch-checked-thumb-background-color`)
-- Migrate all editor text inputs from deprecated `ha-textfield` to `ha-input` (HA 2026.5+ compatible)
-- Update editor loading guard to detect both `ha-input` and `ha-textfield`
-- Remove dead `mwc-select` CSS rule (unused since v1.2.4)
+- Show `---` instead of `NaN%` or `unknownmm` when a sensor returns `unknown` or `unavailable` — humidity, rainfall, pressure, visibility, wind speed and gust, and the precipitation slots
+- Hide `unknown`/`unavailable` in the extended section, which showed the raw text below the separator
+- Add `option_show_current_day` — **"Include Today in Forecast"**, so the strip starts from today rather than tomorrow
+- Add an optional label to the custom slots, shown as small secondary text before the value
+- Fix false-positive errors for sensors with multi-digit numbers in their names, such as `sensor.ivarna103_*`
+- Fix `fireDanger` scoping in the vertical forecast layout
+- Editor: migrate text inputs from the deprecated `ha-textfield` to `ha-input`, and replace the switch colour tokens removed in HA 2026.5
+- Drop the `resize-observer-polyfill` dependency, saving about 30 KB — every browser Home Assistant supports has had `ResizeObserver` natively since 2020
 
 **v1.3.0**
 - Fix all card editor dropdowns not showing saved values
@@ -912,5 +891,5 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 The chart uses the same `weather_entity` and `daily_forecast_days` settings as the Daily Forecast section. No additional entities are required.
 
 [license-shield]: https://img.shields.io/github/license/rudizl/platinum-weather-card-plus-charts.svg?style=flat
-[releases-shield]: https://img.shields.io/github/v/release/rudizl/platinum-weather-card-plus-charts?include_prereleases&style=flat
+[releases-shield]: https://img.shields.io/github/v/release/rudizl/platinum-weather-card-plus-charts?style=flat
 [releases]: https://github.com/rudizl/platinum-weather-card-plus-charts/releases
