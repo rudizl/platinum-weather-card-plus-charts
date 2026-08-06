@@ -20,21 +20,45 @@ The card is in the HACS default store:
 2. Download
 3. Hard-refresh your browser
 
-<details>
-<summary>Installing as a custom repository (no longer needed)</summary>
-
-If you installed the card before it was added to the default store, nothing breaks — updates come through the catalog either way, and you can remove the custom repository entry at your convenience.
-
-1. HACS → ⋮ → Custom Repositories
-2. Add `https://github.com/rudizl/platinum-weather-card-plus-charts` → type **Dashboard**
-3. Download **Platinum Weather Card Plus Charts**
-
-</details>
-
 ---
 
 <details>
 <summary><strong>Changelog</strong></summary>
+
+**v2.3.0**
+
+**Local forecast reworked**
+- The semidiurnal atmospheric tide is subtracted from the pressure trend. At mid latitudes it reaches 0.32 hPa/h on its own, so an uncorrected forecast deteriorated every afternoon and recovered every morning regardless of the weather. ⚠️ Set **Pressure trend window** to match your Derivative helper — default 3 hours
+- Wind direction is used only when steady: gate raised to 8 km/h, plus a circular-concentration test over the last 15 minutes. A vane in light air sweeps the whole compass, and the algorithm applies up to ±8.35 hPa from the bearing
+- Thresholds raised to ±0.30 hPa/h in, ±0.20 out — the scale the algorithm was built around
+- The tendency clause is read live, so it can no longer contradict the pressure slot's arrow (#12)
+- The README now states plainly what a purely barometric method cannot see
+
+**New: warnings section** — an active severe-weather warning from MeteoAlarm or any CAP-compatible integration, in the card's own language rather than the feed's, with visual weight following the severity level
+
+**New: cloud cover from a pyranometer** (#19) — measured rather than forecast, with an optional icon correction that acts only on a flat contradiction
+
+**New: the sun decides day/night icons** — some providers report `clear-night` with the sun 35° above the horizon
+
+**Inherited requests**
+- Decimals on wind speed and gust (#15)
+- Each source on its own line in the extended section (#16)
+- Alignment for the condition text (#17) — honoured by the stylesheet all along, but missing from the editor and documentation
+
+**Fixes**
+- Wind slot showed `unavailable NaNkm/h` when its sensors dropped out; six slots printed `NaN` or leaked the raw state
+- A single `null` in the forecast poisoned the whole temperature chart rather than leaving one gap
+- Precipitation units follow the sensor instead of assuming mm or inches
+- `Entity_forecast_max` was capitalised in a 2022 migration, silently discarding the maximum temperature for anyone with an older config
+- Moving the first section up wrote `undefined` into `section_order` and the section vanished
+- The temperature-decimals migration deleted its own setting
+- Wind speed ignored the sensor's unit
+
+**Editor** — section names lost the redundant "section", controls stay on one line on a phone, and the two-column rows are a real grid
+
+**Tests** — the project had none at the start of this cycle and now has 283, run on every build. Eleven of the fixes above were found by writing them
+
+---
 
 **v2.2.3**
 
@@ -451,7 +475,7 @@ Tapping a slot value (humidity, pressure, wind, ...) — or the big current temp
 
 ### Local forecast (Zambretti)
 
-The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which achieves roughly 90% accuracy for the next 12 hours using barometric pressure, its 3-hour trend, wind direction and season.
+The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which reads barometric pressure, its trend, wind direction and season. It is reported to be right around 90% of the time for the next 12 hours — but that figure comes from the frontal weather it was designed for, and there are conditions it cannot see at all (see *What it can and cannot do* below).
 
 Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
 
@@ -470,6 +494,20 @@ Inputs used:
 
 The hemisphere is detected automatically from your Home Assistant latitude.
 
+#### What it can and cannot do
+
+Zambretti is **purely barometric**. It infers the weather from the pressure level, which way the pressure is moving, and where the wind is coming from. That works because in the mid-latitude frontal weather it was built for — Britain in 1915 — pressure genuinely leads the weather: fronts announce themselves in the barometer hours before they arrive.
+
+It follows that the algorithm is blind to anything that does not move the barometer:
+
+- **Summer convective storms.** Thunderstorms often form under high pressure with no barometric signature whatsoever. The card can read *"fine weather"* while a storm is building overhead, and it is not wrong about the pressure — it simply has no way to see instability, moisture or lift. In a convective climate, treat the local forecast as one input among several rather than the authority.
+- **Fog, frost, and anything driven by radiation or humidity.** No input, no output.
+- **Terrain effects.** Sea breezes, valley winds, lake effect — all invisible to it.
+
+Where it does well is the thing your forecast provider is often slowest on: a front arriving earlier or later than the model said. The barometer at your own location knows before the model updates.
+
+None of this is fixable within Zambretti; the missing input is cloud cover, which is what later algorithms such as Sager (1942) use alongside pressure and wind change. If your station has a pyranometer, that data exists — it is simply not something this card computes today.
+
 > **Your pressure sensor must report sea-level (relative) pressure — check this first.**
 > Zambretti reads the absolute pressure level, so an uncalibrated station throws the forecast off by several categories, permanently. A station at 150 m altitude reads roughly 18 hPa below sea level: the algorithm sees 1002 hPa ("changeable, some rain") when the real sea-level pressure is 1020 hPa ("settled fair"), and the card then predicts rain on a cloudless day.
 >
@@ -485,7 +523,13 @@ The hemisphere is detected automatically from your Home Assistant latitude.
 >
 > To verify, compare the corrected value with the QNH from a nearby airport METAR — they should agree within a hPa or two.
 
-To keep the text stable with fast-reporting stations, the card applies three smoothing rules: wind direction is ignored while wind speed is below 2 km/h (direction is noise in calm conditions), the pressure trend uses hysteresis (enters rising/falling at ±0.12 hPa/h, returns to steady at ±0.08), and a changed forecast text must persist for 5 minutes before it replaces the one on screen.
+To keep the text stable and honest about its inputs, the card applies three rules:
+
+- **Wind direction is used only when it means something** — the reading is dropped below 8 km/h, and also whenever the bearing has been wandering over the last 15 minutes (measured as circular concentration, R < 0.7). A vane in light air sweeps the whole compass; professional stations report `VRB` for the same reason, and aviation reports state a range such as `040V120` — an 80° spread at 9 knots. Since Zambretti applies up to ±8.35 hPa based on the bearing, an unsteady reading alone can move the forecast several categories.
+- **The pressure trend is corrected for the atmospheric tide, then judged conservatively.** Pressure breathes twice a day — maxima near 10:00 and 22:00 local solar time, minima near 04:00 and 16:00 — with an amplitude of about 1.16·cos²(latitude) hPa. At 43°N that is a slope of up to 0.32 hPa/h, several times any sensible "falling" threshold, so an uncorrected forecast deteriorates every afternoon and recovers every morning regardless of the weather. The card subtracts the expected tide (computed from your latitude and longitude, averaged over the trend sensor's window) and then applies hysteresis: rising/falling starts at ±0.30 hPa/h — roughly 0.9 hPa over three hours, the scale the original algorithm was built around — and returns to steady below ±0.20. A changed phrase must also persist for five minutes before it replaces the one on screen.
+
+  The tidal correction has to be averaged over the same window your trend sensor uses — at three hours versus one they differ by up to 0.16 hPa/h, over half the threshold for calling the pressure falling. A Derivative helper does not expose its window on the entity, so set **Pressure trend window** in the editor to match it. Default is 3 hours, which is both the Derivative default and the window the original Zambretti algorithm was built around.
+- **The pressure-tendency clause is read live** from the same source as the pressure slot's arrow, so the sentence and the arrow can never contradict each other.
 
 ```yaml
 type: custom:platinum-weather-card-plus-charts
@@ -565,6 +609,45 @@ sensor:
 ```
 
 Then select it in the editor: Slots Section → *Entity Pressure Trend* (the picker appears once a pressure entity is set).
+
+## Warnings Section
+
+Shows an active severe-weather warning as a coloured row. Point it at a [MeteoAlarm](https://www.home-assistant.io/integrations/meteoalarm/) binary sensor (or any integration exposing the same CAP attributes) and the row appears only while a warning is in force — the rest of the time the section takes no space at all.
+
+The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers. So a Bulgarian card reads *"Жълт код: Високи температури · до сб 00:00"* even though the feed itself is in English. All fifteen hazard types are translated in every language the card supports; unknown types fall back to the provider's own `event` text.
+
+The colour of the row follows the warning level — yellow, orange or red.
+
+| Option | Type | Description |
+| ------ | ---- | ----------- |
+| Warning entity | Entity | MeteoAlarm-compatible binary sensor |
+| Show expiry time | Boolean | Append when the warning ends |
+
+```yaml
+type: custom:platinum-weather-card-plus-charts
+section_order:
+  - overview
+  - warnings
+  - slots
+entity_warning: binary_sensor.meteoalarm_varna
+```
+
+> The MeteoAlarm integration reports only the first warning when several are active for the same region at once. That is a limitation of the integration rather than the card; a template sensor can work around it if you need every warning.
+
+### Cloud cover from a pyranometer
+
+If your station measures solar radiation, the card can work out the cloud cover from it. How much sunlight *would* arrive under a clear sky depends only on the sun's elevation, the day of year and your altitude — pure geometry, no external data — so the ratio between that and what the sensor actually reports is the cloud cover.
+
+Add the **Cloud cover** slot and point *Solar radiation entity* at your pyranometer (W/m²). A sun entity is required as well, since the calculation needs the sun's elevation. Shown as a percentage by default, or in oktas — the eighths meteorologists use — if you prefer.
+
+Worth knowing about its limits:
+
+- **Daylight only.** At night there is no signal at all. The slot falls back to a provider's cloud cover entity if you configure one, and shows `---` otherwise.
+- **It stops below 10° of elevation**, where the air-mass model softens and morning haze distorts the reading, rather than reporting confident nonsense at dawn and dusk.
+- **The clear-sky model uses a fixed atmospheric transmittance**, so it reads a little high in hazy or dusty air and a little low in very clean air. Good enough to tell clear from overcast; not a radiometric instrument.
+- **The sensor must be clean, level and unshaded.** A pyranometer that catches a roof edge each morning will report cloud that isn't there, every morning.
+
+The measurement can also correct the condition icon, under **Measurement corrects the icon**. It intervenes only when the two flatly disagree — a claim of clear sky under 80% cloud, or of overcast under a sun delivering nearly everything it could. The margins are wide on purpose: the clear-sky model is approximate, and a pyranometer reading 30% low through dust still stays well inside them, so a dirty sensor cannot rewrite the sky. Off by default.
 
 ## Icon Packs
 
@@ -722,9 +805,11 @@ double_tap_action:
 | `entity_apparent_temp` | String | none | Apparent temperature entity |
 | `entity_forecast_icon` | String | none | Forecast icon entity |
 | `entity_summary` | String | none | Forecast summary entity |
+| `forecast_text_alignment` | String | `center` | `left`, `center` or `right` for the condition text |
 | `option_local_forecast` | Boolean | `false` | Compute a local Zambretti forecast and show it as the overview summary text (uses `entity_pressure`, `entity_pressure_trend`, `entity_wind_bearing`, `entity_wind_speed`) |
 | `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
 | `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
+| `option_trend_window_hours` | Number | `3` | Time window of your pressure trend sensor, in hours — the tidal correction is averaged over it |
 
 ## Extended Section
 
@@ -733,6 +818,7 @@ double_tap_action:
 | `entity_extended` | String | none | Extended forecast entity |
 | `extended_use_attr` | Boolean | `false` | Use attribute of the entity |
 | `extended_name_attr` | String | none | Attribute name |
+| `option_extended_separator` | Boolean | `true` | Put each source on its own line instead of running them together |
 | `entity_todays_uv_forecast` | String | none | UV forecast entity |
 | `entity_todays_fire_danger` | String | none | Fire danger entity |
 
@@ -777,11 +863,18 @@ double_tap_action:
 | `option_forecast_decimals` | Boolean | `false` | 1 decimal on forecast temperatures |
 | `option_show_forecast_pop` | Boolean | `true` | Show precipitation probability in forecast |
 | `option_pressure_decimals` | Number | `0` | Decimal places for pressure: `0`–`3` |
+| `option_wind_decimals` | Number | `0` | Decimals on wind speed and gust (0–2) — worth setting in m/s, where whole numbers are coarse |
 | `option_color_fire_danger` | Boolean | `true` | Colour fire danger by severity |
 | `option_wind_bearing_icon` | Boolean | `false` | Show the wind bearing as a rotating arrow icon instead of compass text |
 | `option_compact_slots` | Boolean | `false` | Shorter slot label wording (Max, Min, ...) |
+| `option_sun_overrides_icon` | Boolean | `true` | Force the day/night variant of the current condition icon from the sun's elevation, overriding the provider |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
+| `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
+| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help |
+| `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
+| `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
+| `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |
 | `option_show_beaufort` | Boolean | `false` | Prefix the wind slot with the Beaufort force, e.g. "BFT: 4 - SE 12 km/h" |
 
@@ -800,6 +893,9 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 | `option_daily_forecast_date` | Boolean | `false` | Show a locale-formatted date (e.g. 13.07) next to the day name |
 | `option_show_forecast_wind` | Boolean | `false` | Show forecast wind speed/direction in each column |
 | `entity_summary_1` | String | none | Weather summary sensor for day 1 tooltip (auto-incremented for each day) |
+| `entity_extended_1` | String | none | Extended forecast text for day 1, vertical layout (auto-incremented for each day) |
+| `daily_extended_use_attr` | Boolean | `false` | Read the extended forecast text from an attribute of `entity_extended_1` instead of its state |
+| `daily_extended_name_attr` | String | none | Name of that attribute |
 | `daily_extended_forecast_days` | Number | `7` | Extended forecast days (vertical only, 0–7) |
 | `option_daily_color_fire_danger` | Boolean | `true` | Colour fire danger (vertical only) |
 | `old_daily_format` | Boolean | `false` | Stack max/min vertically instead of side by side |

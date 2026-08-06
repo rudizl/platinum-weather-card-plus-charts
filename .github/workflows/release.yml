@@ -15,13 +15,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # jsdom 30 needs the newer webidl internals that arrived in Node 22
+          node-version: '22'
 
       - name: Install dependencies
         run: npm install
 
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
       - name: Build
-        run: npm run build
+        run: npm run build:release
 
       - name: Verify dist
         run: ls -lh dist/platinum-weather-card.js

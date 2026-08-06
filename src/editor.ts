@@ -86,7 +86,7 @@ export class WeatherCardEditor extends LitElement implements LovelaceCardEditor 
       delete tmpConfig['locale'];
     }
 
-    if (tmpConfig.option_today_temperature_decimals) {
+    if (tmpConfig.show_today_decimals !== undefined) {
       tmpConfig['option_today_temperature_decimals'] = tmpConfig.show_today_decimals;
       delete tmpConfig['show_today_decimals'];
     }
@@ -107,7 +107,7 @@ export class WeatherCardEditor extends LitElement implements LovelaceCardEditor 
     }
 
     if (tmpConfig.entity_daytime_high) {
-      tmpConfig['Entity_forecast_max'] = tmpConfig.entity_daytime_high;
+      tmpConfig['entity_forecast_max'] = tmpConfig.entity_daytime_high;
       delete tmpConfig['entity_daytime_high'];
     }
 
@@ -626,6 +626,14 @@ get _forecast_type(): string {
     return this._config?.option_pressure_decimals || null;
   }
 
+  get _option_wind_decimals(): number | null {
+    return this._config?.option_wind_decimals ?? null;
+  }
+
+  get _forecast_text_alignment(): string {
+    return this._config?.forecast_text_alignment || '';
+  }
+
   get _option_color_fire_danger(): boolean {
     return this._config?.option_color_fire_danger !== false; // default on
   }
@@ -713,6 +721,11 @@ get _forecast_type(): string {
           break;
         case 'moon':
           entities.add('entity_moon');
+          break;
+        case 'cloud_cover':
+          entities.add('entity_solar_radiation');
+          entities.add('entity_sun');
+          entities.add('entity_cloud_cover');
           break;
         case 'pop':
           entities.add('entity_pop');
@@ -859,6 +872,36 @@ get _forecast_type(): string {
         <ha-entity-picker .hass=${this.hass} .configValue=${'entity_sun'} .value=${this._entity_sun} .includeDomains=${['sun', 'sensor']}
           name="entity_sun" label=${this._t("entity_sun")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
+      ` : '';
+
+    const entity_solar_radiation = entities.has("entity_solar_radiation") ?
+      html`
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']}
+          name="entity_solar_radiation" label=${this._t("entity_solar_radiation")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+        </ha-entity-picker>
+        <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
+      ` : '';
+
+    const entity_cloud_cover = entities.has("entity_cloud_cover") ?
+      html`
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_cloud_cover'} .value=${this._config?.entity_cloud_cover || ''} .includeDomains=${['sensor']}
+          name="entity_cloud_cover" label=${this._t("entity_cloud_cover")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+        </ha-entity-picker>
+        <div class="side-by-side">
+          <div>
+            <div class="toggle-row">
+                <span class=${this._config?.option_cloud_cover_oktas ? "pwc-switch active" : "pwc-switch"} .value=${'option_cloud_cover_oktas'} @click=${this._toggleVisibility}></span>
+                <span class="toggle-label">${this._t("cloud_cover_oktas")}</span>
+              </div>
+          </div>
+          <div>
+            <div class="toggle-row">
+                <span class=${this._config?.option_cloud_overrides_icon ? "pwc-switch active" : "pwc-switch"} .value=${'option_cloud_overrides_icon'} @click=${this._toggleVisibility}></span>
+                <span class="toggle-label">${this._t("cloud_overrides_icon")}</span>
+              </div>
+          </div>
+        </div>
+        <div class="help-text">${this._t("cloud_overrides_icon_hint")}</div>
       ` : '';
 
     const entity_moon = entities.has("entity_moon") ?
@@ -1008,6 +1051,8 @@ get _forecast_type(): string {
       ${entity_wind_gust_kt}
       ${entity_visibility}
       ${entity_sun}
+      ${entity_solar_radiation}
+      ${entity_cloud_cover}
       ${entity_moon}
       ${entity_pop}
       ${entity_pos}
@@ -1091,6 +1136,15 @@ get _forecast_type(): string {
     return html`
       <div class="side-by-side">
         <div>
+          <label class='mdc-label'>${this._t('condition_alignment')}</label>
+          <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._forecast_text_alignment} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="left">${this._t("align_left")}</option>
+            <option value="center">${this._t("align_center")}</option>
+            <option value="right">${this._t("align_right")}</option>
+          </select>
+        </div>
+        <div>
           <label class='mdc-label'>${this._t('overview_layout')}</label>
           <select class='ha-select-compat' .configValue=${'overview_layout'} .value=${this._overview_layout} @change=${this._valueChanged}>
             <option value=""></option>
@@ -1100,8 +1154,7 @@ get _forecast_type(): string {
             <option value="title only">${this._t("opt_title_only")}</option>
           </select>
         </div>
-        <div></div>
-      </div>
+        </div>
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
@@ -1125,21 +1178,47 @@ get _forecast_type(): string {
         </div>
         ${this._config?.option_local_forecast === true ? html`
         <div>
-          <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
-          </ha-input>
-          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_local_forecast_verbose ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast_verbose'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("local_forecast_verbose")}</span>
+            </div>
         </div>` : html`<div></div>`}
       </div>
       ${this._config?.option_local_forecast === true ? html`
       <div class="side-by-side">
         <div>
+          <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
+        </div>
+        <div>
+          <ha-input type="number" label=${this._t("trend_window")} .value=${this._config?.option_trend_window_hours ?? ''} .configValue=${'option_trend_window_hours'} @input=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("trend_window_hint")}</div>
+        </div>
+      </div>` : html``}
+    `;
+  }
+
+  private _sectionWarningsEditor(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_warning || ''}
+          .configValue=${'entity_warning'} @value-changed=${this._valueChangedPicker}
+          .includeDomains=${['binary_sensor']}
+          name="entity_warning" label=${this._t("entity_warning")} allow-custom-entity>
+        </ha-entity-picker>
+      </div>
+      <div class="help-text">${this._t("entity_warning_hint")}</div>
+      <div class="side-by-side">
+        <div>
           <div class="toggle-row">
-              <span class=${this._config?.option_local_forecast_verbose ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast_verbose'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("local_forecast_verbose")}</span>
+              <span class=${this._config?.option_warning_show_expiry !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_warning_show_expiry'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("warning_show_expiry")}</span>
             </div>
         </div>
         <div></div>
-      </div>` : html``}
+      </div>
     `;
   }
 
@@ -1180,6 +1259,16 @@ get _forecast_type(): string {
         name="entity_todays_fire_danger" label=${this._t("entity_fire_today")} allow-custom-entity
         @value-changed=${this._valueChangedPicker}>
       </ha-entity-picker>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_extended_separator !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_extended_separator'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("extended_separator")}</span>
+            </div>
+          <div class="help-text">${this._t("extended_separator_hint")}</div>
+        </div>
+        <div></div>
+      </div>
     `;
   }
 
@@ -1203,6 +1292,7 @@ get _forecast_type(): string {
       ['sun_next',          'Next sun rise/set time'],
       ['sun_following',     'Following sun rise/set time'],
       ['moon',              'Moon phase'],
+      ['cloud_cover',       'Cloud cover'],
       ['pop',               'Chance of rain'],
       ['popforecast',       'Rainfall forecast'],
       ['possible_today',    "Today's forecast rainfall"],
@@ -1360,6 +1450,19 @@ get _forecast_type(): string {
       </div>
       <div class="side-by-side">
         <div>
+          <label class='mdc-label'>${this._t('wind_decimals')}</label>
+          <select class='ha-select-compat' .configValue=${'option_wind_decimals'} .value=${this._option_wind_decimals !== null ? String(this._option_wind_decimals) : ''} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          <div class="help-text">${this._t('wind_decimals_hint')}</div>
+        </div>
+        <div></div>
+      </div>
+      <div class="side-by-side">
+        <div>
           <div class="toggle-row">
               <span class=${this._option_today_rainfall_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_rainfall_decimals'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("today_rain_decimals")}</span>
@@ -1421,8 +1524,7 @@ get _forecast_type(): string {
               <span class="toggle-label">${this._t("slot_tap_more_info")}</span>
             </div>
         </div>
-        <div></div>
-            </div>
+        </div>
         </div>
       </div>
     `;
@@ -1539,11 +1641,8 @@ get _forecast_type(): string {
             <option value="vertical">${this._t("opt_vertical")}</option>
           </select>
         </div>
-        <div></div>
-      </div>
-      <div class="side-by-side">
         <div>
-        <label class='mdc-label'>${this._t('daily_forecast_days')}</label>
+          <label class='mdc-label'>${this._t('daily_forecast_days')}</label>
         <select class='ha-select-compat' .configValue=${'daily_forecast_days'} .value=${this._daily_forecast_days !== null ? String(this._daily_forecast_days) : ''} @change=${this._valueChanged}>
           <option value=""></option>
           <option value="1">1</option>
@@ -1556,7 +1655,10 @@ get _forecast_type(): string {
             <option value="7">7</option>` : html``}
         </select>
         </div>
-        ${this._daily_forecast_layout === 'vertical' ? html`<div>
+      </div>
+      ${this._daily_forecast_layout === 'vertical' ? html`
+      <div class="side-by-side">
+        <div>
           <label class='mdc-label'>${this._t('daily_extended_days')}</label>
           <select class='ha-select-compat' .configValue=${'daily_extended_forecast_days'} @change=${this._valueChangedNumber}>
           <option value=""></option>
@@ -1569,8 +1671,9 @@ get _forecast_type(): string {
           <option value="6">6</option>
           <option value="7">7</option>
         </select>
-        </div>` : html`<div></div>`}
-      </div>
+        </div>
+        <div></div>
+      </div>` : html``}
 
         <div class="side-by-side">
           <div>
@@ -1594,8 +1697,7 @@ get _forecast_type(): string {
               <span class="toggle-label">${this._t("daily_forecast_date")}</span>
             </div>
           </div>
-          <div></div>
-        </div>
+          </div>
 
         <div class="side-by-side">
         ${this._daily_forecast_layout === 'vertical' ? html`<div>
@@ -1631,6 +1733,15 @@ get _forecast_type(): string {
               <span class="toggle-label">${this._t("compact_slots")}</span>
             </div>
         </div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_sun_overrides_icon !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_sun_overrides_icon'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("sun_overrides_icon")}</span>
+            </div>
+        </div>
+        <div></div>
       </div>
       <div class="side-by-side">
         <div>
@@ -1725,6 +1836,9 @@ get _forecast_type(): string {
       case 'option_overview':
         subel.push(this._optionOverviewEditor());
         break;
+      case 'section_warnings':
+        subel.push(this._sectionWarningsEditor());
+        break;
       case 'section_extended':
         subel.push(this._sectionExtendedEditor());
         break;
@@ -1796,6 +1910,25 @@ get _forecast_type(): string {
             </div>
           </div>
         `;
+      case 'warnings':
+        return html`
+          <div class="section-flex edit-warnings-section">
+            <div class="section-label">
+              <span class=${this._config?.show_section_warnings !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_warnings'} @click=${this._toggleVisibility}></span>
+              <ha-icon class="section-icon" icon="mdi:alert-outline"></ha-icon>
+              <span class="section-title">${this._t("warnings_section")}</span>
+            </div>
+            <div>
+              <ha-icon-button class="down-icon" .value=${'warnings'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
+              </ha-icon-button>
+              <ha-icon-button class="up-icon" .value=${'warnings'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
+              </ha-icon-button>
+              <ha-icon-button class="edit-icon" .value=${'section_warnings'} .path=${mdiPencil} @click="${this._editSubmenu}">
+              </ha-icon-button>
+              <div class="no-icon"></div>
+            </div>
+          </div>
+        `;
       case 'extended':
         return html`
           <div class="section-flex edit-extended-section">
@@ -1830,7 +1963,7 @@ get _forecast_type(): string {
               </ha-icon-button>
               <ha-icon-button class="edit-icon" .value=${'section_slots'} .path=${mdiPencil} @click="${this._editSubmenu}">
               </ha-icon-button>
-              <ha-icon-button class="options-icon" .value=${'option_slots'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
+              <ha-icon-button class="option-icon" .value=${'option_slots'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
               </ha-icon-button>
             </div>
           </div>
@@ -1850,7 +1983,7 @@ get _forecast_type(): string {
               </ha-icon-button>
               <ha-icon-button class="edit-icon" .value=${'section_daily_forecast'} .path=${mdiPencil} @click="${this._editSubmenu}">
               </ha-icon-button>
-              <ha-icon-button class="options-icon" .value=${'option_daily_forecast'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
+              <ha-icon-button class="option-icon" .value=${'option_daily_forecast'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
               </ha-icon-button>
             </div>
           </div>
@@ -1883,6 +2016,8 @@ get _forecast_type(): string {
               <span class="section-title">${this._t("global_options")}</span>
             </div>
             <div>
+              <div class="no-icon"></div>
+              <div class="no-icon"></div>
               <div class="no-icon"></div>
               <ha-icon-button class="edit-icon" .value=${'option_global_options'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
               </ha-icon-button>
@@ -1974,6 +2109,10 @@ get _forecast_type(): string {
       const target = ev.currentTarget;
       if (this._config.section_order) {
         const slot = this._config.section_order.findIndex(t => t === target.value);
+        // The arrows are disabled at the ends, but that is only the UI: a swap
+        // past the start would write undefined into the list and the section
+        // would vanish from the card.
+        if (slot <= 0) return;
         const tmp_section_order = [...this._config.section_order];
         [tmp_section_order[slot], tmp_section_order[slot - 1]] = [this._config.section_order[slot - 1], this._config.section_order[slot]];
         this._config = {
@@ -1994,6 +2133,7 @@ get _forecast_type(): string {
       const target = ev.currentTarget;
       if (this._config.section_order) {
         const slot = this._config.section_order.findIndex(t => t === target.value);
+        if (slot === -1 || slot >= this._config.section_order.length - 1) return;
         const tmp_section_order = [...this._config.section_order];
         [tmp_section_order[slot], tmp_section_order[slot + 1]] = [this._config.section_order[slot + 1], this._config.section_order[slot]]
         this._config = {
@@ -2062,21 +2202,29 @@ get _forecast_type(): string {
   }
 
   static styles: CSSResultGroup = css`
+    ha-input,
+    ha-entity-picker,
+    ha-icon-picker,
+    ha-selector {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
     .help-text {
       font-size: 12px;
+      overflow-wrap: anywhere;
       line-height: 1.3;
       color: var(--secondary-text-color);
       margin: 2px 0 6px;
     }
     :host {
       display: block;
-              /* --mdc-menu-min-width: var(--parentWidth); */
-      --mdc-menu-item-height: 36px;
-      --mdc-typography-subtitle1-font-size: 13px;
     }
     .ha-select-compat {
       display: block;
       width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       padding: 8px;
       font-size: 13px;
       font-family: inherit;
@@ -2101,16 +2249,21 @@ get _forecast_type(): string {
     ha-input {
       display: block;
     }
-    ha-switch {
-      --ha-switch-checked-background-color: var(--primary-color);
-      --ha-switch-checked-thumb-background-color: var(--primary-text-color);
-    }
-    ha-formfield {
-      height: 56px;
+    /* Three 48px buttons plus a spacer is 192px, which leaves nothing for a
+       translated section name on a phone. */
+    .section-flex .edit-icon,
+    .section-flex .up-icon,
+    .section-flex .down-icon,
+    .section-flex .option-icon,
+    .option-icon {
+      --mdc-icon-button-size: 36px;
+      --mdc-icon-size: 20px;
+      flex: 0 0 auto;
     }
     .no-icon {
       display: inline-flex;
-      width: var(--mds-icon-button-size, 48px);
+      width: 36px;
+      flex: 0 0 auto;
     }
     /* .option {
       cursor: pointer;
@@ -2134,15 +2287,27 @@ get _forecast_type(): string {
       padding-left: 16px;
       background: var(--secondary-background-color);
     } */
+    /* Each row also carries an .edit-<name>-section class with no rule of its
+       own: intentional, as a stable hook for anyone styling the editor. */
     .section-flex {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+    /* The buttons are fixed furniture; only the label may give way. Without this
+       a long translated name pushes the submenu button onto its own line. */
+    .section-flex > div:last-child {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
     .section-label {
       display: flex;
       align-items: center;
       gap: 6px;
+      flex: 1 1 auto;
+      min-width: 0;
     }
     .visibility-spacer {
       width: 32px;
@@ -2153,8 +2318,44 @@ get _forecast_type(): string {
       font-weight: 500;
       color: var(--primary-text-color);
       margin-left: 2px;
+      /* The label is the only part of the row allowed to give way; without this
+         a two-word name wraps and pushes the buttons out of alignment with
+         every other row. */
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* Global Options is not a section row but sits in the same list, so it must
+       match: same icon size, same button size, same right-hand alignment. */
+    /* The sub-editor's back button: styled here for the first time — it had a
+       class but no rule, so it sat flush against the fields below. */
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .back-title {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+    }
+    .back-title mwc-icon-button {
+      --mdc-icon-button-size: 36px;
+      --mdc-icon-size: 22px;
+    }
+    .global-options-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .global-options-flex .settings-icon {
+      --mdc-icon-size: 20px;
     }
     .section-icon {
+      /* ha-icon reads --mdc-icon-size today; keep the Material token until
+         Home Assistant settles on a replacement in its Web Awesome migration */
       --mdc-icon-size: 20px;
       color: var(--secondary-text-color);
       opacity: 0.9;
@@ -2200,14 +2401,34 @@ get _forecast_type(): string {
       font-size: 13px;
       color: var(--primary-text-color);
     }
+    /* A real two-column grid rather than a bare flex row: equal halves that
+       cannot overflow, and rows whose height is set by the taller column, so a
+       field with a hint underneath no longer drags its neighbour out of line. */
+    /* Each row is its own grid, so a tall left-hand cell in one row does not
+       push the next row's right-hand cell out of line — but the columns of
+       adjacent rows must still agree, hence the shared fraction and gap. Rows
+       are also given a consistent bottom margin so a control with a hint under
+       it does not appear to belong to the row below. */
     .side-by-side {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
+      align-items: start;
+      margin-bottom: 8px;
+    }
+    .side-by-side:last-child {
+      margin-bottom: 0;
+    }
+    /* The hint belongs to the control above it, not to whatever follows */
+    .side-by-side > div > .help-text {
+      margin-bottom: 0;
     }
     .side-by-side > * {
-      flex: 1;
+      min-width: 0;
     }
-    .side-by-side :not(:last-child) {
-      padding-right: 4px;
+    /* Anything the editor puts in a full-width row of its own */
+    .side-by-side > .full-width {
+      grid-column: 1 / -1;
     }
     .icon-side-by-side {
       display: flex;
