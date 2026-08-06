@@ -25,6 +25,41 @@ The card is in the HACS default store:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.3.0**
+
+**Local forecast reworked**
+- The semidiurnal atmospheric tide is subtracted from the pressure trend. At mid latitudes it reaches 0.32 hPa/h on its own, so an uncorrected forecast deteriorated every afternoon and recovered every morning regardless of the weather. ⚠️ Set **Pressure trend window** to match your Derivative helper — default 3 hours
+- Wind direction is used only when steady: gate raised to 8 km/h, plus a circular-concentration test over the last 15 minutes. A vane in light air sweeps the whole compass, and the algorithm applies up to ±8.35 hPa from the bearing
+- Thresholds raised to ±0.30 hPa/h in, ±0.20 out — the scale the algorithm was built around
+- The tendency clause is read live, so it can no longer contradict the pressure slot's arrow (#12)
+- The README now states plainly what a purely barometric method cannot see
+
+**New: warnings section** — an active severe-weather warning from MeteoAlarm or any CAP-compatible integration, in the card's own language rather than the feed's, with visual weight following the severity level
+
+**New: cloud cover from a pyranometer** (#19) — measured rather than forecast, with an optional icon correction that acts only on a flat contradiction
+
+**New: the sun decides day/night icons** — some providers report `clear-night` with the sun 35° above the horizon
+
+**Inherited requests**
+- Decimals on wind speed and gust (#15)
+- Each source on its own line in the extended section (#16)
+- Alignment for the condition text (#17) — honoured by the stylesheet all along, but missing from the editor and documentation
+
+**Fixes**
+- Wind slot showed `unavailable NaNkm/h` when its sensors dropped out; six slots printed `NaN` or leaked the raw state
+- A single `null` in the forecast poisoned the whole temperature chart rather than leaving one gap
+- Precipitation units follow the sensor instead of assuming mm or inches
+- `Entity_forecast_max` was capitalised in a 2022 migration, silently discarding the maximum temperature for anyone with an older config
+- Moving the first section up wrote `undefined` into `section_order` and the section vanished
+- The temperature-decimals migration deleted its own setting
+- Wind speed ignored the sensor's unit
+
+**Editor** — section names lost the redundant "section", controls stay on one line on a phone, and the two-column rows are a real grid
+
+**Tests** — the project had none at the start of this cycle and now has 283, run on every build. Eleven of the fixes above were found by writing them
+
+---
+
 **v2.2.3**
 
 The card is now available in the **HACS default store** — no custom repository needed.
