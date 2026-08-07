@@ -1775,6 +1775,35 @@ get _forecast_type(): string {
       </div>
       <div class="side-by-side">
         <div>
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']}
+            name="entity_solar_radiation" label=${this._t("entity_solar_radiation")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+          <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
+        </div>
+        <div>
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_cloud_cover'} .value=${this._config?.entity_cloud_cover || ''} .includeDomains=${['sensor']}
+            name="entity_cloud_cover" label=${this._t("entity_cloud_cover")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+        </div>
+      </div>
+      ${this._config?.entity_solar_radiation ? html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_cloud_overrides_icon ? "pwc-switch active" : "pwc-switch"} .value=${'option_cloud_overrides_icon'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("cloud_overrides_icon")}</span>
+            </div>
+          <div class="help-text">${this._t("cloud_overrides_icon_hint")}</div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_cloud_cover_oktas ? "pwc-switch active" : "pwc-switch"} .value=${'option_cloud_cover_oktas'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("cloud_cover_oktas")}</span>
+            </div>
+        </div>
+      </div>` : html``}
+      <div class="side-by-side">
+        <div>
           <label class="label">${this._t("icon_pack")}</label>
           <select class='ha-select-compat' .configValue=${'icon_pack'} .value=${this._icon_pack} @change=${this._valueChanged}>
             <option value='default'>Default (built-in animated)</option>

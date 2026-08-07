@@ -25,6 +25,11 @@ The card is in the HACS default store:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.3.1**
+- The pyranometer settings moved to Global Options. They were behind the cloud cover slot, which meant the icon correction could not be used without also displaying a reading nobody had asked for — the two are independent and are now configured independently
+
+---
+
 **v2.3.0**
 
 **Local forecast reworked**
@@ -617,7 +622,7 @@ entity_warning: binary_sensor.meteoalarm_varna
 
 If your station measures solar radiation, the card can work out the cloud cover from it. How much sunlight *would* arrive under a clear sky depends only on the sun's elevation, the day of year and your altitude — pure geometry, no external data — so the ratio between that and what the sensor actually reports is the cloud cover.
 
-Add the **Cloud cover** slot and point *Solar radiation entity* at your pyranometer (W/m²). A sun entity is required as well, since the calculation needs the sun's elevation. Shown as a percentage by default, or in oktas — the eighths meteorologists use — if you prefer.
+Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); a sun entity is needed too, since the calculation turns on the sun's elevation. From there the measurement is available to two independent things: add the **Cloud cover** slot to show it as a reading, and switch on **Measurement corrects the icon** to let it correct the condition icon. Either without the other is fine.
 
 Worth knowing about its limits:
 
