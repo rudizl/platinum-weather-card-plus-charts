@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { clearSkyIrradiance, cloudCoverFraction, cloudCoverOktas } from '../src/zambretti';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
 // Cloud cover measured rather than forecast: the ratio of what a pyranometer
@@ -321,5 +321,47 @@ describe('the window is short enough to follow the sky', () => {
   it('the median beats the mean when cloud is broken', () => {
     // One reading through a gap should not drag the answer toward clear.
     expect(summarise(10, true)).toBeGreaterThan(summarise(10, false));
+  });
+});
+
+describe('the corrected icon names a file that exists', () => {
+  // At 87% cloud the card rendered N/A: the heaviest band returned a bare
+  // 'cloudy-3', but every icon in the set carries a -day or -night suffix, so
+  // the name matched no file at all.
+  const source = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('gives every band a day/night suffix', () => {
+    const correction = /const EDGES = \[[\s\S]*?adjusted = `[^`]*`;/.exec(source);
+    expect(correction, 'icon correction not found').not.toBeNull();
+    expect(correction![0], 'a band is emitted without a day/night suffix')
+      .toContain('${this.dayOrNight}');
+    expect(correction![0], "a band name is hardcoded without the suffix")
+      .not.toMatch(/adjusted = '(clear|cloudy[\w-]*)'/);
+  });
+
+  it('only overrides plain sky icons', () => {
+    // Rain, snow, fog and storms come from a provider that can see what a
+    // pyranometer cannot — and heavy cloud is when it is most likely right.
+    const guard = /const isPlainSky = [\s\S]*?;/.exec(source);
+    expect(guard, 'no plain-sky guard').not.toBeNull();
+    for (const condition of ['rain', 'snow', 'fog', 'thunder', 'drizzle', 'hail']) {
+      expect(guard![0], `${condition} could be overridden`).not.toContain(condition);
+    }
+  });
+});
+
+describe('every icon the correction can produce is shipped', () => {
+  it('finds a file for each band in both day and night', () => {
+    const dist = join(__dirname, '..', 'dist');
+    if (!existsSync(dist)) return;
+    const files = new Set(readdirSync(dist));
+    for (const band of ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3']) {
+      for (const when of ['day', 'night']) {
+        for (const prefix of ['a-', 's-']) {
+          expect(files.has(`${prefix}${band}-${when}.svg`), `${prefix}${band}-${when}.svg missing`)
+            .toBe(true);
+        }
+      }
+    }
   });
 });

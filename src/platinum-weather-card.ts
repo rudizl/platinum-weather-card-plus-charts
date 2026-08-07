@@ -3147,7 +3147,12 @@ export class PlatinumWeatherCard extends LitElement {
         // Only the plain sky icons are corrected: a provider reporting rain,
         // snow or fog knows something a pyranometer cannot see, and cloud cover
         // has no business contradicting it.
-        if (/^(clear|cloudy)/.test(adjusted)) {
+        // Only a plain sky icon may be corrected. A provider reporting rain,
+        // snow, fog or a storm knows something a pyranometer cannot see, and
+        // heavy cloud is exactly when it is most likely to be right.
+        const isPlainSky = /^(clear|cloudy-[123])-(day|night)$/.test(adjusted)
+          || /^cloudy-(day|night)$/.test(adjusted);
+        if (isPlainSky) {
           // Ordinary meteorological bands rather than wide safety margins. A
           // sensor whose readings are wrong is a sensor to clean; distrusting it
           // while still displaying its number in a slot would be the worse of
@@ -3165,8 +3170,9 @@ export class PlatinumWeatherCard extends LitElement {
             if (Math.abs(cloud - edge) < MARGIN) target = cls._cloudBand;
           }
           cls._cloudBand = target;
-          const name = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target];
-          adjusted = name === 'cloudy-3' ? 'cloudy-3' : `${name}-${this.dayOrNight}`;
+          // Every one of these has a day and a night file; a bare 'cloudy-3'
+          // matches nothing and the card renders N/A.
+          adjusted = `${['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target]}-${this.dayOrNight}`;
         }
       }
     }
