@@ -3899,12 +3899,22 @@ export class PlatinumWeatherCard extends LitElement {
         background: var(--secondary-background-color, rgba(127, 127, 127, 0.15));
       }
       .slot-list .slot-icon {
-        display: block;
+        /* Centred rather than block: icons differ in internal geometry, and
+           without this an icon whose artwork sits high in its box — the UV alert
+           one, for instance — lifts its whole row above its neighbour. */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         flex: 0 0 auto;
         position: relative;
         height: 18px;
         padding-right: 5px;
         color: var(--paper-item-icon-color);
+      }
+      .slot-icon ha-icon {
+        display: flex;
+        align-items: center;
+        --mdc-icon-size: 18px;
       }
       .slot-text {
         display: table-cell;

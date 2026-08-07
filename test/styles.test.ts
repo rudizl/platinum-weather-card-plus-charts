@@ -247,3 +247,22 @@ describe('markup patterns stay consistent', () => {
     expect(toggleLabels + sectionTitles).toBeGreaterThanOrEqual(switches);
   });
 });
+
+describe('slot icons sit on the same line as their neighbours', () => {
+  // The UV alert icon lifted its whole row above the slot beside it: .slot-icon
+  // was display:block with a fixed height, so an icon whose artwork sits high in
+  // its own box was never centred within it.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('centres the icon inside its box', () => {
+    const rule = /\.slot-icon\s*\{([^}]*)\}/.exec(card);
+    expect(rule, '.slot-icon rule missing').not.toBeNull();
+    expect(rule![1], 'icons are not vertically centred').toContain('align-items: center');
+    expect(rule![1], 'block display leaves the icon wherever its artwork falls')
+      .not.toMatch(/display:\s*block/);
+  });
+
+  it('pins the icon size, so one pack cannot shift the rows', () => {
+    expect(card).toMatch(/\.slot-icon ha-icon\s*\{[^}]*--mdc-icon-size/);
+  });
+});
