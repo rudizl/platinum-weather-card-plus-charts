@@ -485,7 +485,7 @@ It follows that the algorithm is blind to anything that does not move the barome
 
 Where it does well is the thing your forecast provider is often slowest on: a front arriving earlier or later than the model said. The barometer at your own location knows before the model updates.
 
-None of this is fixable within Zambretti; the missing input is cloud cover, which is what later algorithms such as Sager (1942) use alongside pressure and wind change. If your station has a pyranometer, that data exists — it is simply not something this card computes today.
+None of this is fixable within Zambretti; the missing input is cloud cover, which is what later algorithms such as Sager (1942) use alongside pressure and wind change. If your station has a pyranometer the card can now measure that — see [Cloud cover from a pyranometer](#cloud-cover-from-a-pyranometer) — but feeding it into the forecast rather than just displaying it would mean a different algorithm, not a tweak to this one.
 
 > **Your pressure sensor must report sea-level (relative) pressure — check this first.**
 > Zambretti reads the absolute pressure level, so an uncalibrated station throws the forecast off by several categories, permanently. A station at 150 m altitude reads roughly 18 hPa below sea level: the algorithm sees 1002 hPa ("changeable, some rain") when the real sea-level pressure is 1020 hPa ("settled fair"), and the card then predicts rain on a cloudless day.
