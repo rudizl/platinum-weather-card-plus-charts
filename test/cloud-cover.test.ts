@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { clearSkyIrradiance, cloudCoverFraction, cloudCoverOktas } from '../src/zambretti';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 // Cloud cover measured rather than forecast: the ratio of what a pyranometer
 // reports to what a clear sky would deliver at that sun elevation.
@@ -248,5 +250,35 @@ describe('the icon does not flicker in broken cloud', () => {
 
   it('needs both: averaging alone still leaves it restless', () => {
     expect(countSwitches(true, false)).toBeGreaterThan(countSwitches(true, true));
+  });
+});
+
+describe('every card on the page reads the same sky', () => {
+  // Two cards showed different icons for the same moment: each was averaging its
+  // own samples from its own start time and holding its own hysteresis band.
+  // State that describes the world, rather than the card, has to be shared.
+  const source = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('keeps the cloud buffer and band on the class, not the instance', () => {
+    for (const field of ['_cloudSamples', '_cloudBand']) {
+      const declaration = new RegExp(`private\\s+(static\\s+)?${field}\\b`).exec(source);
+      expect(declaration, `${field} not declared`).not.toBeNull();
+      expect(declaration![1], `${field} is per-instance; two cards will disagree`)
+        .toBeDefined();
+    }
+  });
+
+  it('reaches them through the constructor, since terser renames the class', () => {
+    // A static referenced by class name breaks in the minified bundle.
+    const uses = source.match(/(?:this\.)?_cloudSamples/g) ?? [];
+    expect(uses.length).toBeGreaterThan(2);
+    expect(source, 'static reached by class name rather than this.constructor')
+      .not.toMatch(/PlatinumWeatherCard\._cloud/);
+  });
+
+  it('does not record a sample per card, only per reading', () => {
+    // Two cards asking within the same second must not both push a sample, or a
+    // dashboard with several cards would weight recent readings twice over.
+    expect(source).toMatch(/now - last\.t > \d+/);
   });
 });

@@ -80,8 +80,12 @@ export class PlatinumWeatherCard extends LitElement {
   private _zamCandidateKey: string | null = null;
   private _zamCandidateTs = 0;
   private _windSamples: { t: number; deg: number }[] = [];
-  private _cloudSamples: { t: number; f: number }[] = [];
-  private _cloudBand: number | null = null;
+  // Static, not per-instance: the sky is the same for every card on the page.
+  // Per-instance buffers meant two cards averaged different sample sets from
+  // different start times and settled into different hysteresis bands, so one
+  // showed sun while the other showed cloud.
+  private static _cloudSamples: { t: number; f: number }[] = [];
+  private static _cloudBand: number | null = null;
 
   private _error: string[] = [];
 
@@ -2547,15 +2551,18 @@ export class PlatinumWeatherCard extends LitElement {
   // changing that fast. Averaging turns "sun through a gap" back into "broken
   // cloud", which is what it is.
   get measuredCloudFraction(): number | null {
+    const cls = this.constructor as typeof PlatinumWeatherCard;
     const instant = this._instantCloudFraction;
     const now = Date.now();
     if (instant !== null) {
-      this._cloudSamples.push({ t: now, f: instant });
+      // one sample per reading, however many cards are asking
+      const last = cls._cloudSamples[cls._cloudSamples.length - 1];
+      if (!last || now - last.t > 5000) cls._cloudSamples.push({ t: now, f: instant });
     }
-    this._cloudSamples = this._cloudSamples.filter((s) => now - s.t <= 900000);
-    if (this._cloudSamples.length === 0) return instant;
-    const sum = this._cloudSamples.reduce((acc, s) => acc + s.f, 0);
-    return sum / this._cloudSamples.length;
+    cls._cloudSamples = cls._cloudSamples.filter((s) => now - s.t <= 900000);
+    if (cls._cloudSamples.length === 0) return instant;
+    const sum = cls._cloudSamples.reduce((acc, s) => acc + s.f, 0);
+    return sum / cls._cloudSamples.length;
   }
 
   private get _instantCloudFraction(): number | null {
@@ -3146,12 +3153,13 @@ export class PlatinumWeatherCard extends LitElement {
           const EDGES = [0.25, 0.55, 0.85];
           const MARGIN = 0.05;
           let target = EDGES.filter((e) => cloud >= e).length;
-          if (this._cloudBand !== null && target !== this._cloudBand) {
-            const edge = EDGES[Math.min(this._cloudBand, target)];
+          const cls = this.constructor as typeof PlatinumWeatherCard;
+          if (cls._cloudBand !== null && target !== cls._cloudBand) {
+            const edge = EDGES[Math.min(cls._cloudBand, target)];
             // only leave the current band once past the edge by the margin
-            if (Math.abs(cloud - edge) < MARGIN) target = this._cloudBand;
+            if (Math.abs(cloud - edge) < MARGIN) target = cls._cloudBand;
           }
-          this._cloudBand = target;
+          cls._cloudBand = target;
           const name = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target];
           adjusted = name === 'cloudy-3' ? 'cloudy-3' : `${name}-${this.dayOrNight}`;
         }
