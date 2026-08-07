@@ -92,6 +92,8 @@ const bg: Translation = {
     "entity_solar_radiation": "Сензор за слънчева радиация",
     "entity_solar_radiation_hint": "Пиранометър в W/m² — облачността се изчислява от него през деня",
     "entity_cloud_cover": "Сензор за облачност (нощем)",
+    "entity_rain_rate": "Сензор за интензитет на дъжда",
+    "entity_rain_rate_hint": "В mm/h - отчетен дъжд има предимство пред доставчик, твърдящ ясно небе",
     "cloud_cover_oktas": "Октаси вместо проценти",
     "cloud_overrides_icon": "Измереното коригира иконата",
     "cloud_overrides_icon_hint": "Само при явно несъгласие — ясно при плътна облачност или обратно",

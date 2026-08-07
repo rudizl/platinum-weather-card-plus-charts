@@ -2550,6 +2550,18 @@ export class PlatinumWeatherCard extends LitElement {
   // typical morning, which is the whole icon range — and the sky is not actually
   // changing that fast. Averaging turns "sun through a gap" back into "broken
   // cloud", which is what it is.
+  // Rain rate in mm/h from the station's own gauge, or null when there is no
+  // gauge or its reading is unusable. Not smoothed: unlike cloud cover, rain
+  // starting is a real event and the card should say so at once.
+  get measuredRainRate(): number | null {
+    const entity = this._config.entity_rain_rate;
+    if (!entity) return null;
+    const state = this.hass.states[entity];
+    if (!state || state.state === 'unknown' || state.state === 'unavailable') return null;
+    const rate = Number(state.state);
+    return isFinite(rate) ? rate : null;
+  }
+
   get measuredCloudFraction(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const instant = this._instantCloudFraction;
@@ -3142,36 +3154,36 @@ export class PlatinumWeatherCard extends LitElement {
     // icon when the two flatly disagree — a claim of clear sky under 80% cloud,
     // or of overcast under a sun delivering nearly everything it could.
     if (!forForecast && this._config?.option_cloud_overrides_icon === true) {
-      const cloud = this.measuredCloudFraction;
-      if (cloud !== null) {
-        // Only the plain sky icons are corrected: a provider reporting rain,
-        // snow or fog knows something a pyranometer cannot see, and cloud cover
-        // has no business contradicting it.
-        // Only a plain sky icon may be corrected. A provider reporting rain,
-        // snow, fog or a storm knows something a pyranometer cannot see, and
-        // heavy cloud is exactly when it is most likely to be right.
-        const isPlainSky = /^(clear|cloudy-[123])-(day|night)$/.test(adjusted)
-          || /^cloudy-(day|night)$/.test(adjusted);
-        if (isPlainSky) {
-          // Ordinary meteorological bands rather than wide safety margins. A
-          // sensor whose readings are wrong is a sensor to clean; distrusting it
-          // while still displaying its number in a slot would be the worse of
-          // the two positions.
-          // Hysteresis on top of the averaging: a value sitting on a boundary
-          // would still alternate, and an icon that changes every few minutes
-          // is worse than one that lags by a few.
+      // A rain gauge sees what neither the provider nor the pyranometer can:
+      // whether it is raining here, now. It outranks both — but only over a
+      // plain sky icon, since a provider reporting snow, hail or a storm knows
+      // something about the precipitation that a tipping bucket does not.
+      const isPlainSky = /^(clear|cloudy(-[123])?)-(day|night)$/.test(adjusted);
+      const rate = this.measuredRainRate;
+
+      if (isPlainSky && rate !== null && rate > 0) {
+        const name = rate < 0.5 ? 'drizzle'
+          : rate < 4 ? 'rainy-1'
+          : rate < 10 ? 'rainy-2'
+          : 'rainy-3';
+        adjusted = `${name}-${this.dayOrNight}`;
+      } else if (isPlainSky) {
+        const cloud = this.measuredCloudFraction;
+        if (cloud !== null) {
+          // Ordinary meteorological bands, with hysteresis so a value sitting on
+          // a boundary does not alternate: an icon that changes every few
+          // minutes is worse than one that lags by a few.
           const EDGES = [0.25, 0.55, 0.85];
           const MARGIN = 0.05;
-          let target = EDGES.filter((e) => cloud >= e).length;
           const cls = this.constructor as typeof PlatinumWeatherCard;
+          let target = EDGES.filter((e) => cloud >= e).length;
           if (cls._cloudBand !== null && target !== cls._cloudBand) {
             const edge = EDGES[Math.min(cls._cloudBand, target)];
-            // only leave the current band once past the edge by the margin
             if (Math.abs(cloud - edge) < MARGIN) target = cls._cloudBand;
           }
           cls._cloudBand = target;
-          // Every one of these has a day and a night file; a bare 'cloudy-3'
-          // matches nothing and the card renders N/A.
+          // Every band has a day and a night file; a bare name matches nothing
+          // and the card renders N/A.
           adjusted = `${['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target]}-${this.dayOrNight}`;
         }
       }

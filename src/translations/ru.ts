@@ -92,6 +92,8 @@ const ru: Translation = {
     "entity_solar_radiation": "Солнечная радиация",
     "entity_solar_radiation_hint": "Пиранометр в Вт/м² — днём облачность вычисляется из него",
     "entity_cloud_cover": "Облачность (ночью)",
+    "entity_rain_rate": "Интенсивность дождя",
+    "entity_rain_rate_hint": "В мм/ч - измеренный дождь важнее поставщика, сообщающего ясно",
     "cloud_cover_oktas": "Октанты вместо процентов",
     "cloud_overrides_icon": "Измерение исправляет значок",
     "cloud_overrides_icon_hint": "Только при явном противоречии — ясно при плотной облачности или наоборот",

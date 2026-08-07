@@ -92,6 +92,8 @@ const fr: Translation = {
     "entity_solar_radiation": "Rayonnement solaire",
     "entity_solar_radiation_hint": "Pyranomètre en W/m² — la nébulosité en est déduite de jour",
     "entity_cloud_cover": "Nébulosité (la nuit)",
+    "entity_rain_rate": "Intensité de pluie",
+    "entity_rain_rate_hint": "En mm/h - la pluie mesurée prime sur un fournisseur annonçant un ciel clair",
     "cloud_cover_oktas": "Octas au lieu de pourcentage",
     "cloud_overrides_icon": "La mesure corrige l'icône",
     "cloud_overrides_icon_hint": "Uniquement en cas de contradiction flagrante — ciel clair annoncé sous couverture dense",

@@ -92,6 +92,8 @@ const he: Translation = {
     "entity_solar_radiation": "קרינת שמש",
     "entity_solar_radiation_hint": "פירנומטר ב-W/m² — כיסוי העננים מחושב ממנו בשעות היום",
     "entity_cloud_cover": "כיסוי עננים (בלילה)",
+    "entity_rain_rate": "עוצמת גשם",
+    "entity_rain_rate_hint": "במילימטר לשעה - גשם שנמדד גובר על ספק המדווח על שמים בהירים",
     "cloud_cover_oktas": "אוקטות במקום אחוזים",
     "cloud_overrides_icon": "המדידה מתקנת את הסמל",
     "cloud_overrides_icon_hint": "רק בסתירה בולטת — שמים בהירים מדווחים תחת עננות כבדה",

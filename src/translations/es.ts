@@ -92,6 +92,8 @@ const es: Translation = {
     "entity_solar_radiation": "Radiación solar",
     "entity_solar_radiation_hint": "Piranómetro en W/m² — de ahí se deriva la nubosidad de día",
     "entity_cloud_cover": "Nubosidad (de noche)",
+    "entity_rain_rate": "Intensidad de lluvia",
+    "entity_rain_rate_hint": "En mm/h - la lluvia medida prevalece sobre un proveedor que anuncia cielo despejado",
     "cloud_cover_oktas": "Octas en vez de porcentaje",
     "cloud_overrides_icon": "La medición corrige el icono",
     "cloud_overrides_icon_hint": "Solo ante contradicción evidente — despejado con nubes densas o al revés",

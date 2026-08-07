@@ -92,6 +92,8 @@ const ua: Translation = {
     "entity_solar_radiation": "Сонячна радіація",
     "entity_solar_radiation_hint": "Піранометр у Вт/м² — удень хмарність обчислюється з нього",
     "entity_cloud_cover": "Хмарність (вночі)",
+    "entity_rain_rate": "Інтенсивність дощу",
+    "entity_rain_rate_hint": "У мм/год - виміряний дощ важливіший за постачальника, що повідомляє ясно",
     "cloud_cover_oktas": "Октанти замість відсотків",
     "cloud_overrides_icon": "Вимірювання виправляє значок",
     "cloud_overrides_icon_hint": "Лише за явної суперечності — ясно за щільної хмарності чи навпаки",

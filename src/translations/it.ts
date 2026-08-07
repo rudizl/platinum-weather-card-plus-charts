@@ -92,6 +92,8 @@ const it: Translation = {
     "entity_solar_radiation": "Radiazione solare",
     "entity_solar_radiation_hint": "Piranometro in W/m² — di giorno la nuvolosità si ricava da questo",
     "entity_cloud_cover": "Nuvolosità (di notte)",
+    "entity_rain_rate": "Intensità di pioggia",
+    "entity_rain_rate_hint": "In mm/h - la pioggia misurata prevale su un provider che dichiara sereno",
     "cloud_cover_oktas": "Okta invece di percentuale",
     "cloud_overrides_icon": "La misura corregge l'icona",
     "cloud_overrides_icon_hint": "Solo in caso di palese contraddizione — sereno dichiarato con cielo coperto",

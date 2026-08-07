@@ -365,3 +365,49 @@ describe('every icon the correction can produce is shipped', () => {
     }
   });
 });
+
+describe('a rain gauge outranks both the provider and the pyranometer', () => {
+  // Weather Underground reported clear-night while the station's gauge read
+  // 1.2 mm/h. A gauge sees what neither of the others can: whether it is
+  // raining here, now.
+  const source = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  const band = (rate: number) =>
+    rate < 0.5 ? 'drizzle' : rate < 4 ? 'rainy-1' : rate < 10 ? 'rainy-2' : 'rainy-3';
+
+  it('maps rate to intensity', () => {
+    expect(band(0.2)).toBe('drizzle');
+    expect(band(1.2)).toBe('rainy-1');   // the reading that prompted this
+    expect(band(6)).toBe('rainy-2');
+    expect(band(20)).toBe('rainy-3');
+  });
+
+  it('is checked before the cloud correction', () => {
+    // Rain while heavily overcast must show rain, not cloud.
+    const rainAt = source.indexOf('const rate = this.measuredRainRate');
+    const cloudAt = source.indexOf('const cloud = this.measuredCloudFraction', rainAt);
+    expect(rainAt).toBeGreaterThan(-1);
+    expect(cloudAt, 'cloud is evaluated before rain').toBeGreaterThan(rainAt);
+  });
+
+  it('still only replaces a plain sky icon', () => {
+    // A provider reporting snow, hail or a storm knows something about the
+    // precipitation that a tipping bucket does not.
+    const block = /const isPlainSky = [\s\S]{0,600}?measuredRainRate[\s\S]{0,400}?\}/.exec(source);
+    expect(block, 'rain branch not guarded by isPlainSky').not.toBeNull();
+  });
+
+  it('is not smoothed, unlike cloud cover', () => {
+    // Rain starting is an event, not a state to average: the card should say so
+    // at once rather than fifteen minutes later.
+    const getter = /get measuredRainRate\(\)[\s\S]*?\n  \}/.exec(source);
+    expect(getter).not.toBeNull();
+    expect(getter![0], 'rain rate is being averaged').not.toMatch(/_rainSamples|median|reduce/);
+  });
+
+  it('ignores a gauge that is unavailable', () => {
+    const getter = /get measuredRainRate\(\)[\s\S]*?\n  \}/.exec(source)![0];
+    expect(getter).toContain("'unavailable'");
+    expect(getter).toContain('isFinite');
+  });
+});

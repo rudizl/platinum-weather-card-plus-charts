@@ -92,6 +92,8 @@ const de: Translation = {
     "entity_solar_radiation": "Sonnenstrahlung",
     "entity_solar_radiation_hint": "Pyranometer in W/m² — daraus wird tagsüber die Bewölkung berechnet",
     "entity_cloud_cover": "Bewölkung (nachts)",
+    "entity_rain_rate": "Regenrate",
+    "entity_rain_rate_hint": "In mm/h - gemessener Regen hat Vorrang vor einem Anbieter, der heiter meldet",
     "cloud_cover_oktas": "Okta statt Prozent",
     "cloud_overrides_icon": "Messung korrigiert das Symbol",
     "cloud_overrides_icon_hint": "Nur bei klarem Widerspruch — heiter gemeldet bei dichter Bewölkung oder umgekehrt",

@@ -633,6 +633,8 @@ Worth knowing about its limits:
 - **The clear-sky model uses a fixed atmospheric transmittance**, so it reads a little high in hazy or dusty air and a little low in very clean air. Good enough to tell clear from overcast; not a radiometric instrument.
 - **The sensor must be clean, level and unshaded.** A pyranometer that catches a roof edge each morning will report cloud that isn't there, every morning.
 
+If your station has a rain gauge, point **Rain rate entity** at it too (mm/h). A gauge sees what neither a forecast provider nor a pyranometer can — whether it is raining here, now — and it takes precedence over both: rain reported by the gauge replaces a clear or cloudy icon, with the intensity following the rate. It is not smoothed the way cloud cover is, because rain starting is an event rather than a state to average.
+
 The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess. Only the plain sky icons are touched: rain, snow and fog are things a provider knows about and a pyranometer cannot see, so those are left alone. Off by default.
 
 The measurement is shared by every card on the page — it describes the sky, not the card — so several cards never disagree about the same moment. Broken cloud swings the instantaneous reading violently — 181 to 513 W/m² inside three minutes on a typical morning, which spans the whole icon range — so the card takes the median of the last five minutes and the band boundaries carry hysteresis. The median rather than the mean because one reading through a gap should not drag the answer toward clear, and five minutes rather than longer because a window that includes a sunny spell from ten minutes ago describes the sky as it was, not as it is. Sun through a gap is still broken cloud, and an icon that changes every few minutes is worse than one that lags by a few.
@@ -861,6 +863,7 @@ double_tap_action:
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
 | `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help |
+| `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky |
 | `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
 | `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |

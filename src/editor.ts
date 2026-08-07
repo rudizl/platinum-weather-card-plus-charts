@@ -1786,6 +1786,15 @@ get _forecast_type(): string {
           </ha-entity-picker>
         </div>
       </div>
+      <div class="side-by-side">
+        <div>
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_rain_rate'} .value=${this._config?.entity_rain_rate || ''} .includeDomains=${['sensor']}
+            name="entity_rain_rate" label=${this._t("entity_rain_rate")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+          <div class="help-text">${this._t("entity_rain_rate_hint")}</div>
+        </div>
+        <div></div>
+      </div>
       ${this._config?.entity_solar_radiation ? html`
       <div class="side-by-side">
         <div>

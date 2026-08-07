@@ -92,6 +92,8 @@ const pl: Translation = {
     "entity_solar_radiation": "Promieniowanie słoneczne",
     "entity_solar_radiation_hint": "Piranometr w W/m² — w dzień na jego podstawie liczone jest zachmurzenie",
     "entity_cloud_cover": "Zachmurzenie (w nocy)",
+    "entity_rain_rate": "Natężenie deszczu",
+    "entity_rain_rate_hint": "W mm/h - zmierzony deszcz ma pierwszeństwo przed dostawcą zgłaszającym bezchmurnie",
     "cloud_cover_oktas": "Oktanty zamiast procentów",
     "cloud_overrides_icon": "Pomiar koryguje ikonę",
     "cloud_overrides_icon_hint": "Tylko przy jawnej sprzeczności — bezchmurnie przy gęstym zachmurzeniu",

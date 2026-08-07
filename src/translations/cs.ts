@@ -92,6 +92,8 @@ const cs: Translation = {
     "entity_solar_radiation": "Sluneční záření",
     "entity_solar_radiation_hint": "Pyranometr ve W/m² — přes den se z něj počítá oblačnost",
     "entity_cloud_cover": "Oblačnost (v noci)",
+    "entity_rain_rate": "Intenzita deště",
+    "entity_rain_rate_hint": "V mm/h - naměřený déšť má přednost před poskytovatelem hlásícím jasno",
     "cloud_cover_oktas": "Okty místo procent",
     "cloud_overrides_icon": "Měření opravuje ikonu",
     "cloud_overrides_icon_hint": "Jen při zjevném rozporu — jasno hlášeno při husté oblačnosti",

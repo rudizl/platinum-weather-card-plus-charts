@@ -92,6 +92,8 @@ const en: Translation = {
     "entity_solar_radiation": "Solar radiation entity",
     "entity_solar_radiation_hint": "Pyranometer in W/m² — cloud cover is derived from it during daylight",
     "entity_cloud_cover": "Cloud cover entity (night fallback)",
+    "entity_rain_rate": "Rain rate entity",
+    "entity_rain_rate_hint": "In mm/h - a gauge reporting rain overrides a provider claiming clear sky",
     "cloud_cover_oktas": "Show oktas instead of percent",
     "cloud_overrides_icon": "Measurement corrects the icon",
     "cloud_overrides_icon_hint": "Only when the two flatly disagree — clear sky claimed under heavy cloud, or overcast under full sun",

@@ -92,6 +92,8 @@ const nl: Translation = {
     "entity_solar_radiation": "Zonnestraling",
     "entity_solar_radiation_hint": "Pyranometer in W/m² — overdag wordt de bewolking hieruit afgeleid",
     "entity_cloud_cover": "Bewolking (’s nachts)",
+    "entity_rain_rate": "Regenintensiteit",
+    "entity_rain_rate_hint": "In mm/u - gemeten regen gaat voor op een aanbieder die helder meldt",
     "cloud_cover_oktas": "Okta in plaats van procent",
     "cloud_overrides_icon": "Meting corrigeert het pictogram",
     "cloud_overrides_icon_hint": "Alleen bij duidelijke tegenspraak — helder gemeld bij dichte bewolking",
