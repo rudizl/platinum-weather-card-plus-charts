@@ -196,3 +196,57 @@ describe('the icon correction follows ordinary cloud bands', () => {
     expect(band(f)).toBe('cloudy-2');
   });
 });
+
+describe('the icon does not flicker in broken cloud', () => {
+  // Real readings from a morning of broken cloud, thirty seconds apart: the
+  // instantaneous value swings from 181 to 513 W/m² within three minutes, which
+  // is the whole icon range. The sky is not changing that fast — sun through a
+  // gap is still broken cloud — so the measurement is averaged and the band
+  // boundaries carry hysteresis.
+  const readings = [
+    335.91, 264.56, 237.81, 270.32, 440.41, 470.17, 271.98, 252.25, 243.73,
+    404.97, 378.85, 217.92, 211.76, 203.55, 198.42, 193.37, 188.56, 184.37,
+    181.61, 180.98, 181.85, 184.37, 188.16, 193.29, 198.74, 207.34, 212.0,
+    215.47, 218.31, 220.6, 227.31, 227.94, 242.38, 394.95, 300.0, 413.34,
+    355.49, 238.67, 286.42, 393.29, 480.19, 504.03, 511.6, 512.63, 460.62,
+    509.55, 500.71, 448.38, 310.34, 412.94, 296.92,
+  ];
+  const CLEAR_SKY = 387; // sun at about 30° of elevation
+
+  function countSwitches(average: boolean, hysteresis: boolean): number {
+    const EDGES = [0.25, 0.55, 0.85];
+    const MARGIN = 0.05;
+    const window: number[] = [];
+    let band: number | null = null;
+    let previous: number | null = null;
+    let switches = 0;
+    for (const reading of readings) {
+      const instant = Math.max(0, Math.min(1, 1 - reading / CLEAR_SKY));
+      window.push(instant);
+      if (window.length > 30) window.shift();
+      const cloud = average ? window.reduce((a, b) => a + b, 0) / window.length : instant;
+      let target = EDGES.filter((e) => cloud >= e).length;
+      if (hysteresis && band !== null && target !== band) {
+        const edge = EDGES[Math.min(band, target)];
+        if (Math.abs(cloud - edge) < MARGIN) target = band;
+      }
+      band = target;
+      if (previous !== null && target !== previous) switches += 1;
+      previous = target;
+    }
+    return switches;
+  }
+
+  it('would flicker without smoothing', () => {
+    // Establishes that the test data genuinely exercises the problem.
+    expect(countSwitches(false, false)).toBeGreaterThan(5);
+  });
+
+  it('settles down once the reading is averaged and the bands hold', () => {
+    expect(countSwitches(true, true)).toBeLessThanOrEqual(2);
+  });
+
+  it('needs both: averaging alone still leaves it restless', () => {
+    expect(countSwitches(true, false)).toBeGreaterThan(countSwitches(true, true));
+  });
+});

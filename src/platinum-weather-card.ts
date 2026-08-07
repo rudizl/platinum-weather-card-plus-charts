@@ -80,6 +80,8 @@ export class PlatinumWeatherCard extends LitElement {
   private _zamCandidateKey: string | null = null;
   private _zamCandidateTs = 0;
   private _windSamples: { t: number; deg: number }[] = [];
+  private _cloudSamples: { t: number; f: number }[] = [];
+  private _cloudBand: number | null = null;
 
   private _error: string[] = [];
 
@@ -2539,7 +2541,24 @@ export class PlatinumWeatherCard extends LitElement {
   // provider value if there is one, and to '---' otherwise.
   // Cloud cover from the pyranometer as a fraction, or null when the sun is too
   // low, the sensor is missing, or its reading is unusable.
+  // Cloud cover averaged over the last fifteen minutes. Broken cloud swings the
+  // instantaneous reading violently — 181 to 513 W/m² inside three minutes on a
+  // typical morning, which is the whole icon range — and the sky is not actually
+  // changing that fast. Averaging turns "sun through a gap" back into "broken
+  // cloud", which is what it is.
   get measuredCloudFraction(): number | null {
+    const instant = this._instantCloudFraction;
+    const now = Date.now();
+    if (instant !== null) {
+      this._cloudSamples.push({ t: now, f: instant });
+    }
+    this._cloudSamples = this._cloudSamples.filter((s) => now - s.t <= 900000);
+    if (this._cloudSamples.length === 0) return instant;
+    const sum = this._cloudSamples.reduce((acc, s) => acc + s.f, 0);
+    return sum / this._cloudSamples.length;
+  }
+
+  private get _instantCloudFraction(): number | null {
     const solarEntity = this._config.entity_solar_radiation;
     const sunEntity = this._config.entity_sun;
     if (!solarEntity || !sunEntity) return null;
@@ -3121,10 +3140,19 @@ export class PlatinumWeatherCard extends LitElement {
           // sensor whose readings are wrong is a sensor to clean; distrusting it
           // while still displaying its number in a slot would be the worse of
           // the two positions.
-          const name = cloud < 0.25 ? 'clear'
-            : cloud < 0.55 ? 'cloudy-1'
-            : cloud < 0.85 ? 'cloudy-2'
-            : 'cloudy-3';
+          // Hysteresis on top of the averaging: a value sitting on a boundary
+          // would still alternate, and an icon that changes every few minutes
+          // is worse than one that lags by a few.
+          const EDGES = [0.25, 0.55, 0.85];
+          const MARGIN = 0.05;
+          let target = EDGES.filter((e) => cloud >= e).length;
+          if (this._cloudBand !== null && target !== this._cloudBand) {
+            const edge = EDGES[Math.min(this._cloudBand, target)];
+            // only leave the current band once past the edge by the margin
+            if (Math.abs(cloud - edge) < MARGIN) target = this._cloudBand;
+          }
+          this._cloudBand = target;
+          const name = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target];
           adjusted = name === 'cloudy-3' ? 'cloudy-3' : `${name}-${this.dayOrNight}`;
         }
       }

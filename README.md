@@ -26,6 +26,7 @@ The card is in the HACS default store:
 <summary><strong>Changelog</strong></summary>
 
 **v2.3.1**
+- Cloud cover is averaged over fifteen minutes with hysteresis on the band boundaries. Broken cloud swings the raw reading across the whole icon range within minutes; on real data from one such morning this cuts the icon changing from eight times in twenty-five minutes to once
 - The icon correction follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above. Correcting only at the extremes left the common case wrong: a provider claiming full sun while the pyranometer saw 59% cloud kept its sun icon
 - The pyranometer settings moved to Global Options. They were behind the cloud cover slot, which meant the icon correction could not be used without also displaying a reading nobody had asked for — the two are independent and are now configured independently
 
@@ -633,6 +634,8 @@ Worth knowing about its limits:
 - **The sensor must be clean, level and unshaded.** A pyranometer that catches a roof edge each morning will report cloud that isn't there, every morning.
 
 The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess. Only the plain sky icons are touched: rain, snow and fog are things a provider knows about and a pyranometer cannot see, so those are left alone. Off by default.
+
+Broken cloud swings the instantaneous reading violently — 181 to 513 W/m² inside three minutes on a typical morning, which spans the whole icon range — so the measurement is averaged over fifteen minutes and the band boundaries carry hysteresis. Sun through a gap is still broken cloud, and an icon that changes every few minutes is worse than one that lags by a few.
 
 The bands are the meteorological ones rather than wide safety margins. A sensor reading badly enough to matter is a sensor to clean, and treating it as untrustworthy while still displaying its number in a slot would be the worse of the two positions.
 
