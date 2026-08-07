@@ -3113,14 +3113,19 @@ export class PlatinumWeatherCard extends LitElement {
     if (!forForecast && this._config?.option_cloud_overrides_icon === true) {
       const cloud = this.measuredCloudFraction;
       if (cloud !== null) {
-        const isClearIcon = /^(clear|cloudy-1)/.test(adjusted);
-        const isOvercastIcon = /^(cloudy-3|cloudy$)/.test(adjusted);
-        // Deliberately wide margins: the model is approximate and a dirty or
-        // partly shaded sensor should not be able to rewrite the sky.
-        if (isClearIcon && cloud >= 0.8) {
-          adjusted = `cloudy-3-${this.dayOrNight}`;
-        } else if (isOvercastIcon && cloud <= 0.15) {
-          adjusted = `clear-${this.dayOrNight}`;
+        // Only the plain sky icons are corrected: a provider reporting rain,
+        // snow or fog knows something a pyranometer cannot see, and cloud cover
+        // has no business contradicting it.
+        if (/^(clear|cloudy)/.test(adjusted)) {
+          // Ordinary meteorological bands rather than wide safety margins. A
+          // sensor whose readings are wrong is a sensor to clean; distrusting it
+          // while still displaying its number in a slot would be the worse of
+          // the two positions.
+          const name = cloud < 0.25 ? 'clear'
+            : cloud < 0.55 ? 'cloudy-1'
+            : cloud < 0.85 ? 'cloudy-2'
+            : 'cloudy-3';
+          adjusted = name === 'cloudy-3' ? 'cloudy-3' : `${name}-${this.dayOrNight}`;
         }
       }
     }

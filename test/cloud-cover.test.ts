@@ -117,41 +117,82 @@ describe('cloudCoverOktas', () => {
   });
 });
 
-describe('the icon correction is deliberately reluctant', () => {
-  // Wide margins on purpose: the clear-sky model is approximate, and a dirty or
-  // partly shaded pyranometer must not be able to rewrite the sky.
-  const CLEAR_THRESHOLD = 0.8;
-  const OVERCAST_THRESHOLD = 0.15;
+describe('the icon correction has three bands', () => {
+  // Correcting only at the extremes left the common case wrong: a provider
+  // claiming full sun while the sensor reads half the expected light.
+  const band = (cloud: number, wasClear: boolean): string => {
+    if (wasClear && cloud >= 0.8) return 'overcast';
+    if (wasClear && cloud >= 0.45) return 'partly';
+    if (!wasClear && cloud <= 0.15) return 'clear';
+    if (!wasClear && cloud <= 0.45) return 'partly';
+    return 'unchanged';
+  };
 
-  it('leaves a disagreement inside the margins alone', () => {
-    // Provider says clear, measurement says half cloudy: not enough to act on.
-    for (const cloud of [0.3, 0.5, 0.7, 0.79]) {
-      expect(cloud >= CLEAR_THRESHOLD, `${cloud} should not trigger`).toBe(false);
+  it('leaves a clear claim alone under light cloud', () => {
+    expect(band(0.2, true)).toBe('unchanged');
+    expect(band(0.44, true)).toBe('unchanged');
+  });
+
+  it('softens a clear claim to partly cloudy in between', () => {
+    // The case that prompted this: 58% cloud measured under a 'sunny' claim.
+    expect(band(0.45, true)).toBe('partly');
+    expect(band(0.58, true)).toBe('partly');
+    expect(band(0.79, true)).toBe('partly');
+  });
+
+  it('goes all the way to overcast only past 80%', () => {
+    expect(band(0.8, true)).toBe('overcast');
+    expect(band(0.95, true)).toBe('overcast');
+  });
+
+  it('corrects an overcast claim in the other direction too', () => {
+    expect(band(0.05, false)).toBe('clear');
+    expect(band(0.3, false)).toBe('partly');
+    expect(band(0.6, false)).toBe('unchanged');
+  });
+});
+
+describe('the icon correction follows ordinary cloud bands', () => {
+  // Wide safety margins were the wrong instinct: correcting only at the extremes
+  // left the common case wrong — a provider claiming full sun while the sky is
+  // half covered — and a sensor reading badly enough to matter is one to clean,
+  // not a reason to distrust it while still showing its number in a slot.
+  const band = (cloud: number) =>
+    cloud < 0.25 ? 'clear' : cloud < 0.55 ? 'cloudy-1' : cloud < 0.85 ? 'cloudy-2' : 'cloudy-3';
+
+  it('calls a nearly clear sky clear', () => {
+    expect(band(0)).toBe('clear');
+    expect(band(0.2)).toBe('clear');
+  });
+
+  it('calls a half-covered sky cloudy rather than sunny or overcast', () => {
+    // The reading that prompted this: 150 W/m² where a clear sky at 29° of
+    // elevation gives 370, so 59% — visibly cloudy, and the provider said sunny.
+    expect(band(0.59)).toBe('cloudy-2');
+  });
+
+  it('reserves the heaviest icon for genuine overcast', () => {
+    expect(band(0.9)).toBe('cloudy-3');
+    expect(band(1)).toBe('cloudy-3');
+  });
+
+  it('moves through the bands in order', () => {
+    const order = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'];
+    let last = -1;
+    for (let c = 0; c <= 1.001; c += 0.05) {
+      const idx = order.indexOf(band(Math.min(c, 1)));
+      expect(idx, `${c} produced an unknown band`).toBeGreaterThanOrEqual(0);
+      expect(idx, `${c} went backwards`).toBeGreaterThanOrEqual(last);
+      last = idx;
     }
-    for (const cloud of [0.16, 0.3, 0.5]) {
-      expect(cloud <= OVERCAST_THRESHOLD, `${cloud} should not trigger`).toBe(false);
-    }
   });
 
-  it('acts only on a flat contradiction', () => {
-    expect(0.85 >= CLEAR_THRESHOLD).toBe(true);
-    expect(0.05 <= OVERCAST_THRESHOLD).toBe(true);
-  });
-
-  it('cannot be triggered by a plausible sensor error', () => {
-    // A pyranometer reading 30% low — dust, or an imperfect level — under a
-    // genuinely clear sky still reports well under the threshold.
-    const elev = 45;
+  it('matches the measurement the slot would show', () => {
+    // Slot and icon must agree: both read measuredCloudFraction.
+    const elev = 29;
     const clear = clearSkyIrradiance(elev);
-    const degraded = cloudCoverFraction(clear * 0.7, elev)!;
-    expect(degraded).toBeLessThan(CLEAR_THRESHOLD);
-  });
-
-  it('does trigger when the sky is genuinely overcast', () => {
-    const elev = 45;
-    const clear = clearSkyIrradiance(elev);
-    // Heavy overcast passes roughly a tenth of the light through.
-    const overcast = cloudCoverFraction(clear * 0.1, elev)!;
-    expect(overcast).toBeGreaterThan(CLEAR_THRESHOLD);
+    const f = cloudCoverFraction(clear * 0.41, elev)!;
+    expect(Math.round(f * 100)).toBeGreaterThan(50);
+    expect(band(f)).toBe('cloudy-2');
   });
 });
