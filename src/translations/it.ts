@@ -93,6 +93,7 @@ const it: Translation = {
     "entity_solar_radiation_hint": "Piranometro in W/m² — di giorno la nuvolosità si ricava da questo",
     "entity_cloud_cover": "Nuvolosità (di notte)",
     "entity_rain_rate": "Intensità di pioggia",
+    "entity_uv_index": "Entità indice UV",
     "entity_rain_rate_hint": "In mm/h - la pioggia misurata prevale su un provider che dichiara sereno",
     "cloud_cover_oktas": "Okta invece di percentuale",
     "cloud_overrides_icon": "La misura corregge l'icona",
@@ -248,6 +249,10 @@ const it: Translation = {
     "opt_24hour": "24 ore"
   },
   "card": {
+    "rain_rate": "Intensità",
+    "rain_rate_compact": "Int.",
+    "uv_index": "Indice UV",
+    "uv_index_compact": "UV",
     "cloud_cover": "Nuvolosità",
     "cloud_compact": "Nuv.",
     "uv_rating": "UV",

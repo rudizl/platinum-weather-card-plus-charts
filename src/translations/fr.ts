@@ -93,6 +93,7 @@ const fr: Translation = {
     "entity_solar_radiation_hint": "Pyranomètre en W/m² — la nébulosité en est déduite de jour",
     "entity_cloud_cover": "Nébulosité (la nuit)",
     "entity_rain_rate": "Intensité de pluie",
+    "entity_uv_index": "Entité indice UV",
     "entity_rain_rate_hint": "En mm/h - la pluie mesurée prime sur un fournisseur annonçant un ciel clair",
     "cloud_cover_oktas": "Octas au lieu de pourcentage",
     "cloud_overrides_icon": "La mesure corrige l'icône",
@@ -248,6 +249,10 @@ const fr: Translation = {
     "opt_24hour": "24 heures"
   },
   "card": {
+    "rain_rate": "Intensité",
+    "rain_rate_compact": "Int.",
+    "uv_index": "Indice UV",
+    "uv_index_compact": "UV",
     "cloud_cover": "Nébulosité",
     "cloud_compact": "Néb.",
     "uv_rating": "UV",

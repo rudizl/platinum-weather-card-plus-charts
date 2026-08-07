@@ -722,6 +722,15 @@ get _forecast_type(): string {
         case 'moon':
           entities.add('entity_moon');
           break;
+        case 'rain_rate':
+          // the gauge lives in Global Options, shared with the icon correction
+          break;
+        case 'rain_rate':
+          entities.add('entity_rain_rate');
+          break;
+        case 'uv_index':
+          entities.add('entity_uv_index');
+          break;
         case 'cloud_cover':
           entities.add('entity_solar_radiation');
           entities.add('entity_sun');
@@ -904,6 +913,13 @@ get _forecast_type(): string {
         <div class="help-text">${this._t("cloud_overrides_icon_hint")}</div>
       ` : '';
 
+    const entity_uv_index = entities.has("entity_uv_index") ?
+      html`
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_uv_index'} .value=${this._config?.entity_uv_index || ''} .includeDomains=${['sensor']}
+          name="entity_uv_index" label=${this._t("entity_uv_index")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+        </ha-entity-picker>
+      ` : '';
+
     const entity_moon = entities.has("entity_moon") ?
       html`
         <ha-entity-picker .hass=${this.hass} .configValue=${'entity_moon'} .value=${this._entity_moon} .includeDomains=${['sensor']}
@@ -1053,6 +1069,7 @@ get _forecast_type(): string {
       ${entity_sun}
       ${entity_solar_radiation}
       ${entity_cloud_cover}
+      ${entity_uv_index}
       ${entity_moon}
       ${entity_pop}
       ${entity_pos}
@@ -1276,6 +1293,8 @@ get _forecast_type(): string {
     const opts: Array<[string, string]> = [
       ['humidity',          'Current humidity'],
       ['rainfall',          "Today's recorded rainfall"],
+      ['rain_rate',         'How hard it is raining now'],
+      ['uv_index',          'Measured UV index'],
       ['pressure',          'Current air pressure'],
       ['wind',              'Current wind conditions'],
       ['wind_gust',         'Current wind gust'],
@@ -1293,6 +1312,7 @@ get _forecast_type(): string {
       ['sun_following',     'Following sun rise/set time'],
       ['moon',              'Moon phase'],
       ['cloud_cover',       'Cloud cover'],
+      ['rain_rate',         'Rain rate'],
       ['pop',               'Chance of rain'],
       ['popforecast',       'Rainfall forecast'],
       ['possible_today',    "Today's forecast rainfall"],

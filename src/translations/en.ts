@@ -93,6 +93,7 @@ const en: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — cloud cover is derived from it during daylight",
     "entity_cloud_cover": "Cloud cover entity (night fallback)",
     "entity_rain_rate": "Rain rate entity",
+    "entity_uv_index": "UV index entity",
     "entity_rain_rate_hint": "In mm/h - a gauge reporting rain overrides a provider claiming clear sky",
     "cloud_cover_oktas": "Show oktas instead of percent",
     "cloud_overrides_icon": "Measurement corrects the icon",
@@ -248,6 +249,10 @@ const en: Translation = {
     "opt_24hour": "24 hour"
   },
   "card": {
+    "rain_rate": "Rain rate",
+    "rain_rate_compact": "Rate",
+    "uv_index": "UV index",
+    "uv_index_compact": "UV",
     "cloud_cover": "Cloud",
     "cloud_compact": "Cloud",
     "uv_rating": "UV",

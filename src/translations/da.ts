@@ -93,6 +93,7 @@ const da: Translation = {
     "entity_solar_radiation_hint": "Pyranometer i W/m² — skydækket udledes heraf om dagen",
     "entity_cloud_cover": "Skydække (om natten)",
     "entity_rain_rate": "Regnintensitet",
+    "entity_uv_index": "UV-indeks-entitet",
     "entity_rain_rate_hint": "I mm/t - målt regn går forud for en udbyder, der melder klart vejr",
     "cloud_cover_oktas": "Okta i stedet for procent",
     "cloud_overrides_icon": "Måling retter ikonet",
@@ -248,6 +249,10 @@ const da: Translation = {
     "opt_24hour": "24 timer"
   },
   "card": {
+    "rain_rate": "Regnintensitet",
+    "rain_rate_compact": "Int.",
+    "uv_index": "UV-indeks",
+    "uv_index_compact": "UV",
     "cloud_cover": "Skydække",
     "cloud_compact": "Sky",
     "uv_rating": "UV",

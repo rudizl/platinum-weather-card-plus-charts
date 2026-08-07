@@ -93,6 +93,7 @@ const nl: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — overdag wordt de bewolking hieruit afgeleid",
     "entity_cloud_cover": "Bewolking (’s nachts)",
     "entity_rain_rate": "Regenintensiteit",
+    "entity_uv_index": "UV-index-entiteit",
     "entity_rain_rate_hint": "In mm/u - gemeten regen gaat voor op een aanbieder die helder meldt",
     "cloud_cover_oktas": "Okta in plaats van procent",
     "cloud_overrides_icon": "Meting corrigeert het pictogram",
@@ -248,6 +249,10 @@ const nl: Translation = {
     "opt_24hour": "24 uur"
   },
   "card": {
+    "rain_rate": "Regenintensiteit",
+    "rain_rate_compact": "Int.",
+    "uv_index": "UV-index",
+    "uv_index_compact": "UV",
     "cloud_cover": "Bewolking",
     "cloud_compact": "Bew.",
     "uv_rating": "UV",

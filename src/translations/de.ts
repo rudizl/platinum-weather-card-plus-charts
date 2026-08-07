@@ -93,6 +93,7 @@ const de: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — daraus wird tagsüber die Bewölkung berechnet",
     "entity_cloud_cover": "Bewölkung (nachts)",
     "entity_rain_rate": "Regenrate",
+    "entity_uv_index": "UV-Index-Entität",
     "entity_rain_rate_hint": "In mm/h - gemessener Regen hat Vorrang vor einem Anbieter, der heiter meldet",
     "cloud_cover_oktas": "Okta statt Prozent",
     "cloud_overrides_icon": "Messung korrigiert das Symbol",
@@ -248,6 +249,10 @@ const de: Translation = {
     "opt_24hour": "24 Stunden"
   },
   "card": {
+    "rain_rate": "Regenrate",
+    "rain_rate_compact": "Rate",
+    "uv_index": "UV-Index",
+    "uv_index_compact": "UV",
     "cloud_cover": "Bewölkung",
     "cloud_compact": "Bew.",
     "uv_rating": "UV",

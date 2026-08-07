@@ -93,6 +93,7 @@ const bg: Translation = {
     "entity_solar_radiation_hint": "Пиранометър в W/m² — облачността се изчислява от него през деня",
     "entity_cloud_cover": "Сензор за облачност (нощем)",
     "entity_rain_rate": "Сензор за интензитет на дъжда",
+    "entity_uv_index": "Сензор за UV индекс",
     "entity_rain_rate_hint": "В mm/h - отчетен дъжд има предимство пред доставчик, твърдящ ясно небе",
     "cloud_cover_oktas": "Октаси вместо проценти",
     "cloud_overrides_icon": "Измереното коригира иконата",
@@ -248,6 +249,10 @@ const bg: Translation = {
     "opt_24hour": "24-часов"
   },
   "card": {
+    "rain_rate": "Интензитет",
+    "rain_rate_compact": "Инт.",
+    "uv_index": "UV индекс",
+    "uv_index_compact": "UV",
     "cloud_cover": "Облачност",
     "cloud_compact": "Обл.",
     "uv_rating": "UV",

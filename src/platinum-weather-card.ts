@@ -1816,6 +1816,8 @@ export class PlatinumWeatherCard extends LitElement {
       case 'possible_today': return this.slotPos;
       case 'possible_tomorrow': return this.slotPossibleTomorrow;
       case 'rainfall': return this.slotRainfall;
+      case 'rain_rate': return this.slotRainRate;
+      case 'uv_index': return this.slotUvIndex;
       case 'humidity': return this.slotHumidity;
       case 'pressure': return this.slotPressure;
       case 'observed_max': return this.slotObservedMax;
@@ -1986,6 +1988,59 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="slot-icon">
             <ha-icon icon="mdi:weather-rainy"></ha-icon>
           </div>${this.localeTextPosTomorrow}&nbsp;<div class="slot-text possible_tomorrow-text">${pos}</div>${units}
+        </div>
+      </li>
+    `;
+  }
+
+  // How hard it is raining right now, as distinct from how much has fallen: the
+  // rainfall slot totals millimetres, this one reports millimetres an hour.
+  get slotRainRate(): TemplateResult {
+    const rate = this.measuredRainRate;
+    const display = rate === null ? '---'
+      : rate.toLocaleString(this.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const icon = rate === null || rate === 0 ? 'mdi:weather-cloudy'
+      : rate < 0.5 ? 'mdi:weather-partly-rainy'
+      : rate < 4 ? 'mdi:weather-rainy'
+      : 'mdi:weather-pouring';
+    return html`
+      <li data-slot="rain_rate">
+        <div class="slot">
+          <div class="slot-icon">
+            <ha-icon icon="${icon}"></ha-icon>
+          </div>
+          <div class="slot-text">${tCard(this.locale, this.compact ? 'rain_rate_compact' : 'rain_rate')}&nbsp;</div>
+          <div class="slot-text rain-rate-text">${display}</div>
+          ${rate === null ? html`` : html`<div class="slot-text unit">mm/h</div>`}
+        </div>
+      </li>
+    `;
+  }
+
+  // The UV index as a measured number, coloured by the WHO exposure bands. The
+  // existing uv_summary slot shows a provider's wording; this shows the reading.
+  get slotUvIndex(): TemplateResult {
+    const entity = this._config.entity_uv_index;
+    const stateObj = entity ? this.hass.states[entity] : undefined;
+    const raw = stateObj ? Number(stateObj.state) : NaN;
+    const usable = stateObj !== undefined && stateObj.state !== 'unknown'
+      && stateObj.state !== 'unavailable' && isFinite(raw);
+    const display = usable ? String(Math.round(raw)) : '---';
+    const colour = !usable ? ''
+      : raw < 3 ? '#4caf50'
+      : raw < 6 ? '#ffc107'
+      : raw < 8 ? '#ff9800'
+      : raw < 11 ? '#f44336'
+      : '#9c27b0';
+    const style = colour ? `color:${colour};` : '';
+    return html`
+      <li data-slot="uv_index">
+        <div class="slot">
+          <div class="slot-icon">
+            <ha-icon icon="mdi:weather-sunny-alert" style="${style}"></ha-icon>
+          </div>
+          <div class="slot-text">${tCard(this.locale, this.compact ? 'uv_index_compact' : 'uv_index')}&nbsp;</div>
+          <div class="slot-text uv-index-text" style="${style}">${display}</div>
         </div>
       </li>
     `;

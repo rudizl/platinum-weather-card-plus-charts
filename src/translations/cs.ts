@@ -93,6 +93,7 @@ const cs: Translation = {
     "entity_solar_radiation_hint": "Pyranometr ve W/m² — přes den se z něj počítá oblačnost",
     "entity_cloud_cover": "Oblačnost (v noci)",
     "entity_rain_rate": "Intenzita deště",
+    "entity_uv_index": "Entita UV indexu",
     "entity_rain_rate_hint": "V mm/h - naměřený déšť má přednost před poskytovatelem hlásícím jasno",
     "cloud_cover_oktas": "Okty místo procent",
     "cloud_overrides_icon": "Měření opravuje ikonu",
@@ -248,6 +249,10 @@ const cs: Translation = {
     "opt_24hour": "24 hodin"
   },
   "card": {
+    "rain_rate": "Intenzita deště",
+    "rain_rate_compact": "Int.",
+    "uv_index": "UV index",
+    "uv_index_compact": "UV",
     "cloud_cover": "Oblačnost",
     "cloud_compact": "Obl.",
     "uv_rating": "UV",

@@ -93,6 +93,7 @@ const pl: Translation = {
     "entity_solar_radiation_hint": "Piranometr w W/m² — w dzień na jego podstawie liczone jest zachmurzenie",
     "entity_cloud_cover": "Zachmurzenie (w nocy)",
     "entity_rain_rate": "Natężenie deszczu",
+    "entity_uv_index": "Encja indeksu UV",
     "entity_rain_rate_hint": "W mm/h - zmierzony deszcz ma pierwszeństwo przed dostawcą zgłaszającym bezchmurnie",
     "cloud_cover_oktas": "Oktanty zamiast procentów",
     "cloud_overrides_icon": "Pomiar koryguje ikonę",
@@ -248,6 +249,10 @@ const pl: Translation = {
     "opt_24hour": "24 godziny"
   },
   "card": {
+    "rain_rate": "Natężenie",
+    "rain_rate_compact": "Nat.",
+    "uv_index": "Indeks UV",
+    "uv_index_compact": "UV",
     "cloud_cover": "Zachmurzenie",
     "cloud_compact": "Zachm.",
     "uv_rating": "UV",
