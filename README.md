@@ -26,6 +26,7 @@ The card is in the HACS default store:
 <summary><strong>Changelog</strong></summary>
 
 **v2.3.1**
+- The icon correction follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above. Correcting only at the extremes left the common case wrong: a provider claiming full sun while the pyranometer saw 59% cloud kept its sun icon
 - The pyranometer settings moved to Global Options. They were behind the cloud cover slot, which meant the icon correction could not be used without also displaying a reading nobody had asked for — the two are independent and are now configured independently
 
 ---
