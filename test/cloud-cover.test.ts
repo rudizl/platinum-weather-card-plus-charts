@@ -225,8 +225,13 @@ describe('the icon does not flicker in broken cloud', () => {
     for (const reading of readings) {
       const instant = Math.max(0, Math.min(1, 1 - reading / CLEAR_SKY));
       window.push(instant);
-      if (window.length > 30) window.shift();
-      const cloud = average ? window.reduce((a, b) => a + b, 0) / window.length : instant;
+      if (window.length > 10) window.shift();
+      let cloud = instant;
+      if (average) {
+        const sorted = [...window].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        cloud = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+      }
       let target = EDGES.filter((e) => cloud >= e).length;
       if (hysteresis && band !== null && target !== band) {
         const edge = EDGES[Math.min(band, target)];
@@ -280,5 +285,41 @@ describe('every card on the page reads the same sky', () => {
     // Two cards asking within the same second must not both push a sample, or a
     // dashboard with several cards would weight recent readings twice over.
     expect(source).toMatch(/now - last\.t > \d+/);
+  });
+});
+
+
+describe('the window is short enough to follow the sky', () => {
+  // A fifteen-minute mean kept reporting 8% cloud while the sky was three
+  // quarters covered: the sunny spell that had ended eight minutes earlier was
+  // still in the window and still being averaged in.
+  const CLEAR_SKY = 606;
+  const readings = [
+    597, 577, 601, 605, 600, 593, 590, 582, 580, 576, 535, 443, 621, 548, 632,
+    630, 627, 488, 390, 318, 311, 303, 303, 285, 286, 392, 273, 263, 258, 259,
+    540, 267, 258, 258, 260, 272, 272,
+  ];
+  const fraction = (w: number) => Math.max(0, Math.min(1, 1 - w / CLEAR_SKY));
+
+  function summarise(count: number, median: boolean): number {
+    const window = readings.slice(-count).map(fraction);
+    if (!median) return window.reduce((a, b) => a + b, 0) / window.length;
+    const sorted = [...window].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  }
+
+  it('a fifteen-minute mean lags far behind the sky', () => {
+    // The failure this replaced: reported clear while it was visibly cloudy.
+    expect(summarise(30, false)).toBeLessThan(0.4);
+  });
+
+  it('five minutes tracks it', () => {
+    expect(summarise(10, true)).toBeGreaterThan(0.5);
+  });
+
+  it('the median beats the mean when cloud is broken', () => {
+    // One reading through a gap should not drag the answer toward clear.
+    expect(summarise(10, true)).toBeGreaterThan(summarise(10, false));
   });
 });

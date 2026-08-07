@@ -2559,10 +2559,15 @@ export class PlatinumWeatherCard extends LitElement {
       const last = cls._cloudSamples[cls._cloudSamples.length - 1];
       if (!last || now - last.t > 5000) cls._cloudSamples.push({ t: now, f: instant });
     }
-    cls._cloudSamples = cls._cloudSamples.filter((s) => now - s.t <= 900000);
+    cls._cloudSamples = cls._cloudSamples.filter((s) => now - s.t <= 300000);
     if (cls._cloudSamples.length === 0) return instant;
-    const sum = cls._cloudSamples.reduce((acc, s) => acc + s.f, 0);
-    return sum / cls._cloudSamples.length;
+    // Median, not mean: a five-minute window of broken cloud is a handful of
+    // readings under cloud and one or two through a gap, and the mean lets those
+    // few bright readings drag the answer toward 'clear' long after the gap has
+    // closed. The median describes what the sky mostly is.
+    const sorted = cls._cloudSamples.map((s) => s.f).sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   }
 
   private get _instantCloudFraction(): number | null {
