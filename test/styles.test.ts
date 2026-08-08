@@ -136,25 +136,20 @@ describe('the card stylesheet matches its markup', () => {
 });
 
 describe('a row with one column says so', () => {
-  it('marks a lone control full-width rather than leaving half the row empty', () => {
-    // The icon pack select sat in the left half with nothing on the right, so
-    // its long option names were truncated for no reason. A control with no
-    // pair should span the row instead.
+  it('gives a lone select the whole row', () => {
+    // The icon pack select sat in half a row — its neighbour only appears when
+    // the pack is 'custom' — so option names like 'Home Assistant official
+    // (CDN, scinos)' were truncated mid-word for no reason.
     //
-    // Counting children by regex is unreliable — the markup nests several
-    // levels — so this checks the specific shape that went wrong: a row whose
-    // only sibling is a conditional that renders nothing most of the time.
-    const rows = Array.from(
-      editor.matchAll(/<div class="side-by-side">\s*<div>([\s\S]*?)<\/div>\s*\$\{[^}]*\?\s*html`[\s\S]*?`\s*:\s*html``\}\s*<\/div>/g),
-    );
-    for (const [row, body] of rows) {
-      // Only selects matter here: a toggle's label wraps onto a second line and
-      // stays readable, but a select truncates its options mid-word. The check
-      // is on the left-hand control alone — the conditional half may contain
-      // anything.
-      const leftHand = body.split('${')[0];
-      if (!leftHand.includes('<select')) continue;
-      expect(row, 'a select whose pair is usually absent should be full-width')
+    // Matching by structure proved unreliable, so this names the selects that
+    // have no permanent partner. A new one added beside a conditional should be
+    // added here too.
+    for (const configValue of ['icon_pack', 'forecast_text_alignment']) {
+      const at = editor.indexOf(`.configValue=\${'${configValue}'}`);
+      expect(at, `${configValue} not found`).toBeGreaterThan(-1);
+      const rowStart = editor.lastIndexOf('<div class="side-by-side">', at);
+      const row = editor.slice(rowStart, at);
+      expect(row, `${configValue} is in half a row, so its options are truncated`)
         .toContain('class="full-width"');
     }
   });
