@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readdirSync, existsSync } from 'fs';
+import { readdirSync, existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import '../src/platinum-weather-card';
 import { makeHass, baseConfig, renderCard } from './helpers';
@@ -144,5 +144,49 @@ describe('static icons option', () => {
     const animated = await cardWithCondition('sunny', 35);
     const staticEl = await cardWithCondition('sunny', 35, { option_static_icons: true });
     expect(iconSrc(animated)).not.toBe(iconSrc(staticEl));
+  });
+});
+
+describe('the icon packs map onto names that exist', () => {
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  function mapperTargets(name: string): string[] {
+    const start = card.indexOf(`private ${name}(`);
+    expect(start, `${name} not found`).toBeGreaterThan(-1);
+    const body = card.slice(start, card.indexOf('\n  }', start));
+    return Array.from(new Set(
+      Array.from(body.matchAll(/:\s*'([\w-]+)'/g)).map((m) => m[1]),
+    ));
+  }
+
+  it('maps every internal icon the card can produce', () => {
+    // Anything the correction or _weatherIcon can emit must have an entry, or
+    // the pack silently falls back for that condition.
+    const emitted = new Set(
+      Array.from(card.matchAll(/return\s+`?\$?\{?'?(clear|cloudy|rainy|snowy|drizzle|fog|hail|wind|thunderstorms)[\w-]*/g))
+        .map((m) => m[0]),
+    );
+    expect(emitted.size).toBeGreaterThan(0);
+    expect(mapperTargets('_iconToHa').length).toBeGreaterThan(10);
+  });
+
+  it('only names files the Home Assistant set actually publishes', () => {
+    // The set is keyed by HA condition names and has fifteen files; a typo here
+    // produces a 404 and an empty square on the card.
+    const published = [
+      'clear-night', 'cloudy', 'fog', 'hail', 'lightning-rainy', 'lightning',
+      'partlycloudy-night', 'partlycloudy', 'pouring', 'rainy', 'snowy-rainy',
+      'snowy', 'sunny', 'windy-variant', 'windy',
+    ];
+    for (const target of mapperTargets('_iconToHa')) {
+      expect(published, `_iconToHa maps to '${target}', which the set does not publish`)
+        .toContain(target);
+    }
+  });
+
+  it('falls back rather than returning undefined for an unknown name', () => {
+    const start = card.indexOf('private _iconToHa(');
+    const body = card.slice(start, card.indexOf('\n  }', start));
+    expect(body, 'no fallback for an unmapped icon').toMatch(/\?\?\s*'[\w-]+'/);
   });
 });

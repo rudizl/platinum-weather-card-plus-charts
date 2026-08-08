@@ -1838,6 +1838,7 @@ get _forecast_type(): string {
             <option value='default'>Default (built-in animated)</option>
             <option value='meteocons-fill'>Meteocons — Fill (CDN, basmilius)</option>
             <option value='meteocons-line'>Meteocons — Line (CDN, basmilius)</option>
+            <option value='ha-official'>Home Assistant official (CDN, scinos)</option>
             <option value='wcc-2'>ammap Weather Icons (requires weather-chart-card)</option>
             <option value='custom'>Custom path...</option>
           </select>

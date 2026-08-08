@@ -3261,6 +3261,9 @@ export class PlatinumWeatherCard extends LitElement {
 
     const wccName = this._iconToWcc(adjusted);
     if (pack === 'wcc-2') return `/hacsfiles/weather-chart-card/icons2/${wccName}.svg`;
+    if (pack === 'ha-official')
+      return `https://cdn.jsdelivr.net/gh/scinos/lovelace-weather-icons@main/svg/${this._iconToHa(adjusted)}.svg`;
+
     const metName = this._iconToMeteocons(adjusted);
     if (pack === 'meteocons-fill') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/${metName}.svg`;
     if (pack === 'meteocons-line') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/${metName}.svg`;
@@ -3316,6 +3319,58 @@ export class PlatinumWeatherCard extends LitElement {
       'unknown':                        'exceptional',
     };
     return map[iconName] ?? 'exceptional';
+  }
+
+  // Maps our internal icon names to Home Assistant's own weather icons, which
+  // scinos/lovelace-weather-icons publishes as standalone SVGs. The set is
+  // keyed by HA condition names and has no day/night pair for most of them,
+  // so several of ours collapse onto one file.
+  private _iconToHa(iconName: string): string {
+    const map: { [key: string]: string } = {
+      'clear-day': 'sunny',
+      'clear-night': 'clear-night',
+      'cloudy-1-day': 'partlycloudy',
+      'cloudy-1-night': 'partlycloudy-night',
+      'cloudy-2-day': 'partlycloudy',
+      'cloudy-2-night': 'partlycloudy-night',
+      'cloudy-3-day': 'cloudy',
+      'cloudy-3-night': 'cloudy',
+      'cloudy': 'cloudy',
+      'drizzle': 'rainy',
+      'fog-day': 'fog',
+      'fog-night': 'fog',
+      'fog': 'fog',
+      'hail': 'hail',
+      'rainy-1-day': 'rainy',
+      'rainy-1-night': 'rainy',
+      'rainy-2-day': 'rainy',
+      'rainy-2-night': 'rainy',
+      'rainy-3-day': 'pouring',
+      'rainy-3-night': 'pouring',
+      'rainy-3': 'pouring',
+      'rain-and-sleet-mix': 'snowy-rainy',
+      'rain-and-snow-mix': 'snowy-rainy',
+      'snowy-1-day': 'snowy',
+      'snowy-1-night': 'snowy',
+      'snowy-2-day': 'snowy',
+      'snowy-2-night': 'snowy',
+      'snowy-3-day': 'snowy',
+      'snowy-3-night': 'snowy',
+      'snow-and-sleet-mix': 'snowy-rainy',
+      'isolated-thunderstorms-day': 'lightning',
+      'isolated-thunderstorms-night': 'lightning',
+      'scattered-thunderstorms-day': 'lightning-rainy',
+      'scattered-thunderstorms-night': 'lightning-rainy',
+      'thunderstorms': 'lightning-rainy',
+      'wind': 'windy',
+      'windy-variant': 'windy-variant',
+      'dust': 'fog',
+      'dust-wind': 'windy',
+      'haze-day': 'fog',
+      'haze-night': 'fog',
+      'unknown': 'cloudy',
+    };
+    return map[iconName] ?? 'cloudy';
   }
 
   private _iconToMeteocons(iconName: string): string {

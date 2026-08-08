@@ -651,6 +651,7 @@ The card supports multiple icon packs, selectable from the editor's **Global Opt
 | `meteocons-fill` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — filled style | Internet (jsDelivr CDN) |
 | `meteocons-line` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — line style | Internet (jsDelivr CDN) |
 | `wcc-2` | [ammap Weather Icons](https://www.ammap.com/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
+| `ha-official` | Home Assistant's own weather icons, served from a CDN — the card then matches the rest of your dashboard rather than introducing a second style |
 | `custom` | Any icon set — set `icon_pack_path` with `{condition}` placeholder | User-provided |
 
 > **Note:** `wcc-1` has been removed — it was byte-for-byte identical to the Meteocons Fill pack. Use `meteocons-fill` instead.
