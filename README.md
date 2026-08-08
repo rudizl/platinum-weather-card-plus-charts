@@ -863,7 +863,7 @@ double_tap_action:
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
 | `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help |
-| `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky |
+| `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky, and drives the rain rate slot. Intensity follows the standard bands: light below 2.5 mm/h, moderate to 10, heavy to 50, violent above |
 | `entity_uv_index` | String | none | UV index sensor for the UV index slot |
 | `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |

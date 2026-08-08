@@ -1999,18 +1999,28 @@ export class PlatinumWeatherCard extends LitElement {
     const rate = this.measuredRainRate;
     const display = rate === null ? '---'
       : rate.toLocaleString(this.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    const icon = rate === null || rate === 0 ? 'mdi:weather-cloudy'
-      : rate < 0.5 ? 'mdi:weather-partly-rainy'
-      : rate < 4 ? 'mdi:weather-rainy'
-      : 'mdi:weather-pouring';
+    // Always a rain icon, including at zero: a plain cloud says nothing about
+    // rain, which is the one thing this slot is for. The bands are the standard
+    // meteorological ones — light below 2.5 mm/h, moderate to 10, heavy to 50,
+    // violent above — and the colour deepens with them.
+    const icon = rate === null || rate === 0 ? 'mdi:water-outline'
+      : rate < 2.5 ? 'mdi:weather-rainy'
+      : rate < 10 ? 'mdi:weather-pouring'
+      : 'mdi:weather-hail';
+    const colour = rate === null || rate === 0 ? ''
+      : rate < 2.5 ? '#4fc3f7'
+      : rate < 10 ? '#29b6f6'
+      : rate < 50 ? '#0288d1'
+      : '#01579b';
+    const rateStyle = colour ? `color:${colour};` : '';
     return html`
       <li data-slot="rain_rate">
         <div class="slot">
           <div class="slot-icon">
-            <ha-icon icon="${icon}"></ha-icon>
+            <ha-icon icon="${icon}" style="${rateStyle}"></ha-icon>
           </div>
           <div class="slot-text">${tCard(this.locale, this.compact ? 'rain_rate_compact' : 'rain_rate')}&nbsp;</div>
-          <div class="slot-text rain-rate-text">${display}</div>
+          <div class="slot-text rain-rate-text" style="${rateStyle}">${display}</div>
           ${rate === null ? html`` : html`<div class="slot-text unit">mm/h</div>`}
         </div>
       </li>
@@ -3217,10 +3227,10 @@ export class PlatinumWeatherCard extends LitElement {
       const rate = this.measuredRainRate;
 
       if (isPlainSky && rate !== null && rate > 0) {
-        const name = rate < 0.5 ? 'drizzle'
-          : rate < 4 ? 'rainy-1'
-          : rate < 10 ? 'rainy-2'
-          : 'rainy-3';
+        // Same meteorological bands the slot uses, so icon and reading agree.
+          const name = rate < 2.5 ? 'rainy-1'
+            : rate < 10 ? 'rainy-2'
+            : 'rainy-3';
         adjusted = `${name}-${this.dayOrNight}`;
       } else if (isPlainSky) {
         const cloud = this.measuredCloudFraction;

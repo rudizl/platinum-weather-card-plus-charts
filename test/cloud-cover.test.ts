@@ -411,3 +411,54 @@ describe('a rain gauge outranks both the provider and the pyranometer', () => {
     expect(getter).toContain('isFinite');
   });
 });
+
+describe('rain intensity follows the meteorological bands', () => {
+  // Light below 2.5 mm/h, moderate to 10, heavy to 50, violent above — the
+  // standard classification, rather than thresholds invented for the card.
+  const source = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('uses the same thresholds for the slot and the icon', () => {
+    // They read the same sensor; disagreeing would put a heavy-rain icon beside
+    // a reading the slot calls light.
+    const slot = /get slotRainRate\(\)[\s\S]*?\n  \}/.exec(source);
+    const correction = /const name = rate <[\s\S]{0,200}?'rainy-3';/.exec(source);
+    expect(slot, 'slot not found').not.toBeNull();
+    expect(correction, 'icon correction not found').not.toBeNull();
+    const thresholds = (text: string) =>
+      Array.from(text.matchAll(/rate < ([\d.]+)/g)).map((m) => Number(m[1])).sort((a, b) => a - b);
+    const slotBands = thresholds(slot![0]).filter((t) => t <= 50);
+    const iconBands = thresholds(correction![0]);
+    for (const t of iconBands) {
+      expect(slotBands, `icon uses ${t} mm/h, which the slot does not`).toContain(t);
+    }
+  });
+
+  it('starts at the standard 2.5 mm/h rather than an invented figure', () => {
+    const slot = /get slotRainRate\(\)[\s\S]*?\n  \}/.exec(source)![0];
+    expect(slot).toContain('rate < 2.5');
+    expect(slot).toContain('rate < 10');
+  });
+
+  it('shows a rain icon even at zero', () => {
+    // A plain cloud says nothing about rain, which is what this slot is for.
+    const slot = /get slotRainRate\(\)[\s\S]*?\n  \}/.exec(source)![0];
+    const zeroIcon = /rate === 0 \? '([\w:-]+)'/.exec(slot);
+    expect(zeroIcon, 'no icon chosen for zero').not.toBeNull();
+    expect(zeroIcon![1], 'a cloud icon tells the reader nothing about rain')
+      .toMatch(/water|rain|drop/);
+  });
+
+  it('deepens the colour with the intensity', () => {
+    const slot = /get slotRainRate\(\)[\s\S]*?\n  \}/.exec(source)![0];
+    const colours = Array.from(slot.matchAll(/'#([0-9a-f]{6})'/gi)).map((m) => m[1]);
+    expect(colours.length, 'no colour bands').toBeGreaterThanOrEqual(3);
+    // brightness should fall as the bands get heavier
+    const luminance = (hex: string) =>
+      parseInt(hex.slice(0, 2), 16) * 0.299 + parseInt(hex.slice(2, 4), 16) * 0.587
+      + parseInt(hex.slice(4, 6), 16) * 0.114;
+    for (let i = 1; i < colours.length; i++) {
+      expect(luminance(colours[i]), `band ${i} is not darker than the one before`)
+        .toBeLessThan(luminance(colours[i - 1]));
+    }
+  });
+});
