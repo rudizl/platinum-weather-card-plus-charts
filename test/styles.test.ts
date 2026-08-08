@@ -135,6 +135,31 @@ describe('the card stylesheet matches its markup', () => {
   });
 });
 
+describe('a row with one column says so', () => {
+  it('marks a lone control full-width rather than leaving half the row empty', () => {
+    // The icon pack select sat in the left half with nothing on the right, so
+    // its long option names were truncated for no reason. A control with no
+    // pair should span the row instead.
+    //
+    // Counting children by regex is unreliable — the markup nests several
+    // levels — so this checks the specific shape that went wrong: a row whose
+    // only sibling is a conditional that renders nothing most of the time.
+    const rows = Array.from(
+      editor.matchAll(/<div class="side-by-side">\s*<div>([\s\S]*?)<\/div>\s*\$\{[^}]*\?\s*html`[\s\S]*?`\s*:\s*html``\}\s*<\/div>/g),
+    );
+    for (const [row, body] of rows) {
+      // Only selects matter here: a toggle's label wraps onto a second line and
+      // stays readable, but a select truncates its options mid-word. The check
+      // is on the left-hand control alone — the conditional half may contain
+      // anything.
+      const leftHand = body.split('${')[0];
+      if (!leftHand.includes('<select')) continue;
+      expect(row, 'a select whose pair is usually absent should be full-width')
+        .toContain('class="full-width"');
+    }
+  });
+});
+
 describe('editor rows use both their columns', () => {
   it('leaves a half empty only where it is justified', () => {
     // An empty half is wasted width on a phone, so most rows should fill both.

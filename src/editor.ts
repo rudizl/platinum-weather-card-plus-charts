@@ -1152,7 +1152,7 @@ get _forecast_type(): string {
   private _optionOverviewEditor(): TemplateResult {
     return html`
       <div class="side-by-side">
-        <div>
+        <div class="full-width">
           <label class='mdc-label'>${this._t('condition_alignment')}</label>
           <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._forecast_text_alignment} @change=${this._valueChanged}>
             <option value=""></option>
@@ -1832,7 +1832,7 @@ get _forecast_type(): string {
         </div>
       </div>` : html``}
       <div class="side-by-side">
-        <div>
+        <div class="full-width">
           <label class="label">${this._t("icon_pack")}</label>
           <select class='ha-select-compat' .configValue=${'icon_pack'} .value=${this._icon_pack} @change=${this._valueChanged}>
             <option value='default'>Default (built-in animated)</option>
@@ -1844,7 +1844,7 @@ get _forecast_type(): string {
           </select>
         </div>
         ${this._icon_pack === 'custom' ? html`
-        <div>
+        <div class="full-width">
           <ha-input .label=${this._t("icon_path")} .value=${this._icon_pack_path}
             .configValue=${'icon_pack_path'} @change=${this._valueChanged}>
           </ha-input>
