@@ -93,6 +93,9 @@ const nl: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — overdag wordt de bewolking hieruit afgeleid",
     "entity_cloud_cover": "Bewolking (’s nachts)",
     "entity_rain_rate": "Regenintensiteit",
+    "entity_dew_point": "Dauwpunt-entiteit",
+    "show_comfort": "Toon het aanvoelen",
+    "show_comfort_hint": "Een woord onder de gevoelstemperatuur, uit het dauwpunt: droog, comfortabel, benauwd",
     "entity_uv_index": "UV-index-entiteit",
     "entity_rain_rate_hint": "In mm/u - gemeten regen gaat voor op een aanbieder die helder meldt",
     "cloud_cover_oktas": "Okta in plaats van procent",
@@ -249,6 +252,13 @@ const nl: Translation = {
     "opt_24hour": "24 uur"
   },
   "card": {
+    "comfort_dry": "Droog",
+    "comfort_pleasant": "Aangenaam",
+    "comfort_comfortable": "Comfortabel",
+    "comfort_slightly_humid": "Iets vochtig",
+    "comfort_humid": "Vochtig",
+    "comfort_muggy": "Benauwd",
+    "comfort_heavy": "Drukkend",
     "rain_rate": "Regenintensiteit",
     "rain_rate_compact": "Int.",
     "uv_index": "UV-index",

@@ -1152,6 +1152,20 @@ get _forecast_type(): string {
   private _optionOverviewEditor(): TemplateResult {
     return html`
       <div class="side-by-side">
+        <div>
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_dew_point'} .value=${this._config?.entity_dew_point || ''} .includeDomains=${['sensor']}
+            name="entity_dew_point" label=${this._t("entity_dew_point")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_show_comfort ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_comfort'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_comfort")}</span>
+            </div>
+          <div class="help-text">${this._t("show_comfort_hint")}</div>
+        </div>
+      </div>
+      <div class="side-by-side">
         <div class="full-width">
           <label class='mdc-label'>${this._t('condition_alignment')}</label>
           <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._forecast_text_alignment} @change=${this._valueChanged}>

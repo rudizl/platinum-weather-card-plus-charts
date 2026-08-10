@@ -462,3 +462,43 @@ describe('rain intensity follows the meteorological bands', () => {
     }
   });
 });
+
+describe('the comfort line follows the National Weather Service bands', () => {
+  const source = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  const band = (dew: number) =>
+    dew < 10 ? 'dry' : dew < 13 ? 'pleasant' : dew < 16 ? 'comfortable'
+      : dew < 18 ? 'slightly_humid' : dew < 21 ? 'humid' : dew < 24 ? 'muggy' : 'heavy';
+
+  it('places the standard thresholds', () => {
+    expect(band(8)).toBe('dry');
+    expect(band(15)).toBe('comfortable');   // a typical coastal summer morning
+    expect(band(19)).toBe('humid');
+    expect(band(26)).toBe('heavy');
+  });
+
+  it('moves through the bands in order', () => {
+    const order = ['dry', 'pleasant', 'comfortable', 'slightly_humid', 'humid', 'muggy', 'heavy'];
+    let last = -1;
+    for (let d = 0; d <= 30; d += 0.5) {
+      const idx = order.indexOf(band(d));
+      expect(idx, `${d}°C produced an unknown band`).toBeGreaterThanOrEqual(0);
+      expect(idx, `${d}°C went backwards`).toBeGreaterThanOrEqual(last);
+      last = idx;
+    }
+  });
+
+  it('converts Fahrenheit before judging', () => {
+    // A sensor reporting °F would otherwise land in 'heavy air' permanently.
+    const getter = /get comfortFromDewPoint\(\)[\s\S]*?\n  \}/.exec(source);
+    expect(getter, 'comfort getter not found').not.toBeNull();
+    expect(getter![0], 'Fahrenheit is not converted').toMatch(/32\)\s*\*\s*5\s*\/\s*9/);
+  });
+
+  it('stays silent unless asked for', () => {
+    const getter = /get comfortFromDewPoint\(\)[\s\S]*?\n  \}/.exec(source)![0];
+    expect(getter, 'no opt-in check').toContain('option_show_comfort');
+    expect(getter, 'no guard for a missing entity').toContain('entity_dew_point');
+    expect(getter).toContain("'unavailable'");
+  });
+});

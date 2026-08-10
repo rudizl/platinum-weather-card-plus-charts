@@ -637,6 +637,24 @@ entity_warning: binary_sensor.meteoalarm_varna
 
 > The MeteoAlarm integration reports only the first warning when several are active for the same region at once. That is a limitation of the integration rather than the card; a template sensor can work around it if you need every warning.
 
+### How the air feels
+
+Under the apparent temperature the card can show a single word — *dry*, *comfortable*, *muggy* — worked out from the dew point. Point **Dew point entity** at your sensor in the overview options and switch on **Show how the air feels**.
+
+Dew point rather than relative humidity, because relative humidity on its own says very little about comfort: 60% at 15°C is pleasant and 60% at 30°C is unbearable, since warm air holds far more water at the same percentage. Dew point is the actual moisture content, so its bands hold whatever the temperature is — a dew point of 21°C feels muggy at 24°C and at 35°C alike, because the moisture your sweat has to compete with is the same either way. That is why forecasters quote it and why it is the more useful number on a humid coast, where the temperature can look modest while the air does not.
+
+The bands are the US National Weather Service ones:
+
+| Dew point | |
+| --------- | - |
+| below 10°C | Dry |
+| 10–13°C | Pleasant |
+| 13–16°C | Comfortable |
+| 16–18°C | Slightly humid |
+| 18–21°C | Humid |
+| 21–24°C | Muggy |
+| above 24°C | Heavy air |
+
 ### Cloud cover from a pyranometer
 
 If your station measures solar radiation, the card can work out the cloud cover from it. How much sunlight *would* arrive under a clear sky depends only on the sun's elevation, the day of year and your altitude — pure geometry, no external data — so the ratio between that and what the sensor actually reports is the cloud cover.
@@ -882,6 +900,8 @@ double_tap_action:
 | `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
 | `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help |
 | `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky, and drives the rain rate slot. Intensity follows the standard bands: light below 2.5 mm/h, moderate to 10, heavy to 50, violent above |
+| `entity_dew_point` | String | none | Dew point sensor, for the comfort line under the apparent temperature |
+| `option_show_comfort` | Boolean | `false` | Show how the air feels, in a word |
 | `entity_uv_index` | String | none | UV index sensor for the UV index slot |
 | `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
 | `option_cloud_overrides_icon` | Boolean | `false` | Let the measured cloud cover and rain rate correct the condition icon |

@@ -93,6 +93,9 @@ const en: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — cloud cover is derived from it during daylight",
     "entity_cloud_cover": "Cloud cover entity (night fallback)",
     "entity_rain_rate": "Rain rate entity",
+    "entity_dew_point": "Dew point entity",
+    "show_comfort": "Show how the air feels",
+    "show_comfort_hint": "A word under the apparent temperature, from the dew point: dry, comfortable, muggy",
     "entity_uv_index": "UV index entity",
     "entity_rain_rate_hint": "In mm/h - a gauge reporting rain overrides a provider claiming clear sky",
     "cloud_cover_oktas": "Show oktas instead of percent",
@@ -249,6 +252,13 @@ const en: Translation = {
     "opt_24hour": "24 hour"
   },
   "card": {
+    "comfort_dry": "Dry",
+    "comfort_pleasant": "Pleasant",
+    "comfort_comfortable": "Comfortable",
+    "comfort_slightly_humid": "Slightly humid",
+    "comfort_humid": "Humid",
+    "comfort_muggy": "Muggy",
+    "comfort_heavy": "Heavy air",
     "rain_rate": "Rain rate",
     "rain_rate_compact": "Rate",
     "uv_index": "UV index",

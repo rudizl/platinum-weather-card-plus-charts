@@ -93,6 +93,9 @@ const de: Translation = {
     "entity_solar_radiation_hint": "Pyranometer in W/m² — daraus wird tagsüber die Bewölkung berechnet",
     "entity_cloud_cover": "Bewölkung (nachts)",
     "entity_rain_rate": "Regenrate",
+    "entity_dew_point": "Taupunkt-Entität",
+    "show_comfort": "Empfinden anzeigen",
+    "show_comfort_hint": "Ein Wort unter der gefühlten Temperatur, aus dem Taupunkt: trocken, behaglich, schwül",
     "entity_uv_index": "UV-Index-Entität",
     "entity_rain_rate_hint": "In mm/h - gemessener Regen hat Vorrang vor einem Anbieter, der heiter meldet",
     "cloud_cover_oktas": "Okta statt Prozent",
@@ -249,6 +252,13 @@ const de: Translation = {
     "opt_24hour": "24 Stunden"
   },
   "card": {
+    "comfort_dry": "Trocken",
+    "comfort_pleasant": "Angenehm",
+    "comfort_comfortable": "Behaglich",
+    "comfort_slightly_humid": "Leicht feucht",
+    "comfort_humid": "Feucht",
+    "comfort_muggy": "Schwül",
+    "comfort_heavy": "Drückend",
     "rain_rate": "Regenrate",
     "rain_rate_compact": "Rate",
     "uv_index": "UV-Index",

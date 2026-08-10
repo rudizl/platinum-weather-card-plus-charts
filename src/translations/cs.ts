@@ -93,6 +93,9 @@ const cs: Translation = {
     "entity_solar_radiation_hint": "Pyranometr ve W/m² — přes den se z něj počítá oblačnost",
     "entity_cloud_cover": "Oblačnost (v noci)",
     "entity_rain_rate": "Intenzita deště",
+    "entity_dew_point": "Entita rosného bodu",
+    "show_comfort": "Zobrazit pocit",
+    "show_comfort_hint": "Slovo pod pocitovou teplotou, z rosného bodu: sucho, pohodlně, dusno",
     "entity_uv_index": "Entita UV indexu",
     "entity_rain_rate_hint": "V mm/h - naměřený déšť má přednost před poskytovatelem hlásícím jasno",
     "cloud_cover_oktas": "Okty místo procent",
@@ -249,6 +252,13 @@ const cs: Translation = {
     "opt_24hour": "24 hodin"
   },
   "card": {
+    "comfort_dry": "Sucho",
+    "comfort_pleasant": "Příjemně",
+    "comfort_comfortable": "Pohodlně",
+    "comfort_slightly_humid": "Mírně vlhko",
+    "comfort_humid": "Vlhko",
+    "comfort_muggy": "Dusno",
+    "comfort_heavy": "Těžký vzduch",
     "rain_rate": "Intenzita deště",
     "rain_rate_compact": "Int.",
     "uv_index": "UV index",

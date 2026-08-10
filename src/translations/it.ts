@@ -93,6 +93,9 @@ const it: Translation = {
     "entity_solar_radiation_hint": "Piranometro in W/m² — di giorno la nuvolosità si ricava da questo",
     "entity_cloud_cover": "Nuvolosità (di notte)",
     "entity_rain_rate": "Intensità di pioggia",
+    "entity_dew_point": "Entità punto di rugiada",
+    "show_comfort": "Mostra la sensazione",
+    "show_comfort_hint": "Una parola sotto la temperatura percepita, dal punto di rugiada: secco, confortevole, afoso",
     "entity_uv_index": "Entità indice UV",
     "entity_rain_rate_hint": "In mm/h - la pioggia misurata prevale su un provider che dichiara sereno",
     "cloud_cover_oktas": "Okta invece di percentuale",
@@ -249,6 +252,13 @@ const it: Translation = {
     "opt_24hour": "24 ore"
   },
   "card": {
+    "comfort_dry": "Secco",
+    "comfort_pleasant": "Gradevole",
+    "comfort_comfortable": "Confortevole",
+    "comfort_slightly_humid": "Un po' umido",
+    "comfort_humid": "Umido",
+    "comfort_muggy": "Afoso",
+    "comfort_heavy": "Opprimente",
     "rain_rate": "Intensità",
     "rain_rate_compact": "Int.",
     "uv_index": "Indice UV",

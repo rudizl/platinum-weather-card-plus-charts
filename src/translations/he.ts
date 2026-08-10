@@ -93,6 +93,9 @@ const he: Translation = {
     "entity_solar_radiation_hint": "פירנומטר ב-W/m² — כיסוי העננים מחושב ממנו בשעות היום",
     "entity_cloud_cover": "כיסוי עננים (בלילה)",
     "entity_rain_rate": "עוצמת גשם",
+    "entity_dew_point": "ישות נקודת טל",
+    "show_comfort": "הצג את התחושה",
+    "show_comfort_hint": "מילה מתחת לטמפרטורה המורגשת, לפי נקודת הטל: יבש, נוח, מחניק",
     "entity_uv_index": "ישות מדד UV",
     "entity_rain_rate_hint": "במילימטר לשעה - גשם שנמדד גובר על ספק המדווח על שמים בהירים",
     "cloud_cover_oktas": "אוקטות במקום אחוזים",
@@ -249,6 +252,13 @@ const he: Translation = {
     "opt_24hour": "24 שעות"
   },
   "card": {
+    "comfort_dry": "יבש",
+    "comfort_pleasant": "נעים",
+    "comfort_comfortable": "נוח",
+    "comfort_slightly_humid": "לח מעט",
+    "comfort_humid": "לח",
+    "comfort_muggy": "מחניק",
+    "comfort_heavy": "כבד",
     "rain_rate": "עוצמת גשם",
     "rain_rate_compact": "עוצמה",
     "uv_index": "מדד UV",

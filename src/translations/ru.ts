@@ -93,6 +93,9 @@ const ru: Translation = {
     "entity_solar_radiation_hint": "Пиранометр в Вт/м² — днём облачность вычисляется из него",
     "entity_cloud_cover": "Облачность (ночью)",
     "entity_rain_rate": "Интенсивность дождя",
+    "entity_dew_point": "Сущность точки росы",
+    "show_comfort": "Показывать ощущение",
+    "show_comfort_hint": "Слово под ощущаемой температурой, по точке росы: сухо, комфортно, душно",
     "entity_uv_index": "Сущность УФ-индекса",
     "entity_rain_rate_hint": "В мм/ч - измеренный дождь важнее поставщика, сообщающего ясно",
     "cloud_cover_oktas": "Октанты вместо процентов",
@@ -249,6 +252,13 @@ const ru: Translation = {
     "opt_24hour": "24 часа"
   },
   "card": {
+    "comfort_dry": "Сухо",
+    "comfort_pleasant": "Приятно",
+    "comfort_comfortable": "Комфортно",
+    "comfort_slightly_humid": "Слегка влажно",
+    "comfort_humid": "Влажно",
+    "comfort_muggy": "Душно",
+    "comfort_heavy": "Тяжело",
     "rain_rate": "Интенсивность",
     "rain_rate_compact": "Инт.",
     "uv_index": "УФ-индекс",

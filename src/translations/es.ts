@@ -93,6 +93,9 @@ const es: Translation = {
     "entity_solar_radiation_hint": "Piranómetro en W/m² — de ahí se deriva la nubosidad de día",
     "entity_cloud_cover": "Nubosidad (de noche)",
     "entity_rain_rate": "Intensidad de lluvia",
+    "entity_dew_point": "Entidad de punto de rocío",
+    "show_comfort": "Mostrar la sensación",
+    "show_comfort_hint": "Una palabra bajo la sensación térmica, según el punto de rocío: seco, cómodo, bochornoso",
     "entity_uv_index": "Entidad del índice UV",
     "entity_rain_rate_hint": "En mm/h - la lluvia medida prevalece sobre un proveedor que anuncia cielo despejado",
     "cloud_cover_oktas": "Octas en vez de porcentaje",
@@ -249,6 +252,13 @@ const es: Translation = {
     "opt_24hour": "24 horas"
   },
   "card": {
+    "comfort_dry": "Seco",
+    "comfort_pleasant": "Agradable",
+    "comfort_comfortable": "Cómodo",
+    "comfort_slightly_humid": "Algo húmedo",
+    "comfort_humid": "Húmedo",
+    "comfort_muggy": "Bochornoso",
+    "comfort_heavy": "Sofocante",
     "rain_rate": "Intensidad",
     "rain_rate_compact": "Int.",
     "uv_index": "Índice UV",

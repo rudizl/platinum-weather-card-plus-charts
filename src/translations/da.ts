@@ -93,6 +93,9 @@ const da: Translation = {
     "entity_solar_radiation_hint": "Pyranometer i W/m² — skydækket udledes heraf om dagen",
     "entity_cloud_cover": "Skydække (om natten)",
     "entity_rain_rate": "Regnintensitet",
+    "entity_dew_point": "Dugpunkt-entitet",
+    "show_comfort": "Vis fornemmelsen",
+    "show_comfort_hint": "Et ord under den følte temperatur, ud fra dugpunktet: tørt, behageligt, lummert",
     "entity_uv_index": "UV-indeks-entitet",
     "entity_rain_rate_hint": "I mm/t - målt regn går forud for en udbyder, der melder klart vejr",
     "cloud_cover_oktas": "Okta i stedet for procent",
@@ -249,6 +252,13 @@ const da: Translation = {
     "opt_24hour": "24 timer"
   },
   "card": {
+    "comfort_dry": "Tørt",
+    "comfort_pleasant": "Behageligt",
+    "comfort_comfortable": "Komfortabelt",
+    "comfort_slightly_humid": "Let fugtigt",
+    "comfort_humid": "Fugtigt",
+    "comfort_muggy": "Lummert",
+    "comfort_heavy": "Trykkende",
     "rain_rate": "Regnintensitet",
     "rain_rate_compact": "Int.",
     "uv_index": "UV-indeks",

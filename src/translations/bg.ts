@@ -93,6 +93,9 @@ const bg: Translation = {
     "entity_solar_radiation_hint": "Пиранометър в W/m² — облачността се изчислява от него през деня",
     "entity_cloud_cover": "Сензор за облачност (нощем)",
     "entity_rain_rate": "Сензор за интензитет на дъжда",
+    "entity_dew_point": "Сензор за точка на оросяване",
+    "show_comfort": "Показвай усещането",
+    "show_comfort_hint": "Дума под усещаната температура, изведена от точката на оросяване: сухо, комфортно, задушно",
     "entity_uv_index": "Сензор за UV индекс",
     "entity_rain_rate_hint": "В mm/h - отчетен дъжд има предимство пред доставчик, твърдящ ясно небе",
     "cloud_cover_oktas": "Октаси вместо проценти",
@@ -249,6 +252,13 @@ const bg: Translation = {
     "opt_24hour": "24-часов"
   },
   "card": {
+    "comfort_dry": "Сухо",
+    "comfort_pleasant": "Приятно",
+    "comfort_comfortable": "Комфортно",
+    "comfort_slightly_humid": "Леко влажно",
+    "comfort_humid": "Влажно",
+    "comfort_muggy": "Задушно",
+    "comfort_heavy": "Тежко",
     "rain_rate": "Интензитет",
     "rain_rate_compact": "Инт.",
     "uv_index": "UV индекс",

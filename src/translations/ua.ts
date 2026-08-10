@@ -93,6 +93,9 @@ const ua: Translation = {
     "entity_solar_radiation_hint": "Піранометр у Вт/м² — удень хмарність обчислюється з нього",
     "entity_cloud_cover": "Хмарність (вночі)",
     "entity_rain_rate": "Інтенсивність дощу",
+    "entity_dew_point": "Сутність точки роси",
+    "show_comfort": "Показувати відчуття",
+    "show_comfort_hint": "Слово під відчутною температурою, за точкою роси: сухо, комфортно, задушливо",
     "entity_uv_index": "Сутність УФ-індексу",
     "entity_rain_rate_hint": "У мм/год - виміряний дощ важливіший за постачальника, що повідомляє ясно",
     "cloud_cover_oktas": "Октанти замість відсотків",
@@ -249,6 +252,13 @@ const ua: Translation = {
     "opt_24hour": "24 години"
   },
   "card": {
+    "comfort_dry": "Сухо",
+    "comfort_pleasant": "Приємно",
+    "comfort_comfortable": "Комфортно",
+    "comfort_slightly_humid": "Злегка волого",
+    "comfort_humid": "Волого",
+    "comfort_muggy": "Задушливо",
+    "comfort_heavy": "Важко",
     "rain_rate": "Інтенсивність",
     "rain_rate_compact": "Інт.",
     "uv_index": "УФ-індекс",

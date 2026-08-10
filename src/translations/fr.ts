@@ -93,6 +93,9 @@ const fr: Translation = {
     "entity_solar_radiation_hint": "Pyranomètre en W/m² — la nébulosité en est déduite de jour",
     "entity_cloud_cover": "Nébulosité (la nuit)",
     "entity_rain_rate": "Intensité de pluie",
+    "entity_dew_point": "Entité point de rosée",
+    "show_comfort": "Afficher le ressenti",
+    "show_comfort_hint": "Un mot sous la température ressentie, d'après le point de rosée : sec, confortable, lourd",
     "entity_uv_index": "Entité indice UV",
     "entity_rain_rate_hint": "En mm/h - la pluie mesurée prime sur un fournisseur annonçant un ciel clair",
     "cloud_cover_oktas": "Octas au lieu de pourcentage",
@@ -249,6 +252,13 @@ const fr: Translation = {
     "opt_24hour": "24 heures"
   },
   "card": {
+    "comfort_dry": "Sec",
+    "comfort_pleasant": "Agréable",
+    "comfort_comfortable": "Confortable",
+    "comfort_slightly_humid": "Un peu humide",
+    "comfort_humid": "Humide",
+    "comfort_muggy": "Lourd",
+    "comfort_heavy": "Étouffant",
     "rain_rate": "Intensité",
     "rain_rate_compact": "Int.",
     "uv_index": "Indice UV",

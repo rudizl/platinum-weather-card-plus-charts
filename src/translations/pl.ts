@@ -93,6 +93,9 @@ const pl: Translation = {
     "entity_solar_radiation_hint": "Piranometr w W/m² — w dzień na jego podstawie liczone jest zachmurzenie",
     "entity_cloud_cover": "Zachmurzenie (w nocy)",
     "entity_rain_rate": "Natężenie deszczu",
+    "entity_dew_point": "Encja punktu rosy",
+    "show_comfort": "Pokaż odczucie",
+    "show_comfort_hint": "Słowo pod temperaturą odczuwalną, z punktu rosy: sucho, komfortowo, parno",
     "entity_uv_index": "Encja indeksu UV",
     "entity_rain_rate_hint": "W mm/h - zmierzony deszcz ma pierwszeństwo przed dostawcą zgłaszającym bezchmurnie",
     "cloud_cover_oktas": "Oktanty zamiast procentów",
@@ -249,6 +252,13 @@ const pl: Translation = {
     "opt_24hour": "24 godziny"
   },
   "card": {
+    "comfort_dry": "Sucho",
+    "comfort_pleasant": "Przyjemnie",
+    "comfort_comfortable": "Komfortowo",
+    "comfort_slightly_humid": "Lekko wilgotno",
+    "comfort_humid": "Wilgotno",
+    "comfort_muggy": "Parno",
+    "comfort_heavy": "Duszno",
     "rain_rate": "Natężenie",
     "rain_rate_compact": "Nat.",
     "uv_index": "Indeks UV",

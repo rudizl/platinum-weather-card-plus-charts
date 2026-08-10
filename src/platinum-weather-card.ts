@@ -538,6 +538,7 @@ export class PlatinumWeatherCard extends LitElement {
       <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
            @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
+        ${this.comfortFromDewPoint ? html`<div class="comfort">${this.comfortFromDewPoint}</div>` : html``}
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
     ` : html``;
@@ -585,6 +586,7 @@ export class PlatinumWeatherCard extends LitElement {
       <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
            @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
+        ${this.comfortFromDewPoint ? html`<div class="comfort">${this.comfortFromDewPoint}</div>` : html``}
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
     ` : html``;
@@ -2618,6 +2620,33 @@ export class PlatinumWeatherCard extends LitElement {
   // Rain rate in mm/h from the station's own gauge, or null when there is no
   // gauge or its reading is unusable. Not smoothed: unlike cloud cover, rain
   // starting is a real event and the card should say so at once.
+  // Dew point says more about how the air will feel than temperature does: it
+  // is the same figure whatever the temperature, and it is what people mean by
+  // muggy. The bands are the ones used in forecasting.
+  get comfortFromDewPoint(): string | null {
+    if (this._config.option_show_comfort !== true) return null;
+    const entity = this._config.entity_dew_point;
+    if (!entity) return null;
+    const stateObj = this.hass.states[entity];
+    if (!stateObj || stateObj.state === 'unknown' || stateObj.state === 'unavailable') return null;
+    let dew = Number(stateObj.state);
+    if (!isFinite(dew)) return null;
+    if (String(stateObj.attributes?.unit_of_measurement ?? '').includes('F')) {
+      dew = (dew - 32) * 5 / 9;
+    }
+    // US National Weather Service bands. They hold whatever the temperature is:
+    // a dew point of 20°C feels the same at 24°C as at 35°C, because the amount
+    // of moisture sweat has to compete with is the same.
+    const key = dew < 10 ? 'comfort_dry'
+      : dew < 13 ? 'comfort_pleasant'
+      : dew < 16 ? 'comfort_comfortable'
+      : dew < 18 ? 'comfort_slightly_humid'
+      : dew < 21 ? 'comfort_humid'
+      : dew < 24 ? 'comfort_muggy'
+      : 'comfort_heavy';
+    return tCard(this.locale, key);
+  }
+
   get measuredRainRate(): number | null {
     const entity = this._config.entity_rain_rate;
     if (!entity) return null;
@@ -3800,6 +3829,11 @@ export class PlatinumWeatherCard extends LitElement {
         color: var(--primary-text-color);
         position: relative;
         line-height: 74%;
+      }
+      .comfort {
+        font-size: 0.85em;
+        opacity: 0.75;
+        text-align: right;
       }
       .apparent-temp {
         display: table-row;
