@@ -286,3 +286,26 @@ describe('slot icons sit on the same line as their neighbours', () => {
     expect(card).toMatch(/\.slot-icon ha-icon\s*\{[^}]*--mdc-icon-size/);
   });
 });
+
+describe('the comfort word sits under the apparent temperature', () => {
+  // Placed inside .apparent-temp it landed between the number and the degree
+  // sign, because that container is a table-row and lays its children out
+  // horizontally.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('is outside the apparent temperature container', () => {
+    const blocks = card.match(/<div class="apparent-temp[\s\S]*?<\/div>\s*\n/g) ?? [];
+    expect(blocks.length).toBeGreaterThan(0);
+    for (const block of blocks) {
+      expect(block, 'the comfort word is inside a table-row and will sit beside the number')
+        .not.toContain('comfort');
+    }
+  });
+
+  it('has a row of its own', () => {
+    expect(card).toContain('comfort-row');
+    const rule = /\.comfort-row\s*\{([^}]*)\}/.exec(card);
+    expect(rule, '.comfort-row has no rule').not.toBeNull();
+    expect(rule![1]).toContain('table-row');
+  });
+});

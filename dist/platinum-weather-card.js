@@ -62,9 +62,9 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
       <div class="apparent-temp${this._overviewTapEntity("apparent")?" overview-tappable":""}"
            @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${l}</div>
-        ${this.comfortFromDewPoint?L`<div class="comfort">${this.comfortFromDewPoint}</div>`:L``}
         <div class="unit-temp-small"> ${this.getUOM("temperature")}</div>
       </div>
+      ${this.comfortFromDewPoint?L`<div class="comfort-row"><div class="comfort">${this.comfortFromDewPoint}</div></div>`:L``}
     `:L``,c=!0===this._config.option_show_overview_separator?L`<hr class=line>`:"",d=this.localForecastText,h=null!==d?L`<div class="forecast-text">${d}</div>`:this._config.entity_summary&&this.hass.states[this._config.entity_summary]?null!==(e=L`<div class="forecast-text">${this.hassExtended.formatEntityState(this.hass.states[this._config.entity_summary])}</div>`)&&void 0!==e?e:L`<div class="forecast-text">---</div>`:L``;return L`
       <div class="overview-section section">
         ${this._config.text_card_title?L`<div class="card-header">${this._config.text_card_title}</div>`:L``}
@@ -87,9 +87,9 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
       <div class="apparent-temp${this._overviewTapEntity("apparent")?" overview-tappable":""}"
            @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${o}</div>
-        ${this.comfortFromDewPoint?L`<div class="comfort">${this.comfortFromDewPoint}</div>`:L``}
         <div class="unit-temp-small"> ${this.getUOM("temperature")}</div>
       </div>
+      ${this.comfortFromDewPoint?L`<div class="comfort-row"><div class="comfort">${this.comfortFromDewPoint}</div></div>`:L``}
     `:L``,n=!0===this._config.option_show_overview_separator?L`<hr class=line>`:"";return L`
       <div class="overview-section section${e}">
         ${this._config.text_card_title?L`<div class="card-header">${this._config.text_card_title}</div>`:L``}
@@ -669,10 +669,18 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         position: relative;
         line-height: 74%;
       }
+      /* Its own row: .apparent-temp is a table-row, so anything placed inside it
+         lines up beside the temperature rather than under it. */
+      .comfort-row {
+        display: table-row;
+        margin-left: auto;
+      }
       .comfort {
+        display: table-cell;
         font-size: 0.85em;
         opacity: 0.75;
         text-align: right;
+        padding-top: 2px;
       }
       .apparent-temp {
         display: table-row;

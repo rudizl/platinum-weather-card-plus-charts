@@ -538,9 +538,9 @@ export class PlatinumWeatherCard extends LitElement {
       <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
            @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
-        ${this.comfortFromDewPoint ? html`<div class="comfort">${this.comfortFromDewPoint}</div>` : html``}
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
+      ${this.comfortFromDewPoint ? html`<div class="comfort-row"><div class="comfort">${this.comfortFromDewPoint}</div></div>` : html``}
     ` : html``;
 
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
@@ -586,9 +586,9 @@ export class PlatinumWeatherCard extends LitElement {
       <div class="apparent-temp${this._overviewTapEntity('apparent') ? ' overview-tappable' : ''}"
            @click=${this._overviewClick} data-overview="apparent">
         <div class="apparent">${this.localeTextFeelsLike}&nbsp;${apparent}</div>
-        ${this.comfortFromDewPoint ? html`<div class="comfort">${this.comfortFromDewPoint}</div>` : html``}
         <div class="unit-temp-small"> ${this.getUOM('temperature')}</div>
       </div>
+      ${this.comfortFromDewPoint ? html`<div class="comfort-row"><div class="comfort">${this.comfortFromDewPoint}</div></div>` : html``}
     ` : html``;
 
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
@@ -3830,10 +3830,18 @@ export class PlatinumWeatherCard extends LitElement {
         position: relative;
         line-height: 74%;
       }
+      /* Its own row: .apparent-temp is a table-row, so anything placed inside it
+         lines up beside the temperature rather than under it. */
+      .comfort-row {
+        display: table-row;
+        margin-left: auto;
+      }
       .comfort {
+        display: table-cell;
         font-size: 0.85em;
         opacity: 0.75;
         text-align: right;
+        padding-top: 2px;
       }
       .apparent-temp {
         display: table-row;
