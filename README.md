@@ -25,6 +25,23 @@ The card is in the HACS default store:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.3.2**
+
+**New**
+- **A rain gauge outranks both the provider and the pyranometer.** Weather Underground reported clear-night while the station's gauge read 1.2 mm/h. Point `entity_rain_rate` at your gauge and measured rain replaces a clear or cloudy icon, with the intensity following the standard bands — light below 2.5 mm/h, moderate to 10, heavy to 50, violent above. It still leaves alone a provider reporting snow, hail or a storm, which knows something about the precipitation a tipping bucket does not, and it is not smoothed the way cloud cover is: rain starting is an event, not a state to average
+- **Rain rate slot** — how hard it is raining now, as distinct from the rainfall slot, which totals what has fallen today. Coloured by intensity
+- **UV index slot** — the measured number, coloured by the WHO exposure bands, alongside the existing uv_summary slot, which shows a provider's wording
+- **A fifth icon pack: Home Assistant's own weather icons.** Every other pack introduces a second visual style to a dashboard; this one is what Home Assistant already draws elsewhere
+
+**Fixes**
+- Heavy cloud rendered N/A: the heaviest band returned a name without a day/night suffix, so it matched no file
+- A provider reporting rain, snow, fog or a storm could be overridden by the cloud measurement — heavy cloud is exactly when it is most likely to be right
+- The UV slot sat higher than the slot beside it: slot icons were never centred within their box, so an icon whose artwork sits high lifted its whole row
+- The icon pack and text alignment selects sat in half a row with nothing beside them, truncating their options mid-word
+- Bulgarian wording for Zambretti letter k: *вероятни* overstated a band that means showers are possible rather than likely
+
+---
+
 **v2.3.1**
 - Cloud cover is the median of the last five minutes, with hysteresis on the band boundaries, and shared across every card on the page rather than measured per card — two cards were showing different icons for the same sky. Broken cloud swings the raw reading across the whole icon range within minutes; on real data from one such morning this cuts the icon changing from eight times in twenty-five minutes to once
 - The icon correction follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above. Correcting only at the extremes left the common case wrong: a provider claiming full sun while the pyranometer saw 59% cloud kept its sun icon
@@ -867,8 +884,10 @@ double_tap_action:
 | `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky, and drives the rain rate slot. Intensity follows the standard bands: light below 2.5 mm/h, moderate to 10, heavy to 50, violent above |
 | `entity_uv_index` | String | none | UV index sensor for the UV index slot |
 | `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
+| `option_cloud_overrides_icon` | Boolean | `false` | Let the measured cloud cover and rain rate correct the condition icon |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
 | `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
+| `show_section_warnings` | Boolean | `true` | Show the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |
 | `option_show_beaufort` | Boolean | `false` | Prefix the wind slot with the Beaufort force, e.g. "BFT: 4 - SE 12 km/h" |
