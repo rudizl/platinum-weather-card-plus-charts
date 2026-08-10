@@ -294,9 +294,21 @@ describe('the comfort word sits under the apparent temperature', () => {
   const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
 
   it('is outside the apparent temperature container', () => {
-    const blocks = card.match(/<div class="apparent-temp[\s\S]*?<\/div>\s*\n/g) ?? [];
-    expect(blocks.length).toBeGreaterThan(0);
-    for (const block of blocks) {
+    // Walk from each .apparent-temp opening to its matching close, counting
+    // nesting — a naive non-greedy match stops at the first </div> and misses
+    // anything added deeper inside.
+    for (const m of card.matchAll(/<div class="apparent-temp/g)) {
+      let depth = 0;
+      let i = m.index!;
+      let end = i;
+      const tag = /<\/?div\b/g;
+      tag.lastIndex = i;
+      let t: RegExpExecArray | null;
+      while ((t = tag.exec(card)) !== null) {
+        depth += t[0].startsWith('</') ? -1 : 1;
+        if (depth === 0) { end = t.index; break; }
+      }
+      const block = card.slice(i, end);
       expect(block, 'the comfort word is inside a table-row and will sit beside the number')
         .not.toContain('comfort');
     }
