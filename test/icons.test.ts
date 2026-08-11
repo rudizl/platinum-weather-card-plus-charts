@@ -198,7 +198,7 @@ describe('monochrome icons', () => {
     // A filter reaches into <img>, where CSS variables do not, so one rule
     // covers the CDN packs as well as the built-in ones — no second set of
     // files to ship or keep in step.
-    const rule = /\.mono-icons img\s*\{([^}]*)\}/.exec(card);
+    const rule = /\.mono-icons[^{]*\{([^}]*grayscale[^}]*)\}/.exec(card);
     expect(rule, 'no monochrome rule').not.toBeNull();
     expect(rule![1]).toContain('grayscale');
   });
@@ -211,5 +211,33 @@ describe('monochrome icons', () => {
 
   it('is off unless asked for', () => {
     expect(card).toMatch(/option_mono_icons === true/);
+  });
+});
+
+describe('monochrome reaches every icon', () => {
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('covers each of the ways the card draws an icon', () => {
+    // Three different mechanisms: <img> for the large condition icon, a
+    // background image on <i class="icon"> in the forecast columns, and ha-icon
+    // in the slots. A rule naming only one leaves the rest coloured.
+    const rule = /((?:\.mono-icons[^{]*,\s*)*\.mono-icons[^{]*)\{[^}]*grayscale/.exec(card);
+    expect(rule, 'no monochrome rule').not.toBeNull();
+    const selector = rule![1];
+    for (const target of ['img', '.icon', 'ha-icon']) {
+      expect(selector, `monochrome does not cover ${target}`).toContain(target);
+    }
+  });
+
+  it('names every element type the card actually renders icons into', () => {
+    // If a new mechanism appears in the card, this fails until the rule knows
+    // about it.
+    const usesImg = /<img src="\$\{url\.href\}/.test(card);
+    const usesBackground = /class="icon" style="background/.test(card);
+    const usesHaIcon = /<ha-icon /.test(card);
+    const rule = /((?:\.mono-icons[^{]*,\s*)*\.mono-icons[^{]*)\{[^}]*grayscale/.exec(card)![1];
+    if (usesImg) expect(rule).toContain('img');
+    if (usesBackground) expect(rule).toContain('.icon');
+    if (usesHaIcon) expect(rule).toContain('ha-icon');
   });
 });

@@ -3836,7 +3836,15 @@ export class PlatinumWeatherCard extends LitElement {
          variables cannot, so it covers the CDN packs as well as the built-in
          ones. Contrast is lifted a little, since a plain desaturation of the
          warmer icons comes out flat. */
-      .mono-icons img {
+      /* The card draws icons three different ways: <img> for the large condition
+         icon, a background image on <i class="icon"> in the forecast columns,
+         and ha-icon for the slots. All three need the filter, or half the card
+         goes grey and half stays coloured. */
+      .mono-icons img,
+      .mono-icons .icon,
+      .mono-icons ha-icon,
+      .mono-icons .moon-icon,
+      .mono-icons svg {
         filter: grayscale(1) contrast(1.15);
       }
       .comfort-row {
