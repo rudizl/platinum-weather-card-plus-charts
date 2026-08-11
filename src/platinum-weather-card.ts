@@ -1678,7 +1678,7 @@ export class PlatinumWeatherCard extends LitElement {
       <style>
         ${this.styles}
       </style>
-      <ha-card class="card${this._config?.option_mono_icons === true ? ' mono-icons' : ''}"
+      <ha-card class="card"
         tabindex=${ifDefined(
           hasAction(this._config.tap_action) ? "0" : undefined
         )}
@@ -3832,21 +3832,6 @@ export class PlatinumWeatherCard extends LitElement {
       }
       /* Its own row: .apparent-temp is a table-row, so anything placed inside it
          lines up beside the temperature rather than under it. */
-      /* Monochrome icons: a grayscale filter reaches into <img> where CSS
-         variables cannot, so it covers the CDN packs as well as the built-in
-         ones. Contrast is lifted a little, since a plain desaturation of the
-         warmer icons comes out flat. */
-      /* The card draws icons three different ways: <img> for the large condition
-         icon, a background image on <i class="icon"> in the forecast columns,
-         and ha-icon for the slots. All three need the filter, or half the card
-         goes grey and half stays coloured. */
-      .mono-icons img,
-      .mono-icons .icon,
-      .mono-icons ha-icon,
-      .mono-icons .moon-icon,
-      .mono-icons svg {
-        filter: grayscale(1) contrast(1.15);
-      }
       .comfort-row {
         display: table-row;
         margin-left: auto;

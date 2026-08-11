@@ -123,8 +123,6 @@ const en: Translation = {
     "time_format": "Time Format",
     "locale": "Locale",
     "icon_pack": "Icon Pack",
-    "mono_icons": "Monochrome icons",
-    "mono_icons_hint": "Grayscale, whichever pack is selected - suits e-ink and plain dashboards",
     "opt_locale_auto": "Auto (browser)",
     "actions": "Actions",
     "tap_action": "Tap Action",

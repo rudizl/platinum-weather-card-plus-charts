@@ -123,8 +123,6 @@ const pl: Translation = {
     "time_format": "Format czasu",
     "locale": "Język",
     "icon_pack": "Pakiet ikon",
-    "mono_icons": "Ikony monochromatyczne",
-    "mono_icons_hint": "Odcienie szarości, niezależnie od pakietu - pasuje do e-ink i oszczędnych paneli",
     "opt_locale_auto": "Automatycznie (przeglądarka)",
     "actions": "Akcje",
     "tap_action": "Akcja dotknięcia",

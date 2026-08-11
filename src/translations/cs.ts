@@ -123,8 +123,6 @@ const cs: Translation = {
     "time_format": "Formát času",
     "locale": "Jazyk",
     "icon_pack": "Balíček ikon",
-    "mono_icons": "Monochromatické ikony",
-    "mono_icons_hint": "Odstíny šedi, ať je vybrán jakýkoli balíček - vhodné pro e-ink a střídmé nástěnky",
     "opt_locale_auto": "Auto (prohlížeč)",
     "actions": "Akce",
     "tap_action": "Akce při kliknutí",

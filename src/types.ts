@@ -168,7 +168,6 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   entity_uv_index?: string;
   entity_dew_point?: string;
   option_show_comfort?: boolean;
-  option_mono_icons?: boolean;
   option_color_fire_danger?: boolean;
 
   option_locale?: string;
