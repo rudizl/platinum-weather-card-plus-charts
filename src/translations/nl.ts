@@ -123,6 +123,8 @@ const nl: Translation = {
     "time_format": "Tijdformaat",
     "locale": "Taal",
     "icon_pack": "Pictogrampakket",
+    "mono_icons": "Monochrome pictogrammen",
+    "mono_icons_hint": "Grijstinten, welk pakket ook - geschikt voor e-ink en sobere dashboards",
     "opt_locale_auto": "Automatisch (browser)",
     "actions": "Acties",
     "tap_action": "Tik-actie",

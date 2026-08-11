@@ -123,6 +123,8 @@ const he: Translation = {
     "time_format": "תבנית שעה",
     "locale": "שפה",
     "icon_pack": "חבילת סמלים",
+    "mono_icons": "סמלים מונוכרומטיים",
+    "mono_icons_hint": "גווני אפור, בכל חבילה - מתאים ל-e-ink וללוחות פשוטים",
     "opt_locale_auto": "אוטומטי (דפדפן)",
     "actions": "פעולות",
     "tap_action": "פעולה בלחיצה",

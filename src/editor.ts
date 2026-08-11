@@ -1846,6 +1846,16 @@ get _forecast_type(): string {
         </div>
       </div>` : html``}
       <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_mono_icons ? "pwc-switch active" : "pwc-switch"} .value=${'option_mono_icons'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("mono_icons")}</span>
+            </div>
+          <div class="help-text">${this._t("mono_icons_hint")}</div>
+        </div>
+        <div></div>
+      </div>
+      <div class="side-by-side">
         <div class="full-width">
           <label class="label">${this._t("icon_pack")}</label>
           <select class='ha-select-compat' .configValue=${'icon_pack'} .value=${this._icon_pack} @change=${this._valueChanged}>

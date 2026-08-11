@@ -123,6 +123,8 @@ const it: Translation = {
     "time_format": "Formato ora",
     "locale": "Lingua",
     "icon_pack": "Pacchetto icone",
+    "mono_icons": "Icone monocromatiche",
+    "mono_icons_hint": "Scala di grigi, qualunque sia il pacchetto - adatto a e-ink e dashboard sobrie",
     "opt_locale_auto": "Automatico (browser)",
     "actions": "Azioni",
     "tap_action": "Azione al tocco",

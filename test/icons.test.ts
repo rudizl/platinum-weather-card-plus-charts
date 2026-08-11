@@ -190,3 +190,26 @@ describe('the icon packs map onto names that exist', () => {
     expect(body, 'no fallback for an unmapped icon').toMatch(/\?\?\s*'[\w-]+'/);
   });
 });
+
+describe('monochrome icons', () => {
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('desaturates through a filter rather than a second icon set', () => {
+    // A filter reaches into <img>, where CSS variables do not, so one rule
+    // covers the CDN packs as well as the built-in ones — no second set of
+    // files to ship or keep in step.
+    const rule = /\.mono-icons img\s*\{([^}]*)\}/.exec(card);
+    expect(rule, 'no monochrome rule').not.toBeNull();
+    expect(rule![1]).toContain('grayscale');
+  });
+
+  it('applies to the whole card, so no icon is missed', () => {
+    // Per-icon classes would need adding to every img the card renders, and one
+    // would eventually be forgotten.
+    expect(card).toMatch(/<ha-card class="card\$\{[^}]*mono-icons/);
+  });
+
+  it('is off unless asked for', () => {
+    expect(card).toMatch(/option_mono_icons === true/);
+  });
+});

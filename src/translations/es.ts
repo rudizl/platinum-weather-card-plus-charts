@@ -123,6 +123,8 @@ const es: Translation = {
     "time_format": "Formato de hora",
     "locale": "Idioma",
     "icon_pack": "Paquete de iconos",
+    "mono_icons": "Iconos monocromos",
+    "mono_icons_hint": "Escala de grises, sea cual sea el paquete - apropiado para e-ink y paneles sobrios",
     "opt_locale_auto": "Automático (navegador)",
     "actions": "Acciones",
     "tap_action": "Acción al tocar",

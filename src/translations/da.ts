@@ -123,6 +123,8 @@ const da: Translation = {
     "time_format": "Tidsformat",
     "locale": "Sprog",
     "icon_pack": "Ikonpakke",
+    "mono_icons": "Monokrome ikoner",
+    "mono_icons_hint": "Gråtoner, uanset pakke - velegnet til e-ink og enkle dashboards",
     "opt_locale_auto": "Automatisk (browser)",
     "actions": "Handlinger",
     "tap_action": "Tryk-handling",

@@ -693,6 +693,10 @@ The card supports multiple icon packs, selectable from the editor's **Global Opt
 
 For `custom`, set `icon_pack_path` to a path template such as `/local/my-icons/{condition}.svg`. The `{condition}` placeholder is replaced with the HA weather condition name (e.g. `clear-day`, `partlycloudy`, `rain`).
 
+### Monochrome
+
+**Monochrome icons** desaturates whichever pack you have selected, which suits e-ink displays and dashboards that would rather not have colour competing for attention. It is a filter rather than a second set of files, so it applies to the CDN packs as well as the built-in ones and there is nothing extra to keep in step.
+
 ### Third-party icon licenses
 
 | Icon pack | Author | License |
@@ -902,6 +906,7 @@ double_tap_action:
 | `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky, and drives the rain rate slot. Intensity follows the standard bands: light below 2.5 mm/h, moderate to 10, heavy to 50, violent above |
 | `entity_dew_point` | String | none | Dew point sensor, for the comfort line under the apparent temperature |
 | `option_show_comfort` | Boolean | `false` | Show how the air feels, in a word |
+| `option_mono_icons` | Boolean | `false` | Desaturate the icons, whichever pack is selected |
 | `entity_uv_index` | String | none | UV index sensor for the UV index slot |
 | `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
 | `option_cloud_overrides_icon` | Boolean | `false` | Let the measured cloud cover and rain rate correct the condition icon |

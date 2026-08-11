@@ -123,6 +123,8 @@ const ua: Translation = {
     "time_format": "Формат часу",
     "locale": "Мова",
     "icon_pack": "Набір значків",
+    "mono_icons": "Монохромні значки",
+    "mono_icons_hint": "Відтінки сірого, незалежно від пакета - пасує для e-ink і строгих панелей",
     "opt_locale_auto": "Автоматично (браузер)",
     "actions": "Дії",
     "tap_action": "Дія при дотику",
