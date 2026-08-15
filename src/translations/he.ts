@@ -2,6 +2,7 @@ import type { Translation } from './types';
 
 const he: Translation = {
   "sager": {
+    "wind_label": "רוח:",
     "A": "מזג אוויר נאה",
     "B": "נאה וחם יותר",
     "C": "נאה וקריר יותר",
@@ -144,6 +145,10 @@ const he: Translation = {
     "daily_forecast_date": "תאריך ליד היום",
     "local_forecast_verbose": "טקסט תחזית מפורט",
     "forecast_altitude": "גובה התחנה (מ')",
+    "forecast_algorithm": "אלגוריתם התחזית",
+    "forecast_algorithm_hint": "Sager מביא בחשבון גם את השמים ואת סיבוב הרוח, ולכן יקרא לבוקר מעונן מעונן היכן ש-Zambretti קורא לו נאה",
+    "entity_wind_bearing_6h": "כיוון הרוח לפני שש שעות",
+    "entity_wind_bearing_6h_hint": "עוזר Statistics על חיישן הכיוון — Sager זקוק לשינוי, שלוח מחוונים אינו זוכר",
     "forecast_altitude_hint": "השאר ריק אם החיישן מדווח לחץ יחסי (גובה פני הים)",
     "trend_window": "חלון מגמה (שעות)",
     "trend_window_hint": "חייב להתאים לחלון הזמן של עוזר ה-Derivative — ברירת מחדל 3",

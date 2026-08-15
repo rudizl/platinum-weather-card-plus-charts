@@ -2,6 +2,7 @@ import type { Translation } from './types';
 
 const bg: Translation = {
   "sager": {
+    "wind_label": "Вятър:",
     "A": "Хубаво време",
     "B": "Хубаво и по-топло",
     "C": "Хубаво и по-хладно",
@@ -142,6 +143,10 @@ const bg: Translation = {
     "daily_forecast_date": "Дата до деня",
     "local_forecast_verbose": "Многословна прогноза",
     "forecast_altitude": "Надморска височина (м)",
+    "forecast_algorithm": "Алгоритъм за прогноза",
+    "forecast_algorithm_hint": "Sager отчита и небето, и завъртането на вятъра, затова може да нарече облачна сутрин облачна, докато Zambretti я нарича хубава",
+    "entity_wind_bearing_6h": "Посока на вятъра преди 6 часа",
+    "entity_wind_bearing_6h_hint": "Statistics помощник върху сензора за посока — Sager се нуждае от промяната, а таблото не я помни",
     "forecast_altitude_hint": "Остави празно, ако сензорът дава относително (sea-level) налягане",
     "trend_window": "Прозорец на тренда (ч)",
     "trend_window_hint": "Трябва да съвпада с времевия прозорец на Derivative помощника — по подразбиране 3",

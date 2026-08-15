@@ -20,8 +20,9 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
 import { CARD_VERSION } from './const';
-import { tCard, tMoonPhase, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
+import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas } from './zambretti';
+import { sagerForecast } from './sager';
 
 
 /* eslint no-console: 0 */
@@ -546,7 +547,7 @@ export class PlatinumWeatherCard extends LitElement {
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
-    const localForecast = this.localForecastText;
+    const localForecast = this.sagerForecastText ?? this.localForecastText;
     const forecastText = localForecast !== null ?
       html`<div class="forecast-text">${localForecast}</div>` :
       (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
@@ -636,7 +637,7 @@ export class PlatinumWeatherCard extends LitElement {
 
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
-    const localForecast = this.localForecastText;
+    const localForecast = this.sagerForecastText ?? this.localForecastText;
     const forecastText = localForecast !== null ?
       html`<div class="forecast-text-right">${localForecast}</div>` :
       (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
@@ -2105,6 +2106,90 @@ export class PlatinumWeatherCard extends LitElement {
     if (['falling', 'down', 'decreasing'].includes(s)) return 'falling';
     if (['steady', 'stable'].includes(s)) return 'steady';
     return null;
+  }
+
+  // Sea-level pressure in hPa, with the station-altitude correction applied when
+  // configured. Shared so both forecast algorithms judge the same barometer.
+  private get _forecastPressureHpa(): number | null {
+    const entity = this._config.entity_pressure;
+    if (!entity || !this.hass.states[entity]) return null;
+    const stateObj = this.hass.states[entity];
+    const raw = entity.match('^weather.') === null ? stateObj.state : stateObj.attributes.pressure;
+    const value = Number(raw);
+    if (isNaN(value)) return null;
+    const uom = this._config.pressure_units
+      ? this._config.pressure_units
+      : entity.match('^weather.') === null
+        ? stateObj.attributes.unit_of_measurement
+        : stateObj.attributes.pressure_unit;
+    let pressure = pressureToHpa(value, uom);
+    const altitude = Number(this._config.option_forecast_altitude);
+    if (isFinite(altitude) && altitude > 0) {
+      const tempEntity = this._config.entity_temperature;
+      const tempC = tempEntity && this.hass.states[tempEntity]
+        ? Number(this.hass.states[tempEntity].state) : NaN;
+      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
+    }
+    return pressure;
+  }
+
+  // Pressure change in hPa per hour, with the atmospheric tide removed.
+  private get pressureTrendHpaPerHour(): number | null {
+    const trendEntity = this._config.entity_pressure_trend;
+    if (!trendEntity || !this.hass.states[trendEntity]) return null;
+    const raw = Number(this.hass.states[trendEntity].state);
+    if (!isFinite(raw)) return null;
+    const lat = this.hass.config?.latitude;
+    const lon = this.hass.config?.longitude;
+    if (lat === undefined || lon === undefined) return raw;
+    const window = Number(this._config.option_trend_window_hours);
+    return raw - tidalTrendHpaPerHour(new Date(), lat, lon,
+      isNaN(window) || window <= 0 ? 3 : window);
+  }
+
+  // Sager takes the same barometer as Zambretti but also the sky and the way the
+  // wind has turned, which is why it can call an overcast morning cloudy where a
+  // purely barometric method calls it fine.
+  //
+  // It needs the wind bearing from six hours ago, which a frontend cannot
+  // remember across a page reload — hence the explicit entity. Without it the
+  // card falls back to Zambretti rather than guessing.
+  get sagerForecastText(): string | null {
+    if (this._config.option_forecast_algorithm !== 'sager') return null;
+
+    const pressure = this._forecastPressureHpa;
+    if (pressure === null) return null;
+
+    const sixHourEntity = this._config.entity_wind_bearing_6h;
+    const sixHourState = sixHourEntity ? this.hass.states[sixHourEntity] : undefined;
+    const sixHourBearing = sixHourState
+      && sixHourState.state !== 'unknown' && sixHourState.state !== 'unavailable'
+      ? Number(sixHourState.state) : NaN;
+    if (!isFinite(sixHourBearing)) return null;
+
+    const bearingEntity = this._config.entity_wind_bearing;
+    const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
+    const bearing = bearingState
+      && bearingState.state !== 'unknown' && bearingState.state !== 'unavailable'
+      ? Number(bearingState.state) : NaN;
+
+    const result = sagerForecast({
+      pressureHpa: pressure,
+      trendHpaPerHour: this.pressureTrendHpaPerHour ?? 0,
+      windBearingDeg: isFinite(bearing) ? bearing : null,
+      windBearingSixHoursAgoDeg: sixHourBearing,
+      cloudCover: this.measuredCloudFraction,
+      rainRateMmH: this.measuredRainRate,
+      northernHemisphere: (this.hass.config?.latitude ?? 0) >= 0,
+    });
+    if (result === null) return null;
+
+    let text = tSager(this.locale, result.weather);
+    if (this._config.option_local_forecast_verbose === true) {
+      const wind = tSager(this.locale, `wind_${result.windChange}`);
+      if (wind) text += ` ${tSager(this.locale, 'wind_label')} ${wind.toLowerCase()}.`;
+    }
+    return text;
   }
 
   // Local Zambretti nowcast computed from entity_pressure (+trend, +wind bearing).

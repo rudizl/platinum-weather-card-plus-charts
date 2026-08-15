@@ -2,6 +2,7 @@ import type { Translation } from './types';
 
 const da: Translation = {
   "sager": {
+    "wind_label": "Vind:",
     "A": "Pænt vejr",
     "B": "Pænt og varmere",
     "C": "Pænt og køligere",
@@ -144,6 +145,10 @@ const da: Translation = {
     "daily_forecast_date": "Dato ved siden af dagen",
     "local_forecast_verbose": "Udførlig prognosetekst",
     "forecast_altitude": "Stationens højde (m)",
+    "forecast_algorithm": "Prognosealgoritme",
+    "forecast_algorithm_hint": "Sager læser også himlen og vindens drejning og kalder en overskyet morgen skyet, hvor Zambretti kalder den pæn",
+    "entity_wind_bearing_6h": "Vindretning for seks timer siden",
+    "entity_wind_bearing_6h_hint": "En Statistics-hjælper på din vindretningssensor — Sager har brug for ændringen, som et dashboard ikke husker",
     "forecast_altitude_hint": "Lad stå tomt, hvis sensoren rapporterer relativt tryk (havniveau)",
     "trend_window": "Trendvindue (t)",
     "trend_window_hint": "Skal matche tidsvinduet for din Derivative-hjælper — standard 3",

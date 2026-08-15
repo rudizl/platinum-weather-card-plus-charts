@@ -2,6 +2,7 @@ import type { Translation } from './types';
 
 const it: Translation = {
   "sager": {
+    "wind_label": "Vento:",
     "A": "Bel tempo",
     "B": "Bello e più mite",
     "C": "Bello e più fresco",
@@ -144,6 +145,10 @@ const it: Translation = {
     "daily_forecast_date": "Data accanto al giorno",
     "local_forecast_verbose": "Testo di previsione esteso",
     "forecast_altitude": "Altitudine della stazione (m)",
+    "forecast_algorithm": "Algoritmo di previsione",
+    "forecast_algorithm_hint": "Sager considera anche il cielo e la rotazione del vento, così definisce nuvolosa una mattina coperta che Zambretti dice bella",
+    "entity_wind_bearing_6h": "Direzione del vento sei ore fa",
+    "entity_wind_bearing_6h_hint": "Un helper Statistics sul sensore di direzione — Sager richiede la variazione, che una dashboard non memorizza",
     "forecast_altitude_hint": "Lasciare vuoto se il sensore riporta la pressione relativa (livello del mare)",
     "trend_window": "Finestra di tendenza (h)",
     "trend_window_hint": "Deve corrispondere alla finestra temporale del tuo helper Derivative — predefinito 3",

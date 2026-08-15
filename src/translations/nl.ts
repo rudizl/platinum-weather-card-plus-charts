@@ -2,6 +2,7 @@ import type { Translation } from './types';
 
 const nl: Translation = {
   "sager": {
+    "wind_label": "Wind:",
     "A": "Mooi weer",
     "B": "Mooi en warmer",
     "C": "Mooi en koeler",
@@ -144,6 +145,10 @@ const nl: Translation = {
     "daily_forecast_date": "Datum naast de dag",
     "local_forecast_verbose": "Uitgebreide voorspellingstekst",
     "forecast_altitude": "Hoogte van het station (m)",
+    "forecast_algorithm": "Voorspellingsalgoritme",
+    "forecast_algorithm_hint": "Sager kijkt ook naar de lucht en de winddraaiing, en noemt een bewolkte ochtend bewolkt waar Zambretti hem mooi noemt",
+    "entity_wind_bearing_6h": "Windrichting zes uur geleden",
+    "entity_wind_bearing_6h_hint": "Een Statistics-helper op je windrichtingssensor — Sager heeft de verandering nodig, die een dashboard niet onthoudt",
     "forecast_altitude_hint": "Leeg laten als de sensor relatieve druk (zeeniveau) rapporteert",
     "trend_window": "Trendvenster (u)",
     "trend_window_hint": "Moet overeenkomen met het tijdvenster van je Derivative-helper — standaard 3",

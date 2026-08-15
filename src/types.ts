@@ -168,6 +168,8 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   entity_uv_index?: string;
   entity_dew_point?: string;
   option_show_comfort?: boolean;
+  option_forecast_algorithm?: 'zambretti' | 'sager';
+  entity_wind_bearing_6h?: string;
   option_color_fire_danger?: boolean;
 
   option_locale?: string;

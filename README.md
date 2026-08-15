@@ -497,6 +497,28 @@ Inputs used:
 
 The hemisphere is detected automatically from your Home Assistant latitude.
 
+#### The Sager Weathercaster
+
+Zambretti's blindness to the sky is not fixable within Zambretti — but it is precisely what Raymond Sager set out to address in 1942. His instrument reads six things rather than three: pressure, its trend, the wind sector, **how the wind has turned over six hours**, the cloud cover, and whether it is raining. Choose it under **Forecast algorithm**.
+
+The difference shows in the case that prompted this: a morning at 1020 hPa with the barometer rising and the sky two-thirds covered. Zambretti says *fine weather*, because that is what the barometer says. Sager says *unsettled*, because it can also see the cloud.
+
+It needs one thing the card cannot supply itself. Sager compares the wind now with the wind six hours ago, and a dashboard forgets everything when the page reloads — so the history has to come from a helper you create:
+
+```yaml
+# Settings → Devices & Services → Helpers → Statistics
+# Source: your wind direction sensor
+# Characteristic: average
+# Sampling size: enough to cover six hours
+# Max age: 6 hours
+```
+
+Point **Wind bearing six hours ago** at that helper. Without it the card falls back to Zambretti rather than guessing.
+
+The forecasts are Sager's own, with his lettering (A through Y), so the output is comparable with any other implementation of the instrument. His wording is condensed for the card: *"Precipitation or showers/flurries followed by improvement (within 12 hours) and becoming cooler"* was written for a printed manual.
+
+Cloud cover comes from the pyranometer if you have one configured, and rain from the gauge. Without a pyranometer Sager still works, assuming partly cloudy — it simply loses the advantage that made it worth choosing.
+
 #### What it can and cannot do
 
 Zambretti is **purely barometric**. It infers the weather from the pressure level, which way the pressure is moving, and where the wind is coming from. That works because in the mid-latitude frontal weather it was built for — Britain in 1915 — pressure genuinely leads the weather: fronts announce themselves in the barometer hours before they arrive.
@@ -838,6 +860,8 @@ double_tap_action:
 | `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
 | `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 | `option_trend_window_hours` | Number | `3` | Time window of your pressure trend sensor, in hours — the tidal correction is averaged over it |
+| `option_forecast_algorithm` | String | `zambretti` | `zambretti` or `sager` |
+| `entity_wind_bearing_6h` | String | none | Wind bearing six hours ago, from a statistics helper — required by Sager |
 
 ## Extended Section
 

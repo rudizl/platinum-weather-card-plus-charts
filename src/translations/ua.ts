@@ -2,6 +2,7 @@ import type { Translation } from './types';
 
 const ua: Translation = {
   "sager": {
+    "wind_label": "Вітер:",
     "A": "Ясно",
     "B": "Ясно і тепліше",
     "C": "Ясно і прохолодніше",
@@ -144,6 +145,10 @@ const ua: Translation = {
     "daily_forecast_date": "Дата поруч із днем",
     "local_forecast_verbose": "Розгорнутий текст прогнозу",
     "forecast_altitude": "Висота станції (м)",
+    "forecast_algorithm": "Алгоритм прогнозу",
+    "forecast_algorithm_hint": "Sager враховує і небо, і поворот вітру, тож назве похмурий ранок похмурим там, де Zambretti каже «ясно»",
+    "entity_wind_bearing_6h": "Напрямок вітру шість годин тому",
+    "entity_wind_bearing_6h_hint": "Помічник Statistics над сенсором напрямку — Sager потрібна зміна, якої панель не пам'ятає",
     "forecast_altitude_hint": "Залиште порожнім, якщо датчик повідомляє відносний тиск (рівень моря)",
     "trend_window": "Вікно тренду (год)",
     "trend_window_hint": "Має збігатися з часовим вікном помічника Derivative — типово 3",

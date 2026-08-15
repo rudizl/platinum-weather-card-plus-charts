@@ -2,6 +2,7 @@ import type { Translation } from './types';
 
 const cs: Translation = {
   "sager": {
+    "wind_label": "Vítr:",
     "A": "Pěkně",
     "B": "Pěkně a tepleji",
     "C": "Pěkně a chladněji",
@@ -144,6 +145,10 @@ const cs: Translation = {
     "daily_forecast_date": "Zobrazit datum vedle dne",
     "local_forecast_verbose": "Podrobný text předpovědi",
     "forecast_altitude": "Nadmořská výška stanice (m)",
+    "forecast_algorithm": "Algoritmus předpovědi",
+    "forecast_algorithm_hint": "Sager zohledňuje i oblohu a stáčení větru, takže zataženém ráno označí za oblačné tam, kde Zambretti říká pěkně",
+    "entity_wind_bearing_6h": "Směr větru před šesti hodinami",
+    "entity_wind_bearing_6h_hint": "Pomocník Statistics nad senzorem směru — Sager potřebuje změnu, kterou nástěnka nepamatuje",
     "forecast_altitude_hint": "Nechte prázdné, pokud senzor hlásí relativní tlak (k hladině moře)",
     "trend_window": "Okno trendu (h)",
     "trend_window_hint": "Musí odpovídat časovému oknu pomocníka Derivative — výchozí 3",
