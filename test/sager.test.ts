@@ -338,3 +338,38 @@ describe('the wind clause earns its line', () => {
     expect(sagerForecast({ ...base, trendHpaPerHour: 0 })!.windChange).toBe('U');
   });
 });
+
+describe('the sentence reads as prose', () => {
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+  const getter = /get sagerForecastText\(\)[\s\S]*?\n  \}/.exec(card)![0];
+
+  it('names the sky, since Sager\'s phrases alone are very terse', () => {
+    // 'Fair' on its own is a poor showing next to Zambretti's full sentence,
+    // and the card has measured the sky anyway.
+    expect(getter).toContain('sky_clear');
+    expect(getter).toContain('measuredCloudFraction');
+  });
+
+  it('gives the sky its own sentence', () => {
+    // Several forecasts end in a temperature clause, so appending the sky to
+    // them produced 'cooler under overcast' — one muddled thought.
+    expect(getter, 'the sky is appended rather than made its own sentence')
+      .toMatch(/text \+= ` \$\{sky\}\.`/);
+  });
+
+  it('does not repeat a tendency the forecast already states', () => {
+    // 'Precipitation and warmer. Temperature: warmer.' is clumsy.
+    expect(getter).toContain('alreadySaid');
+    const withTendency = ['B', 'C', 'E', 'F', 'H', 'K', 'L', 'N', 'S', 'W', 'Y'];
+    for (const letter of withTendency) {
+      expect(tSager('en', letter), `${letter} should carry a tendency`)
+        .toMatch(/warmer|cooler/i);
+    }
+  });
+
+  it('drops both optional clauses when neither says anything', () => {
+    const calm = sagerForecast({ ...base, trendHpaPerHour: 0, cloudCover: 0.1 })!;
+    expect(calm.windChange).toBe('U');
+    expect(calm.temperature).toBe('steady');
+  });
+});

@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const fr: Translation = {
   "sager": {
+    "sky_clear": "Le ciel est dégagé",
+    "sky_partly": "Les nuages sont épars",
+    "sky_cloudy": "Le ciel est nuageux",
+    "sky_overcast": "Le ciel est couvert",
+    "temp_label": "Température :",
     "wind_label": "Vent :",
     "A": "Beau temps",
     "B": "Beau et plus doux",

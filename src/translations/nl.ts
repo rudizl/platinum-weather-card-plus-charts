@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const nl: Translation = {
   "sager": {
+    "sky_clear": "De hemel is helder",
+    "sky_partly": "De bewolking is wisselend",
+    "sky_cloudy": "De hemel is bewolkt",
+    "sky_overcast": "De hemel is zwaarbewolkt",
+    "temp_label": "Temperatuur:",
     "wind_label": "Wind:",
     "A": "Mooi weer",
     "B": "Mooi en warmer",

@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const he: Translation = {
   "sager": {
+    "sky_clear": "השמים בהירים",
+    "sky_partly": "העננות מקוטעת",
+    "sky_cloudy": "השמים מעוננים",
+    "sky_overcast": "השמים מעוננים לחלוטין",
+    "temp_label": "טמפרטורה:",
     "wind_label": "רוח:",
     "A": "מזג אוויר נאה",
     "B": "נאה וחם יותר",

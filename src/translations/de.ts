@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const de: Translation = {
   "sager": {
+    "sky_clear": "Der Himmel ist klar",
+    "sky_partly": "Die Bewölkung ist aufgelockert",
+    "sky_cloudy": "Der Himmel ist bewölkt",
+    "sky_overcast": "Der Himmel ist bedeckt",
+    "temp_label": "Temperatur:",
     "wind_label": "Wind:",
     "A": "Schön",
     "B": "Schön und wärmer",

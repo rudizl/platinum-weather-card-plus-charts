@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const cs: Translation = {
   "sager": {
+    "sky_clear": "Obloha je jasná",
+    "sky_partly": "Oblačnost je proměnlivá",
+    "sky_cloudy": "Obloha je oblačná",
+    "sky_overcast": "Obloha je zatažená",
+    "temp_label": "Teplota:",
     "wind_label": "Vítr:",
     "A": "Pěkně",
     "B": "Pěkně a tepleji",

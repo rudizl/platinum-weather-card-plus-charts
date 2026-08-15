@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const ru: Translation = {
   "sager": {
+    "sky_clear": "Небо ясное",
+    "sky_partly": "Облачность переменная",
+    "sky_cloudy": "Небо облачное",
+    "sky_overcast": "Небо сплошь затянуто",
+    "temp_label": "Температура:",
     "wind_label": "Ветер:",
     "A": "Ясно",
     "B": "Ясно и теплее",

@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const da: Translation = {
   "sager": {
+    "sky_clear": "Himlen er klar",
+    "sky_partly": "Skyerne er spredte",
+    "sky_cloudy": "Himlen er skyet",
+    "sky_overcast": "Himlen er overskyet",
+    "temp_label": "Temperatur:",
     "wind_label": "Vind:",
     "A": "Pænt vejr",
     "B": "Pænt og varmere",

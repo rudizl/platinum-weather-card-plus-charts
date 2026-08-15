@@ -2184,18 +2184,39 @@ export class PlatinumWeatherCard extends LitElement {
     });
     if (result === null) return null;
 
-    // Sager's forecasts are phrases rather than sentences, so the card supplies
-    // the full stop — without it the wind clause runs straight on from the
-    // forecast: 'Fair Wind: little change.'
+    // Sager's phrases are terse — 'Fair' where Zambretti manages a sentence — so
+    // the card fills them out with what it has actually measured. The sky is
+    // named rather than left implicit, since a forecast of fair weather reads
+    // very differently under a clear sky and under a covered one.
     let text = tSager(this.locale, result.weather);
     if (text && !/[.!?]$/.test(text)) text += '.';
-    // The wind clause is only worth the line when it says something. 'U' is
-    // Sager's 'no important change', which is also the commonest case — printing
-    // it every time costs half a line to report that nothing is happening, and
-    // its absence then carries the same meaning.
-    if (this._config.option_local_forecast_verbose === true && result.windChange !== 'U') {
-      const wind = tSager(this.locale, `wind_${result.windChange}`);
-      if (wind) text += ` ${tSager(this.locale, 'wind_label')} ${wind.toLowerCase()}.`;
+
+    // The sky goes in a sentence of its own rather than trailing the forecast:
+    // several of Sager's phrases already end in a temperature clause, and
+    // 'cooler under overcast' reads as one muddled thought.
+    const cloud = this.measuredCloudFraction;
+    if (cloud !== null) {
+      const sky = tSager(this.locale, cloud < 0.25 ? 'sky_clear'
+        : cloud < 0.50 ? 'sky_partly'
+        : cloud < 0.85 ? 'sky_cloudy'
+        : 'sky_overcast');
+      if (sky) text += ` ${sky}.`;
+    }
+
+    if (this._config.option_local_forecast_verbose === true) {
+      // Only worth their line when they say something: 'no important change' is
+      // Sager's commonest outcome for both wind and temperature.
+      if (result.windChange !== 'U') {
+        const wind = tSager(this.locale, `wind_${result.windChange}`);
+        if (wind) text += ` ${tSager(this.locale, 'wind_label')} ${wind.toLowerCase()}.`;
+      }
+      // Several forecasts already carry the tendency in their own wording
+      // ('Precipitation and warmer'), so repeating it would be clumsy.
+      const alreadySaid = /[A-Z]?(warmer|cooler)/i.test(tSager('en', result.weather));
+      if (result.temperature !== 'steady' && !alreadySaid) {
+        const temp = tSager(this.locale, `temp_${result.temperature}`);
+        if (temp) text += ` ${tSager(this.locale, 'temp_label')} ${temp.toLowerCase()}.`;
+      }
     }
     return text;
   }

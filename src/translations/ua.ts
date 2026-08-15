@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const ua: Translation = {
   "sager": {
+    "sky_clear": "Небо ясне",
+    "sky_partly": "Хмарність мінлива",
+    "sky_cloudy": "Небо хмарне",
+    "sky_overcast": "Небо суцільно затягнуте",
+    "temp_label": "Температура:",
     "wind_label": "Вітер:",
     "A": "Ясно",
     "B": "Ясно і тепліше",

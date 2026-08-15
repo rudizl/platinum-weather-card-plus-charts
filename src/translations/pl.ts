@@ -2,6 +2,11 @@ import type { Translation } from './types';
 
 const pl: Translation = {
   "sager": {
+    "sky_clear": "Niebo jest bezchmurne",
+    "sky_partly": "Zachmurzenie jest umiarkowane",
+    "sky_cloudy": "Niebo jest pochmurne",
+    "sky_overcast": "Niebo jest całkowicie zachmurzone",
+    "temp_label": "Temperatura:",
     "wind_label": "Wiatr:",
     "A": "Pogodnie",
     "B": "Pogodnie i cieplej",
