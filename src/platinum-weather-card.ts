@@ -2184,7 +2184,11 @@ export class PlatinumWeatherCard extends LitElement {
     });
     if (result === null) return null;
 
+    // Sager's forecasts are phrases rather than sentences, so the card supplies
+    // the full stop — without it the wind clause runs straight on from the
+    // forecast: 'Fair Wind: little change.'
     let text = tSager(this.locale, result.weather);
+    if (text && !/[.!?]$/.test(text)) text += '.';
     if (this._config.option_local_forecast_verbose === true) {
       const wind = tSager(this.locale, `wind_${result.windChange}`);
       if (wind) text += ` ${tSager(this.locale, 'wind_label')} ${wind.toLowerCase()}.`;

@@ -105,9 +105,12 @@ function skyDigit(cloudCover: number | null, rainRateMmH: number | null): string
   // Sager's own categories: clear, partly cloudy, mostly overcast. The middle
   // band is narrow because the instrument asks what the sky mostly is, and a
   // sky two thirds covered is not 'partly cloudy' to an observer looking up.
-  if (cloudCover < 0.25) return '1';             // clear
-  if (cloudCover < 0.60) return '2';             // partly cloudy
-  return '3';                                     // overcast
+  // Oktas, as an observer would report them: clear or nearly so up to 2/8,
+  // partly cloudy to 4/8, more than half covered is 'cloudy' — which is the
+  // point at which calling it fine weather stops being defensible.
+  if (cloudCover < 0.25) return '1';             // 0-2 oktas
+  if (cloudCover < 0.50) return '2';             // 3-4 oktas
+  return '3';                                     // 5 oktas and up
 }
 
 /** Position 5: which way the wind has turned. */

@@ -264,3 +264,52 @@ describe('the card falls back rather than guessing', () => {
     expect(getter).toContain('this._forecastPressureHpa');
   });
 });
+
+describe('a sky more than half covered is not fair weather', () => {
+  // At 59% cloud the card said 'Fair', because the threshold sat at 60%. No
+  // observer looking at a sky that covered would call it fine.
+  it('calls anything past half cover cloudy', () => {
+    for (const cloudCover of [0.5, 0.59, 0.7, 0.9]) {
+      const result = sagerForecast({
+        ...base, pressureHpa: 1020, trendHpaPerHour: 0.3, cloudCover,
+      })!;
+      expect(result.code[3], `${Math.round(cloudCover * 100)}% should be overcast`).toBe('3');
+      expect(result.weather, `${Math.round(cloudCover * 100)}% should not be fair`)
+        .not.toBe('A');
+    }
+  });
+
+  it('still calls a genuinely clear sky fair', () => {
+    const result = sagerForecast({
+      ...base, pressureHpa: 1020, trendHpaPerHour: 0.3, cloudCover: 0.1,
+      windBearingDeg: 0, windBearingSixHoursAgoDeg: 0,
+    })!;
+    expect(result.code[3]).toBe('1');
+    expect(['A', 'B', 'C']).toContain(result.weather);
+  });
+
+  it('places the bands on the oktas an observer would report', () => {
+    // 0-2 oktas clear, 3-4 partly cloudy, 5 and up cloudy.
+    expect(sagerForecast({ ...base, cloudCover: 0.24 })!.code[3]).toBe('1');
+    expect(sagerForecast({ ...base, cloudCover: 0.26 })!.code[3]).toBe('2');
+    expect(sagerForecast({ ...base, cloudCover: 0.49 })!.code[3]).toBe('2');
+    expect(sagerForecast({ ...base, cloudCover: 0.51 })!.code[3]).toBe('3');
+  });
+});
+
+describe('the forecast reads as a sentence', () => {
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('ends the forecast before the wind clause begins', () => {
+    // Sager's forecasts are phrases, not sentences: without a full stop the
+    // card rendered 'Fair Wind: little change.'
+    const getter = /get sagerForecastText\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter, 'no full stop is added after the forecast')
+      .toMatch(/\[.!\?\]\$\/\.test\(text\)|text \+= '\.'/);
+  });
+
+  it('does not double the full stop when the phrase already has one', () => {
+    const getter = /get sagerForecastText\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toContain('!/[.!?]$/.test(text)');
+  });
+});
