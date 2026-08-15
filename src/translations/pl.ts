@@ -1,6 +1,36 @@
 import type { Translation } from './types';
 
 const pl: Translation = {
+  "sager": {
+    "A": "Pogodnie",
+    "B": "Pogodnie i cieplej",
+    "C": "Pogodnie i chłodniej",
+    "D": "Zmienne",
+    "E": "Zmienne i cieplej",
+    "F": "Zmienne i chłodniej",
+    "G": "Wzrost zachmurzenia, potem opady",
+    "H": "Wzrost zachmurzenia, potem opady; cieplej",
+    "J": "Przelotne opady",
+    "K": "Przelotne opady i cieplej",
+    "L": "Przelotne opady i chłodniej",
+    "M": "Opady",
+    "N": "Opady i cieplej",
+    "P": "Opady, ochłodzenie; poprawa w ciągu 24 godzin",
+    "R": "Opady, poprawa w ciągu 12 godzin",
+    "S": "Opady, poprawa w ciągu 12 godzin; chłodniej",
+    "T": "Opady, poprawa w ciągu 6 godzin",
+    "U": "Opady, poprawa w ciągu 6 godzin; chłodniej",
+    "W": "Opady, potem pogodnie w ciągu 6 godzin; chłodniej",
+    "X": "Zmienne, potem pogodnie",
+    "Y": "Zmienne, potem pogodnie w ciągu 6 godzin; chłodniej",
+    "wind_D": "Słabnący",
+    "wind_N": "Prawdopodobnie wzmagający się",
+    "wind_S": "Silny, możliwe wichury",
+    "wind_U": "Niewielka zmiana",
+    "temp_warmer": "Cieplej",
+    "temp_cooler": "Chłodniej",
+    "temp_steady": "Niewielka zmiana"
+  },
   "warning": {
     "type_1": "Silny wiatr",
     "type_2": "Śnieg i gołoledź",

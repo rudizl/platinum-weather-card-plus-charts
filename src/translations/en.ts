@@ -1,6 +1,36 @@
 import type { Translation } from './types';
 
 const en: Translation = {
+  "sager": {
+    "A": "Fair",
+    "B": "Fair and warmer",
+    "C": "Fair and cooler",
+    "D": "Unsettled",
+    "E": "Unsettled and warmer",
+    "F": "Unsettled and cooler",
+    "G": "Increasing cloud, then precipitation",
+    "H": "Increasing cloud, then precipitation; warmer",
+    "J": "Showers",
+    "K": "Showers and warmer",
+    "L": "Showers and cooler",
+    "M": "Precipitation",
+    "N": "Precipitation and warmer",
+    "P": "Precipitation, turning cooler; improving within 24 hours",
+    "R": "Precipitation, improving within 12 hours",
+    "S": "Precipitation, improving within 12 hours; cooler",
+    "T": "Precipitation, improving within 6 hours",
+    "U": "Precipitation, improving within 6 hours; cooler",
+    "W": "Precipitation, then fair within 6 hours; cooler",
+    "X": "Unsettled, then fair",
+    "Y": "Unsettled, then fair within 6 hours; cooler",
+    "wind_D": "Easing",
+    "wind_N": "Probably increasing",
+    "wind_S": "Strong, possibly gale force",
+    "wind_U": "Little change",
+    "temp_warmer": "Warmer",
+    "temp_cooler": "Cooler",
+    "temp_steady": "Little change"
+  },
   "warning": {
     "type_1": "Wind",
     "type_2": "Snow and ice",

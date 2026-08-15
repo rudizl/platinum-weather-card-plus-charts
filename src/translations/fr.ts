@@ -1,6 +1,36 @@
 import type { Translation } from './types';
 
 const fr: Translation = {
+  "sager": {
+    "A": "Beau temps",
+    "B": "Beau et plus doux",
+    "C": "Beau et plus frais",
+    "D": "Instable",
+    "E": "Instable et plus doux",
+    "F": "Instable et plus frais",
+    "G": "Nébulosité croissante, puis précipitations",
+    "H": "Nébulosité croissante, puis précipitations ; plus doux",
+    "J": "Averses",
+    "K": "Averses et plus doux",
+    "L": "Averses et plus frais",
+    "M": "Précipitations",
+    "N": "Précipitations et plus doux",
+    "P": "Précipitations, rafraîchissement ; amélioration sous 24 heures",
+    "R": "Précipitations, amélioration sous 12 heures",
+    "S": "Précipitations, amélioration sous 12 heures ; plus frais",
+    "T": "Précipitations, amélioration sous 6 heures",
+    "U": "Précipitations, amélioration sous 6 heures ; plus frais",
+    "W": "Précipitations, puis beau sous 6 heures ; plus frais",
+    "X": "Instable, puis beau",
+    "Y": "Instable, puis beau sous 6 heures ; plus frais",
+    "wind_D": "Faiblissant",
+    "wind_N": "Probablement en hausse",
+    "wind_S": "Fort, coups de vent possibles",
+    "wind_U": "Peu de changement",
+    "temp_warmer": "Plus doux",
+    "temp_cooler": "Plus frais",
+    "temp_steady": "Peu de changement"
+  },
   "warning": {
     "type_1": "Vent",
     "type_2": "Neige et verglas",

@@ -1,6 +1,36 @@
 import type { Translation } from './types';
 
 const de: Translation = {
+  "sager": {
+    "A": "Schön",
+    "B": "Schön und wärmer",
+    "C": "Schön und kühler",
+    "D": "Wechselhaft",
+    "E": "Wechselhaft und wärmer",
+    "F": "Wechselhaft und kühler",
+    "G": "Zunehmende Bewölkung, dann Niederschlag",
+    "H": "Zunehmende Bewölkung, dann Niederschlag; wärmer",
+    "J": "Schauer",
+    "K": "Schauer und wärmer",
+    "L": "Schauer und kühler",
+    "M": "Niederschlag",
+    "N": "Niederschlag und wärmer",
+    "P": "Niederschlag, kühler werdend; Besserung binnen 24 Stunden",
+    "R": "Niederschlag, Besserung binnen 12 Stunden",
+    "S": "Niederschlag, Besserung binnen 12 Stunden; kühler",
+    "T": "Niederschlag, Besserung binnen 6 Stunden",
+    "U": "Niederschlag, Besserung binnen 6 Stunden; kühler",
+    "W": "Niederschlag, dann schön binnen 6 Stunden; kühler",
+    "X": "Wechselhaft, dann schön",
+    "Y": "Wechselhaft, dann schön binnen 6 Stunden; kühler",
+    "wind_D": "Nachlassend",
+    "wind_N": "Wahrscheinlich zunehmend",
+    "wind_S": "Stark, möglicherweise stürmisch",
+    "wind_U": "Kaum Änderung",
+    "temp_warmer": "Wärmer",
+    "temp_cooler": "Kühler",
+    "temp_steady": "Kaum Änderung"
+  },
   "warning": {
     "type_1": "Wind",
     "type_2": "Schnee und Eis",

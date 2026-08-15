@@ -1,6 +1,36 @@
 import type { Translation } from './types';
 
 const da: Translation = {
+  "sager": {
+    "A": "Pænt vejr",
+    "B": "Pænt og varmere",
+    "C": "Pænt og køligere",
+    "D": "Ustadigt",
+    "E": "Ustadigt og varmere",
+    "F": "Ustadigt og køligere",
+    "G": "Tiltagende skydække, derefter nedbør",
+    "H": "Tiltagende skydække, derefter nedbør; varmere",
+    "J": "Byger",
+    "K": "Byger og varmere",
+    "L": "Byger og køligere",
+    "M": "Nedbør",
+    "N": "Nedbør og varmere",
+    "P": "Nedbør, køligere; bedring inden 24 timer",
+    "R": "Nedbør, bedring inden 12 timer",
+    "S": "Nedbør, bedring inden 12 timer; køligere",
+    "T": "Nedbør, bedring inden 6 timer",
+    "U": "Nedbør, bedring inden 6 timer; køligere",
+    "W": "Nedbør, derefter pænt inden 6 timer; køligere",
+    "X": "Ustadigt, derefter pænt",
+    "Y": "Ustadigt, derefter pænt inden 6 timer; køligere",
+    "wind_D": "Aftagende",
+    "wind_N": "Sandsynligvis tiltagende",
+    "wind_S": "Kraftig, muligvis kuling",
+    "wind_U": "Ringe ændring",
+    "temp_warmer": "Varmere",
+    "temp_cooler": "Køligere",
+    "temp_steady": "Ringe ændring"
+  },
   "warning": {
     "type_1": "Vind",
     "type_2": "Sne og is",

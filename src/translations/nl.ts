@@ -1,6 +1,36 @@
 import type { Translation } from './types';
 
 const nl: Translation = {
+  "sager": {
+    "A": "Mooi weer",
+    "B": "Mooi en warmer",
+    "C": "Mooi en koeler",
+    "D": "Wisselvallig",
+    "E": "Wisselvallig en warmer",
+    "F": "Wisselvallig en koeler",
+    "G": "Toenemende bewolking, dan neerslag",
+    "H": "Toenemende bewolking, dan neerslag; warmer",
+    "J": "Buien",
+    "K": "Buien en warmer",
+    "L": "Buien en koeler",
+    "M": "Neerslag",
+    "N": "Neerslag en warmer",
+    "P": "Neerslag, koeler wordend; verbetering binnen 24 uur",
+    "R": "Neerslag, verbetering binnen 12 uur",
+    "S": "Neerslag, verbetering binnen 12 uur; koeler",
+    "T": "Neerslag, verbetering binnen 6 uur",
+    "U": "Neerslag, verbetering binnen 6 uur; koeler",
+    "W": "Neerslag, dan mooi binnen 6 uur; koeler",
+    "X": "Wisselvallig, dan mooi",
+    "Y": "Wisselvallig, dan mooi binnen 6 uur; koeler",
+    "wind_D": "Afnemend",
+    "wind_N": "Waarschijnlijk toenemend",
+    "wind_S": "Sterk, mogelijk stormachtig",
+    "wind_U": "Weinig verandering",
+    "temp_warmer": "Warmer",
+    "temp_cooler": "Koeler",
+    "temp_steady": "Weinig verandering"
+  },
   "warning": {
     "type_1": "Wind",
     "type_2": "Sneeuw en ijzel",

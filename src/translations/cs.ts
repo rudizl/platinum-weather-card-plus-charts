@@ -1,6 +1,36 @@
 import type { Translation } from './types';
 
 const cs: Translation = {
+  "sager": {
+    "A": "Pěkně",
+    "B": "Pěkně a tepleji",
+    "C": "Pěkně a chladněji",
+    "D": "Proměnlivo",
+    "E": "Proměnlivo a tepleji",
+    "F": "Proměnlivo a chladněji",
+    "G": "Přibývání oblačnosti, poté srážky",
+    "H": "Přibývání oblačnosti, poté srážky; tepleji",
+    "J": "Přeháňky",
+    "K": "Přeháňky a tepleji",
+    "L": "Přeháňky a chladněji",
+    "M": "Srážky",
+    "N": "Srážky a tepleji",
+    "P": "Srážky, ochlazení; zlepšení do 24 hodin",
+    "R": "Srážky, zlepšení do 12 hodin",
+    "S": "Srážky, zlepšení do 12 hodin; chladněji",
+    "T": "Srážky, zlepšení do 6 hodin",
+    "U": "Srážky, zlepšení do 6 hodin; chladněji",
+    "W": "Srážky, poté pěkně do 6 hodin; chladněji",
+    "X": "Proměnlivo, poté pěkně",
+    "Y": "Proměnlivo, poté pěkně do 6 hodin; chladněji",
+    "wind_D": "Slábnoucí",
+    "wind_N": "Pravděpodobně sílící",
+    "wind_S": "Silný, možné vichřice",
+    "wind_U": "Malá změna",
+    "temp_warmer": "Tepleji",
+    "temp_cooler": "Chladněji",
+    "temp_steady": "Malá změna"
+  },
   "warning": {
     "type_1": "Silný vítr",
     "type_2": "Sníh a led",
