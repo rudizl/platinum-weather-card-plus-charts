@@ -2189,7 +2189,11 @@ export class PlatinumWeatherCard extends LitElement {
     // forecast: 'Fair Wind: little change.'
     let text = tSager(this.locale, result.weather);
     if (text && !/[.!?]$/.test(text)) text += '.';
-    if (this._config.option_local_forecast_verbose === true) {
+    // The wind clause is only worth the line when it says something. 'U' is
+    // Sager's 'no important change', which is also the commonest case — printing
+    // it every time costs half a line to report that nothing is happening, and
+    // its absence then carries the same meaning.
+    if (this._config.option_local_forecast_verbose === true && result.windChange !== 'U') {
       const wind = tSager(this.locale, `wind_${result.windChange}`);
       if (wind) text += ` ${tSager(this.locale, 'wind_label')} ${wind.toLowerCase()}.`;
     }

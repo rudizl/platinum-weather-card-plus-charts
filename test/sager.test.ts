@@ -313,3 +313,28 @@ describe('the forecast reads as a sentence', () => {
     expect(getter).toContain('!/[.!?]$/.test(text)');
   });
 });
+
+describe('the wind clause earns its line', () => {
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('is omitted when the wind is not expected to change', () => {
+    // 'U' is Sager's 'no important change' and the commonest outcome: printing
+    // it every time spends half a line reporting that nothing is happening.
+    const getter = /get sagerForecastText\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter, 'the no-change case is not filtered out')
+      .toMatch(/result\.windChange !== 'U'/);
+  });
+
+  it('still shows the cases that matter', () => {
+    // A falling barometer tightens the gradient, and on a coast that is worth
+    // knowing before it arrives.
+    const falling = sagerForecast({ ...base, trendHpaPerHour: -1.5 })!;
+    expect(falling.windChange).not.toBe('U');
+    const rising = sagerForecast({ ...base, trendHpaPerHour: 2 })!;
+    expect(rising.windChange).not.toBe('U');
+  });
+
+  it('reports no change on a steady barometer', () => {
+    expect(sagerForecast({ ...base, trendHpaPerHour: 0 })!.windChange).toBe('U');
+  });
+});
