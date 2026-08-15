@@ -134,66 +134,65 @@ export function sagerForecast(input: SagerInput): SagerForecast | null {
     ? windEvolution(windBearingSixHoursAgoDeg, windBearingDeg, northernHemisphere)
     : 'steady';
 
-  const code = pressureLetter(pressureHpa)
-    + windDigit(sector)
-    + trendDigit(trendHpaPerHour)
-    + skyDigit(cloudCover, rainRateMmH)
-    + evolutionDigit(evolution);
-
   const trend = trendDigit(trendHpaPerHour);
   const sky = skyDigit(cloudCover, rainRateMmH);
+  const code = pressureLetter(pressureHpa) + windDigit(sector) + trend + sky
+    + evolutionDigit(evolution);
+
   const raining = sky === '4';
   const overcast = sky === '3' || raining;
-  const falling = trend === '4' || trend === '5';
+  const clear = sky === '1';
   const fallingFast = trend === '5';
-  const rising = trend === '1' || trend === '2';
+  const falling = trend === '4' || fallingFast;
+  const risingFast = trend === '1';
+  const rising = trend === '2' || risingFast;
   const low = pressureHpa < 1005.76;
   const high = pressureHpa > 1019.30;
 
-  // The wind sector matters because of where the air is coming from: in the
-  // northern hemisphere the southerly and easterly quadrants carry moisture
-  // ahead of a depression, while northerly and westerly bring the drier air
-  // behind it. South of the equator the pattern mirrors.
+  // Where the air is coming from. In the northern hemisphere the southerly and
+  // easterly quadrants carry moisture ahead of a depression; northerly and
+  // westerly bring the drier air behind it. South of the equator it mirrors.
   const wetQuadrant = sector !== null && (northernHemisphere
     ? ['E', 'SE', 'S', 'SW'].includes(sector)
     : ['E', 'NE', 'N', 'NW'].includes(sector));
-
-  let weather: string;
-  if (raining) {
-    weather = rising ? 'clearing_soon' : falling ? 'rain_continuing' : 'rain_intermittent';
-  } else if (fallingFast && (low || wetQuadrant)) {
-    weather = overcast ? 'rain_soon' : 'rain_likely';
-  } else if (falling && wetQuadrant) {
-    weather = overcast ? 'rain_likely' : 'increasing_cloud';
-  } else if (falling) {
-    weather = overcast ? 'unsettled' : 'increasing_cloud';
-  } else if (rising && overcast) {
-    weather = 'clearing_slowly';
-  } else if (rising) {
-    weather = high ? 'fair_continuing' : 'improving';
-  } else if (overcast) {
-    // High pressure with an overcast sky is the anticyclonic gloom that a purely
-    // barometric method calls 'fine weather' and an observer calls grey.
-    weather = low ? 'unsettled' : 'cloudy_no_change';
-  } else {
-    weather = high ? 'fair_continuing' : 'no_change';
-  }
-
-  // Wind: falling pressure means a tightening gradient, so more of it.
-  const windChange = fallingFast ? 'increasing_strongly'
-    : falling ? 'increasing'
-    : trend === '1' ? 'decreasing'
-    : evolution === 'steady' ? 'little_change'
-    : 'shifting';
-
-  // Temperature: air arriving from the pole is colder than air from the tropics,
-  // and a clearing sky at night lets heat go.
-  const fromCold = sector !== null && (northernHemisphere
+  const coldQuadrant = sector !== null && (northernHemisphere
     ? ['N', 'NE', 'NW'].includes(sector)
     : ['S', 'SE', 'SW'].includes(sector));
-  const temperature = fromCold && rising ? 'colder'
+
+  // Sager's own letters, so the output is comparable with any other
+  // implementation of the instrument rather than particular to this card.
+  let weather: string;
+  if (raining) {
+    if (risingFast) weather = coldQuadrant ? 'W' : 'T';   // clearing within 6 hours
+    else if (rising) weather = coldQuadrant ? 'S' : 'R';  // clearing within 12
+    else if (falling) weather = wetQuadrant ? 'N' : 'M';  // precipitation continuing
+    else weather = coldQuadrant ? 'L' : 'J';              // showers
+  } else if (fallingFast) {
+    weather = overcast ? 'M' : wetQuadrant ? 'H' : 'G';
+  } else if (falling) {
+    if (overcast) weather = wetQuadrant ? 'G' : 'D';
+    else weather = wetQuadrant ? 'H' : 'E';
+  } else if (rising && overcast) {
+    weather = coldQuadrant ? 'Y' : 'X';                   // unsettled then fair
+  } else if (rising) {
+    weather = coldQuadrant ? 'C' : 'B';                   // fair, cooler or warmer
+  } else if (overcast) {
+    weather = low ? 'D' : coldQuadrant ? 'F' : 'D';       // unsettled
+  } else if (clear && high) {
+    weather = 'A';                                        // fair
+  } else {
+    weather = coldQuadrant ? 'C' : high ? 'A' : 'D';
+  }
+
+  // Wind velocity, again with Sager's letters.
+  const windChange = fallingFast ? (low ? 'S' : 'N')
+    : falling ? 'N'
+    : risingFast ? 'D'
+    : 'U';
+
+  const temperature = coldQuadrant && rising ? 'cooler'
     : wetQuadrant && falling ? 'warmer'
-    : 'little_change';
+    : 'steady';
 
   return { weather, windChange, temperature, code };
 }
