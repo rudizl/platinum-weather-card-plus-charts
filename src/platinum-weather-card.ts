@@ -87,6 +87,9 @@ export class PlatinumWeatherCard extends LitElement {
   // showed sun while the other showed cloud.
   private static _cloudSamples: { t: number; f: number }[] = [];
   private static _cloudBand: number | null = null;
+  // The last cloud reading taken while the sun was high enough to trust it.
+  // Static for the same reason the buffer is: it describes the sky, not a card.
+  private static _lastDaylightCloud: { t: number; f: number } | null = null;
 
   private _error: string[] = [];
 
@@ -2178,7 +2181,7 @@ export class PlatinumWeatherCard extends LitElement {
       trendHpaPerHour: this.pressureTrendHpaPerHour ?? 0,
       windBearingDeg: isFinite(bearing) ? bearing : null,
       windBearingSixHoursAgoDeg: sixHourBearing,
-      cloudCover: this.measuredCloudFraction,
+      cloudCover: this.forecastCloudFraction,
       rainRateMmH: this.measuredRainRate,
       northernHemisphere: (this.hass.config?.latitude ?? 0) >= 0,
     });
@@ -2194,7 +2197,7 @@ export class PlatinumWeatherCard extends LitElement {
     // The sky goes in a sentence of its own rather than trailing the forecast:
     // several of Sager's phrases already end in a temperature clause, and
     // 'cooler under overcast' reads as one muddled thought.
-    const cloud = this.measuredCloudFraction;
+    const cloud = this.forecastCloudFraction;
     if (cloud !== null) {
       const sky = tSager(this.locale, cloud < 0.25 ? 'sky_clear'
         : cloud < 0.50 ? 'sky_partly'
@@ -2768,6 +2771,22 @@ export class PlatinumWeatherCard extends LitElement {
     if (!state || state.state === 'unknown' || state.state === 'unavailable') return null;
     const rate = Number(state.state);
     return isFinite(rate) ? rate : null;
+  }
+
+  // Cloud cover for the forecast, which unlike the slot would rather have a
+  // stale figure than none: a pyranometer says nothing after dark, and the sky
+  // seldom turns over completely between dusk and dawn. Falls back to the last
+  // daylight reading, and gives up once that is a day old.
+  get forecastCloudFraction(): number | null {
+    const cls = this.constructor as typeof PlatinumWeatherCard;
+    const now = this.measuredCloudFraction;
+    if (now !== null) {
+      cls._lastDaylightCloud = { t: Date.now(), f: now };
+      return now;
+    }
+    const last = cls._lastDaylightCloud;
+    if (last === null) return null;
+    return Date.now() - last.t <= 86400000 ? last.f : null;
   }
 
   get measuredCloudFraction(): number | null {

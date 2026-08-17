@@ -347,7 +347,7 @@ describe('the sentence reads as prose', () => {
     // 'Fair' on its own is a poor showing next to Zambretti's full sentence,
     // and the card has measured the sky anyway.
     expect(getter).toContain('sky_clear');
-    expect(getter).toContain('measuredCloudFraction');
+    expect(getter).toContain('forecastCloudFraction');
   });
 
   it('gives the sky its own sentence', () => {
@@ -371,5 +371,37 @@ describe('the sentence reads as prose', () => {
     const calm = sagerForecast({ ...base, trendHpaPerHour: 0, cloudCover: 0.1 })!;
     expect(calm.windChange).toBe('U');
     expect(calm.temperature).toBe('steady');
+  });
+});
+
+describe('the forecast keeps a sky reading overnight', () => {
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('falls back to the last daylight reading rather than nothing', () => {
+    // A pyranometer says nothing after dark, which is exactly when Sager loses
+    // the advantage it was chosen for. The sky seldom turns over completely
+    // between dusk and dawn, so yesterday's is better than none.
+    const getter = /get forecastCloudFraction\(\)[\s\S]*?\n  \}/.exec(card);
+    expect(getter, 'no forecast-specific cloud getter').not.toBeNull();
+    expect(getter![0]).toContain('_lastDaylightCloud');
+  });
+
+  it('gives up on a reading over a day old', () => {
+    // Beyond that it is a guess about a different weather system.
+    const getter = /get forecastCloudFraction\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toContain('86400000');
+  });
+
+  it('shares the remembered reading across cards', () => {
+    // Same reason the averaging buffer is static: it describes the sky.
+    expect(card).toMatch(/private static _lastDaylightCloud/);
+  });
+
+  it('leaves the slot showing dashes at night', () => {
+    // The slot reports a measurement, and there is none after dark — only the
+    // forecast is better served by a stale figure than by nothing.
+    const slot = /get slotCloudCover\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(slot).toContain('measuredCloudFraction');
+    expect(slot).not.toContain('forecastCloudFraction');
   });
 });

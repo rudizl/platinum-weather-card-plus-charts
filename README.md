@@ -519,6 +519,8 @@ The forecasts are Sager's own, with his lettering (A through Y), so the output i
 
 Cloud cover comes from the pyranometer if you have one configured, and rain from the gauge. Without a pyranometer Sager still works, assuming partly cloudy — it simply loses the advantage that made it worth choosing.
 
+After dark a pyranometer says nothing, which is precisely when that advantage would go missing, so the forecast falls back to the last reading taken in daylight. The sky seldom turns over completely between dusk and dawn, and a figure from this evening is a better guess than no figure at all; beyond a day old it is discarded, being by then a guess about a different weather system. The cloud cover **slot** is unaffected and still shows `---` at night, since it reports a measurement rather than a forecast input.
+
 #### What it can and cannot do
 
 Zambretti is **purely barometric**. It infers the weather from the pressure level, which way the pressure is moving, and where the wind is coming from. That works because in the mid-latitude frontal weather it was built for — Britain in 1915 — pressure genuinely leads the weather: fronts announce themselves in the barometer hours before they arrive.
