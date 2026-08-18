@@ -444,3 +444,136 @@ describe('a clear sky is not unsettled weather', () => {
     expect(['A', 'B', 'C']).not.toContain(result.weather);
   });
 });
+
+describe('the algorithm holds together across its whole input range', () => {
+  // Sweeping the inputs catches the contradictions that spot checks miss —
+  // 'Unsettled. The sky is clear.' survived several rounds of manual testing.
+  const FAIR = ['A', 'B', 'C'];
+  const MIXED = ['D', 'E', 'F', 'X', 'Y'];
+  const rank = (letter: string) =>
+    FAIR.includes(letter) ? 0 : MIXED.includes(letter) ? 1 : 2;
+
+  const pressures = [975, 990, 1000, 1008, 1015, 1022, 1035];
+  const trends = [-2, -1, -0.3, 0, 0.3, 1, 2];
+  const clouds = [0, 0.3, 0.6, 0.95];
+  const bearings = [0, 45, 90, 135, 180, 225, 270, 315];
+
+  it('never calls it fair while it is raining', () => {
+    for (const pressureHpa of pressures) {
+      for (const trendHpaPerHour of trends) {
+        for (const windBearingDeg of bearings) {
+          const r = sagerForecast({
+            ...base, pressureHpa, trendHpaPerHour, windBearingDeg,
+            windBearingSixHoursAgoDeg: windBearingDeg, cloudCover: 0.9, rainRateMmH: 2,
+          })!;
+          expect(FAIR, `${pressureHpa}/${trendHpaPerHour} raining`).not.toContain(r.weather);
+        }
+      }
+    }
+  });
+
+  it('never calls it fair under an overcast sky', () => {
+    for (const pressureHpa of pressures) {
+      for (const trendHpaPerHour of trends) {
+        const r = sagerForecast({
+          ...base, pressureHpa, trendHpaPerHour, cloudCover: 0.95,
+        })!;
+        expect(FAIR, `${pressureHpa}/${trendHpaPerHour} overcast`).not.toContain(r.weather);
+      }
+    }
+  });
+
+  it('never improves the forecast as cloud increases', () => {
+    for (const pressureHpa of pressures) {
+      for (const trendHpaPerHour of trends) {
+        for (const windBearingDeg of bearings) {
+          let previous = -1;
+          for (const cloudCover of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
+            const r = sagerForecast({
+              ...base, pressureHpa, trendHpaPerHour, cloudCover, windBearingDeg,
+              windBearingSixHoursAgoDeg: windBearingDeg,
+            })!;
+            expect(rank(r.weather), `more cloud gave a better forecast at ${pressureHpa} hPa`)
+              .toBeGreaterThanOrEqual(previous);
+            previous = rank(r.weather);
+          }
+        }
+      }
+    }
+  });
+
+  it('never improves the forecast as the barometer falls', () => {
+    for (const pressureHpa of pressures) {
+      for (const cloudCover of clouds) {
+        for (const windBearingDeg of bearings) {
+          let previous = -1;
+          for (const trendHpaPerHour of [2, 1, 0, -1, -2]) {
+            const r = sagerForecast({
+              ...base, pressureHpa, trendHpaPerHour, cloudCover, windBearingDeg,
+              windBearingSixHoursAgoDeg: windBearingDeg,
+            })!;
+            expect(rank(r.weather), `a falling barometer improved the forecast at ${pressureHpa} hPa`)
+              .toBeGreaterThanOrEqual(previous);
+            previous = rank(r.weather);
+          }
+        }
+      }
+    }
+  });
+
+  it('mirrors between hemispheres about the north-south axis', () => {
+    // East stays east: ahead of a depression the air arrives from the east in
+    // both hemispheres. Only the poleward and equatorward sides swap.
+    const mirrored: Record<number, number> = {
+      0: 180, 45: 135, 90: 90, 135: 45, 180: 0, 225: 315, 270: 270, 315: 225,
+    };
+    for (const pressureHpa of [1000, 1015, 1030]) {
+      for (const trendHpaPerHour of [-1, 0, 1]) {
+        for (const cloudCover of [0, 0.5, 0.9]) {
+          for (const windBearingDeg of bearings) {
+            const north = sagerForecast({
+              ...base, pressureHpa, trendHpaPerHour, cloudCover, windBearingDeg,
+              windBearingSixHoursAgoDeg: windBearingDeg, northernHemisphere: true,
+            })!;
+            const south = sagerForecast({
+              ...base, pressureHpa, trendHpaPerHour, cloudCover,
+              windBearingDeg: mirrored[windBearingDeg],
+              windBearingSixHoursAgoDeg: mirrored[windBearingDeg],
+              northernHemisphere: false,
+            })!;
+            expect(south.weather, `${windBearingDeg}° north vs ${mirrored[windBearingDeg]}° south`)
+              .toBe(north.weather);
+          }
+        }
+      }
+    }
+  });
+
+  it('can reach every forecast it has a phrase for', () => {
+    // Three of Sager's twenty-one were unreachable: the logic had no path to
+    // 'showers and warmer', or to either of the two 'improving' variants that
+    // also turn cooler. A phrase that can never appear is a phrase that was
+    // translated thirteen times for nothing.
+    const reached = new Set<string>();
+    for (const pressureHpa of pressures) {
+      for (const trendHpaPerHour of trends) {
+        for (const cloudCover of clouds) {
+          for (const rainRateMmH of [0, 1, 5, 15]) {
+            for (const windBearingDeg of bearings) {
+              for (const windBearingSixHoursAgoDeg of [0, 90, 180, 270]) {
+                reached.add(sagerForecast({
+                  ...base, pressureHpa, trendHpaPerHour, cloudCover, rainRateMmH,
+                  windBearingDeg, windBearingSixHoursAgoDeg,
+                })!.weather);
+              }
+            }
+          }
+        }
+      }
+    }
+    const translated = Object.keys(TRANSLATIONS.en.sager)
+      .filter((k) => /^[A-Z]$/.test(k));
+    const unreachable = translated.filter((letter) => !reached.has(letter));
+    expect(unreachable, 'forecasts with a phrase but no path to them').toEqual([]);
+  });
+});

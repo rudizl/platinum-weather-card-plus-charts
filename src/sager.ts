@@ -166,10 +166,21 @@ export function sagerForecast(input: SagerInput): SagerForecast | null {
   // implementation of the instrument rather than particular to this card.
   let weather: string;
   if (raining) {
-    if (risingFast) weather = coldQuadrant ? 'W' : 'T';   // clearing within 6 hours
-    else if (rising) weather = coldQuadrant ? 'S' : 'R';  // clearing within 12
-    else if (falling) weather = wetQuadrant ? 'N' : 'M';  // precipitation continuing
-    else weather = coldQuadrant ? 'L' : 'J';              // showers
+    if (risingFast) {
+      // Clearing within six hours; 'U' where the air is merely cooler, 'W' when
+      // it is clearing to fair outright.
+      weather = coldQuadrant ? 'W' : wetQuadrant ? 'U' : 'T';
+    } else if (rising) {
+      weather = coldQuadrant ? 'S' : 'R';                 // clearing within 12
+    } else if (fallingFast) {
+      // Still deepening: no improvement in sight for the rest of the day.
+      weather = coldQuadrant ? 'P' : 'N';
+    } else if (falling) {
+      weather = wetQuadrant ? 'N' : 'M';                  // precipitation continuing
+    } else {
+      // Steady barometer with rain falling: showers rather than a front.
+      weather = coldQuadrant ? 'L' : wetQuadrant ? 'K' : 'J';
+    }
   } else if (fallingFast) {
     weather = overcast ? 'M' : wetQuadrant ? 'H' : 'G';
   } else if (falling) {
