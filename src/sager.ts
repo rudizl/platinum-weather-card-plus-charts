@@ -181,10 +181,16 @@ export function sagerForecast(input: SagerInput): SagerForecast | null {
     weather = coldQuadrant ? 'C' : 'B';                   // fair, cooler or warmer
   } else if (overcast) {
     weather = low ? 'D' : coldQuadrant ? 'F' : 'D';       // unsettled
-  } else if (clear && high) {
-    weather = 'A';                                        // fair
+  } else if (clear) {
+    // A clear sky on a steady barometer is settled weather, whatever the
+    // absolute pressure. Calling it unsettled because the reading is merely
+    // below average produced 'Unsettled. The sky is clear.' — which reads as a
+    // contradiction because it is one. Only a low and falling barometer
+    // justifies the word, and a falling one is handled above.
+    weather = coldQuadrant ? 'C' : 'A';
   } else {
-    weather = coldQuadrant ? 'C' : high ? 'A' : 'D';
+    // Partly cloudy: unsettled only when the pressure is genuinely low.
+    weather = low ? 'D' : coldQuadrant ? 'C' : 'A';
   }
 
   // Wind velocity, again with Sager's letters.

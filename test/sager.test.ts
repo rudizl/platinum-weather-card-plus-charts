@@ -405,3 +405,42 @@ describe('the forecast keeps a sky reading overnight', () => {
     expect(slot).not.toContain('forecastCloudFraction');
   });
 });
+
+describe('a clear sky is not unsettled weather', () => {
+  // 'Unsettled. The sky is clear.' reads as a contradiction because it was one:
+  // the pressure was merely below average, not low and falling.
+  it('calls a clear sky on a steady barometer fair, whatever the pressure', () => {
+    for (const pressureHpa of [995, 1005, 1008.9, 1015, 1030]) {
+      const result = sagerForecast({
+        ...base, pressureHpa, trendHpaPerHour: 0, cloudCover: 0.05,
+      })!;
+      expect(['A', 'B', 'C'], `${pressureHpa} hPa clear and steady`)
+        .toContain(result.weather);
+    }
+  });
+
+  it('still warns when the barometer is falling, clear sky or not', () => {
+    // A front announces itself in the barometer before it appears overhead.
+    const result = sagerForecast({
+      ...base, pressureHpa: 1002, trendHpaPerHour: -1, cloudCover: 0.05,
+      windBearingDeg: 180, windBearingSixHoursAgoDeg: 180,
+    })!;
+    expect(['A', 'B', 'C']).not.toContain(result.weather);
+  });
+
+  it('reserves unsettled for a genuinely low barometer under cloud', () => {
+    const result = sagerForecast({
+      ...base, pressureHpa: 1003, trendHpaPerHour: 0, cloudCover: 0.35,
+    })!;
+    expect(['D', 'E', 'F']).toContain(result.weather);
+  });
+
+  it('never pairs a fair forecast with an overcast sky', () => {
+    // The reverse of the same mistake: high pressure with the sky covered is
+    // anticyclonic gloom, not fine weather.
+    const result = sagerForecast({
+      ...base, pressureHpa: 1025, trendHpaPerHour: 0, cloudCover: 0.8,
+    })!;
+    expect(['A', 'B', 'C']).not.toContain(result.weather);
+  });
+});
