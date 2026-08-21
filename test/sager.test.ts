@@ -242,7 +242,7 @@ describe('translations', () => {
 describe('the card falls back rather than guessing', () => {
   const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
 
-  it('needs an explicit six-hour bearing entity', () => {
+  it('takes the six-hour bearing from an explicit entity', () => {
     // A frontend cannot remember six hours across a page reload, so the history
     // has to come from a helper the user creates.
     const getter = /get sagerForecastText\(\)[\s\S]*?\n  \}/.exec(card);
@@ -250,10 +250,58 @@ describe('the card falls back rather than guessing', () => {
     expect(getter![0]).toContain('entity_wind_bearing_6h');
   });
 
-  it('returns null when that entity is missing, so Zambretti takes over', () => {
+  it('runs without it rather than refusing outright', () => {
+    // It sharpens one branch; the other five inputs stand on their own, and the
+    // sky measurement is the reason to choose Sager at all. Refusing without it
+    // threw that away for the sake of an input that only fine-tunes.
     const getter = /get sagerForecastText\(\)[\s\S]*?\n  \}/.exec(card)![0];
-    expect(getter).toMatch(/if \(!isFinite\(sixHourBearing\)\) return null;/);
+    expect(getter, 'still refuses when the bearing is missing')
+      .not.toMatch(/if \(!isFinite\(sixHourBearing\)\) return null;/);
+    expect(getter, 'the missing case is not passed through as null')
+      .toMatch(/isFinite\(sixHourBearing\) \? sixHourBearing : null/);
+  });
+
+  it('still falls back to Zambretti when the pressure is unusable', () => {
     expect(card).toContain('this.sagerForecastText ?? this.localForecastText');
+  });
+
+  it('lets the six-hour bearing change the forecast, having asked for it', () => {
+    // It reached the code string but never the reasoning: for 640 combinations
+    // of the other inputs, turning the wind through every sector changed
+    // nothing. An input worth demanding a helper for should do something.
+    let influential = 0;
+    for (const pressureHpa of [995, 1005, 1015, 1025]) {
+      for (const trendHpaPerHour of [-2, -1, 0, 1, 2]) {
+        for (const cloudCover of [0, 0.3, 0.6, 0.9]) {
+          for (const windBearingDeg of [0, 90, 180, 270]) {
+            const seen = new Set<string>();
+            for (const six of [0, 45, 90, 135, 180, 225, 270, 315]) {
+              seen.add(sagerForecast({
+                ...base, pressureHpa, trendHpaPerHour, cloudCover, windBearingDeg,
+                windBearingSixHoursAgoDeg: six,
+              })!.weather);
+            }
+            if (seen.size > 1) influential += 1;
+          }
+        }
+      }
+    }
+    expect(influential, 'the six-hour bearing never changes the forecast')
+      .toBeGreaterThan(0);
+  });
+
+  it('lets it matter only where the sign is real', () => {
+    // A backing wind under a falling barometer is a warm front arriving. On a
+    // steady or rising barometer the same turn means little, and at a coastal
+    // site it is usually just the sea breeze running its daily clock.
+    const steady = new Set<string>();
+    for (const six of [0, 90, 180, 270]) {
+      steady.add(sagerForecast({
+        ...base, trendHpaPerHour: 0, windBearingSixHoursAgoDeg: six,
+      })!.weather);
+    }
+    expect(steady.size, 'wind evolution moves the forecast on a steady barometer')
+      .toBe(1);
   });
 
   it('shares the barometer with Zambretti rather than reading it twice', () => {

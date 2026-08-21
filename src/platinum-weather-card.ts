@@ -2163,12 +2163,15 @@ export class PlatinumWeatherCard extends LitElement {
     const pressure = this._forecastPressureHpa;
     if (pressure === null) return null;
 
+    // The six-hour bearing sharpens one branch — a backing wind under a falling
+    // barometer is a front arriving — but the other five inputs stand on their
+    // own. Refusing to run without it would throw away the sky measurement,
+    // which is the reason to choose Sager in the first place.
     const sixHourEntity = this._config.entity_wind_bearing_6h;
     const sixHourState = sixHourEntity ? this.hass.states[sixHourEntity] : undefined;
     const sixHourBearing = sixHourState
       && sixHourState.state !== 'unknown' && sixHourState.state !== 'unavailable'
       ? Number(sixHourState.state) : NaN;
-    if (!isFinite(sixHourBearing)) return null;
 
     const bearingEntity = this._config.entity_wind_bearing;
     const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
@@ -2180,7 +2183,7 @@ export class PlatinumWeatherCard extends LitElement {
       pressureHpa: pressure,
       trendHpaPerHour: this.pressureTrendHpaPerHour ?? 0,
       windBearingDeg: isFinite(bearing) ? bearing : null,
-      windBearingSixHoursAgoDeg: sixHourBearing,
+      windBearingSixHoursAgoDeg: isFinite(sixHourBearing) ? sixHourBearing : null,
       cloudCover: this.forecastCloudFraction,
       rainRateMmH: this.measuredRainRate,
       northernHemisphere: (this.hass.config?.latitude ?? 0) >= 0,
@@ -2820,7 +2823,20 @@ export class PlatinumWeatherCard extends LitElement {
     const measured = Number(solarState.state);
     const elevation = Number(sunState.attributes?.elevation);
     if (isNaN(measured) || isNaN(elevation)) return null;
-    return cloudCoverFraction(measured, elevation, Number(this._config.option_forecast_altitude) || 0);
+
+    // Morning and evening cut-offs are separate because obstructions rarely
+    // are: a building to the west shades the late sun while the eastern
+    // horizon stays clear, and a single threshold then has to be set for the
+    // worse side and throws away good readings on the other.
+    const azimuth = Number(sunState.attributes?.azimuth);
+    const evening = isFinite(azimuth) ? azimuth > 180 : false;
+    const configured = Number(evening
+      ? this._config.option_cloud_min_elevation_pm
+      : this._config.option_cloud_min_elevation_am);
+    const minElevation = isFinite(configured) && configured > 0 ? configured : 10;
+
+    return cloudCoverFraction(measured, elevation,
+      Number(this._config.option_forecast_altitude) || 0, minElevation);
   }
 
   get slotCloudCover(): TemplateResult {

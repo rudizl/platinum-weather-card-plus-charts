@@ -170,6 +170,8 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_show_comfort?: boolean;
   option_forecast_algorithm?: 'zambretti' | 'sager';
   entity_wind_bearing_6h?: string;
+  option_cloud_min_elevation_am?: number;
+  option_cloud_min_elevation_pm?: number;
   option_color_fire_danger?: boolean;
 
   option_locale?: string;

@@ -513,7 +513,9 @@ It needs one thing the card cannot supply itself. Sager compares the wind now wi
 # Max age: 6 hours
 ```
 
-Point **Wind bearing six hours ago** at that helper. Without it the card falls back to Zambretti rather than guessing.
+Point **Wind bearing six hours ago** at that helper. It is not required: without it the other five inputs still stand, and the sky measurement — the reason to choose Sager at all — is worth more than the one branch the bearing sharpens.
+
+That branch is a backing wind under a falling barometer, which is the classic signature of a warm front arriving. Worth knowing before you rely on it at a coastal site: a sea breeze turns the wind through the same angles every day regardless of the weather, so the signal is noisier there than inland.
 
 The forecasts are Sager's own, with his lettering (A through Y), so the output is comparable with any other implementation of the instrument. His wording is condensed for the card: *"Precipitation or showers/flurries followed by improvement (within 12 hours) and becoming cooler"* was written for a printed manual.
 
@@ -688,7 +690,7 @@ Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); 
 Worth knowing about its limits:
 
 - **Daylight only.** At night there is no signal at all. The slot falls back to a provider's cloud cover entity if you configure one, and shows `---` otherwise.
-- **It stops below 10° of elevation**, where the air-mass model softens and morning haze distorts the reading, rather than reporting confident nonsense at dawn and dusk.
+- **It stops below 10° of elevation**, where the air-mass model softens and morning haze distorts the reading, rather than reporting confident nonsense at dawn and dusk. The morning and evening cut-offs are set separately, under **Min sun elevation**, because obstructions rarely are symmetrical: a building to the west shades the late sun while the eastern horizon stays clear, and a single threshold then has to be set for the worse side. Five days of measurements here showed cloud reading 41% at six in the evening against 6% at noon, over a cloudless week — all of it the house.
 - **The clear-sky model uses a fixed atmospheric transmittance**, so it reads a little high in hazy or dusty air and a little low in very clean air. Good enough to tell clear from overcast; not a radiometric instrument.
 - **The sensor must be clean, level and unshaded.** A pyranometer that catches a roof edge each morning will report cloud that isn't there, every morning.
 
@@ -863,7 +865,9 @@ double_tap_action:
 | `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 | `option_trend_window_hours` | Number | `3` | Time window of your pressure trend sensor, in hours — the tidal correction is averaged over it |
 | `option_forecast_algorithm` | String | `zambretti` | `zambretti` or `sager` |
-| `entity_wind_bearing_6h` | String | none | Wind bearing six hours ago, from a statistics helper — required by Sager |
+| `entity_wind_bearing_6h` | String | none | Wind bearing six hours ago, from a statistics helper — optional, sharpens one branch of Sager |
+| `option_cloud_min_elevation_am` | Number | `10` | Sun elevation below which the sky is not measured, morning |
+| `option_cloud_min_elevation_pm` | Number | `10` | The same for the evening, set separately for obstructions on one side |
 
 ## Extended Section
 

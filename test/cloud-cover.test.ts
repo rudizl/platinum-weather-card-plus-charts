@@ -502,3 +502,35 @@ describe('the comfort line follows the National Weather Service bands', () => {
     expect(getter).toContain("'unavailable'");
   });
 });
+
+describe('the elevation cut-off is separate for morning and evening', () => {
+  // Obstructions rarely are symmetrical: a building to the west shades the late
+  // sun while the eastern horizon stays clear. A single threshold has to be set
+  // for the worse side, throwing away good readings on the other.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('chooses the threshold by which side of the sky the sun is on', () => {
+    const getter = /private get _instantCloudFraction\(\)[\s\S]*?\n  \}/.exec(card);
+    expect(getter, 'cloud getter not found').not.toBeNull();
+    expect(getter![0], 'azimuth is not consulted').toContain('azimuth');
+    expect(getter![0]).toContain('option_cloud_min_elevation_am');
+    expect(getter![0]).toContain('option_cloud_min_elevation_pm');
+  });
+
+  it('keeps 10° as the default on both sides', () => {
+    const getter = /private get _instantCloudFraction\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toMatch(/configured > 0 \? configured : 10/);
+  });
+
+  it('passes the chosen threshold through rather than ignoring it', () => {
+    const getter = /private get _instantCloudFraction\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toMatch(/cloudCoverFraction\([\s\S]*?minElevation\)/);
+  });
+
+  it('honours whatever threshold it is given', () => {
+    // The measurement itself already supported this; only the card did not.
+    expect(cloudCoverFraction(50, 12, 0, 10)).not.toBeNull();
+    expect(cloudCoverFraction(50, 12, 0, 20)).toBeNull();
+    expect(cloudCoverFraction(50, 25, 0, 20)).not.toBeNull();
+  });
+});

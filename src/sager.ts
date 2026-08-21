@@ -184,8 +184,14 @@ export function sagerForecast(input: SagerInput): SagerForecast | null {
   } else if (fallingFast) {
     weather = overcast ? 'M' : wetQuadrant ? 'H' : 'G';
   } else if (falling) {
-    if (overcast) weather = wetQuadrant ? 'G' : 'D';
-    else weather = wetQuadrant ? 'H' : 'E';
+    // A backing wind under a falling barometer is the classic signature of a
+    // warm front approaching: the wind turns anticlockwise ahead of it while
+    // the pressure drops. Veering under the same fall is the cold front behind,
+    // which clears sooner. This is the one place the six-hour bearing earns its
+    // keep, so the effect is deliberately modest — one step, not a rewrite.
+    const frontal = evolution === 'backing';
+    if (overcast) weather = (wetQuadrant || frontal) ? 'G' : 'D';
+    else weather = (wetQuadrant || frontal) ? 'H' : 'E';
   } else if (rising && overcast) {
     weather = coldQuadrant ? 'Y' : 'X';                   // unsettled then fair
   } else if (rising) {

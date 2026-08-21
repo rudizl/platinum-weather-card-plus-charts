@@ -1857,6 +1857,23 @@ get _forecast_type(): string {
       ${this._config?.entity_solar_radiation ? html`
       <div class="side-by-side">
         <div>
+          <ha-input type="number" label=${this._t("cloud_min_elevation_am")}
+            .value=${this._config?.option_cloud_min_elevation_am ?? ''}
+            .configValue=${'option_cloud_min_elevation_am'} @change=${this._valueChangedNumber}>
+          </ha-input>
+        </div>
+        <div>
+          <ha-input type="number" label=${this._t("cloud_min_elevation_pm")}
+            .value=${this._config?.option_cloud_min_elevation_pm ?? ''}
+            .configValue=${'option_cloud_min_elevation_pm'} @change=${this._valueChangedNumber}>
+          </ha-input>
+        </div>
+      </div>
+      <div class="side-by-side full-width">
+        <div class="full-width"><div class="help-text">${this._t("cloud_min_elevation_hint")}</div></div>
+      </div>
+      <div class="side-by-side">
+        <div>
           <div class="toggle-row">
               <span class=${this._config?.option_cloud_overrides_icon ? "pwc-switch active" : "pwc-switch"} .value=${'option_cloud_overrides_icon'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("cloud_overrides_icon")}</span>
