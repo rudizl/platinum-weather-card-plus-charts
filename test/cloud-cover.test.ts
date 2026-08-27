@@ -342,7 +342,7 @@ describe('the corrected icon names a file that exists', () => {
   it('only overrides plain sky icons', () => {
     // Rain, snow, fog and storms come from a provider that can see what a
     // pyranometer cannot — and heavy cloud is when it is most likely right.
-    const guard = /const isPlainSky = [\s\S]*?;/.exec(source);
+    const guard = /(const|let) isPlainSky = [\s\S]*?;/.exec(source);
     expect(guard, 'no plain-sky guard').not.toBeNull();
     for (const condition of ['rain', 'snow', 'fog', 'thunder', 'drizzle', 'hail']) {
       expect(guard![0], `${condition} could be overridden`).not.toContain(condition);
@@ -393,8 +393,9 @@ describe('a rain gauge outranks both the provider and the pyranometer', () => {
   it('still only replaces a plain sky icon', () => {
     // A provider reporting snow, hail or a storm knows something about the
     // precipitation that a tipping bucket does not.
-    const block = /const isPlainSky = [\s\S]{0,600}?measuredRainRate[\s\S]{0,400}?\}/.exec(source);
-    expect(block, 'rain branch not guarded by isPlainSky').not.toBeNull();
+    // The rain branch must sit behind the same gate as the cloud correction.
+    const rainBranch = /if \(isPlainSky && rate !== null && rate > 0\)/.exec(source);
+    expect(rainBranch, 'rain branch not guarded by isPlainSky').not.toBeNull();
   });
 
   it('is not smoothed, unlike cloud cover', () => {
@@ -532,5 +533,44 @@ describe('the elevation cut-off is separate for morning and evening', () => {
     expect(cloudCoverFraction(50, 12, 0, 10)).not.toBeNull();
     expect(cloudCoverFraction(50, 12, 0, 20)).toBeNull();
     expect(cloudCoverFraction(50, 25, 0, 20)).not.toBeNull();
+  });
+});
+
+describe('a clear measurement overrules a provider claiming a storm', () => {
+  // Weather Underground reported lightning-rainy while the pyranometer read
+  // 551 W/m² against a clear-sky expectation of 538, and the gauge was dry.
+  // A reading above the theoretical maximum rules out cloud in front of the
+  // sun, let alone a thunderstorm overhead.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('treats a flat contradiction as grounds to correct anyway', () => {
+    const block = /(const|let) isPlainSky[\s\S]{0,900}?contradicted[\s\S]{0,200}?;/.exec(card);
+    expect(block, 'no contradiction check').not.toBeNull();
+    expect(block![0], 'the sky measurement is not consulted').toContain('measuredCloudFraction');
+    expect(block![0], 'the gauge is not consulted').toMatch(/rate === null \|\| rate === 0/);
+  });
+
+  it('requires both a clear sky and a dry gauge', () => {
+    // Either alone is not enough: a pyranometer can read high through thin
+    // cloud, and a dry gauge says nothing about a storm a mile away.
+    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card);
+    expect(block, 'no contradiction rule').not.toBeNull();
+    expect(block![0]).toContain('&&');
+  });
+
+  it('sets a demanding threshold for it', () => {
+    // 15% is nearly cloudless. Anything looser and the card would start
+    // second-guessing a provider that can see more than one garden.
+    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card)![0];
+    const threshold = /cloud < (0\.\d+)/.exec(block);
+    expect(threshold, 'no cloud threshold').not.toBeNull();
+    expect(Number(threshold![1])).toBeLessThanOrEqual(0.2);
+  });
+
+  it('still leaves a provider alone when the sky is not clear', () => {
+    // Rain, snow and storms remain the provider's to report whenever the
+    // measurement does not actively disagree.
+    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card)![0];
+    expect(block).toContain('cloud !== null');
   });
 });

@@ -3401,8 +3401,18 @@ export class PlatinumWeatherCard extends LitElement {
       // whether it is raining here, now. It outranks both — but only over a
       // plain sky icon, since a provider reporting snow, hail or a storm knows
       // something about the precipitation that a tipping bucket does not.
-      const isPlainSky = /^(clear|cloudy(-[123])?)-(day|night)$/.test(adjusted);
+      let isPlainSky = /^(clear|cloudy(-[123])?)-(day|night)$/.test(adjusted);
       const rate = this.measuredRainRate;
+
+      // A provider reporting rain, snow or a storm usually knows something the
+      // sensors cannot see — but not when they flatly contradict it. Full
+      // sunshine on the pyranometer and a dry gauge rule out a thunderstorm
+      // overhead, whatever the forecast area as a whole is doing: a provider
+      // covers a region, a station covers a garden.
+      const cloud = this.measuredCloudFraction;
+      const contradicted = cloud !== null && cloud < 0.15
+        && (rate === null || rate === 0);
+      if (contradicted && !isPlainSky) isPlainSky = true;
 
       if (isPlainSky && rate !== null && rate > 0) {
         // Same meteorological bands the slot uses, so icon and reading agree.
