@@ -90,6 +90,8 @@ export class PlatinumWeatherCard extends LitElement {
   // The last cloud reading taken while the sun was high enough to trust it.
   // Static for the same reason the buffer is: it describes the sky, not a card.
   private static _lastDaylightCloud: { t: number; f: number } | null = null;
+  // When it last rained, so a gap between showers does not read as fine weather.
+  private static _lastRain: { t: number; rate: number } | null = null;
 
   private _error: string[] = [];
 
@@ -2185,7 +2187,7 @@ export class PlatinumWeatherCard extends LitElement {
       windBearingDeg: isFinite(bearing) ? bearing : null,
       windBearingSixHoursAgoDeg: isFinite(sixHourBearing) ? sixHourBearing : null,
       cloudCover: this.forecastCloudFraction,
-      rainRateMmH: this.measuredRainRate,
+      rainRateMmH: this.forecastRainRate,
       northernHemisphere: (this.hass.config?.latitude ?? 0) >= 0,
     });
     if (result === null) return null;
@@ -2780,6 +2782,29 @@ export class PlatinumWeatherCard extends LitElement {
   // stale figure than none: a pyranometer says nothing after dark, and the sky
   // seldom turns over completely between dusk and dawn. Falls back to the last
   // daylight reading, and gives up once that is a day old.
+  // Rain rate for the forecast, which unlike the slot should not forget a shower
+  // the moment it stops. On 27 August it rained at 20:00, stopped for two hours
+  // and resumed at 23:00 — and in the gap the forecast read 'fair, cooler',
+  // which nobody standing outside would have agreed with.
+  //
+  // The slot keeps showing the true instantaneous rate; only the forecast holds
+  // on, and only for ninety minutes, which is about the length of a gap between
+  // showers in one convective spell rather than the start of a dry evening.
+  get forecastRainRate(): number | null {
+    const cls = this.constructor as typeof PlatinumWeatherCard;
+    const now = this.measuredRainRate;
+    if (now !== null && now > 0) {
+      cls._lastRain = { t: Date.now(), rate: now };
+      return now;
+    }
+    const last = cls._lastRain;
+    if (last === null) return now;
+    if (Date.now() - last.t > 5400000) return now;
+    // Report it as showery rather than at full strength: it is not raining this
+    // minute, but the spell has not ended either.
+    return Math.min(last.rate, 1);
+  }
+
   get forecastCloudFraction(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = this.measuredCloudFraction;

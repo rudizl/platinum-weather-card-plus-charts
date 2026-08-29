@@ -625,3 +625,53 @@ describe('the algorithm holds together across its whole input range', () => {
     expect(unreachable, 'forecasts with a phrase but no path to them').toEqual([]);
   });
 });
+
+describe('a gap between showers is not fine weather', () => {
+  // 27 August: rain at 20:00, nothing at 21:00 and 22:00, rain again at 23:00.
+  // In the gap the forecast read 'fair, cooler' — the card was reading the
+  // instantaneous rate and nothing else.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('holds on to a recent shower for the forecast', () => {
+    const getter = /get forecastRainRate\(\)[\s\S]*?\n  \}/.exec(card);
+    expect(getter, 'no forecast-specific rain getter').not.toBeNull();
+    expect(getter![0]).toContain('_lastRain');
+  });
+
+  it('lets go after ninety minutes', () => {
+    // About the length of a gap within one convective spell; beyond that the
+    // shower is over and holding on would be wishful.
+    const getter = /get forecastRainRate\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toContain('5400000');
+  });
+
+  it('reports the remembered rain as showery, not at full strength', () => {
+    // It is not raining this minute. Carrying 12 mm/h forward would forecast a
+    // downpour from a puddle.
+    const getter = /get forecastRainRate\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toMatch(/Math\.min\(last\.rate, 1\)/);
+  });
+
+  it('leaves the slot reading the true rate', () => {
+    // The slot reports what the gauge says now; only the forecast has reason to
+    // remember.
+    const slot = /get slotRainRate\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(slot).toContain('measuredRainRate');
+    expect(slot).not.toContain('forecastRainRate');
+  });
+
+  it('changes the forecast in the gap', () => {
+    // The conditions of that evening: 1018.4 hPa, rising slowly, sky unknown
+    // after dark.
+    const base = {
+      pressureHpa: 1018.4, trendHpaPerHour: 0.17, windBearingDeg: 337,
+      windBearingSixHoursAgoDeg: 197, cloudCover: null, northernHemisphere: true,
+    };
+    const forgotten = sagerForecast({ ...base, rainRateMmH: 0 })!;
+    const remembered = sagerForecast({ ...base, rainRateMmH: 1 })!;
+    expect(remembered.weather, 'remembering the shower changed nothing')
+      .not.toBe(forgotten.weather);
+    expect(['A', 'B', 'C'], 'still calls a showery evening fair')
+      .not.toContain(remembered.weather);
+  });
+});

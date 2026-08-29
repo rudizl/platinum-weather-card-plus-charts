@@ -519,7 +519,7 @@ That branch is a backing wind under a falling barometer, which is the classic si
 
 The forecasts are Sager's own, with his lettering (A through Y), so the output is comparable with any other implementation of the instrument. His wording is condensed for the card: *"Precipitation or showers/flurries followed by improvement (within 12 hours) and becoming cooler"* was written for a printed manual.
 
-Cloud cover comes from the pyranometer if you have one configured, and rain from the gauge. Without a pyranometer Sager still works, assuming partly cloudy — it simply loses the advantage that made it worth choosing.
+Cloud cover comes from the pyranometer if you have one configured, and rain from the gauge. The forecast holds on to a shower for ninety minutes after it stops, since a dry gap in the middle of a convective spell is not fine weather — on one evening here it rained at eight, stopped for two hours and resumed at eleven, and in the gap the forecast read *fair*. The rain rate slot is unaffected and still reports what the gauge says this minute. Without a pyranometer Sager still works, assuming partly cloudy — it simply loses the advantage that made it worth choosing.
 
 After dark a pyranometer says nothing, which is precisely when that advantage would go missing, so the forecast falls back to the last reading taken in daylight. The sky seldom turns over completely between dusk and dawn, and a figure from this evening is a better guess than no figure at all; beyond a day old it is discarded, being by then a guess about a different weather system. The cloud cover **slot** is unaffected and still shows `---` at night, since it reports a measurement rather than a forecast input.
 
