@@ -244,3 +244,117 @@ describe('tappable readings are marked only when they will do something', () => 
     expect(li?.classList.contains('slot-tappable')).toBe(false);
   });
 });
+
+describe('units come from the entity, not the system settings', () => {
+  // Issue #20: an instance in Sweden was quietly set to US customary, so the
+  // card printed a Celsius reading from Met.no under a °F label. Nothing is
+  // ever converted, so the figure was right and only the suffix was wrong —
+  // which is what made it diagnosable, and also what made it wrong.
+  const imperial = {
+    unit_system: {
+      length: 'mi', mass: 'lb', temperature: '°F', volume: 'gal',
+      pressure: 'psi', wind_speed: 'mph', accumulated_precipitation: 'in',
+    },
+  };
+
+  async function metricEntityOnImperialSystem(extra: Record<string, unknown> = {}) {
+    return (await renderCard(
+      baseConfig({
+        section_order: ['overview', 'slots'],
+        overview_layout: 'complete',
+        entity_temperature: 'sensor.temp',
+        slot_l1: 'humidity',
+        slot_r1: 'remove',
+        entity_humidity: 'sensor.hum',
+        ...extra,
+      } as never),
+      makeHass(
+        {
+          'sensor.temp': { state: '13.9', attributes: { unit_of_measurement: '°C' } },
+          'sensor.hum': { state: '64', attributes: { unit_of_measurement: '%' } },
+        },
+        { config: imperial },
+      ),
+    )) as HTMLElement;
+  }
+
+  it('labels a Celsius sensor in Celsius even on a Fahrenheit system', () => {
+    // The exact shape of the report.
+    return metricEntityOnImperialSystem().then((el) => {
+      const text = el.shadowRoot?.textContent ?? '';
+      expect(text, 'the reading is labelled with the system unit').not.toContain('°F');
+      expect(text).toContain('°C');
+    });
+  });
+
+  it('does the same for a weather entity, which states its own units', () => {
+    return renderCard(
+      baseConfig({
+        section_order: ['overview'],
+        overview_layout: 'complete',
+        weather_entity: 'weather.metno',
+        entity_temperature: 'weather.metno',
+      } as never),
+      makeHass(
+        {
+          'weather.metno': {
+            state: 'cloudy',
+            attributes: {
+              temperature: 13.9,
+              temperature_unit: '°C',
+              precipitation_unit: 'mm',
+              pressure_unit: 'hPa',
+              wind_speed_unit: 'm/s',
+            },
+          },
+        },
+        { config: imperial },
+      ),
+    ).then((el) => {
+      const text = (el as HTMLElement).shadowRoot?.textContent ?? '';
+      expect(text, 'a weather entity stating °C was labelled °F').not.toContain('°F');
+      expect(text).toContain('°C');
+    });
+  });
+
+  it('falls back to the system only when nothing states a unit', () => {
+    // Removing the fallback altogether would leave the unit blank for anyone
+    // whose sensor does not declare one.
+    return renderCard(
+      baseConfig({
+        section_order: ['overview'],
+        overview_layout: 'complete',
+        entity_temperature: 'sensor.bare',
+      } as never),
+      makeHass({ 'sensor.bare': { state: '55' } }, { config: imperial }),
+    ).then((el) => {
+      expect((el as HTMLElement).shadowRoot?.textContent).toContain('°F');
+    });
+  });
+
+  it('reads precipitation from the weather entity too', () => {
+    return renderCard(
+      baseConfig({
+        section_order: ['slots'],
+        slot_l1: 'rainfall',
+        slot_r1: 'remove',
+        weather_entity: 'weather.metno',
+        entity_rainfall: 'weather.metno',
+      } as never),
+      makeHass(
+        {
+          'weather.metno': {
+            state: 'rainy',
+            attributes: { precipitation: 2.5, precipitation_unit: 'mm' },
+          },
+        },
+        { config: imperial },
+      ),
+    ).then((el) => {
+      const slot = (el as HTMLElement).shadowRoot?.querySelector('li[data-slot="rainfall"]');
+      const text = (slot?.textContent ?? '').replace(/\s+/g, ' ');
+      expect(text, 'millimetres were labelled inches').not.toMatch(/\bin\b/);
+      expect(text).toContain('mm');
+    });
+  });
+});
