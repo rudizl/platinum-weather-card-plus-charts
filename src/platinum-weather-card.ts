@@ -3668,12 +3668,26 @@ export class PlatinumWeatherCard extends LitElement {
   // length unit — wrong whenever a sensor reports something else (snow in cm, or a
   // rain gauge in inches on a metric system). Falls back to the old behaviour when
   // the entity has no unit, so nothing changes for anyone whose sensor is silent.
+  // The unit an entity states for itself, whether it is a sensor or a weather
+  // entity. Reported as issue #20: the card was taking the value from the
+  // entity and the label from Home Assistant's global unit system, so an
+  // instance set to US customary printed a Celsius reading as °F — the figure
+  // was right and only the suffix was wrong, since nothing is ever converted.
+  // A unit should come from wherever the number came from.
+  private _entityUnit(entityId: string | undefined, weatherAttribute: string): string | null {
+    if (!entityId) return null;
+    const attributes = this.hass.states[entityId]?.attributes;
+    if (!attributes) return null;
+    const stated = entityId.match('^weather.') === null
+      ? attributes.unit_of_measurement
+      : attributes[weatherAttribute];
+    return typeof stated === 'string' && stated.length > 0 ? stated : null;
+  }
+
   private _precipUnit(entityId: string | undefined): string {
-    if (entityId && entityId.match('^weather.') === null) {
-      const uom = this.hass.states[entityId]?.attributes?.unit_of_measurement;
-      if (typeof uom === 'string' && uom.length > 0) return uom;
-    }
-    return this.getUOM('precipitation');
+    return this._entityUnit(entityId, 'precipitation_unit')
+      ?? this._entityUnit(this._config.weather_entity, 'precipitation_unit')
+      ?? this.getUOM('precipitation');
   }
 
   getUOM(measure: string): string {
@@ -3703,9 +3717,21 @@ export class PlatinumWeatherCard extends LitElement {
       case 'length':
         return lengthUnit;
       case 'precipitation':
-        return lengthUnit === 'km' ? 'mm' : 'in';
-      case 'intensity':
+        return this._entityUnit(this._config.weather_entity, 'precipitation_unit')
+          ?? (lengthUnit === 'km' ? 'mm' : 'in');
+      case 'intensity': {
+        const precip = this._entityUnit(this._config.weather_entity, 'precipitation_unit');
+        if (precip) return `${precip}/h`;
         return lengthUnit === 'km' ? 'mm/h' : 'in/h';
+      }
+      case 'temperature': {
+        // Prefer whatever the entity says, for the reason above; the system
+        // setting is the last resort rather than the first.
+        return this._entityUnit(this._config.entity_temperature, 'temperature_unit')
+          ?? this._entityUnit(this._config.weather_entity, 'temperature_unit')
+          ?? this.hass.config.unit_system.temperature
+          ?? '';
+      }
       default:
         return this.hass.config.unit_system[measure] || '';
     }

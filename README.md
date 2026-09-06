@@ -25,6 +25,12 @@ The card is in the HACS default store:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.3.3**
+- **Units are read from the entity rather than from Home Assistant's global unit system** (#20). The card took the value from one place and the label from the other, so an instance set to US customary printed a Celsius reading from Met.no as °F — the figure was correct and only the suffix was wrong, since nothing is ever converted. Pressure and wind already worked this way; temperature and precipitation now do too, falling back to the system setting only when nothing states a unit of its own. Reported by @BadrexSWE
+- **A word for how the air feels**, under the apparent temperature: *dry*, *comfortable*, *muggy*. Relative humidity says little about comfort on its own — 60% at 15°C is pleasant and 60% at 30°C is unbearable — while dew point is the actual moisture content, so its bands hold whatever the temperature is. Seven bands from the US National Weather Service. Off by default; set **Dew point entity** and switch on **Show how the air feels**
+
+---
+
 **v2.3.2**
 
 **New**
