@@ -26,6 +26,9 @@ The card is in the HACS default store:
 <summary><strong>Changelog</strong></summary>
 
 **v2.3.4**
+- Four slots existed with no documentation: `cloud_cover`, `rain_rate`, `uv_index` and `wind_gust`. Now in the slot table
+- `rain_rate` appeared twice in the slot dropdown, and its duplicate `case` in the editor was unreachable — the empty one won, so the gauge entity was never requested
+- Both charts were documented as on by default; they are off
 - **The chart stopped a day short of the forecast strip** when *Include today in forecast* was off (discussion #21). The forecast was trimmed to the configured number of days counting from today, while the card displayed from tomorrow — so the last day it went on to ask for had already been discarded. Five columns, four points, and the points spread across the full width rather than lining up beneath the columns. Reported by @safepay
 - Documented that each chart hides only its own text row: the temperature chart hides the max/min figures, the precipitation chart hides the millimetres, independently
 - The dew point comfort table now shows Fahrenheit alongside Celsius — the boundaries are originally Fahrenheit, which is why the Celsius figures look arbitrary
@@ -603,9 +606,11 @@ Up to 8 rows of data in 2 columns. The required entities update dynamically base
 | ---------- | ----------- | ------- |
 | `humidity` | Current humidity | 36% |
 | `rainfall` | Today's recorded rainfall | 5mm |
+| `rain_rate` | How hard it is raining now, coloured by intensity | Rate 1.2mm/h |
 | `pressure` | Current air pressure | 1018hPa |
 | `wind` | Wind direction, speed and gust | SSE 9km/h (Gust 13km/h) |
 | `wind_kt` | Wind in knots | SSE 5Kt (Gust 6Kt) |
+| `wind_gust` | Gust on its own, without the direction and mean | Gust 13km/h |
 | `visibility` | Current visibility | 70km |
 | `observed_max` | Today's observed maximum | Observed Max 19°C |
 | `observed_min` | Today's observed minimum | Observed Min 4°C |
@@ -618,11 +623,13 @@ Up to 8 rows of data in 2 columns. The required entities update dynamically base
 | `sun_next` | Next sunrise or sunset | 7:10pm |
 | `sun_following` | Following sunrise or sunset | Mon 6:35am |
 | `moon` | Moon phase with dynamic icon and translated name | Растяща луна |
+| `cloud_cover` | Cloud cover measured from a pyranometer, daylight only | Cloud 24% |
 | `pop` | Chance of rain | 10% |
 | `popforecast` | Rainfall forecast | 10% - 3 to 6mm |
 | `possible_today` | Forecast rain today | Forecast 15-25mm |
 | `possible_tomorrow` | Forecast rain tomorrow | Fore Tom 5-10mm |
-| `uv_summary` | UV forecast | UV High |
+| `uv_summary` | UV forecast, as the provider words it | UV High |
+| `uv_index` | Measured UV index, coloured by the WHO exposure bands | UV 7 |
 | `fire_danger` | Fire danger | Moderate |
 | `custom1`–`custom4` | Custom entity with icon and unit | |
 | `empty` | Blank slot (preserves space) | |
@@ -995,8 +1002,8 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
 | `show_section_charts` | Boolean | `true` | Show/hide the charts section |
-| `option_show_temperature_chart` | Boolean | `true` | Show max/min temperature lines |
-| `option_show_precipitation_chart` | Boolean | `true` | Show precipitation bars |
+| `option_show_temperature_chart` | Boolean | `false` | Show max/min temperature lines. Hides the max/min text in the forecast columns while on |
+| `option_show_precipitation_chart` | Boolean | `false` | Show precipitation bars. Hides the millimetre text in the forecast columns while on |
 
 The chart uses the same `weather_entity` and `daily_forecast_days` settings as the Daily Forecast section. No additional entities are required.
 
