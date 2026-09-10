@@ -651,15 +651,17 @@ Dew point rather than relative humidity, because relative humidity on its own sa
 
 The bands are the US National Weather Service ones:
 
-| Dew point | |
-| --------- | - |
-| below 10°C | Dry |
-| 10–13°C | Pleasant |
-| 13–16°C | Comfortable |
-| 16–18°C | Slightly humid |
-| 18–21°C | Humid |
-| 21–24°C | Muggy |
-| above 24°C | Heavy air |
+| Dew point | | |
+| --------- | - | - |
+| below 10°C | below 50°F | Dry |
+| 10–13°C | 50–55°F | Pleasant |
+| 13–16°C | 55–60°F | Comfortable |
+| 16–18°C | 60–65°F | Slightly humid |
+| 18–21°C | 65–70°F | Humid |
+| 21–24°C | 70–75°F | Muggy |
+| above 24°C | above 75°F | Heavy air |
+
+The Fahrenheit boundaries are the original ones, this being an American scale whose steps were chosen as round numbers there. The Celsius column is the conversion rounded to whole degrees, and it is what the card actually compares against — so a Fahrenheit reading within about half a degree of a boundary may fall on the other side of it.
 
 ### Cloud cover from a pyranometer
 
