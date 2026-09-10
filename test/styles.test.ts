@@ -321,3 +321,42 @@ describe('the comfort word sits under the apparent temperature', () => {
     expect(rule![1]).toContain('table-row');
   });
 });
+
+describe('the README lists every slot the editor offers', () => {
+  // Four slots had been added to the card and the editor without reaching the
+  // documentation: cloud_cover, rain_rate, uv_index and wind_gust. A slot
+  // nobody can find is a slot that was built for nothing.
+  const readme = readFileSync(join(__dirname, '..', 'README.md'), 'utf8');
+
+  it('documents each entry in the slot dropdown', () => {
+    const start = editor.indexOf("['humidity',");
+    expect(start, 'slot list not found').toBeGreaterThan(-1);
+    const list = editor.slice(start, editor.indexOf(']', editor.indexOf("'remove'", start)));
+    const slots = Array.from(list.matchAll(/\['(\w+)',/g)).map((m) => m[1]);
+    expect(slots.length).toBeGreaterThan(20);
+
+    // custom2..4 are covered by a range in the table rather than a row each
+    const ranged = /^custom[2-9]$/;
+    const missing = slots.filter((s) => !ranged.test(s) && !readme.includes(`\`${s}\``));
+    expect(missing, 'slots offered in the editor but absent from the README').toEqual([]);
+  });
+
+  it('offers each slot exactly once', () => {
+    // rain_rate appeared twice, so the dropdown listed it twice — and the
+    // duplicate case in the entity switch was dead code the runtime never
+    // reached.
+    const start = editor.indexOf("['humidity',");
+    const list = editor.slice(start, editor.indexOf(']', editor.indexOf("'remove'", start)));
+    const slots = Array.from(list.matchAll(/\['(\w+)',/g)).map((m) => m[1]);
+    const seen = new Set<string>();
+    const duplicated = slots.filter((s) => (seen.has(s) ? true : (seen.add(s), false)));
+    expect(duplicated, 'the same slot is offered more than once').toEqual([]);
+  });
+
+  it('has no duplicate cases in the entity switch', () => {
+    const cases = Array.from(editor.matchAll(/^\s+case '(\w+)':$/gm)).map((m) => m[1]);
+    const seen = new Set<string>();
+    const duplicated = cases.filter((c) => (seen.has(c) ? true : (seen.add(c), false)));
+    expect(duplicated, 'a duplicate case is unreachable code').toEqual([]);
+  });
+});

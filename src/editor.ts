@@ -723,9 +723,6 @@ get _forecast_type(): string {
           entities.add('entity_moon');
           break;
         case 'rain_rate':
-          // the gauge lives in Global Options, shared with the icon correction
-          break;
-        case 'rain_rate':
           entities.add('entity_rain_rate');
           break;
         case 'uv_index':
@@ -1326,7 +1323,6 @@ get _forecast_type(): string {
       ['sun_following',     'Following sun rise/set time'],
       ['moon',              'Moon phase'],
       ['cloud_cover',       'Cloud cover'],
-      ['rain_rate',         'Rain rate'],
       ['pop',               'Chance of rain'],
       ['popforecast',       'Rainfall forecast'],
       ['possible_today',    "Today's forecast rainfall"],
