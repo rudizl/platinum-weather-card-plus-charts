@@ -755,6 +755,15 @@ When the **Charts section is disabled**, max/min temperature and precipitation a
 
 When the **Charts section is enabled**, the same data is rendered visually as temperature lines (max in orange, min in blue) and precipitation bars in the chart strip below the forecast. The text values are automatically hidden to avoid duplication — the chart already tells the full story.
 
+The two charts are independent, and each hides only its own row:
+
+| | hides |
+| --- | --- |
+| `option_show_temperature_chart` | the max/min text in each column |
+| `option_show_precipitation_chart` | the millimetre text in each column |
+
+So a card with the precipitation chart on and the temperature chart off shows the temperatures as text and the rainfall as bars. If you would rather have the figures as well as the chart, switch off the chart you want the text for — there is no separate control for the text itself, since the pair are two views of one number.
+
 ## Global Options
 
 | Option | Type | Description |
