@@ -25,6 +25,14 @@ The card is in the HACS default store:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.3.4**
+- **The chart stopped a day short of the forecast strip** when *Include today in forecast* was off (discussion #21). The forecast was trimmed to the configured number of days counting from today, while the card displayed from tomorrow — so the last day it went on to ask for had already been discarded. Five columns, four points, and the points spread across the full width rather than lining up beneath the columns. Reported by @safepay
+- Documented that each chart hides only its own text row: the temperature chart hides the max/min figures, the precipitation chart hides the millimetres, independently
+- The dew point comfort table now shows Fahrenheit alongside Celsius — the boundaries are originally Fahrenheit, which is why the Celsius figures look arbitrary
+- Vitest upgraded to 4.1.11, closing a moderate path-traversal advisory in a development dependency
+
+---
+
 **v2.3.3**
 - **Units are read from the entity rather than from Home Assistant's global unit system** (#20). The card took the value from one place and the label from the other, so an instance set to US customary printed a Celsius reading from Met.no as °F — the figure was correct and only the suffix was wrong, since nothing is ever converted. Pressure and wind already worked this way; temperature and precipitation now do too, falling back to the system setting only when nothing states a unit of its own. Reported by @BadrexSWE
 - **A word for how the air feels**, under the apparent temperature: *dry*, *comfortable*, *muggy*. Relative humidity says little about comfort on its own — 60% at 15°C is pleasant and 60% at 30°C is unbearable — while dew point is the actual moisture content, so its bands hold whatever the temperature is. Seven bands from the US National Weather Service. Off by default; set **Dew point entity** and switch on **Show how the air feels**
