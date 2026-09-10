@@ -26,6 +26,9 @@ The card is in the HACS default store:
 <summary><strong>Changelog</strong></summary>
 
 **v2.3.4**
+- Four slots existed with no documentation: `cloud_cover`, `rain_rate`, `uv_index` and `wind_gust`. Now in the slot table
+- `rain_rate` appeared twice in the slot dropdown, and its duplicate `case` in the editor was unreachable — the empty one won, so the gauge entity was never requested
+- Both charts were documented as on by default; they are off
 - **The chart stopped a day short of the forecast strip** when *Include today in forecast* was off (discussion #21). The forecast was trimmed to the configured number of days counting from today, while the card displayed from tomorrow — so the last day it went on to ask for had already been discarded. Five columns, four points, and the points spread across the full width rather than lining up beneath the columns. Reported by @safepay
 - Documented that each chart hides only its own text row: the temperature chart hides the max/min figures, the precipitation chart hides the millimetres, independently
 - The dew point comfort table now shows Fahrenheit alongside Celsius — the boundaries are originally Fahrenheit, which is why the Celsius figures look arbitrary
