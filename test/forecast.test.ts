@@ -150,3 +150,70 @@ describe('bad forecast data', () => {
     expect(el.shadowRoot?.textContent).not.toContain('NaN');
   });
 });
+
+describe('the chart matches the strip when today is excluded', () => {
+  // Discussion #21: five columns, four chart points, and the points spread
+  // across the full width instead of under the columns. The forecast was being
+  // trimmed to `daily_forecast_days` entries counting from today, while the
+  // card was displaying from tomorrow — so the last day it asked for had
+  // already been thrown away.
+  //
+  // Every existing chart test set option_show_current_day, which is why this
+  // went unnoticed: with today included, the trim and the display line up.
+
+  async function card(showCurrentDay: boolean, days = 5, provided = 8) {
+    const hass = makeHass(
+      { 'weather.test': { state: 'sunny', attributes: { temperature: 17 } } },
+      { forecast: makeForecast(provided) },
+    );
+    return (await renderCard(
+      baseConfig({
+        section_order: ['daily_forecast'],
+        weather_entity: 'weather.test',
+        entity_forecast_icon_1: 'weather.test',
+        entity_forecast_max_1: 'weather.test',
+        entity_forecast_min_1: 'weather.test',
+        daily_forecast_layout: 'horizontal',
+        daily_forecast_days: days,
+        option_show_current_day: showCurrentDay,
+        show_section_charts: true,
+        option_show_temperature_chart: true,
+      } as never),
+      hass,
+    )) as HTMLElement;
+  }
+
+  const columns = (el: HTMLElement) => el.shadowRoot?.querySelectorAll('.dayname').length ?? 0;
+  const points = (el: HTMLElement) => {
+    const pts = el.shadowRoot?.querySelector('svg polyline')?.getAttribute('points') ?? '';
+    return pts.trim() ? pts.trim().split(/\s+/).length : 0;
+  };
+
+  it('plots one point per column with today excluded', async () => {
+    const el = await card(false);
+    expect(columns(el), 'the strip lost a column too').toBe(5);
+    expect(points(el), 'the chart stopped a day short of the strip').toBe(5);
+  });
+
+  it('still does so with today included', async () => {
+    const el = await card(true);
+    expect(points(el)).toBe(columns(el));
+  });
+
+  it('agrees at every day count, either way', async () => {
+    for (const days of [3, 4, 5, 6]) {
+      for (const showCurrentDay of [true, false]) {
+        const el = await card(showCurrentDay, days);
+        expect(points(el), `${days} days, today ${showCurrentDay ? 'in' : 'out'}`)
+          .toBe(columns(el));
+      }
+    }
+  });
+
+  it('stops where the provider runs out rather than inventing days', async () => {
+    // Asking for six from a five-day forecast with today excluded leaves four.
+    const el = await card(false, 6, 5);
+    expect(points(el)).toBe(columns(el));
+    expect(columns(el)).toBeLessThanOrEqual(4);
+  });
+});

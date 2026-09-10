@@ -1637,11 +1637,19 @@ export class PlatinumWeatherCard extends LitElement {
 
     //tjl added/modified
     //  from: https://github.com/home-assistant/frontend/blob/dev/src/panels/lovelace/cards/hui-weather-forecast-card.ts
-    this.forecast1 = 
-    //this._config?.show_forecast !== false && forecastData?.forecast?.length
+    // The slice has to allow for the day the card starts on. With
+    // option_show_current_day off, the strip and the chart both begin at
+    // tomorrow, so they need entries 1..days — trimming to `days` from index 0
+    // throws away the last one they ask for, and the chart then stops a day
+    // short of the strip. Reported in discussion #21 against an eight-day BOM
+    // forecast: five columns, four points, and the points spread across the
+    // full width rather than lining up under the columns.
+    const forecastDays = this._config.daily_forecast_days
+      ? this._config.daily_forecast_days : 5;
+    const firstDay = this._config.option_show_current_day ? 0 : 1;
+    this.forecast1 =
       this._config.weather_entity && forecastData?.forecast?.length
-      //? forecastData.forecast.slice(0, 5)
-        ? forecastData.forecast.slice(0, this._config.daily_forecast_days ? this._config.daily_forecast_days : 5)
+        ? forecastData.forecast.slice(0, firstDay + forecastDays)
         : undefined;
   
     if (this._checkForErrors()) htmlCode.push(this._showConfigWarning(this._error));
