@@ -25,6 +25,14 @@ The card is in the HACS default store:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.3.4**
+- **The chart stopped a day short of the forecast strip** when *Include today in forecast* was off (discussion #21). The forecast was trimmed to the configured number of days counting from today, while the card displayed from tomorrow — so the last day it went on to ask for had already been discarded. Five columns, four points, and the points spread across the full width rather than lining up beneath the columns. Reported by @safepay
+- Documented that each chart hides only its own text row: the temperature chart hides the max/min figures, the precipitation chart hides the millimetres, independently
+- The dew point comfort table now shows Fahrenheit alongside Celsius — the boundaries are originally Fahrenheit, which is why the Celsius figures look arbitrary
+- Vitest upgraded to 4.1.11, closing a moderate path-traversal advisory in a development dependency
+
+---
+
 **v2.3.3**
 - **Units are read from the entity rather than from Home Assistant's global unit system** (#20). The card took the value from one place and the label from the other, so an instance set to US customary printed a Celsius reading from Met.no as °F — the figure was correct and only the suffix was wrong, since nothing is ever converted. Pressure and wind already worked this way; temperature and precipitation now do too, falling back to the system setting only when nothing states a unit of its own. Reported by @BadrexSWE
 - **A word for how the air feels**, under the apparent temperature: *dry*, *comfortable*, *muggy*. Relative humidity says little about comfort on its own — 60% at 15°C is pleasant and 60% at 30°C is unbearable — while dew point is the actual moisture content, so its bands hold whatever the temperature is. Seven bands from the US National Weather Service. Off by default; set **Dew point entity** and switch on **Show how the air feels**
@@ -677,15 +685,17 @@ Dew point rather than relative humidity, because relative humidity on its own sa
 
 The bands are the US National Weather Service ones:
 
-| Dew point | |
-| --------- | - |
-| below 10°C | Dry |
-| 10–13°C | Pleasant |
-| 13–16°C | Comfortable |
-| 16–18°C | Slightly humid |
-| 18–21°C | Humid |
-| 21–24°C | Muggy |
-| above 24°C | Heavy air |
+| Dew point | | |
+| --------- | - | - |
+| below 10°C | below 50°F | Dry |
+| 10–13°C | 50–55°F | Pleasant |
+| 13–16°C | 55–60°F | Comfortable |
+| 16–18°C | 60–65°F | Slightly humid |
+| 18–21°C | 65–70°F | Humid |
+| 21–24°C | 70–75°F | Muggy |
+| above 24°C | above 75°F | Heavy air |
+
+The Fahrenheit boundaries are the original ones, this being an American scale whose steps were chosen as round numbers there. The Celsius column is the conversion rounded to whole degrees, and it is what the card actually compares against — so a Fahrenheit reading within about half a degree of a boundary may fall on the other side of it.
 
 ### Cloud cover from a pyranometer
 
@@ -780,6 +790,15 @@ When the **Charts section is disabled**, max/min temperature and precipitation a
 ![Forecast columns without charts](images/forecast-columns-no-charts.png)
 
 When the **Charts section is enabled**, the same data is rendered visually as temperature lines (max in orange, min in blue) and precipitation bars in the chart strip below the forecast. The text values are automatically hidden to avoid duplication — the chart already tells the full story.
+
+The two charts are independent, and each hides only its own row:
+
+| | hides |
+| --- | --- |
+| `option_show_temperature_chart` | the max/min text in each column |
+| `option_show_precipitation_chart` | the millimetre text in each column |
+
+So a card with the precipitation chart on and the temperature chart off shows the temperatures as text and the rainfall as bars. If you would rather have the figures as well as the chart, switch off the chart you want the text for — there is no separate control for the text itself, since the pair are two views of one number.
 
 ## Global Options
 
