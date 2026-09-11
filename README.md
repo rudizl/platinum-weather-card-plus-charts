@@ -1,4 +1,13 @@
-# Platinum Weather Card Plus Charts
+<p align="center">
+  <img src="images/banner.svg" alt="" width="620">
+</p>
+
+<h1 align="center">Platinum Weather Card Plus Charts</h1>
+
+<p align="center">
+  <img src="images/platinum-weather-card.png" alt="The card with its Charts section" width="420">
+</p>
+
 
 A mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) and [Weather Chart Card](https://github.com/mlamberts78/weather-chart-card) — two of the best weather cards for Home Assistant, neither of which has seen active development for a while. I used to run Weather Chart Card on my main dashboard and Platinum on a dedicated weather view. At some point it felt pointless to maintain two separate cards with overlapping functionality, so I merged them as far as makes sense.
 
@@ -337,126 +346,34 @@ The card is now available in the **HACS default store** — no custom repository
 
 **Older releases**
 
-**v1.3.1** — the changes below were released across a series of betas and are collected here
+**v1.x** — the first year, before the v2.0.0 rewrite
 
-- Show `---` instead of `NaN%` or `unknownmm` when a sensor returns `unknown` or `unavailable` — humidity, rainfall, pressure, visibility, wind speed and gust, and the precipitation slots
-- Hide `unknown`/`unavailable` in the extended section, which showed the raw text below the separator
-- Add `option_show_current_day` — **"Include Today in Forecast"**, so the strip starts from today rather than tomorrow
-- Add an optional label to the custom slots, shown as small secondary text before the value
-- Fix false-positive errors for sensors with multi-digit numbers in their names, such as `sensor.ivarna103_*`
-- Fix `fireDanger` scoping in the vertical forecast layout
-- Editor: migrate text inputs from the deprecated `ha-textfield` to `ha-input`, and replace the switch colour tokens removed in HA 2026.5
-- Drop the `resize-observer-polyfill` dependency, saving about 30 KB — every browser Home Assistant supports has had `ResizeObserver` natively since 2020
+The card began as a merge of Platinum Weather Card and Weather Chart Card, and most of this line went on making that merge hold together against a moving Home Assistant. The editor dropdowns broke three times in a row as HA retired `mwc-list-item`, then `ha-list-item`, then the switch colour tokens; they were finally settled by dropping the HA components altogether for native `<select>` elements, which is why they have not broken since.
 
-**v1.3.0**
-- Fix all card editor dropdowns not showing saved values
-- Fix rainy/pouring icon associations
-- Add `moon` slot with dynamic phase icons and translations (11 locales)
-- Add `option_forecast_decimals`, `option_show_forecast_pop`
-- Add `currentWindSpeedUnit` — reads wind unit from weather entity attributes
-- Add Spanish (`es`) locale
-- HA profile integration for time/date format
-- Single-file build
+The rest was mostly the card learning to say nothing gracefully. Sensors that return `unknown` or `unavailable` had been rendering as `NaN%` and `unknownmm` across a dozen slots, and the extended section printed the raw word below its separator.
 
-**v1.2.4**
-- Definitive fix for broken editor dropdowns — replaced all `ha-select`/`ha-list-item` with native `<select>` elements
-
-**v1.2.3**
-- Fix editor dropdowns — `mwc-list-item` removed in HA 2024.x, replaced with `ha-list-item`
-
-**v1.2.2**
-- Fix all dropdowns in the card editor not working in newer HA versions
-
-**v1.2.1**
-- Add `double_tap_action` support
-- Add `Gust` localization for all supported languages
-- Accept `hourly` and `twice_daily` as valid `forecast_type` values
-- Fix broken layout in slots section, malformed HTML in beaufort wind display
+Features added along the way: the `moon` slot with its phase icons, `option_show_current_day`, labels on the custom slots, `double_tap_action`, Spanish, wind units read from the weather entity, and time and date formats following the HA profile. The build became a single file, and `resize-observer-polyfill` went — about 30 KB for something every browser HA supports has had natively since 2020.
 
 </details>
 
 ---
 
-## Screenshots
-
-<table>
-<tr>
-<td align="center" width="50%">
-
-**Classic weather forecast**
-
-![Classic weather forecast](images/classic-weather-forecast.png)
-
-</td>
-<td align="center" width="50%">
-
-**Card with Charts section**
-
-![Card overview](images/platinum-weather-card.png)
-
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-
-**Forecast hover tooltip**
-
-![Forecast tooltip](images/tooltip-forecast.png)
-
-</td>
-<td align="center" width="50%">
-
-**Editor — section list**
-
-![Editor sections](images/editor-sections.png)
-
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-
-**Editor — Global Options (locale & icon pack)**
-
-![Editor global options](images/global-options.png)
-
-</td>
-<td align="center" width="50%">
-
-**Slot configuration in editor**
-
-![Editor slots](images/slots-section-highlighted.png)
-
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-
-**Icon pack selection**
-
-![Editor icon pack](images/editor-icon-pack.png)
-
-</td>
-<td align="center" width="50%">
-
-**Local Zambretti forecast (verbose)**
-
-![Local forecast](images/local-forecast-zambretti.png)
-
-</td>
-</tr>
-</table>
-
----
-
 # Sections
 
-- Overview
-- Extended
-- Slots
-- Daily Forecast
-- **Charts**
+<p align="center">
+  <img src="images/editor-sections.png" alt="The section list in the editor" width="720">
+</p>
 
-Use the lock icon on each section header to hide it entirely, and the up/down buttons to reorder them. The **Global Options** section contains settings that affect multiple sections.
+- **Warnings** — weather alerts from a MeteoAlarm-compatible sensor
+- **Overview** — the condition icon, temperature and forecast text
+- **Extended** — a longer forecast description
+- **Slots** — two columns of readings, up to eight each
+- **Daily Forecast** — a column per day
+- **Charts** — temperature lines and precipitation bars
+
+Each row has a switch to hide the section entirely, arrows to reorder it, and a pencil to open its settings. The second icon, where present, opens that section's visibility rules — the conditions under which it appears at all.
+
+**Global Options** at the top is not a section of the card; it holds the settings that several sections draw on, such as the locale, the icon pack and the station sensors.
 
 ## Overview Section
 
@@ -590,6 +507,8 @@ option_local_forecast: true
 
 Shows today's detailed forecast text.
 
+Where several entities feed it, **Separate sources** puts each on its own line rather than running them into one paragraph — which matters because providers rarely end their text with a full stop, so without it two forecasts collide mid-sentence.
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Entity Extended Forecast | Entity | Entity providing the detailed forecast |
@@ -599,6 +518,12 @@ Shows today's detailed forecast text.
 | Entity Today's Fire Danger | String | Optional entity appended to the extended forecast |
 
 ## Slots Section
+
+Each column holds up to eight slots, chosen from the list below and configured here:
+
+<p align="center">
+  <img src="images/slots-section-highlighted.png" alt="Slot configuration in the editor" width="720">
+</p>
 
 Up to 8 rows of data in 2 columns. The required entities update dynamically based on which slots are selected.
 
@@ -666,7 +591,11 @@ Shows an active severe-weather warning as a coloured row. Point it at a [MeteoAl
 
 The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers. So a Bulgarian card reads *"Жълт код: Високи температури · до сб 00:00"* even though the feed itself is in English. All fifteen hazard types are translated in every language the card supports; unknown types fall back to the provider's own `event` text.
 
-The colour of the row follows the warning level — yellow, orange or red.
+The colour of the row follows the warning level — yellow, orange or red. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
+
+![Warnings section](images/warnings-section.png)
+
+Two hazard types from the same feed, on a Bulgarian card: high temperature and rain. The icon follows the hazard, the bar follows the level, and the expiry time is formatted in the card's locale.
 
 | Option | Type | Description |
 | ------ | ---- | ----------- |
@@ -708,7 +637,7 @@ The Fahrenheit boundaries are the original ones, this being an American scale wh
 
 If your station measures solar radiation, the card can work out the cloud cover from it. How much sunlight *would* arrive under a clear sky depends only on the sun's elevation, the day of year and your altitude — pure geometry, no external data — so the ratio between that and what the sensor actually reports is the cloud cover.
 
-Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); a sun entity is needed too, since the calculation turns on the sun's elevation. From there the measurement is available to two independent things: add the **Cloud cover** slot to show it as a reading, and switch on **Measurement corrects the icon** to let it correct the condition icon. Either without the other is fine.
+Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); a sun entity is needed too, since the calculation turns on the sun's elevation. The slot reads as a percentage by default; **Show oktas instead of percent** switches it to eighths of the sky, which is how observers and aviation reports state it. From there the measurement is available to two independent things: add the **Cloud cover** slot to show it as a reading, and switch on **Measurement corrects the icon** to let it correct the condition icon. Either without the other is fine.
 
 Worth knowing about its limits:
 
@@ -719,13 +648,29 @@ Worth knowing about its limits:
 
 If your station has a rain gauge, point **Rain rate entity** at it too (mm/h). A gauge sees what neither a forecast provider nor a pyranometer can — whether it is raining here, now — and it takes precedence over both: rain reported by the gauge replaces a clear or cloudy icon, with the intensity following the rate. It is not smoothed the way cloud cover is, because rain starting is an event rather than a state to average.
 
-The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess. Only the plain sky icons are touched: rain, snow and fog are things a provider knows about and a pyranometer cannot see, so those are left alone — unless the measurement flatly contradicts them. Full sunshine on the pyranometer with a dry gauge rules out a thunderstorm overhead whatever the forecast area as a whole is doing, and a provider covers a region where a station covers a garden. Off by default.
+The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess.
+
+Only the plain sky icons are touched: rain, snow and fog are things a provider knows about and the sensors cannot see, so those are left alone — unless the measurement flatly contradicts them. Full sunshine on the pyranometer with a dry gauge rules out a thunderstorm overhead whatever the forecast area as a whole is doing, and a provider covers a region where a station covers a garden. Off by default.
 
 The measurement is shared by every card on the page — it describes the sky, not the card — so several cards never disagree about the same moment. Broken cloud swings the instantaneous reading violently — 181 to 513 W/m² inside three minutes on a typical morning, which spans the whole icon range — so the card takes the median of the last five minutes and the band boundaries carry hysteresis. The median rather than the mean because one reading through a gap should not drag the answer toward clear, and five minutes rather than longer because a window that includes a sunny spell from ten minutes ago describes the sky as it was, not as it is. Sun through a gap is still broken cloud, and an icon that changes every few minutes is worse than one that lags by a few.
 
 The bands are the meteorological ones rather than wide safety margins. A sensor reading badly enough to matter is a sensor to clean, and treating it as untrustworthy while still displaying its number in a slot would be the worse of the two positions.
 
+### Which icon the card shows
+
+The provider supplies a condition, and the card draws it — but two things can overrule that, and both are about the card being able to see something the provider only predicts.
+
+**The sun decides day or night.** Providers pick the day or night variant from their own forecast periods, and some switch to the night daypart in mid-afternoon: they report `clear-night` with the sun still 35° up, and the card would dutifully draw a moon. When a **sun entity** is configured, its elevation wins instead. This is on by default (**Day/night icon from sun**); switch it off to take the provider's word.
+
+**The measurement can correct the condition itself.** That one is off by default and is described under [Cloud cover from a pyranometer](#cloud-cover-from-a-pyranometer) — briefly, a pyranometer and a rain gauge can contradict a forecast written hours ago for a region rather than a garden.
+
+The two are independent: the sun override only changes day to night and back, never the weather, so it applies whatever else is switched on.
+
 ## Icon Packs
+
+<p align="center">
+  <img src="images/editor-icon-pack.png" alt="Choosing an icon pack" width="720">
+</p>
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
 
@@ -734,7 +679,7 @@ The card supports multiple icon packs, selectable from the editor's **Global Opt
 | `default` | Built-in animated SVG icons (bundled with the card) | None |
 | `meteocons-fill` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — filled style | Internet (jsDelivr CDN) |
 | `meteocons-line` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — line style | Internet (jsDelivr CDN) |
-| `wcc-2` | [ammap Weather Icons](https://www.ammap.com/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
+| `wcc-2` | [ammap Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
 | `ha-official` | Home Assistant's own weather icons, served from a CDN — the card then matches the rest of your dashboard rather than introducing a second style |
 | `custom` | Any icon set — set `icon_pack_path` with `{condition}` placeholder | User-provided |
 
@@ -752,6 +697,12 @@ For `custom`, set `icon_pack_path` to a path template such as `/local/my-icons/{
 > **Note:** The card's **default built-in icons** are also based on amCharts weather icons, extended by [@makin-things](https://github.com/Makin-Things/weather-icons).
 
 ## Daily Forecast Section
+
+Hovering a column shows the full forecast for that day, including the precipitation amount:
+
+<p align="center">
+  <img src="images/tooltip-forecast.png" alt="Forecast tooltip on hover" width="420">
+</p>
 
 Two layout options: **Horizontal** (default, up to 5 days) and **Vertical** (up to 7 days).
 
@@ -773,7 +724,7 @@ Hovering over any forecast day column shows a tooltip with date, weather descrip
 | Show date next to day | Boolean | Locale-formatted date after the day name (day label font shrinks to fit) |
 | Show forecast wind | Boolean | Wind speed/direction in each forecast column |
 
-With **Show date next to day** enabled:
+With **Show date next to day** enabled, the date follows the day name and the label shrinks to fit:
 
 ![Daily forecast with dates](images/daily-forecast-dates.png)
 
@@ -798,6 +749,14 @@ When the **Charts section is disabled**, max/min temperature and precipitation a
 
 When the **Charts section is enabled**, the same data is rendered visually as temperature lines (max in orange, min in blue) and precipitation bars in the chart strip below the forecast. The text values are automatically hidden to avoid duplication — the chart already tells the full story.
 
+![Forecast columns with charts](images/daily-forecast-dates.png)
+
+The same five days either way. The whole card in each mode:
+
+| Without charts | With charts |
+|----------------|-------------|
+| ![Card without charts](images/classic-weather-forecast.png) | ![Card with charts](images/platinum-weather-card.png) |
+
 The two charts are independent, and each hides only its own row:
 
 | | hides |
@@ -808,6 +767,10 @@ The two charts are independent, and each hides only its own row:
 So a card with the precipitation chart on and the temperature chart off shows the temperatures as text and the rainfall as bars. If you would rather have the figures as well as the chart, switch off the chart you want the text for — there is no separate control for the text itself, since the pair are two views of one number.
 
 ## Global Options
+
+<p align="center">
+  <img src="images/global-options.png" alt="Global options in the editor" width="720">
+</p>
 
 | Option | Type | Description |
 | ------ | ---- | ----------- |
