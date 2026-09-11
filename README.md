@@ -593,6 +593,10 @@ The wording is the card's own, in the card's language, rather than the provider'
 
 The colour of the row follows the warning level — yellow, orange or red.
 
+![Warnings section](images/warnings-section.png)
+
+Two hazard types from the same feed, on a Bulgarian card: high temperature and rain. The icon follows the hazard, the bar follows the level, and the expiry time is formatted in the card's locale.
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Warning entity | Entity | MeteoAlarm-compatible binary sensor |
