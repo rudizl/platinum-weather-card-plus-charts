@@ -509,6 +509,8 @@ option_local_forecast: true
 
 Shows today's detailed forecast text.
 
+Where several entities feed it, **Separate sources** puts each on its own line rather than running them into one paragraph — which matters because providers rarely end their text with a full stop, so without it two forecasts collide mid-sentence.
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Entity Extended Forecast | Entity | Entity providing the detailed forecast |
@@ -591,7 +593,7 @@ Shows an active severe-weather warning as a coloured row. Point it at a [MeteoAl
 
 The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers. So a Bulgarian card reads *"Жълт код: Високи температури · до сб 00:00"* even though the feed itself is in English. All fifteen hazard types are translated in every language the card supports; unknown types fall back to the provider's own `event` text.
 
-The colour of the row follows the warning level — yellow, orange or red.
+The colour of the row follows the warning level — yellow, orange or red. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
 
 ![Warnings section](images/warnings-section.png)
 
@@ -637,7 +639,7 @@ The Fahrenheit boundaries are the original ones, this being an American scale wh
 
 If your station measures solar radiation, the card can work out the cloud cover from it. How much sunlight *would* arrive under a clear sky depends only on the sun's elevation, the day of year and your altitude — pure geometry, no external data — so the ratio between that and what the sensor actually reports is the cloud cover.
 
-Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); a sun entity is needed too, since the calculation turns on the sun's elevation. From there the measurement is available to two independent things: add the **Cloud cover** slot to show it as a reading, and switch on **Measurement corrects the icon** to let it correct the condition icon. Either without the other is fine.
+Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); a sun entity is needed too, since the calculation turns on the sun's elevation. The slot reads as a percentage by default; **Show oktas instead of percent** switches it to eighths of the sky, which is how observers and aviation reports state it. From there the measurement is available to two independent things: add the **Cloud cover** slot to show it as a reading, and switch on **Measurement corrects the icon** to let it correct the condition icon. Either without the other is fine.
 
 Worth knowing about its limits:
 
@@ -681,7 +683,7 @@ The card supports multiple icon packs, selectable from the editor's **Global Opt
 | `default` | Built-in animated SVG icons (bundled with the card) | None |
 | `meteocons-fill` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — filled style | Internet (jsDelivr CDN) |
 | `meteocons-line` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — line style | Internet (jsDelivr CDN) |
-| `wcc-2` | [ammap Weather Icons](https://www.ammap.com/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
+| `wcc-2` | [ammap Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
 | `ha-official` | Home Assistant's own weather icons, served from a CDN — the card then matches the rest of your dashboard rather than introducing a second style |
 | `custom` | Any icon set — set `icon_pack_path` with `{condition}` placeholder | User-provided |
 
