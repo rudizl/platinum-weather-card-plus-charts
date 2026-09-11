@@ -1,4 +1,13 @@
-# Platinum Weather Card Plus Charts
+<p align="center">
+  <img src="images/banner.svg" alt="" width="620">
+</p>
+
+<h1 align="center">Platinum Weather Card Plus Charts</h1>
+
+<p align="center">
+  <img src="images/platinum-weather-card.png" alt="The card with its Charts section" width="420">
+</p>
+
 
 A mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) and [Weather Chart Card](https://github.com/mlamberts78/weather-chart-card) — two of the best weather cards for Home Assistant, neither of which has seen active development for a while. I used to run Weather Chart Card on my main dashboard and Platinum on a dedicated weather view. At some point it felt pointless to maintain two separate cards with overlapping functionality, so I merged them as far as makes sense.
 
@@ -377,78 +386,11 @@ The card is now available in the **HACS default store** — no custom repository
 
 ---
 
-## Screenshots
-
-<table>
-<tr>
-<td align="center" width="50%">
-
-**Classic weather forecast**
-
-![Classic weather forecast](images/classic-weather-forecast.png)
-
-</td>
-<td align="center" width="50%">
-
-**Card with Charts section**
-
-![Card overview](images/platinum-weather-card.png)
-
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-
-**Forecast hover tooltip**
-
-![Forecast tooltip](images/tooltip-forecast.png)
-
-</td>
-<td align="center" width="50%">
-
-**Editor — section list**
-
-![Editor sections](images/editor-sections.png)
-
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-
-**Editor — Global Options (locale & icon pack)**
-
-![Editor global options](images/global-options.png)
-
-</td>
-<td align="center" width="50%">
-
-**Slot configuration in editor**
-
-![Editor slots](images/slots-section-highlighted.png)
-
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-
-**Icon pack selection**
-
-![Editor icon pack](images/editor-icon-pack.png)
-
-</td>
-<td align="center" width="50%">
-
-**Local Zambretti forecast (verbose)**
-
-![Local forecast](images/local-forecast-zambretti.png)
-
-</td>
-</tr>
-</table>
-
----
-
 # Sections
+
+<p align="center">
+  <img src="images/editor-sections.png" alt="The section list in the editor" width="720">
+</p>
 
 - Overview
 - Extended
@@ -573,6 +515,12 @@ Shows today's detailed forecast text.
 | Entity Today's Fire Danger | String | Optional entity appended to the extended forecast |
 
 ## Slots Section
+
+Each column holds up to eight slots, chosen from the list below and configured here:
+
+<p align="center">
+  <img src="images/slots-section-highlighted.png" alt="Slot configuration in the editor" width="720">
+</p>
 
 Up to 8 rows of data in 2 columns. The required entities update dynamically based on which slots are selected.
 
@@ -701,6 +649,10 @@ The bands are the meteorological ones rather than wide safety margins. A sensor 
 
 ## Icon Packs
 
+<p align="center">
+  <img src="images/editor-icon-pack.png" alt="Choosing an icon pack" width="720">
+</p>
+
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
 
 | Value | Description | Requirement |
@@ -727,6 +679,12 @@ For `custom`, set `icon_pack_path` to a path template such as `/local/my-icons/{
 
 ## Daily Forecast Section
 
+Hovering a column shows the full forecast for that day, including the precipitation amount:
+
+<p align="center">
+  <img src="images/tooltip-forecast.png" alt="Forecast tooltip on hover" width="420">
+</p>
+
 Two layout options: **Horizontal** (default, up to 5 days) and **Vertical** (up to 7 days).
 
 Hovering over any forecast day column shows a tooltip with date, weather description, max/min temperatures, precipitation, and wind speed/direction. The tooltip content is identical to the Charts section tooltip.
@@ -747,7 +705,7 @@ Hovering over any forecast day column shows a tooltip with date, weather descrip
 | Show date next to day | Boolean | Locale-formatted date after the day name (day label font shrinks to fit) |
 | Show forecast wind | Boolean | Wind speed/direction in each forecast column |
 
-With **Show date next to day** enabled:
+With **Show date next to day** enabled, the date follows the day name and the label shrinks to fit:
 
 ![Daily forecast with dates](images/daily-forecast-dates.png)
 
@@ -772,6 +730,14 @@ When the **Charts section is disabled**, max/min temperature and precipitation a
 
 When the **Charts section is enabled**, the same data is rendered visually as temperature lines (max in orange, min in blue) and precipitation bars in the chart strip below the forecast. The text values are automatically hidden to avoid duplication — the chart already tells the full story.
 
+![Forecast columns with charts](images/daily-forecast-dates.png)
+
+The same five days either way. The whole card in each mode:
+
+| Without charts | With charts |
+|----------------|-------------|
+| ![Card without charts](images/classic-weather-forecast.png) | ![Card with charts](images/platinum-weather-card.png) |
+
 The two charts are independent, and each hides only its own row:
 
 | | hides |
@@ -782,6 +748,10 @@ The two charts are independent, and each hides only its own row:
 So a card with the precipitation chart on and the temperature chart off shows the temperatures as text and the rainfall as bars. If you would rather have the figures as well as the chart, switch off the chart you want the text for — there is no separate control for the text itself, since the pair are two views of one number.
 
 ## Global Options
+
+<p align="center">
+  <img src="images/global-options.png" alt="Global options in the editor" width="720">
+</p>
 
 | Option | Type | Description |
 | ------ | ---- | ----------- |

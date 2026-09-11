@@ -1,0 +1,1188 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="502" height="88" viewBox="0 0 502 88" role="img" aria-label="Animated weather icons shipped with the card"><g transform="translate(18,20)">
+  <defs>
+    <filter id="i0-blur" x="-.34167" y="-.34167" width="1.6833" height="1.85">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+      <feOffset dx="0" dy="4" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA slope="0.05" type="linear" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style type="text/css">
+      <![CDATA[
+      /*
+** SUN
+*/
+      @keyframes i0-am-weather-sun {
+        0% {
+          -webkit-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(360deg);
+          -moz-transform: rotate(360deg);
+          -ms-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+
+      .i0-i0-am-weather-sun {
+        -webkit-animation-name: i0-am-weather-sun;
+        -moz-animation-name: i0-am-weather-sun;
+        -ms-animation-name: i0-am-weather-sun;
+        animation-name: i0-am-weather-sun;
+        -webkit-animation-duration: 9s;
+        -moz-animation-duration: 9s;
+        -ms-animation-duration: 9s;
+        animation-duration: 9s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes i0-i0-am-weather-sun-shiny {
+        0% {
+          stroke-dasharray: 3px 10px;
+          stroke-dashoffset: 0px;
+        }
+
+        50% {
+          stroke-dasharray: 0.1px 10px;
+          stroke-dashoffset: -1px;
+        }
+
+        100% {
+          stroke-dasharray: 3px 10px;
+          stroke-dashoffset: 0px;
+        }
+      }
+
+      .i0-i0-am-weather-sun-shiny line {
+        -webkit-animation-name: i0-i0-am-weather-sun-shiny;
+        -moz-animation-name: i0-i0-am-weather-sun-shiny;
+        -ms-animation-name: i0-i0-am-weather-sun-shiny;
+        animation-name: i0-i0-am-weather-sun-shiny;
+        -webkit-animation-duration: 2s;
+        -moz-animation-duration: 2s;
+        -ms-animation-duration: 2s;
+        animation-duration: 2s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+      ]]>
+    </style>
+  </defs>
+  <g transform="translate(16,-2)" filter="url(#i0-blur)">
+    <g transform="translate(0,16)">
+      <g class="i0-i0-am-weather-sun"
+        style="-moz-animation-duration:9s;-moz-animation-iteration-count:infinite;-moz-animation-name:i0-am-weather-sun;-moz-animation-timing-function:linear;-ms-animation-duration:9s;-ms-animation-iteration-count:infinite;-ms-animation-name:i0-am-weather-sun;-ms-animation-timing-function:linear;-webkit-animation-duration:9s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i0-am-weather-sun;-webkit-animation-timing-function:linear">
+        <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round" stroke-width="2" />
+        <g transform="rotate(45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(135)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="scale(-1)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(225)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <circle r="5" fill="#ffa500" stroke="#ffa500" stroke-width="2" />
+      </g>
+    </g>
+  </g>
+</g><g transform="translate(100,20)">
+  <defs>
+    <filter id="i1-blur" x="-.20655" y="-.28472" width="1.403" height="1.6944">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+      <feOffset dx="0" dy="4" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA slope="0.05" type="linear" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style type="text/css">
+      <![CDATA[
+      /*
+** CLOUDS
+*/
+      @keyframes i1-am-weather-cloud-2 {
+        0% {
+          -webkit-transform: translate(0px, 0px);
+          -moz-transform: translate(0px, 0px);
+          -ms-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+        }
+
+        50% {
+          -webkit-transform: translate(2px, 0px);
+          -moz-transform: translate(2px, 0px);
+          -ms-transform: translate(2px, 0px);
+          transform: translate(2px, 0px);
+        }
+
+        100% {
+          -webkit-transform: translate(0px, 0px);
+          -moz-transform: translate(0px, 0px);
+          -ms-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+        }
+      }
+
+      .i1-i1-am-weather-cloud-2 {
+        -webkit-animation-name: i1-am-weather-cloud-2;
+        -moz-animation-name: i1-am-weather-cloud-2;
+        animation-name: i1-am-weather-cloud-2;
+        -webkit-animation-duration: 3s;
+        -moz-animation-duration: 3s;
+        animation-duration: 3s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      /*
+** SUN
+*/
+      @keyframes i1-am-weather-sun {
+        0% {
+          -webkit-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(360deg);
+          -moz-transform: rotate(360deg);
+          -ms-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+
+      .i1-i1-am-weather-sun {
+        -webkit-animation-name: i1-am-weather-sun;
+        -moz-animation-name: i1-am-weather-sun;
+        -ms-animation-name: i1-am-weather-sun;
+        animation-name: i1-am-weather-sun;
+        -webkit-animation-duration: 9s;
+        -moz-animation-duration: 9s;
+        -ms-animation-duration: 9s;
+        animation-duration: 9s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes i1-i1-am-weather-sun-shiny {
+        0% {
+          stroke-dasharray: 3px 10px;
+          stroke-dashoffset: 0px;
+        }
+
+        50% {
+          stroke-dasharray: 0.1px 10px;
+          stroke-dashoffset: -1px;
+        }
+
+        100% {
+          stroke-dasharray: 3px 10px;
+          stroke-dashoffset: 0px;
+        }
+      }
+
+      .i1-i1-am-weather-sun-shiny line {
+        -webkit-animation-name: i1-i1-am-weather-sun-shiny;
+        -moz-animation-name: i1-i1-am-weather-sun-shiny;
+        -ms-animation-name: i1-i1-am-weather-sun-shiny;
+        animation-name: i1-i1-am-weather-sun-shiny;
+        -webkit-animation-duration: 2s;
+        -moz-animation-duration: 2s;
+        -ms-animation-duration: 2s;
+        animation-duration: 2s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+      ]]>
+    </style>
+  </defs>
+  <g transform="translate(16 -2)" filter="url(#i1-blur)">
+    <g transform="translate(0,16)">
+      <g class="i1-i1-am-weather-sun"
+        style="-moz-animation-duration:9s;-moz-animation-iteration-count:infinite;-moz-animation-name:i1-am-weather-sun;-moz-animation-timing-function:linear;-ms-animation-duration:9s;-ms-animation-iteration-count:infinite;-ms-animation-name:i1-am-weather-sun;-ms-animation-timing-function:linear;-webkit-animation-duration:9s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i1-am-weather-sun;-webkit-animation-timing-function:linear">
+        <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round" stroke-width="2" />
+        <g transform="rotate(45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(135)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="scale(-1)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(225)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+      </g>
+      <circle r="5" fill="#ffa500" stroke="#ffa500" stroke-width="2" />
+    </g>
+    <g class="i1-i1-am-weather-cloud-2"
+      style="-moz-animation-duration:3s;-moz-animation-iteration-count:infinite;-moz-animation-name:i1-am-weather-cloud-2;-moz-animation-timing-function:linear;-webkit-animation-duration:3s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i1-am-weather-cloud-2;-webkit-animation-timing-function:linear">
+      <path transform="translate(-20,-11)"
+        d="m47.7 35.4c0-4.6-3.7-8.2-8.2-8.2-1 0-1.9 0.2-2.8 0.5-0.3-3.4-3.1-6.2-6.6-6.2-3.7 0-6.7 3-6.7 6.7 0 0.8 0.2 1.6 0.4 2.3-0.3-0.1-0.7-0.1-1-0.1-3.7 0-6.7 3-6.7 6.7 0 3.6 2.9 6.6 6.5 6.7h17.2c4.4-0.5 7.9-4 7.9-8.4z"
+        fill="#91c0f8" stroke="#fff" stroke-linejoin="round" stroke-width="1.2" />
+    </g>
+  </g>
+</g><g transform="translate(182,20)">
+  <defs>
+    <filter id="i2-blur" x="-.20655" y="-.20592" width="1.403" height="1.4872">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+      <feOffset dx="0" dy="4" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA slope="0.05" type="linear" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style type="text/css">
+      <![CDATA[
+      /*
+** SUN
+*/
+      @keyframes i2-am-weather-sun {
+        0% {
+          -webkit-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(360deg);
+          -moz-transform: rotate(360deg);
+          -ms-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+
+      .i2-i2-am-weather-sun {
+        -webkit-animation-name: i2-am-weather-sun;
+        -moz-animation-name: i2-am-weather-sun;
+        -ms-animation-name: i2-am-weather-sun;
+        animation-name: i2-am-weather-sun;
+        -webkit-animation-duration: 9s;
+        -moz-animation-duration: 9s;
+        -ms-animation-duration: 9s;
+        animation-duration: 9s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      /*
+** CLOUDS
+*/
+      @keyframes i2-am-weather-cloud-2 {
+        0% {
+          -webkit-transform: translate(0px, 0px);
+          -moz-transform: translate(0px, 0px);
+          -ms-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+        }
+
+        50% {
+          -webkit-transform: translate(2px, 0px);
+          -moz-transform: translate(2px, 0px);
+          -ms-transform: translate(2px, 0px);
+          transform: translate(2px, 0px);
+        }
+
+        100% {
+          -webkit-transform: translate(0px, 0px);
+          -moz-transform: translate(0px, 0px);
+          -ms-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+        }
+      }
+
+      .i2-i2-am-weather-cloud-2 {
+        -webkit-animation-name: i2-am-weather-cloud-2;
+        -moz-animation-name: i2-am-weather-cloud-2;
+        animation-name: i2-am-weather-cloud-2;
+        -webkit-animation-duration: 3s;
+        -moz-animation-duration: 3s;
+        animation-duration: 3s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      /*
+** RAIN
+*/
+      @keyframes i2-am-weather-rain {
+        0% {
+          stroke-dashoffset: 0;
+        }
+
+        100% {
+          stroke-dashoffset: -100;
+        }
+      }
+
+      .i2-i2-am-weather-rain-1 {
+        -webkit-animation-name: i2-am-weather-rain;
+        -moz-animation-name: i2-am-weather-rain;
+        -ms-animation-name: i2-am-weather-rain;
+        animation-name: i2-am-weather-rain;
+        -webkit-animation-duration: 8s;
+        -moz-animation-duration: 8s;
+        -ms-animation-duration: 8s;
+        animation-duration: 8s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      .i2-i2-am-weather-rain-2 {
+        -webkit-animation-name: i2-am-weather-rain;
+        -moz-animation-name: i2-am-weather-rain;
+        -ms-animation-name: i2-am-weather-rain;
+        animation-name: i2-am-weather-rain;
+        -webkit-animation-delay: 0.25s;
+        -moz-animation-delay: 0.25s;
+        -ms-animation-delay: 0.25s;
+        animation-delay: 0.25s;
+        -webkit-animation-duration: 8s;
+        -moz-animation-duration: 8s;
+        -ms-animation-duration: 8s;
+        animation-duration: 8s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+      ]]>
+    </style>
+  </defs>
+  <g transform="translate(16,-2)" filter="url(#i2-blur)">
+    <g transform="translate(0,16)">
+      <g class="i2-i2-am-weather-sun"
+        style="-moz-animation-duration:9s;-moz-animation-iteration-count:infinite;-moz-animation-name:i2-am-weather-sun;-moz-animation-timing-function:linear;-ms-animation-duration:9s;-ms-animation-iteration-count:infinite;-ms-animation-name:i2-am-weather-sun;-ms-animation-timing-function:linear;-webkit-animation-duration:9s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i2-am-weather-sun;-webkit-animation-timing-function:linear">
+        <line transform="translate(0,9)" y2="3" stroke="#ffa500" stroke-linecap="round" stroke-width="2" fifll="none" />
+        <g transform="rotate(45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(135)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="scale(-1)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(225)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <circle r="5" fill="#ffa500" stroke="#ffa500" stroke-width="2" />
+      </g>
+    </g>
+    <g class="am-weather-cloud-3"
+      style="-moz-animation-duration:3s;-moz-animation-iteration-count:infinite;-moz-animation-name:i2-am-weather-cloud-2;-moz-animation-timing-function:linear;-webkit-animation-duration:3s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i2-am-weather-cloud-2;-webkit-animation-timing-function:linear">
+      <path transform="translate(-20,-11)"
+        d="m47.7 35.4c0-4.6-3.7-8.2-8.2-8.2-1 0-1.9 0.2-2.8 0.5-0.3-3.4-3.1-6.2-6.6-6.2-3.7 0-6.7 3-6.7 6.7 0 0.8 0.2 1.6 0.4 2.3-0.3-0.1-0.7-0.1-1-0.1-3.7 0-6.7 3-6.7 6.7 0 3.6 2.9 6.6 6.5 6.7h17.2c4.4-0.5 7.9-4 7.9-8.4z"
+        fill="#57a0ee" stroke="#fff" stroke-linejoin="round" stroke-width="1.2" />
+    </g>
+    <g transform="translate(-20,-10) rotate(10,-245.89,217.31)" fill="none" stroke="#91c0f8" stroke-dasharray="4, 7" stroke-linecap="round"
+      stroke-width="2">
+      <line class="i2-i2-am-weather-rain-1" transform="translate(-6,1)" y2="8"
+        style="-moz-animation-duration:8s;-moz-animation-iteration-count:infinite;-moz-animation-name:i2-am-weather-rain;-moz-animation-timing-function:linear;-ms-animation-duration:8s;-ms-animation-iteration-count:infinite;-ms-animation-name:i2-am-weather-rain;-ms-animation-timing-function:linear;-webkit-animation-duration:8s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i2-am-weather-rain;-webkit-animation-timing-function:linear" />
+      <line class="i2-i2-am-weather-rain-2" transform="translate(0,-1)" y2="8"
+        style="-moz-animation-delay:0.25s;-moz-animation-duration:8s;-moz-animation-iteration-count:infinite;-moz-animation-name:i2-am-weather-rain;-moz-animation-timing-function:linear;-ms-animation-delay:0.25s;-ms-animation-duration:8s;-ms-animation-iteration-count:infinite;-ms-animation-name:i2-am-weather-rain;-ms-animation-timing-function:linear;-webkit-animation-delay:0.25s;-webkit-animation-duration:8s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i2-am-weather-rain;-webkit-animation-timing-function:linear" />
+    </g>
+  </g>
+</g><g transform="translate(264,20)">
+ <defs>
+  <filter id="i3-blur" x="-.24684" y="-.19575" width="1.4937" height="1.4959">
+   <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+   <feOffset dx="0" dy="4" result="offsetblur"/>
+   <feComponentTransfer>
+    <feFuncA slope="0.05" type="linear"/>
+   </feComponentTransfer>
+   <feMerge>
+    <feMergeNode/>
+    <feMergeNode in="SourceGraphic"/>
+   </feMerge>
+  </filter>
+  <style type="text/css"><![CDATA[
+/*
+** CLOUDS
+*/
+@keyframes i3-am-weather-cloud-1 {
+  0% {
+    -webkit-transform: translate(-5px,0px);
+       -moz-transform: translate(-5px,0px);
+        -ms-transform: translate(-5px,0px);
+            transform: translate(-5px,0px);
+  }
+
+  50% {
+    -webkit-transform: translate(10px,0px);
+       -moz-transform: translate(10px,0px);
+        -ms-transform: translate(10px,0px);
+            transform: translate(10px,0px);
+  }
+
+  100% {
+    -webkit-transform: translate(-5px,0px);
+       -moz-transform: translate(-5px,0px);
+        -ms-transform: translate(-5px,0px);
+            transform: translate(-5px,0px);
+  }
+}
+
+.i3-i3-am-weather-cloud-1 {
+  -webkit-animation-name: i3-am-weather-cloud-1;
+     -moz-animation-name: i3-am-weather-cloud-1;
+          animation-name: i3-am-weather-cloud-1;
+  -webkit-animation-duration: 7s;
+     -moz-animation-duration: 7s;
+          animation-duration: 7s;
+  -webkit-animation-timing-function: linear;
+     -moz-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+     -moz-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+}
+
+@keyframes i3-am-weather-cloud-2 {
+  0% {
+    -webkit-transform: translate(0px,0px);
+       -moz-transform: translate(0px,0px);
+        -ms-transform: translate(0px,0px);
+            transform: translate(0px,0px);
+  }
+
+  50% {
+    -webkit-transform: translate(2px,0px);
+       -moz-transform: translate(2px,0px);
+        -ms-transform: translate(2px,0px);
+            transform: translate(2px,0px);
+  }
+
+  100% {
+    -webkit-transform: translate(0px,0px);
+       -moz-transform: translate(0px,0px);
+        -ms-transform: translate(0px,0px);
+            transform: translate(0px,0px);
+  }
+}
+
+.i3-i3-am-weather-cloud-2 {
+  -webkit-animation-name: i3-am-weather-cloud-2;
+     -moz-animation-name: i3-am-weather-cloud-2;
+          animation-name: i3-am-weather-cloud-2;
+  -webkit-animation-duration: 3s;
+     -moz-animation-duration: 3s;
+          animation-duration: 3s;
+  -webkit-animation-timing-function: linear;
+     -moz-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+     -moz-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+}
+
+/*
+** STROKE
+*/
+@keyframes i3-am-weather-stroke {
+  0% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  2% {
+    -webkit-transform: translate(0.3px,0.0px);
+       -moz-transform: translate(0.3px,0.0px);
+        -ms-transform: translate(0.3px,0.0px);
+            transform: translate(0.3px,0.0px);
+  }
+
+  4% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  6% {
+    -webkit-transform: translate(0.5px,0.4px);
+       -moz-transform: translate(0.5px,0.4px);
+        -ms-transform: translate(0.5px,0.4px);
+            transform: translate(0.5px,0.4px);
+  }
+
+  8% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  10% {
+    -webkit-transform: translate(0.3px,0.0px);
+       -moz-transform: translate(0.3px,0.0px);
+        -ms-transform: translate(0.3px,0.0px);
+            transform: translate(0.3px,0.0px);
+  }
+
+  12% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  14% {
+    -webkit-transform: translate(0.3px,0.0px);
+       -moz-transform: translate(0.3px,0.0px);
+        -ms-transform: translate(0.3px,0.0px);
+            transform: translate(0.3px,0.0px);
+  }
+
+  16% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  18% {
+    -webkit-transform: translate(0.3px,0.0px);
+       -moz-transform: translate(0.3px,0.0px);
+        -ms-transform: translate(0.3px,0.0px);
+            transform: translate(0.3px,0.0px);
+  }
+
+  20% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  22% {
+    -webkit-transform: translate(1px,0.0px);
+       -moz-transform: translate(1px,0.0px);
+        -ms-transform: translate(1px,0.0px);
+            transform: translate(1px,0.0px);
+  }
+
+  24% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  26% {
+    -webkit-transform: translate(-1px,0.0px);
+       -moz-transform: translate(-1px,0.0px);
+        -ms-transform: translate(-1px,0.0px);
+            transform: translate(-1px,0.0px);
+
+  }
+
+  28% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  40% {
+    fill: orange;
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+
+  65% {
+    fill: white;
+    -webkit-transform: translate(-1px,5.0px);
+       -moz-transform: translate(-1px,5.0px);
+        -ms-transform: translate(-1px,5.0px);
+            transform: translate(-1px,5.0px);
+  }
+  61% {
+    fill: orange;
+  }
+
+  100% {
+    -webkit-transform: translate(0.0px,0.0px);
+       -moz-transform: translate(0.0px,0.0px);
+        -ms-transform: translate(0.0px,0.0px);
+            transform: translate(0.0px,0.0px);
+  }
+}
+
+.i3-i3-am-weather-stroke {
+  -webkit-animation-name: i3-am-weather-stroke;
+     -moz-animation-name: i3-am-weather-stroke;
+          animation-name: i3-am-weather-stroke;
+  -webkit-animation-duration: 1.11s;
+     -moz-animation-duration: 1.11s;
+          animation-duration: 1.11s;
+  -webkit-animation-timing-function: linear;
+     -moz-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+     -moz-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+}
+        ]]></style>
+ </defs>
+ <g id="i3-thunder" transform="translate(-4,-12)" filter="url(#i3-blur)">
+  <g transform="translate(20,10)">
+   <g class="i3-i3-am-weather-cloud-1" style="-moz-animation-duration:7s;-moz-animation-iteration-count:infinite;-moz-animation-name:i3-am-weather-cloud-1;-moz-animation-timing-function:linear;-webkit-animation-duration:7s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i3-am-weather-cloud-1;-webkit-animation-timing-function:linear">
+    <path transform="matrix(.6 0 0 .6 -10 -6)" d="m47.7 35.4c0-4.6-3.7-8.2-8.2-8.2-1 0-1.9 0.2-2.8 0.5-0.3-3.4-3.1-6.2-6.6-6.2-3.7 0-6.7 3-6.7 6.7 0 0.8 0.2 1.6 0.4 2.3-0.3-0.1-0.7-0.1-1-0.1-3.7 0-6.7 3-6.7 6.7 0 3.6 2.9 6.6 6.5 6.7h17.2c4.4-0.5 7.9-4 7.9-8.4z" fill="#91c0f8" stroke="#fff" stroke-linejoin="round" stroke-width="1.2"/>
+   </g>
+   <path transform="translate(-20,-11)" d="m47.7 35.4c0-4.6-3.7-8.2-8.2-8.2-1 0-1.9 0.2-2.8 0.5-0.3-3.4-3.1-6.2-6.6-6.2-3.7 0-6.7 3-6.7 6.7 0 0.8 0.2 1.6 0.4 2.3-0.3-0.1-0.7-0.1-1-0.1-3.7 0-6.7 3-6.7 6.7 0 3.6 2.9 6.6 6.5 6.7h17.2c4.4-0.5 7.9-4 7.9-8.4z" fill="#57a0ee" stroke="#fff" stroke-linejoin="round" stroke-width="1.2"/>
+   <g transform="matrix(1.2,0,0,1.2,-4,28)">
+    <polygon class="i3-i3-am-weather-stroke" points="11.1 6.9 14.3 -2.9 20.5 -2.9 16.4 4.3 20.3 4.3 11.5 14.6 14.9 6.9" fill="#ffa500" stroke="#fff" style="-moz-animation-duration:1.11s;-moz-animation-iteration-count:infinite;-moz-animation-name:i3-am-weather-stroke;-moz-animation-timing-function:linear;-webkit-animation-duration:1.11s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i3-am-weather-stroke;-webkit-animation-timing-function:linear"/>
+   </g>
+  </g>
+ </g>
+</g><g transform="translate(346,20)">
+  <defs>
+    <filter id="i4-blur" x="-.20655" y="-.23099" width="1.403" height="1.5634">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+      <feOffset dx="0" dy="4" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA slope="0.05" type="linear" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style type="text/css">
+      <![CDATA[
+      /*
+** CLOUDS
+*/
+      @keyframes i4-am-weather-cloud-2 {
+        0% {
+          -webkit-transform: translate(0px, 0px);
+          -moz-transform: translate(0px, 0px);
+          -ms-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+        }
+
+        50% {
+          -webkit-transform: translate(2px, 0px);
+          -moz-transform: translate(2px, 0px);
+          -ms-transform: translate(2px, 0px);
+          transform: translate(2px, 0px);
+        }
+
+        100% {
+          -webkit-transform: translate(0px, 0px);
+          -moz-transform: translate(0px, 0px);
+          -ms-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+        }
+      }
+
+      .i4-i4-am-weather-cloud-2 {
+        -webkit-animation-name: i4-am-weather-cloud-2;
+        -moz-animation-name: i4-am-weather-cloud-2;
+        animation-name: i4-am-weather-cloud-2;
+        -webkit-animation-duration: 3s;
+        -moz-animation-duration: 3s;
+        animation-duration: 3s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      /*
+** SUN
+*/
+      @keyframes i4-am-weather-sun {
+        0% {
+          -webkit-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(360deg);
+          -moz-transform: rotate(360deg);
+          -ms-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+
+      .i4-i4-am-weather-sun {
+        -webkit-animation-name: i4-am-weather-sun;
+        -moz-animation-name: i4-am-weather-sun;
+        -ms-animation-name: i4-am-weather-sun;
+        animation-name: i4-am-weather-sun;
+        -webkit-animation-duration: 9s;
+        -moz-animation-duration: 9s;
+        -ms-animation-duration: 9s;
+        animation-duration: 9s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes i4-i4-am-weather-sun-shiny {
+        0% {
+          stroke-dasharray: 3px 10px;
+          stroke-dashoffset: 0px;
+        }
+
+        50% {
+          stroke-dasharray: 0.1px 10px;
+          stroke-dashoffset: -1px;
+        }
+
+        100% {
+          stroke-dasharray: 3px 10px;
+          stroke-dashoffset: 0px;
+        }
+      }
+
+      .i4-i4-am-weather-sun-shiny line {
+        -webkit-animation-name: i4-i4-am-weather-sun-shiny;
+        -moz-animation-name: i4-i4-am-weather-sun-shiny;
+        -ms-animation-name: i4-i4-am-weather-sun-shiny;
+        animation-name: i4-i4-am-weather-sun-shiny;
+        -webkit-animation-duration: 2s;
+        -moz-animation-duration: 2s;
+        -ms-animation-duration: 2s;
+        animation-duration: 2s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      /*
+** SNOW
+*/
+      @keyframes i4-am-weather-snow {
+        0% {
+          -webkit-transform: translateX(0) translateY(0);
+          -moz-transform: translateX(0) translateY(0);
+          -ms-transform: translateX(0) translateY(0);
+          transform: translateX(0) translateY(0);
+        }
+
+        33.33% {
+          -webkit-transform: translateX(-1.2px) translateY(2px);
+          -moz-transform: translateX(-1.2px) translateY(2px);
+          -ms-transform: translateX(-1.2px) translateY(2px);
+          transform: translateX(-1.2px) translateY(2px);
+        }
+
+        66.66% {
+          -webkit-transform: translateX(1.4px) translateY(4px);
+          -moz-transform: translateX(1.4px) translateY(4px);
+          -ms-transform: translateX(1.4px) translateY(4px);
+          transform: translateX(1.4px) translateY(4px);
+          opacity: 1;
+        }
+
+        100% {
+          -webkit-transform: translateX(-1.6px) translateY(6px);
+          -moz-transform: translateX(-1.6px) translateY(6px);
+          -ms-transform: translateX(-1.6px) translateY(6px);
+          transform: translateX(-1.6px) translateY(6px);
+          opacity: 0;
+        }
+      }
+
+      .i4-i4-am-weather-snow-1 {
+        -webkit-animation-name: i4-am-weather-snow;
+        -moz-animation-name: i4-am-weather-snow;
+        -ms-animation-name: i4-am-weather-snow;
+        animation-name: i4-am-weather-snow;
+        -webkit-animation-duration: 2s;
+        -moz-animation-duration: 2s;
+        -ms-animation-duration: 2s;
+        animation-duration: 2s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+
+      .i4-i4-am-weather-snow-2 {
+        -webkit-animation-name: i4-am-weather-snow;
+        -moz-animation-name: i4-am-weather-snow;
+        -ms-animation-name: i4-am-weather-snow;
+        animation-name: i4-am-weather-snow;
+        -webkit-animation-delay: 1.2s;
+        -moz-animation-delay: 1.2s;
+        -ms-animation-delay: 1.2s;
+        animation-delay: 1.2s;
+        -webkit-animation-duration: 2s;
+        -moz-animation-duration: 2s;
+        -ms-animation-duration: 2s;
+        animation-duration: 2s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+      }
+      ]]>
+    </style>
+  </defs>
+  <g transform="translate(16,-2)" filter="url(#i4-blur)">
+    <g transform="translate(0,16)">
+      <g class="i4-i4-am-weather-sun"
+        style="-moz-animation-duration:9s;-moz-animation-iteration-count:infinite;-moz-animation-name:i4-am-weather-sun;-moz-animation-timing-function:linear;-ms-animation-duration:9s;-ms-animation-iteration-count:infinite;-ms-animation-name:i4-am-weather-sun;-ms-animation-timing-function:linear;-webkit-animation-duration:9s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i4-am-weather-sun;-webkit-animation-timing-function:linear">
+        <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round" stroke-width="2" />
+        <g transform="rotate(45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(135)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="scale(-1)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(225)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-90)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+        <g transform="rotate(-45)">
+          <line transform="translate(0,9)" y2="3" fill="none" stroke="#ffa500" stroke-linecap="round"
+            stroke-width="2" />
+        </g>
+      </g>
+      <circle r="5" fill="#ffa500" stroke="#ffa500" stroke-width="2" />
+    </g>
+    <g class="am-weather-cloud-3"
+      style="-moz-animation-duration:3s;-moz-animation-iteration-count:infinite;-moz-animation-name:i4-am-weather-cloud-2;-moz-animation-timing-function:linear;-webkit-animation-duration:3s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i4-am-weather-cloud-2;-webkit-animation-timing-function:linear">
+      <path transform="translate(-20,-11)"
+        d="m47.7 35.4c0-4.6-3.7-8.2-8.2-8.2-1 0-1.9 0.2-2.8 0.5-0.3-3.4-3.1-6.2-6.6-6.2-3.7 0-6.7 3-6.7 6.7 0 0.8 0.2 1.6 0.4 2.3-0.3-0.1-0.7-0.1-1-0.1-3.7 0-6.7 3-6.7 6.7 0 3.6 2.9 6.6 6.5 6.7h17.2c4.4-0.5 7.9-4 7.9-8.4z"
+        fill="#57a0ee" stroke="#fff" stroke-linejoin="round" stroke-width="1.2" />
+    </g>
+    <g class="i4-i4-am-weather-snow-1"
+      style="-moz-animation-duration:2s;-moz-animation-iteration-count:infinite;-moz-animation-name:i4-am-weather-snow;-moz-animation-timing-function:linear;-ms-animation-duration:2s;-ms-animation-iteration-count:infinite;-ms-animation-name:i4-am-weather-snow;-ms-animation-timing-function:linear;-webkit-animation-duration:2s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i4-am-weather-snow;-webkit-animation-timing-function:linear">
+      <g transform="translate(7,28)" fill="none" stroke="#57a0ee" stroke-linecap="round">
+        <line transform="translate(0,9)" y1="-2.5" y2="2.5" stroke-width="1.2" />
+        <line transform="rotate(45,-10.864,4.5)" y1="-2.5" y2="2.5" />
+        <line transform="rotate(90,-4.5,4.5)" y1="-2.5" y2="2.5" />
+        <line transform="rotate(135,-1.864,4.5)" y1="-2.5" y2="2.5" />
+      </g>
+    </g>
+    <g class="i4-i4-am-weather-snow-2"
+      style="-moz-animation-delay:1.2s;-moz-animation-duration:2s;-moz-animation-iteration-count:infinite;-moz-animation-name:i4-am-weather-snow;-moz-animation-timing-function:linear;-ms-animation-delay:1.2s;-ms-animation-duration:2s;-ms-animation-iteration-count:infinite;-ms-animation-name:i4-am-weather-snow;-ms-animation-timing-function:linear;-webkit-animation-delay:1.2s;-webkit-animation-duration:2s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i4-am-weather-snow;-webkit-animation-timing-function:linear">
+      <g transform="translate(16,28)" fill="none" stroke="#57a0ee" stroke-linecap="round">
+        <line transform="translate(0,9)" y1="-2.5" y2="2.5" stroke-width="1.2" />
+        <line transform="rotate(45,-10.864,4.5)" y1="-2.5" y2="2.5" />
+        <line transform="rotate(90,-4.5,4.5)" y1="-2.5" y2="2.5" />
+        <line transform="rotate(135,-1.864,4.5)" y1="-2.5" y2="2.5" />
+      </g>
+    </g>
+  </g>
+</g><g transform="translate(428,20)">
+  <defs>
+    <filter id="i5-blur" x="-.3038" y="-.3318" width="1.6076" height="1.894">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+      <feOffset dx="0" dy="4" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA slope="0.05" type="linear" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <style type="text/css">
+      <![CDATA[
+      /*
+** MOON
+*/
+      @keyframes i5-am-weather-moon {
+        0% {
+          -webkit-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+
+        50% {
+          -webkit-transform: rotate(15deg);
+          -moz-transform: rotate(15deg);
+          -ms-transform: rotate(15deg);
+          transform: rotate(15deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+      }
+
+      .i5-i5-am-weather-moon {
+        -webkit-animation-name: i5-am-weather-moon;
+        -moz-animation-name: i5-am-weather-moon;
+        -ms-animation-name: i5-am-weather-moon;
+        animation-name: i5-am-weather-moon;
+        -webkit-animation-duration: 6s;
+        -moz-animation-duration: 6s;
+        -ms-animation-duration: 6s;
+        animation-duration: 6s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+        -moz-animation-iteration-count: infinite;
+        -ms-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
+        -webkit-transform-origin: 12.5px 15.15px 0;
+        /* TODO FF CENTER ISSUE */
+        -moz-transform-origin: 12.5px 15.15px 0;
+        /* TODO FF CENTER ISSUE */
+        -ms-transform-origin: 12.5px 15.15px 0;
+        /* TODO FF CENTER ISSUE */
+        transform-origin: 12.5px 15.15px 0;
+        /* TODO FF CENTER ISSUE */
+      }
+
+      @keyframes i5-i5-am-weather-moon-star-1 {
+        0% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .i5-i5-i5-am-weather-moon-star-1 {
+        -webkit-animation-name: i5-i5-am-weather-moon-star-1;
+        -moz-animation-name: i5-i5-am-weather-moon-star-1;
+        -ms-animation-name: i5-i5-am-weather-moon-star-1;
+        animation-name: i5-i5-am-weather-moon-star-1;
+        -webkit-animation-delay: 3s;
+        -moz-animation-delay: 3s;
+        -ms-animation-delay: 3s;
+        animation-delay: 3s;
+        -webkit-animation-duration: 5s;
+        -moz-animation-duration: 5s;
+        -ms-animation-duration: 5s;
+        animation-duration: 5s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: 1;
+        -moz-animation-iteration-count: 1;
+        -ms-animation-iteration-count: 1;
+        animation-iteration-count: 1;
+      }
+
+      @keyframes i5-i5-am-weather-moon-star-2 {
+        0% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .i5-i5-i5-am-weather-moon-star-2 {
+        -webkit-animation-name: i5-i5-am-weather-moon-star-2;
+        -moz-animation-name: i5-i5-am-weather-moon-star-2;
+        -ms-animation-name: i5-i5-am-weather-moon-star-2;
+        animation-name: i5-i5-am-weather-moon-star-2;
+        -webkit-animation-delay: 5s;
+        -moz-animation-delay: 5s;
+        -ms-animation-delay: 5s;
+        animation-delay: 5s;
+        -webkit-animation-duration: 4s;
+        -moz-animation-duration: 4s;
+        -ms-animation-duration: 4s;
+        animation-duration: 4s;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-timing-function: linear;
+        -ms-animation-timing-function: linear;
+        animation-timing-function: linear;
+        -webkit-animation-iteration-count: 1;
+        -moz-animation-iteration-count: 1;
+        -ms-animation-iteration-count: 1;
+        animation-iteration-count: 1;
+      }
+      ]]>
+    </style>
+  </defs>
+  <g id="i5-night" transform="translate(-4,-18)" filter="url(#i5-blur)">
+    <g transform="matrix(.8 0 0 .78534 36 20.022)" stroke-width="1.2616">
+      <g class="i5-i5-i5-i5-am-weather-moon-star-1"
+        style="-moz-animation-delay:3s;-moz-animation-duration:5s;-moz-animation-iteration-count:1;-moz-animation-name:i5-i5-am-weather-moon-star-1;-moz-animation-timing-function:linear;-ms-animation-delay:3s;-ms-animation-duration:5s;-ms-animation-iteration-count:1;-ms-animation-name:i5-i5-am-weather-moon-star-1;-ms-animation-timing-function:linear;-webkit-animation-delay:3s;-webkit-animation-duration:5s;-webkit-animation-iteration-count:1;-webkit-animation-name:i5-i5-am-weather-moon-star-1;-webkit-animation-timing-function:linear">
+        <polygon points="4 2.7 5.2 3.3 4 4 3.3 5.2 2.7 4 1.5 3.3 2.7 2.7 3.3 1.5" fill="#ffa500" stroke-miterlimit="10"
+          stroke-width="1.4105" />
+      </g>
+      <g class="i5-i5-i5-i5-am-weather-moon-star-2"
+        style="-moz-animation-delay:5s;-moz-animation-duration:4s;-moz-animation-iteration-count:1;-moz-animation-name:i5-i5-am-weather-moon-star-2;-moz-animation-timing-function:linear;-ms-animation-delay:5s;-ms-animation-duration:4s;-ms-animation-iteration-count:1;-ms-animation-name:i5-i5-am-weather-moon-star-2;-ms-animation-timing-function:linear;-webkit-animation-delay:5s;-webkit-animation-duration:4s;-webkit-animation-iteration-count:1;-webkit-animation-name:i5-i5-am-weather-moon-star-2;-webkit-animation-timing-function:linear">
+        <polygon transform="translate(20,10)" points="4 2.7 5.2 3.3 4 4 3.3 5.2 2.7 4 1.5 3.3 2.7 2.7 3.3 1.5"
+          fill="#ffa500" stroke-miterlimit="10" stroke-width="1.4105" />
+      </g>
+      <g class="i5-i5-am-weather-moon"
+        style="-moz-animation-duration:6s;-moz-animation-iteration-count:infinite;-moz-animation-name:i5-am-weather-moon;-moz-animation-timing-function:linear;-moz-transform-origin:12.5px 15.15px 0;-ms-animation-duration:6s;-ms-animation-iteration-count:infinite;-ms-animation-name:i5-am-weather-moon;-ms-animation-timing-function:linear;-ms-transform-origin:12.5px 15.15px 0;-webkit-animation-duration:6s;-webkit-animation-iteration-count:infinite;-webkit-animation-name:i5-am-weather-moon;-webkit-animation-timing-function:linear;-webkit-transform-origin:12.5px 15.15px 0">
+        <path
+          d="m14.5 13.2c0-3.7 2-6.9 5-8.7-1.5-0.9-3.2-1.3-5-1.3-5.5 0-10 4.5-10 10s4.5 10 10 10c1.8 0 3.5-0.5 5-1.3-3-1.7-5-5-5-8.7z"
+          fill="#ffa500" stroke="#ffa500" stroke-linejoin="round" stroke-width="2.5232" />
+      </g>
+    </g>
+  </g>
+</g></svg>
