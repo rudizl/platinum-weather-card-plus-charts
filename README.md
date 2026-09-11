@@ -346,41 +346,13 @@ The card is now available in the **HACS default store** — no custom repository
 
 **Older releases**
 
-**v1.3.1** — the changes below were released across a series of betas and are collected here
+**v1.x** — the first year, before the v2.0.0 rewrite
 
-- Show `---` instead of `NaN%` or `unknownmm` when a sensor returns `unknown` or `unavailable` — humidity, rainfall, pressure, visibility, wind speed and gust, and the precipitation slots
-- Hide `unknown`/`unavailable` in the extended section, which showed the raw text below the separator
-- Add `option_show_current_day` — **"Include Today in Forecast"**, so the strip starts from today rather than tomorrow
-- Add an optional label to the custom slots, shown as small secondary text before the value
-- Fix false-positive errors for sensors with multi-digit numbers in their names, such as `sensor.ivarna103_*`
-- Fix `fireDanger` scoping in the vertical forecast layout
-- Editor: migrate text inputs from the deprecated `ha-textfield` to `ha-input`, and replace the switch colour tokens removed in HA 2026.5
-- Drop the `resize-observer-polyfill` dependency, saving about 30 KB — every browser Home Assistant supports has had `ResizeObserver` natively since 2020
+The card began as a merge of Platinum Weather Card and Weather Chart Card, and most of this line went on making that merge hold together against a moving Home Assistant. The editor dropdowns broke three times in a row as HA retired `mwc-list-item`, then `ha-list-item`, then the switch colour tokens; they were finally settled by dropping the HA components altogether for native `<select>` elements, which is why they have not broken since.
 
-**v1.3.0**
-- Fix all card editor dropdowns not showing saved values
-- Fix rainy/pouring icon associations
-- Add `moon` slot with dynamic phase icons and translations (11 locales)
-- Add `option_forecast_decimals`, `option_show_forecast_pop`
-- Add `currentWindSpeedUnit` — reads wind unit from weather entity attributes
-- Add Spanish (`es`) locale
-- HA profile integration for time/date format
-- Single-file build
+The rest was mostly the card learning to say nothing gracefully. Sensors that return `unknown` or `unavailable` had been rendering as `NaN%` and `unknownmm` across a dozen slots, and the extended section printed the raw word below its separator.
 
-**v1.2.4**
-- Definitive fix for broken editor dropdowns — replaced all `ha-select`/`ha-list-item` with native `<select>` elements
-
-**v1.2.3**
-- Fix editor dropdowns — `mwc-list-item` removed in HA 2024.x, replaced with `ha-list-item`
-
-**v1.2.2**
-- Fix all dropdowns in the card editor not working in newer HA versions
-
-**v1.2.1**
-- Add `double_tap_action` support
-- Add `Gust` localization for all supported languages
-- Accept `hourly` and `twice_daily` as valid `forecast_type` values
-- Fix broken layout in slots section, malformed HTML in beaufort wind display
+Features added along the way: the `moon` slot with its phase icons, `option_show_current_day`, labels on the custom slots, `double_tap_action`, Spanish, wind units read from the weather entity, and time and date formats following the HA profile. The build became a single file, and `resize-observer-polyfill` went — about 30 KB for something every browser HA supports has had natively since 2020.
 
 </details>
 
