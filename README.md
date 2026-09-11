@@ -392,13 +392,16 @@ The card is now available in the **HACS default store** — no custom repository
   <img src="images/editor-sections.png" alt="The section list in the editor" width="720">
 </p>
 
-- Overview
-- Extended
-- Slots
-- Daily Forecast
-- **Charts**
+- **Warnings** — weather alerts from a MeteoAlarm-compatible sensor
+- **Overview** — the condition icon, temperature and forecast text
+- **Extended** — a longer forecast description
+- **Slots** — two columns of readings, up to eight each
+- **Daily Forecast** — a column per day
+- **Charts** — temperature lines and precipitation bars
 
-Use the lock icon on each section header to hide it entirely, and the up/down buttons to reorder them. The **Global Options** section contains settings that affect multiple sections.
+Each row has a switch to hide the section entirely, arrows to reorder it, and a pencil to open its settings. The second icon, where present, opens that section's visibility rules — the conditions under which it appears at all.
+
+**Global Options** at the top is not a section of the card; it holds the settings that several sections draw on, such as the locale, the icon pack and the station sensors.
 
 ## Overview Section
 
