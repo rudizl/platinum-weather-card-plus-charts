@@ -654,6 +654,16 @@ The measurement is shared by every card on the page — it describes the sky, no
 
 The bands are the meteorological ones rather than wide safety margins. A sensor reading badly enough to matter is a sensor to clean, and treating it as untrustworthy while still displaying its number in a slot would be the worse of the two positions.
 
+### Which icon the card shows
+
+The provider supplies a condition, and the card draws it — but two things can overrule that, and both are about the card being able to see something the provider only predicts.
+
+**The sun decides day or night.** Providers pick the day or night variant from their own forecast periods, and some switch to the night daypart in mid-afternoon: they report `clear-night` with the sun still 35° up, and the card would dutifully draw a moon. When a **sun entity** is configured, its elevation wins instead. This is on by default (**Day/night icon from sun**); switch it off to take the provider's word.
+
+**The measurement can correct the condition itself.** That one is off by default and is described under [Cloud cover from a pyranometer](#cloud-cover-from-a-pyranometer) — briefly, a pyranometer and a rain gauge can contradict a forecast written hours ago for a region rather than a garden.
+
+The two are independent: the sun override only changes day to night and back, never the weather, so it applies whatever else is switched on.
+
 ## Icon Packs
 
 <p align="center">
