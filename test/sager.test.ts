@@ -434,10 +434,24 @@ describe('the forecast keeps a sky reading overnight', () => {
     expect(getter![0]).toContain('_lastDaylightCloud');
   });
 
-  it('gives up on a reading over a day old', () => {
-    // Beyond that it is a guess about a different weather system.
+  it('gives up on a reading more than six hours old', () => {
+    // Checked against a frontal event: the sky was last measured at 38% on a
+    // Saturday afternoon, that figure was still being reported through the
+    // night, and by the time rain arrived at six the next morning the cloud had
+    // reached 84%. A fourteen-hour-old reading is a memory of a different sky.
     const getter = /get forecastCloudFraction\(\)[\s\S]*?\n  \}/.exec(card)![0];
-    expect(getter).toContain('86400000');
+    expect(getter, 'the fallback still holds a reading for a full day')
+      .not.toContain('86400000');
+    expect(getter).toContain('21600000');
+  });
+
+  it('covers a summer night but not a winter one, which is the point', () => {
+    // Six hours reaches from dusk to the small hours in summer, when the
+    // convective events this helps with occur. A long winter night runs out,
+    // and should: nothing measured at four in the afternoon says much about
+    // eight the next morning.
+    const SIX_HOURS = 21600000;
+    expect(SIX_HOURS / 3600000).toBe(6);
   });
 
   it('shares the remembered reading across cards', () => {

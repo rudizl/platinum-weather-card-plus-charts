@@ -2822,7 +2822,12 @@ export class PlatinumWeatherCard extends LitElement {
     }
     const last = cls._lastDaylightCloud;
     if (last === null) return null;
-    return Date.now() - last.t <= 86400000 ? last.f : null;
+    // Six hours, not a day. Checked against a real frontal event: the sky was
+    // last measured at 38% on a Saturday afternoon, that figure was still being
+    // reported through the night, and by the time rain arrived at six the next
+    // morning the cloud had reached 84%. A fourteen-hour-old reading is not
+    // information about the present sky, it is a memory of a different one.
+    return Date.now() - last.t <= 21600000 ? last.f : null;
   }
 
   get measuredCloudFraction(): number | null {
