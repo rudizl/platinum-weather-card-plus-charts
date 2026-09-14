@@ -716,8 +716,58 @@ export class PlatinumWeatherCard extends LitElement {
   // "2; yellow; Moderate". The numbers are the stable part of the EUMETNET CAP
   // profile, so the card keys off those and renders its own translated wording
   // rather than the provider's English text.
+  // A storm close enough to reach you is a warning in the same sense a
+  // MeteoAlarm row is, so it belongs in the same section rather than in a slot
+  // that would sit empty almost always. The severity comes from the distance,
+  // which is the only thing a strike detector can tell you about urgency.
+  private _renderLightningWarning(): TemplateResult {
+    const distEntity = this._config.entity_lightning_distance;
+    if (!distEntity) return html``;
+    const distState = this.hass.states[distEntity];
+    if (!distState || distState.state === 'unknown' || distState.state === 'unavailable') return html``;
+    const distance = Number(distState.state);
+    if (!isFinite(distance)) return html``;
+
+    const threshold = Number(this._config.option_lightning_max_distance);
+    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50;
+    if (distance > limit) return html``;
+
+    // Red within fifteen kilometres — near enough that the next strike could be
+    // overhead; amber to thirty; yellow beyond.
+    const levelNum = distance <= 15 ? '4' : distance <= 30 ? '3' : '2';
+    const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum]!;
+    const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum]!;
+    const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum]!;
+    const levelClass = levelNum === '4' ? 'warning-row level-red'
+      : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
+
+    const unit = distState.attributes?.unit_of_measurement ?? 'km';
+    let headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)}${unit}`;
+
+    const bearingEntity = this._config.entity_lightning_azimuth;
+    const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
+    const bearing = bearingState ? Number(bearingState.state) : NaN;
+    if (isFinite(bearing)) {
+      const points = tWindDirections(this.locale);
+      headline += ` ${points[Math.round(((bearing % 360) + 360) % 360 / 22.5) % 16]}`;
+    }
+
+    return html`
+      <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});">
+        <ha-icon class="warning-icon" style="color: ${colour};" icon="mdi:flash"></ha-icon>
+        <div class="warning-text">${headline}</div>
+      </div>
+    `;
+  }
+
   private _renderWarningsSection(): TemplateResult {
     if (this._config?.show_section_warnings === false) return html``;
+    const lightning = this._renderLightningWarning();
+    const provider = this._renderProviderWarning();
+    return html`${lightning}${provider}`;
+  }
+
+  private _renderProviderWarning(): TemplateResult {
     const entity = this._config.entity_warning;
     if (!entity) return html``;
     const stateObj = this.hass.states[entity];

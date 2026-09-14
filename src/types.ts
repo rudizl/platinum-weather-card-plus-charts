@@ -142,6 +142,9 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_sun_overrides_icon?: boolean;
   option_trend_window_hours?: number;
   entity_warning?: string;
+  entity_lightning_distance?: string;
+  entity_lightning_azimuth?: string;
+  option_lightning_max_distance?: number;
   option_warning_show_expiry?: boolean;
   option_forecast_altitude?: number;
 

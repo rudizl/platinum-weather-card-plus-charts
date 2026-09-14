@@ -689,3 +689,55 @@ describe('a gap between showers is not fine weather', () => {
       .not.toContain(remembered.weather);
   });
 });
+
+describe('a nearby storm warns in the warnings section', () => {
+  // A strike detector belongs with the MeteoAlarm rows rather than in a slot:
+  // an approaching storm is a warning in the same sense, and the section
+  // already appears and disappears on its own — a slot would sit empty almost
+  // always. Six weeks of readings here recorded no strikes at all.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  const band = (km: number) => (km <= 15 ? '4' : km <= 30 ? '3' : '2');
+
+  it('takes its severity from the distance', () => {
+    // The only thing a detector can say about urgency is how far away it is.
+    expect(band(8)).toBe('4');    // red — the next strike could be overhead
+    expect(band(22)).toBe('3');   // amber
+    expect(band(45)).toBe('2');   // yellow
+  });
+
+  it('shares the row styling with the provider warnings', () => {
+    // So a storm at 10 km and a yellow rain warning stack, and the more urgent
+    // one is obviously the more urgent one.
+    const fn = /_renderLightningWarning\(\)[\s\S]*?\n  \}/.exec(card);
+    expect(fn, 'lightning renderer not found').not.toBeNull();
+    expect(fn![0]).toContain('warning-row');
+    expect(fn![0]).toContain('level-red');
+  });
+
+  it('ignores a storm beyond the configured distance', () => {
+    const fn = /_renderLightningWarning\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toContain('option_lightning_max_distance');
+    expect(fn, 'no default for the threshold').toMatch(/threshold > 0 \? threshold : 50/);
+  });
+
+  it('says nothing at all without a distance entity', () => {
+    // Most people have no detector, and the section must not appear for them.
+    const fn = /_renderLightningWarning\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/if \(!distEntity\) return html``/);
+    expect(fn).toContain("'unavailable'");
+  });
+
+  it('adds the bearing only when there is one', () => {
+    // The counter resets nightly and the bearing is unknown between storms, so
+    // neither can be assumed present.
+    const fn = /_renderLightningWarning\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/isFinite\(bearing\)/);
+  });
+
+  it('keeps both sources in one section', () => {
+    const section = /_renderWarningsSection\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(section).toContain('_renderLightningWarning');
+    expect(section).toContain('_renderProviderWarning');
+  });
+});

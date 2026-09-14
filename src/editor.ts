@@ -1265,6 +1265,34 @@ get _forecast_type(): string {
       <div class="help-text">${this._t("entity_warning_hint")}</div>
       <div class="side-by-side">
         <div>
+          <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_lightning_distance || ''}
+            .configValue=${'entity_lightning_distance'} @value-changed=${this._valueChangedPicker}
+            .includeDomains=${['sensor']}
+            name="entity_lightning_distance" label=${this._t("entity_lightning_distance")} allow-custom-entity>
+          </ha-entity-picker>
+        </div>
+        <div>
+          <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_lightning_azimuth || ''}
+            .configValue=${'entity_lightning_azimuth'} @value-changed=${this._valueChangedPicker}
+            .includeDomains=${['sensor']}
+            name="entity_lightning_azimuth" label=${this._t("entity_lightning_azimuth")} allow-custom-entity>
+          </ha-entity-picker>
+        </div>
+      </div>
+      ${this._config?.entity_lightning_distance ? html`
+      <div class="side-by-side">
+        <div>
+          <ha-input type="number" label=${this._t("lightning_max_distance")}
+            .value=${this._config?.option_lightning_max_distance ?? ''}
+            .configValue=${'option_lightning_max_distance'} @change=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("lightning_max_distance_hint")}</div>
+        </div>
+        <div></div>
+      </div>` : html``}
+      <div class="help-text">${this._t("entity_lightning_hint")}</div>
+      <div class="side-by-side">
+        <div>
           <div class="toggle-row">
               <span class=${this._config?.option_warning_show_expiry !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_warning_show_expiry'} @click=${this._toggleVisibility}></span>
               <span class="toggle-label">${this._t("warning_show_expiry")}</span>

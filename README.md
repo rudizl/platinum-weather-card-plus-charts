@@ -591,7 +591,11 @@ Shows an active severe-weather warning as a coloured row. Point it at a [MeteoAl
 
 The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers. So a Bulgarian card reads *"Жълт код: Високи температури · до сб 00:00"* even though the feed itself is in English. All fifteen hazard types are translated in every language the card supports; unknown types fall back to the provider's own `event` text.
 
-The colour of the row follows the warning level — yellow, orange or red. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
+The colour of the row follows the warning level — yellow, orange or red.
+
+A **lightning detector** can add a row of its own. Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row alongside any provider warning, coloured by how close it is: red within 15 km, amber to 30, yellow beyond. Add the bearing entity and the row says which way it lies. **Warn within** sets the range, 50 km by default.
+
+This is deliberately part of the warnings section rather than a slot. An approaching storm is a warning in the same sense a rain alert is, and the section already appears and vanishes on its own, where a slot would sit empty most of the time — six weeks of readings at the station this was built against recorded no strikes at all. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
 
 ![Warnings section](images/warnings-section.png)
 
@@ -932,6 +936,9 @@ double_tap_action:
 | `option_cloud_overrides_icon` | Boolean | `false` | Let the measured cloud cover and rain rate correct the condition icon |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
 | `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
+| `entity_lightning_distance` | String | none | Strike detector distance sensor — adds its own warning row |
+| `entity_lightning_azimuth` | String | none | Strike detector bearing sensor, for the direction |
+| `option_lightning_max_distance` | Number | `50` | Storms further away than this are ignored |
 | `show_section_warnings` | Boolean | `true` | Show the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |
