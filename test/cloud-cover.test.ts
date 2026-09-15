@@ -574,3 +574,45 @@ describe('a clear measurement overrules a provider claiming a storm', () => {
     expect(block).toContain('cloud !== null');
   });
 });
+
+describe('plain overcast is correctable too', () => {
+  // Weather Underground reported cloudy against a measured 17%, with the
+  // correction switched on, and the icon stayed a cloud. The guard required a
+  // -day or -night suffix, but 'cloudy' has no day/night variant — it is the
+  // same grey either way — so plain overcast was the one sky state the
+  // correction could not reach. Which is also the state a provider most often
+  // gets wrong, since it is what they fall back on.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+  const guard = /(const|let) isPlainSky = (\/[^/]+\/)/.exec(card);
+
+  function matches(name: string): boolean {
+    expect(guard, 'plain-sky guard not found').not.toBeNull();
+    // eslint-disable-next-line no-eval
+    return (eval(guard![2]) as RegExp).test(name);
+  }
+
+  it('accepts a suffixless cloudy', () => {
+    expect(matches('cloudy')).toBe(true);
+  });
+
+  it('still accepts the suffixed sky names', () => {
+    for (const n of ['clear-day', 'clear-night', 'cloudy-1-day', 'cloudy-2-night', 'cloudy-3-day']) {
+      expect(matches(n), n).toBe(true);
+    }
+  });
+
+  it('still refuses anything the sensors cannot see', () => {
+    // A pyranometer cannot tell rain from snow, and a provider can.
+    for (const n of ['rainy-1-day', 'rainy-3-night', 'snowy-2-day', 'fog', 'fog-day',
+                     'thunderstorms', 'hail', 'drizzle', 'rain-and-snow-mix']) {
+      expect(matches(n), n).toBe(false);
+    }
+  });
+
+  it('does not accept a bare clear either way round', () => {
+    // 'clear' with no suffix is not a name the card emits, but if it ever did,
+    // correcting it would be right rather than wrong.
+    expect(matches('clear')).toBe(true);
+    expect(matches('cloudy-4-day')).toBe(false);
+  });
+});

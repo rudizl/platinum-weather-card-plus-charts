@@ -3489,7 +3489,12 @@ export class PlatinumWeatherCard extends LitElement {
       // whether it is raining here, now. It outranks both — but only over a
       // plain sky icon, since a provider reporting snow, hail or a storm knows
       // something about the precipitation that a tipping bucket does not.
-      let isPlainSky = /^(clear|cloudy(-[123])?)-(day|night)$/.test(adjusted);
+      // 'cloudy' has no day/night variant — it is the same grey either way — so
+      // the suffix must be optional here. Requiring it meant a provider
+      // reporting plain overcast was the one sky state the correction could not
+      // touch, which is also the state it most often gets wrong: seen reporting
+      // cloudy against a measured 17%.
+      let isPlainSky = /^(clear|cloudy(-[123])?)(-(day|night))?$/.test(adjusted);
       const rate = this.measuredRainRate;
 
       // A provider reporting rain, snow or a storm usually knows something the
