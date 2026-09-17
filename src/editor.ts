@@ -1766,7 +1766,6 @@ get _forecast_type(): string {
           name="entity_fire_danger_1" label=${this._t("entity_fire_danger_1")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : ``}
-      ${this._hourlyForecastOptions()}
     `;
   }
 
@@ -2072,6 +2071,8 @@ get _forecast_type(): string {
       case 'option_charts':
         subel.push(this._optionChartsEditor());
         break;
+      case 'option_hourly_forecast':
+        return this._hourlyForecastOptions();
       case 'option_global_options':
         subel.push(this._optionGlobalOptionsEditor());
         break;
@@ -2222,6 +2223,26 @@ get _forecast_type(): string {
             </div>
           </div>
         `;
+      case 'hourly_forecast':
+        // A row of its own, but not a section: the hours are a view of the
+        // forecast, so there is nothing to reorder and nothing to hide — which
+        // view shows is the mode select inside.
+        return html`
+          <div class="section-flex">
+            <div class="section-label">
+              <div class="visibility-spacer"></div>
+              <ha-icon class="section-icon" icon="mdi:clock-outline"></ha-icon>
+              <span class="section-title">${this._t("hourly_heading")}</span>
+            </div>
+            <div>
+              <div class="no-icon"></div>
+              <div class="no-icon"></div>
+              <div class="no-icon"></div>
+              <ha-icon-button class="edit-icon" .value=${'option_hourly_forecast'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
+              </ha-icon-button>
+            </div>
+          </div>
+        `;
       case 'global_options':
         return html`
           <div class="section-flex">
@@ -2256,6 +2277,11 @@ get _forecast_type(): string {
     htmlConfig.push(this.getConfigBlock('global_options', false, false));
     slots.forEach((slot, index) => {
       htmlConfig.push(this.getConfigBlock(slot, index === 0, index + 1 === slots.length));
+      // Directly beneath the forecast it belongs to, rather than at the end of
+      // the list where nobody would look for it.
+      if (slot === 'daily_forecast') {
+        htmlConfig.push(this.getConfigBlock('hourly_forecast', false, false));
+      }
     });
 
     return html`${htmlConfig}`;

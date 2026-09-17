@@ -146,11 +146,22 @@ describe('the two views share one section', () => {
     expect(card).toMatch(/overscroll-behavior-x: contain/);
   });
 
-  it('has its settings with the forecast it belongs to', () => {
-    // Not a panel of its own behind a pencil in the section list — the hours
-    // are a view of the forecast, so their entity and span live with it.
-    expect(editor).toContain('_hourlyForecastOptions');
-    expect(editor).toMatch(/_sectionDailyForecastEditor[\s\S]*?_hourlyForecastOptions\(\)/);
+  it('has a row of its own, under the forecast it belongs to', () => {
+    // Buried inside the Daily Forecast panel it was unfindable: you had to know
+    // to open that pencil and scroll. It is its own row now, pushed directly
+    // after the daily forecast rather than at the end of the list.
+    expect(editor).toMatch(/case 'hourly_forecast':/);
+    expect(editor).toMatch(/if \(slot === 'daily_forecast'\) \{\s*\n\s*htmlConfig\.push\(this\.getConfigBlock\('hourly_forecast'/);
+    expect(editor).toMatch(/case 'option_hourly_forecast':/);
+  });
+
+  it('has no reorder arrows or visibility switch on that row', () => {
+    // It is a view of the forecast, not a section: there is nothing to reorder
+    // and nothing to hide, since the mode select decides which view shows.
+    const row = /case 'hourly_forecast':[\s\S]*?\n        `;/.exec(editor)![0];
+    expect(row).not.toContain('down-icon');
+    expect(row).not.toContain('pwc-switch');
+    expect(row).toContain('edit-icon');
   });
 
   it('offers only weather entities for the source', () => {
