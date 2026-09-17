@@ -253,3 +253,25 @@ describe('night shading', () => {
     expect(Number(alpha![1])).toBeLessThan(0.35);
   });
 });
+
+describe('the tabs do not trigger the card\'s own tap action', () => {
+  // With tap_action set to navigate, tapping a tab carried you off to another
+  // view instead of switching the forecast — the card listens for taps and the
+  // tab click bubbled up to it.
+  it('stops the click at the tab', () => {
+    const fn = /_renderForecastTabs\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/e\.stopPropagation\(\)/);
+  });
+
+  it('stops pointerdown too, which is what starts the press handling', () => {
+    // Stopping only the click would still leave the card's hold timer running.
+    const fn = /_renderForecastTabs\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/@pointerdown=\$\{swallow\}/);
+    expect(fn).toMatch(/@pointercancel=\$\{swallow\}/);
+  });
+
+  it('is the card that listens, which is why this is needed', () => {
+    expect(card).toMatch(/this\.addEventListener\('pointerdown'/);
+    expect(card).toMatch(/this\.addEventListener\('click'/);
+  });
+});

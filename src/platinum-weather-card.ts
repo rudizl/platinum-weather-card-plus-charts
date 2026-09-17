@@ -1821,9 +1821,17 @@ export class PlatinumWeatherCard extends LitElement {
     // one view configured they would be a control that does nothing.
     if (this._forecastMode !== 'both') return html``;
     if (!this.hourlyForecast) return html``;
-    const pick = (hourly: boolean) => () => { this._showHourly = hourly; };
+    // The card itself listens for taps, and a tap_action of navigate would
+    // carry a tab click off to another view. The tab is a control within the
+    // card, so its click stops here — pointerdown too, since that is what
+    // starts the card's own press handling.
+    const pick = (hourly: boolean) => (e: Event) => {
+      e.stopPropagation();
+      this._showHourly = hourly;
+    };
+    const swallow = (e: Event) => e.stopPropagation();
     return html`
-      <div class="forecast-tabs">
+      <div class="forecast-tabs" @pointerdown=${swallow} @pointercancel=${swallow}>
         <button class="forecast-tab ${this._showHourly ? '' : 'active'}"
                 @click=${pick(false)}>${tCard(this.locale, 'tab_daily')}</button>
         <button class="forecast-tab ${this._showHourly ? 'active' : ''}"
