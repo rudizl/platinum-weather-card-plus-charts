@@ -782,7 +782,19 @@ Two layout options: **Horizontal** (default, up to 5 days) and **Vertical** (up 
 
 The section can hold a second view. Point **Hourly weather entity** at a provider that publishes hourly forecasts and a pair of tabs appears — **Daily** and **Hourly** — the way Home Assistant's own more-info dialog does it. Without one configured there are no tabs and nothing changes.
 
-The hourly view is a column per hour: time, icon, temperature, with the rainfall underneath only where there is any. It scrolls sideways, each column keeping a minimum width, so twenty-four or forty-eight hours stays readable rather than being squeezed across a phone. Set the span with **Hours to show** — twelve by default, up to forty-eight.
+**Which forecast to show** picks between *daily only*, *hourly only*, and *both, with tabs*. Tabs appear only in the last: with a single view configured they would be a control that does nothing.
+
+The hourly view is a column per hour — time, icon, temperature — and it scrolls sideways, each column keeping a minimum width, so the span stays readable rather than being squeezed across a phone.
+
+| | |
+| --- | --- |
+| **Hours to show** | 1 to 48, twelve by default |
+| **Step** | Take every nth hour. Three fits two days in the space of eight, which is usually the better trade |
+| **Shade the night hours** | A faint wash behind the hours the sun is down, so it is obvious where the day ends |
+| **Show rainfall** | A figure under the hours expecting some; the row vanishes when the whole span is dry, rather than printing a column of zeroes |
+| **Show wind** | Speed under each hour |
+
+The night shading is **calculated, not read**. A sun entity reports where the sun is now, and these are hours that have not happened yet, so the card works the elevation out from your latitude and longitude — using the standard −0.833° horizon, which accounts for refraction and the sun's own width and is what "sunrise" actually means.
 
 It is a **separate weather entity** rather than a second forecast type on the one used for the days, and that is deliberate. Most people already run more than one provider, and the one that is better at hours is often not the one they prefer for days: Met.no publishes forty-eight hours, needs no API key and works anywhere, which makes it a common second source even for people whose daily forecast comes from elsewhere. The card subscribes to the two independently.
 
@@ -1021,6 +1033,11 @@ double_tap_action:
 | `option_lightning_max_distance` | Number | `50` | Storms further away than this are ignored |
 | `entity_hourly` | String | none | Weather entity for the hourly view — enables the Daily/Hourly tabs |
 | `hourly_forecast_hours` | Number | `12` | Hours to show, 1 to 48 |
+| `hourly_forecast_step` | Number | `1` | Take every nth hour |
+| `hourly_forecast_mode` | String | `daily` | `daily`, `hourly` or `both` |
+| `option_hourly_shade_night` | Boolean | `true` | Shade the hours the sun is down |
+| `option_hourly_precipitation` | Boolean | `true` | Rainfall under the hours expecting some |
+| `option_hourly_wind` | Boolean | `false` | Wind speed under each hour |
 | `show_section_warnings` | Boolean | `true` | Show the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |

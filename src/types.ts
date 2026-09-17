@@ -144,6 +144,11 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   entity_warning?: string;
   entity_hourly?: string;
   hourly_forecast_hours?: number;
+  hourly_forecast_step?: number;
+  hourly_forecast_mode?: 'daily' | 'hourly' | 'both';
+  option_hourly_precipitation?: boolean;
+  option_hourly_wind?: boolean;
+  option_hourly_shade_night?: boolean;
   entity_lightning_distance?: string;
   entity_lightning_azimuth?: string;
   option_lightning_max_distance?: number;

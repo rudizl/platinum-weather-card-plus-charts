@@ -21,7 +21,7 @@ import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from
 
 import { CARD_VERSION } from './const';
 import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
-import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas } from './zambretti';
+import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
 import { sagerForecast } from './sager';
 
 
@@ -290,7 +290,15 @@ export class PlatinumWeatherCard extends LitElement {
     const span = isFinite(hours) && hours > 0 ? Math.min(hours, 48) : 12;
     const cutoff = Date.now() - 3600000;
     const upcoming = data.filter((f) => new Date(f.datetime).getTime() >= cutoff);
-    return (upcoming.length ? upcoming : data).slice(0, span);
+    const window = (upcoming.length ? upcoming : data).slice(0, span);
+
+    // A step thins the columns rather than shortening the span: two days at
+    // three-hourly is the same eight columns as eight hours at one, and tells
+    // you a great deal more. The first entry is always kept, since it is the
+    // hour you are standing in.
+    const step = Number(this._config?.hourly_forecast_step);
+    if (!isFinite(step) || step <= 1) return window;
+    return window.filter((_, i) => i % Math.round(step) === 0);
   }
 
   //tjl from bramkragten's weather-card
@@ -1572,7 +1580,13 @@ export class PlatinumWeatherCard extends LitElement {
     if (!forecast || forecast.length === 0) return html``;
 
     const decimals = this._config?.option_today_temperature_decimals === true ? 1 : 0;
-    const anyRain = forecast.some((f) => Number(f.precipitation) > 0);
+    const showRain = this._config?.option_hourly_precipitation !== false
+      && forecast.some((f) => Number(f.precipitation) > 0);
+    const showWind = this._config?.option_hourly_wind === true;
+    const shadeNight = this._config?.option_hourly_shade_night !== false;
+    const lat = this.hass?.config?.latitude;
+    const lon = this.hass?.config?.longitude;
+    const canShade = shadeNight && typeof lat === 'number' && typeof lon === 'number';
 
     const columns = forecast.map((f) => {
       const when = new Date(f.datetime);
@@ -1589,10 +1603,22 @@ export class PlatinumWeatherCard extends LitElement {
             minimumFractionDigits: decimals, maximumFractionDigits: decimals })}°`
         : '---';
 
+      // Night is worked out rather than read: the sun entity says where the sun
+      // is now, and these are hours that have not happened yet.
+      const night = canShade && sunElevation(when, lat as number, lon as number) < -0.833;
+
+      const windBits: string[] = [];
+      if (showWind) {
+        const ws = Number(f.wind_speed);
+        if (isFinite(ws)) {
+          windBits.push(`${Math.round(ws)}${this.getUOM('wind_speed')}`);
+        }
+      }
+
       const p = Number(f.precipitation);
       // Only where something is expected: a column of zeroes is noise, and the
       // row is dropped entirely when the whole span is dry.
-      const rain = anyRain
+      const rain = showRain
         ? html`<div class="hourly-rain">${p > 0
             ? `${p.toLocaleString(this.locale, {
                 minimumFractionDigits: 1, maximumFractionDigits: 1 })}${this._precipUnit(undefined)}`
@@ -1600,11 +1626,12 @@ export class PlatinumWeatherCard extends LitElement {
         : html``;
 
       return html`
-        <div class="hourly-col">
+        <div class="hourly-col${night ? ' hourly-night' : ''}">
           <div class="hourly-time">${time}</div>
           <i class="icon hourly-icon" style="background: none, url(${url}) no-repeat; background-size: contain;"></i>
           <div class="hourly-temp">${temp}</div>
           ${rain}
+          ${showWind ? html`<div class="hourly-wind">${windBits.join('')}</div>` : html``}
         </div>
       `;
     });
@@ -1775,8 +1802,16 @@ export class PlatinumWeatherCard extends LitElement {
   // own more-info dialog does. Hours and days answer different questions —
   // "will I get wet walking home" against "is the weekend any good" — and the
   // familiar shape for that is a switch, not two blocks of the card.
+  private get _forecastMode(): 'daily' | 'hourly' | 'both' {
+    const mode = this._config?.hourly_forecast_mode;
+    if (!this._config?.entity_hourly) return 'daily';
+    return mode === 'hourly' || mode === 'both' ? mode : 'daily';
+  }
+
   private _renderForecastTabs(): TemplateResult {
-    if (!this._config?.entity_hourly) return html``;
+    // Tabs are for choosing, so they only appear when there is a choice: with
+    // one view configured they would be a control that does nothing.
+    if (this._forecastMode !== 'both') return html``;
     if (!this.hourlyForecast) return html``;
     const pick = (hourly: boolean) => () => { this._showHourly = hourly; };
     return html`
@@ -1793,9 +1828,14 @@ export class PlatinumWeatherCard extends LitElement {
     if (this._config?.show_section_daily_forecast === false) return html``;
 
     const tabs = this._renderForecastTabs();
+    const mode = this._forecastMode;
+    // Hours only: no tabs, and the days are not drawn at all.
+    if (mode === 'hourly' && this.hourlyForecast) {
+      return this._renderHourlyForecastSection();
+    }
     // Falling back rather than showing an empty frame: the tabs only appear
     // when there are hours to show, so this can only be reached mid-load.
-    if (this._showHourly && this.hourlyForecast) {
+    if (mode === 'both' && this._showHourly && this.hourlyForecast) {
       return html`${tabs}${this._renderHourlyForecastSection()}`;
     }
     const days = this._config.daily_forecast_layout !== 'vertical'
@@ -1857,7 +1897,9 @@ export class PlatinumWeatherCard extends LitElement {
             sections.push(this._renderDailyForecastSection());
             // The hourly view carries its own chart; showing the daily one
             // underneath it would be two charts of different things.
-            if (!this._showHourly) sections.push(this._renderChartSection());
+            const showingHours = this._forecastMode === 'hourly'
+              || (this._forecastMode === 'both' && this._showHourly);
+            if (!showingHours) sections.push(this._renderChartSection());
             break;
 
         }
@@ -4291,6 +4333,17 @@ export class PlatinumWeatherCard extends LitElement {
       }
       .hourly-temp {
         font-size: 0.92em;
+      }
+      .hourly-night {
+        /* A faint wash, not a block: it should say where the day ends without
+           making those hours harder to read than the rest. */
+        background: rgba(50, 70, 110, 0.22);
+        border-radius: 4px;
+      }
+      .hourly-wind {
+        font-size: 0.7em;
+        opacity: 0.65;
+        min-height: 1em;
       }
       .hourly-rain {
         font-size: 0.72em;

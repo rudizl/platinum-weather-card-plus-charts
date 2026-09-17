@@ -169,3 +169,29 @@ export function cloudCoverFraction(
 export function cloudCoverOktas(fraction: number): number {
   return Math.round(Math.min(Math.max(fraction, 0), 1) * 8);
 }
+
+/**
+ * The sun's elevation at an arbitrary moment, in degrees.
+ *
+ * The sun entity reports where the sun is now; shading the night hours of a
+ * forecast means knowing where it will be, which nothing in Home Assistant
+ * publishes. This is the standard NOAA approximation, good to a fraction of a
+ * degree — far better than needed to decide whether it is dark.
+ */
+export function sunElevation(when: Date, latitude: number, longitude: number): number {
+  const rad = Math.PI / 180;
+  const start = Date.UTC(when.getUTCFullYear(), 0, 0);
+  const dayOfYear = (when.getTime() - start) / 86400000;
+  const hours = when.getUTCHours() + when.getUTCMinutes() / 60 + when.getUTCSeconds() / 3600;
+
+  // Declination: where the sun stands relative to the equator on this date.
+  const declination = 23.44 * rad * Math.sin(2 * Math.PI * (284 + dayOfYear) / 365);
+  // Hour angle, from local solar noon.
+  const solarTime = hours + longitude / 15;
+  const hourAngle = (solarTime - 12) * 15 * rad;
+
+  const lat = latitude * rad;
+  const sine = Math.sin(lat) * Math.sin(declination)
+    + Math.cos(lat) * Math.cos(declination) * Math.cos(hourAngle);
+  return Math.asin(Math.max(-1, Math.min(1, sine))) / rad;
+}

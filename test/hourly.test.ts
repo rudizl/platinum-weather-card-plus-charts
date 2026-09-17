@@ -80,12 +80,12 @@ describe('the hourly view is columns, like the days above it', () => {
 
   it('shows rainfall only where there is some', () => {
     // A column of zeroes is noise.
-    expect(fn).toContain('anyRain');
+    expect(fn).toContain('showRain');
     expect(fn).toMatch(/p > 0/);
   });
 
   it('drops the rain row entirely when the whole span is dry', () => {
-    expect(fn).toMatch(/anyRain\s*\?[\s\S]*?: html``/);
+    expect(fn).toMatch(/showRain\s*\?[\s\S]*?: html``/);
   });
 
   it('falls back rather than printing NaN', () => {
@@ -123,14 +123,16 @@ describe('the two views share one section', () => {
   it('shows no tabs at all without an hourly entity', () => {
     // Most people will not configure one, and a single lonely tab is worse
     // than none.
+    // Tabs are for choosing: with one view configured they would be a
+    // control that does nothing, so they appear only in 'both'.
     const fn = /_renderForecastTabs\(\)[\s\S]*?\n  \}/.exec(card)![0];
-    expect(fn).toMatch(/if \(!this\._config\?\.entity_hourly\) return html``;/);
+    expect(fn).toMatch(/this\._forecastMode !== 'both'/);
     expect(fn).toMatch(/if \(!this\.hourlyForecast\) return html``;/);
   });
 
   it('does not draw the daily chart under the hourly view', () => {
     // Two charts of different things, stacked, with no label saying which.
-    expect(card).toMatch(/if \(!this\._showHourly\) sections\.push\(this\._renderChartSection\(\)\)/);
+    expect(card).toMatch(/if \(!showingHours\) sections\.push\(this\._renderChartSection\(\)\)/);
   });
 
   it('scrolls sideways rather than squeezing every hour in', () => {
@@ -154,5 +156,85 @@ describe('the two views share one section', () => {
   it('offers only weather entities for the source', () => {
     const panel = /_hourlyForecastOptions\(\)[\s\S]*?\n  \}/.exec(editor)![0];
     expect(panel).toMatch(/includeDomains=\$\{\['weather'\]\}/);
+  });
+});
+
+describe('the hourly settings', () => {
+  it('offers days, hours, or both', () => {
+    const panel = /_hourlyForecastOptions\(\)[\s\S]*?\n  \}/.exec(editor)![0];
+    for (const mode of ['daily', 'hourly', 'both']) {
+      expect(panel, `no '${mode}' option`).toContain(`value="${mode}"`);
+    }
+  });
+
+  it('gives that select a getter, like every other one', () => {
+    // A select without one renders blank however the config reads — the fault
+    // that left two dropdowns permanently empty back in v2.2.2.
+    expect(editor).toMatch(/get _hourly_forecast_mode\(\): string \{/);
+    expect(editor).toMatch(/\.value=\$\{this\._hourly_forecast_mode\}/);
+  });
+
+  it('falls back to daily for an unrecognised mode', () => {
+    // Someone editing YAML by hand can write anything at all.
+    const fn = /private get _forecastMode\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/mode === 'hourly' \|\| mode === 'both' \? mode : 'daily'/);
+  });
+
+  it('forces daily when no hourly entity is configured', () => {
+    // Otherwise a leftover mode: 'hourly' would leave the card showing nothing.
+    const fn = /private get _forecastMode\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/if \(!this\._config\?\.entity_hourly\) return 'daily';/);
+  });
+
+  it('thins the columns with a step rather than shortening the span', () => {
+    // Two days at three-hourly is the same eight columns as eight hours at one,
+    // and says a great deal more.
+    const getter = /get hourlyForecast\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toContain('hourly_forecast_step');
+    expect(getter).toMatch(/i % Math\.round\(step\) === 0/);
+  });
+
+  it('always keeps the first hour when stepping', () => {
+    // It is the hour you are standing in; dropping it would be odd.
+    const getter = /get hourlyForecast\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toMatch(/i % Math\.round\(step\) === 0/);
+    expect([0, 3, 6].every((i) => i % 3 === 0)).toBe(true);
+  });
+
+  it('ignores a step of one or less', () => {
+    const getter = /get hourlyForecast\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toMatch(/!isFinite\(step\) \|\| step <= 1/);
+  });
+});
+
+describe('night shading', () => {
+  it('computes the sun rather than reading it', () => {
+    // The sun entity says where the sun is now; these are hours that have not
+    // happened yet, and nothing in Home Assistant publishes that.
+    const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
+    expect(fn).toContain('sunElevation');
+    expect(card).toMatch(/import \{[^}]*sunElevation[^}]*\} from '\.\/zambretti'/);
+  });
+
+  it('uses the standard horizon, not zero', () => {
+    // -0.833° accounts for refraction and the sun's own width: it is the
+    // definition of sunrise, and using 0 would call the golden hour night.
+    const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
+    expect(fn).toContain('-0.833');
+  });
+
+  it('does nothing without coordinates', () => {
+    const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
+    expect(fn).toMatch(/typeof lat === 'number'/);
+    expect(fn).toMatch(/typeof lon === 'number'/);
+  });
+
+  it('shades rather than blanks', () => {
+    // Night hours should stay as readable as the rest; the wash says where the
+    // day ends, it does not hide anything.
+    const rule = /\.hourly-night \{([^}]*)\}/.exec(card);
+    expect(rule, 'no night style').not.toBeNull();
+    const alpha = /rgba\([^)]*,\s*([\d.]+)\)/.exec(rule![1]);
+    expect(Number(alpha![1])).toBeLessThan(0.35);
   });
 });

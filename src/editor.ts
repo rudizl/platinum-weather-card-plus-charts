@@ -622,6 +622,10 @@ get _forecast_type(): string {
     return this._config?.option_show_precipitation_chart === true; // default off
   }
 
+  get _hourly_forecast_mode(): string {
+    return this._config?.hourly_forecast_mode || 'daily';
+  }
+
   get _option_forecast_algorithm(): string {
     return this._config?.option_forecast_algorithm || 'zambretti';
   }
@@ -1254,7 +1258,9 @@ get _forecast_type(): string {
   }
 
   private _hourlyForecastOptions(): TemplateResult {
+    const hasEntity = !!this._config?.entity_hourly;
     return html`
+      <label class="label">${this._t("hourly_heading")}</label>
       <div class="side-by-side">
         <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_hourly || ''}
           .configValue=${'entity_hourly'} @value-changed=${this._valueChangedPicker}
@@ -1263,6 +1269,20 @@ get _forecast_type(): string {
         </ha-entity-picker>
       </div>
       <div class="help-text">${this._t("entity_hourly_hint")}</div>
+      ${hasEntity ? html`
+      <div class="side-by-side">
+        <div>
+          <label class='mdc-label'>${this._t('hourly_mode')}</label>
+          <select class='ha-select-compat' .configValue=${'hourly_forecast_mode'}
+            .value=${this._hourly_forecast_mode} @change=${this._valueChanged}>
+            <option value="daily">${this._t('hourly_mode_daily')}</option>
+            <option value="hourly">${this._t('hourly_mode_hourly')}</option>
+            <option value="both">${this._t('hourly_mode_both')}</option>
+          </select>
+          <div class="help-text">${this._t('hourly_mode_hint')}</div>
+        </div>
+        <div></div>
+      </div>
       <div class="side-by-side">
         <div>
           <ha-input type="number" label=${this._t("hourly_forecast_hours")}
@@ -1271,8 +1291,40 @@ get _forecast_type(): string {
           </ha-input>
           <div class="help-text">${this._t("hourly_forecast_hours_hint")}</div>
         </div>
-        <div></div>
+        <div>
+          <ha-input type="number" label=${this._t("hourly_forecast_step")}
+            .value=${this._config?.hourly_forecast_step ?? ''}
+            .configValue=${'hourly_forecast_step'} @change=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("hourly_forecast_step_hint")}</div>
+        </div>
       </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+            <span class=${this._config?.option_hourly_shade_night !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_hourly_shade_night'} @click=${this._toggleVisibility}></span>
+            <span class="toggle-label">${this._t("hourly_shade_night")}</span>
+          </div>
+          <div class="help-text">${this._t("hourly_shade_night_hint")}</div>
+        </div>
+        <div>
+          <div class="toggle-row">
+            <span class=${this._config?.option_hourly_precipitation !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_hourly_precipitation'} @click=${this._toggleVisibility}></span>
+            <span class="toggle-label">${this._t("hourly_precipitation")}</span>
+          </div>
+          <div class="help-text">${this._t("hourly_precipitation_hint")}</div>
+        </div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+            <span class=${this._config?.option_hourly_wind ? "pwc-switch active" : "pwc-switch"} .value=${'option_hourly_wind'} @click=${this._toggleVisibility}></span>
+            <span class="toggle-label">${this._t("hourly_wind")}</span>
+          </div>
+          <div class="help-text">${this._t("hourly_wind_hint")}</div>
+        </div>
+        <div></div>
+      </div>` : html``}
     `;
   }
 
