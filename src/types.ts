@@ -142,6 +142,9 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_sun_overrides_icon?: boolean;
   option_trend_window_hours?: number;
   entity_warning?: string;
+  entity_lightning_distance?: string;
+  entity_lightning_azimuth?: string;
+  option_lightning_max_distance?: number;
   option_warning_show_expiry?: boolean;
   option_forecast_altitude?: number;
 
@@ -168,6 +171,10 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   entity_uv_index?: string;
   entity_dew_point?: string;
   option_show_comfort?: boolean;
+  option_forecast_algorithm?: 'zambretti' | 'sager';
+  entity_wind_bearing_6h?: string;
+  option_cloud_min_elevation_am?: number;
+  option_cloud_min_elevation_pm?: number;
   option_color_fire_danger?: boolean;
 
   option_locale?: string;

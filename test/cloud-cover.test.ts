@@ -342,7 +342,7 @@ describe('the corrected icon names a file that exists', () => {
   it('only overrides plain sky icons', () => {
     // Rain, snow, fog and storms come from a provider that can see what a
     // pyranometer cannot — and heavy cloud is when it is most likely right.
-    const guard = /const isPlainSky = [\s\S]*?;/.exec(source);
+    const guard = /(const|let) isPlainSky = [\s\S]*?;/.exec(source);
     expect(guard, 'no plain-sky guard').not.toBeNull();
     for (const condition of ['rain', 'snow', 'fog', 'thunder', 'drizzle', 'hail']) {
       expect(guard![0], `${condition} could be overridden`).not.toContain(condition);
@@ -393,8 +393,9 @@ describe('a rain gauge outranks both the provider and the pyranometer', () => {
   it('still only replaces a plain sky icon', () => {
     // A provider reporting snow, hail or a storm knows something about the
     // precipitation that a tipping bucket does not.
-    const block = /const isPlainSky = [\s\S]{0,600}?measuredRainRate[\s\S]{0,400}?\}/.exec(source);
-    expect(block, 'rain branch not guarded by isPlainSky').not.toBeNull();
+    // The rain branch must sit behind the same gate as the cloud correction.
+    const rainBranch = /if \(isPlainSky && rate !== null && rate > 0\)/.exec(source);
+    expect(rainBranch, 'rain branch not guarded by isPlainSky').not.toBeNull();
   });
 
   it('is not smoothed, unlike cloud cover', () => {
@@ -500,5 +501,118 @@ describe('the comfort line follows the National Weather Service bands', () => {
     expect(getter, 'no opt-in check').toContain('option_show_comfort');
     expect(getter, 'no guard for a missing entity').toContain('entity_dew_point');
     expect(getter).toContain("'unavailable'");
+  });
+});
+
+describe('the elevation cut-off is separate for morning and evening', () => {
+  // Obstructions rarely are symmetrical: a building to the west shades the late
+  // sun while the eastern horizon stays clear. A single threshold has to be set
+  // for the worse side, throwing away good readings on the other.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('chooses the threshold by which side of the sky the sun is on', () => {
+    const getter = /private get _instantCloudFraction\(\)[\s\S]*?\n  \}/.exec(card);
+    expect(getter, 'cloud getter not found').not.toBeNull();
+    expect(getter![0], 'azimuth is not consulted').toContain('azimuth');
+    expect(getter![0]).toContain('option_cloud_min_elevation_am');
+    expect(getter![0]).toContain('option_cloud_min_elevation_pm');
+  });
+
+  it('keeps 10° as the default on both sides', () => {
+    const getter = /private get _instantCloudFraction\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toMatch(/configured > 0 \? configured : 10/);
+  });
+
+  it('passes the chosen threshold through rather than ignoring it', () => {
+    const getter = /private get _instantCloudFraction\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(getter).toMatch(/cloudCoverFraction\([\s\S]*?minElevation\)/);
+  });
+
+  it('honours whatever threshold it is given', () => {
+    // The measurement itself already supported this; only the card did not.
+    expect(cloudCoverFraction(50, 12, 0, 10)).not.toBeNull();
+    expect(cloudCoverFraction(50, 12, 0, 20)).toBeNull();
+    expect(cloudCoverFraction(50, 25, 0, 20)).not.toBeNull();
+  });
+});
+
+describe('a clear measurement overrules a provider claiming a storm', () => {
+  // Weather Underground reported lightning-rainy while the pyranometer read
+  // 551 W/m² against a clear-sky expectation of 538, and the gauge was dry.
+  // A reading above the theoretical maximum rules out cloud in front of the
+  // sun, let alone a thunderstorm overhead.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+
+  it('treats a flat contradiction as grounds to correct anyway', () => {
+    const block = /(const|let) isPlainSky[\s\S]{0,900}?contradicted[\s\S]{0,200}?;/.exec(card);
+    expect(block, 'no contradiction check').not.toBeNull();
+    expect(block![0], 'the sky measurement is not consulted').toContain('measuredCloudFraction');
+    expect(block![0], 'the gauge is not consulted').toMatch(/rate === null \|\| rate === 0/);
+  });
+
+  it('requires both a clear sky and a dry gauge', () => {
+    // Either alone is not enough: a pyranometer can read high through thin
+    // cloud, and a dry gauge says nothing about a storm a mile away.
+    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card);
+    expect(block, 'no contradiction rule').not.toBeNull();
+    expect(block![0]).toContain('&&');
+  });
+
+  it('sets a demanding threshold for it', () => {
+    // 15% is nearly cloudless. Anything looser and the card would start
+    // second-guessing a provider that can see more than one garden.
+    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card)![0];
+    const threshold = /cloud < (0\.\d+)/.exec(block);
+    expect(threshold, 'no cloud threshold').not.toBeNull();
+    expect(Number(threshold![1])).toBeLessThanOrEqual(0.2);
+  });
+
+  it('still leaves a provider alone when the sky is not clear', () => {
+    // Rain, snow and storms remain the provider's to report whenever the
+    // measurement does not actively disagree.
+    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card)![0];
+    expect(block).toContain('cloud !== null');
+  });
+});
+
+describe('plain overcast is correctable too', () => {
+  // Weather Underground reported cloudy against a measured 17%, with the
+  // correction switched on, and the icon stayed a cloud. The guard required a
+  // -day or -night suffix, but 'cloudy' has no day/night variant — it is the
+  // same grey either way — so plain overcast was the one sky state the
+  // correction could not reach. Which is also the state a provider most often
+  // gets wrong, since it is what they fall back on.
+  const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
+  const guard = /(const|let) isPlainSky = (\/[^/]+\/)/.exec(card);
+
+  function matches(name: string): boolean {
+    expect(guard, 'plain-sky guard not found').not.toBeNull();
+    // eslint-disable-next-line no-eval
+    return (eval(guard![2]) as RegExp).test(name);
+  }
+
+  it('accepts a suffixless cloudy', () => {
+    expect(matches('cloudy')).toBe(true);
+  });
+
+  it('still accepts the suffixed sky names', () => {
+    for (const n of ['clear-day', 'clear-night', 'cloudy-1-day', 'cloudy-2-night', 'cloudy-3-day']) {
+      expect(matches(n), n).toBe(true);
+    }
+  });
+
+  it('still refuses anything the sensors cannot see', () => {
+    // A pyranometer cannot tell rain from snow, and a provider can.
+    for (const n of ['rainy-1-day', 'rainy-3-night', 'snowy-2-day', 'fog', 'fog-day',
+                     'thunderstorms', 'hail', 'drizzle', 'rain-and-snow-mix']) {
+      expect(matches(n), n).toBe(false);
+    }
+  });
+
+  it('does not accept a bare clear either way round', () => {
+    // 'clear' with no suffix is not a name the card emits, but if it ever did,
+    // correcting it would be right rather than wrong.
+    expect(matches('clear')).toBe(true);
+    expect(matches('cloudy-4-day')).toBe(false);
   });
 });

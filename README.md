@@ -431,6 +431,32 @@ Inputs used:
 
 The hemisphere is detected automatically from your Home Assistant latitude.
 
+#### The Sager Weathercaster
+
+Zambretti's blindness to the sky is not fixable within Zambretti — but it is precisely what Raymond Sager set out to address in 1942. His instrument reads six things rather than three: pressure, its trend, the wind sector, **how the wind has turned over six hours**, the cloud cover, and whether it is raining. Choose it under **Forecast algorithm**.
+
+The difference shows in the case that prompted this: a morning at 1020 hPa with the barometer rising and the sky two-thirds covered. Zambretti says *fine weather*, because that is what the barometer says. Sager says *unsettled*, because it can also see the cloud.
+
+It needs one thing the card cannot supply itself. Sager compares the wind now with the wind six hours ago, and a dashboard forgets everything when the page reloads — so the history has to come from a helper you create:
+
+```yaml
+# Settings → Devices & Services → Helpers → Statistics
+# Source: your wind direction sensor
+# Characteristic: average
+# Sampling size: enough to cover six hours
+# Max age: 6 hours
+```
+
+Point **Wind bearing six hours ago** at that helper. It is not required: without it the other five inputs still stand, and the sky measurement — the reason to choose Sager at all — is worth more than the one branch the bearing sharpens.
+
+That branch is a backing wind under a falling barometer, which is the classic signature of a warm front arriving. Worth knowing before you rely on it at a coastal site: a sea breeze turns the wind through the same angles every day regardless of the weather, so the signal is noisier there than inland.
+
+The forecasts are Sager's own, with his lettering (A through Y), so the output is comparable with any other implementation of the instrument. His wording is condensed for the card: *"Precipitation or showers/flurries followed by improvement (within 12 hours) and becoming cooler"* was written for a printed manual.
+
+Cloud cover comes from the pyranometer if you have one configured, and rain from the gauge. The forecast holds on to a shower for ninety minutes after it stops, since a dry gap in the middle of a convective spell is not fine weather — on one evening here it rained at eight, stopped for two hours and resumed at eleven, and in the gap the forecast read *fair*. The rain rate slot is unaffected and still reports what the gauge says this minute. Without a pyranometer Sager still works, assuming partly cloudy — it simply loses the advantage that made it worth choosing.
+
+After dark a pyranometer says nothing, which is precisely when that advantage would go missing, so the forecast falls back to the last reading taken in daylight — for six hours. That reaches from dusk into the small hours, where a stale figure is still roughly true. Longer than that it stops being information: on one frontal night here the sky was last measured at 38% on the Saturday afternoon, and by the time rain arrived at six the next morning it had reached 84%, with the old figure still being reported throughout. The cloud cover **slot** is unaffected and still shows `---` at night, since it reports a measurement rather than a forecast input.
+
 #### What it can and cannot do
 
 Zambretti is **purely barometric**. It infers the weather from the pressure level, which way the pressure is moving, and where the wind is coming from. That works because in the mid-latitude frontal weather it was built for — Britain in 1915 — pressure genuinely leads the weather: fronts announce themselves in the barometer hours before they arrive.
@@ -565,7 +591,11 @@ Shows an active severe-weather warning as a coloured row. Point it at a [MeteoAl
 
 The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers. So a Bulgarian card reads *"Жълт код: Високи температури · до сб 00:00"* even though the feed itself is in English. All fifteen hazard types are translated in every language the card supports; unknown types fall back to the provider's own `event` text.
 
-The colour of the row follows the warning level — yellow, orange or red. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
+The colour of the row follows the warning level — yellow, orange or red.
+
+A **lightning detector** can add a row of its own. Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row alongside any provider warning, coloured by how close it is: red within 15 km, amber to 30, yellow beyond. Add the bearing entity and the row says which way it lies. **Warn within** sets the range, 50 km by default.
+
+This is deliberately part of the warnings section rather than a slot. An approaching storm is a warning in the same sense a rain alert is, and the section already appears and vanishes on its own, where a slot would sit empty most of the time — six weeks of readings at the station this was built against recorded no strikes at all. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
 
 ![Warnings section](images/warnings-section.png)
 
@@ -616,7 +646,7 @@ Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); 
 Worth knowing about its limits:
 
 - **Daylight only.** At night there is no signal at all. The slot falls back to a provider's cloud cover entity if you configure one, and shows `---` otherwise.
-- **It stops below 10° of elevation**, where the air-mass model softens and morning haze distorts the reading, rather than reporting confident nonsense at dawn and dusk.
+- **It stops below 10° of elevation**, where the air-mass model softens and morning haze distorts the reading, rather than reporting confident nonsense at dawn and dusk. The morning and evening cut-offs are set separately, under **Min sun elevation**, because obstructions rarely are symmetrical: a building to the west shades the late sun while the eastern horizon stays clear, and a single threshold then has to be set for the worse side. Five days of measurements here showed cloud reading 41% at six in the evening against 6% at noon, over a cloudless week — all of it the house.
 - **The clear-sky model uses a fixed atmospheric transmittance**, so it reads a little high in hazy or dusty air and a little low in very clean air. Good enough to tell clear from overcast; not a radiometric instrument.
 - **The sensor must be clean, level and unshaded.** A pyranometer that catches a roof edge each morning will report cloud that isn't there, every morning.
 
@@ -624,9 +654,7 @@ If your station has a rain gauge, point **Rain rate entity** at it too (mm/h). A
 
 The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess.
 
-The same switch also lets a **rain gauge** overrule the icon, where one is configured under `entity_rain_rate`: a gauge reporting rain replaces a clear or cloudy icon, with the intensity following the standard bands. A gauge sees what neither a forecast nor a pyranometer can — whether it is raining here, now.
-
-Only the plain sky icons are touched either way: rain, snow and fog are things a provider knows about and the sensors cannot see, so those are left alone. Off by default.
+Only the plain sky icons are touched: rain, snow and fog are things a provider knows about and the sensors cannot see, so those are left alone — unless the measurement flatly contradicts them. Full sunshine on the pyranometer with a dry gauge rules out a thunderstorm overhead whatever the forecast area as a whole is doing, and a provider covers a region where a station covers a garden. Off by default.
 
 The measurement is shared by every card on the page — it describes the sky, not the card — so several cards never disagree about the same moment. Broken cloud swings the instantaneous reading violently — 181 to 513 W/m² inside three minutes on a typical morning, which spans the whole icon range — so the card takes the median of the last five minutes and the band boundaries carry hysteresis. The median rather than the mean because one reading through a gap should not drag the answer toward clear, and five minutes rather than longer because a window that includes a sunny spell from ten minutes ago describes the sky as it was, not as it is. Sun through a gap is still broken cloud, and an icon that changes every few minutes is worse than one that lags by a few.
 
@@ -835,6 +863,10 @@ double_tap_action:
 | `option_local_forecast_verbose` | Boolean | `false` | Full-sentence forecast text with a pressure-tendency clause |
 | `option_forecast_altitude` | Number | none | Station altitude in meters — set only when the pressure sensor reports absolute pressure |
 | `option_trend_window_hours` | Number | `3` | Time window of your pressure trend sensor, in hours — the tidal correction is averaged over it |
+| `option_forecast_algorithm` | String | `zambretti` | `zambretti` or `sager` |
+| `entity_wind_bearing_6h` | String | none | Wind bearing six hours ago, from a statistics helper — optional, sharpens one branch of Sager |
+| `option_cloud_min_elevation_am` | Number | `10` | Sun elevation below which the sky is not measured, morning |
+| `option_cloud_min_elevation_pm` | Number | `10` | The same for the evening, set separately for obstructions on one side |
 
 ## Extended Section
 
@@ -904,6 +936,9 @@ double_tap_action:
 | `option_cloud_overrides_icon` | Boolean | `false` | Let the measured cloud cover and rain rate correct the condition icon |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |
 | `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
+| `entity_lightning_distance` | String | none | Strike detector distance sensor — adds its own warning row |
+| `entity_lightning_azimuth` | String | none | Strike detector bearing sensor, for the direction |
+| `option_lightning_max_distance` | Number | `50` | Storms further away than this are ignored |
 | `show_section_warnings` | Boolean | `true` | Show the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |

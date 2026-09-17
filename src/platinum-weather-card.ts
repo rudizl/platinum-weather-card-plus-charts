@@ -20,8 +20,9 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
 import { CARD_VERSION } from './const';
-import { tCard, tMoonPhase, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
+import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas } from './zambretti';
+import { sagerForecast } from './sager';
 
 
 /* eslint no-console: 0 */
@@ -86,6 +87,11 @@ export class PlatinumWeatherCard extends LitElement {
   // showed sun while the other showed cloud.
   private static _cloudSamples: { t: number; f: number }[] = [];
   private static _cloudBand: number | null = null;
+  // The last cloud reading taken while the sun was high enough to trust it.
+  // Static for the same reason the buffer is: it describes the sky, not a card.
+  private static _lastDaylightCloud: { t: number; f: number } | null = null;
+  // When it last rained, so a gap between showers does not read as fine weather.
+  private static _lastRain: { t: number; rate: number } | null = null;
 
   private _error: string[] = [];
 
@@ -546,7 +552,7 @@ export class PlatinumWeatherCard extends LitElement {
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
-    const localForecast = this.localForecastText;
+    const localForecast = this.sagerForecastText ?? this.localForecastText;
     const forecastText = localForecast !== null ?
       html`<div class="forecast-text">${localForecast}</div>` :
       (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
@@ -636,7 +642,7 @@ export class PlatinumWeatherCard extends LitElement {
 
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
-    const localForecast = this.localForecastText;
+    const localForecast = this.sagerForecastText ?? this.localForecastText;
     const forecastText = localForecast !== null ?
       html`<div class="forecast-text-right">${localForecast}</div>` :
       (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
@@ -710,8 +716,58 @@ export class PlatinumWeatherCard extends LitElement {
   // "2; yellow; Moderate". The numbers are the stable part of the EUMETNET CAP
   // profile, so the card keys off those and renders its own translated wording
   // rather than the provider's English text.
+  // A storm close enough to reach you is a warning in the same sense a
+  // MeteoAlarm row is, so it belongs in the same section rather than in a slot
+  // that would sit empty almost always. The severity comes from the distance,
+  // which is the only thing a strike detector can tell you about urgency.
+  private _renderLightningWarning(): TemplateResult {
+    const distEntity = this._config.entity_lightning_distance;
+    if (!distEntity) return html``;
+    const distState = this.hass.states[distEntity];
+    if (!distState || distState.state === 'unknown' || distState.state === 'unavailable') return html``;
+    const distance = Number(distState.state);
+    if (!isFinite(distance)) return html``;
+
+    const threshold = Number(this._config.option_lightning_max_distance);
+    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50;
+    if (distance > limit) return html``;
+
+    // Red within fifteen kilometres — near enough that the next strike could be
+    // overhead; amber to thirty; yellow beyond.
+    const levelNum = distance <= 15 ? '4' : distance <= 30 ? '3' : '2';
+    const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum]!;
+    const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum]!;
+    const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum]!;
+    const levelClass = levelNum === '4' ? 'warning-row level-red'
+      : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
+
+    const unit = distState.attributes?.unit_of_measurement ?? 'km';
+    let headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)}${unit}`;
+
+    const bearingEntity = this._config.entity_lightning_azimuth;
+    const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
+    const bearing = bearingState ? Number(bearingState.state) : NaN;
+    if (isFinite(bearing)) {
+      const points = tWindDirections(this.locale);
+      headline += ` ${points[Math.round(((bearing % 360) + 360) % 360 / 22.5) % 16]}`;
+    }
+
+    return html`
+      <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});">
+        <ha-icon class="warning-icon" style="color: ${colour};" icon="mdi:flash"></ha-icon>
+        <div class="warning-text">${headline}</div>
+      </div>
+    `;
+  }
+
   private _renderWarningsSection(): TemplateResult {
     if (this._config?.show_section_warnings === false) return html``;
+    const lightning = this._renderLightningWarning();
+    const provider = this._renderProviderWarning();
+    return html`${lightning}${provider}`;
+  }
+
+  private _renderProviderWarning(): TemplateResult {
     const entity = this._config.entity_warning;
     if (!entity) return html``;
     const stateObj = this.hass.states[entity];
@@ -2115,6 +2171,122 @@ export class PlatinumWeatherCard extends LitElement {
     return null;
   }
 
+  // Sea-level pressure in hPa, with the station-altitude correction applied when
+  // configured. Shared so both forecast algorithms judge the same barometer.
+  private get _forecastPressureHpa(): number | null {
+    const entity = this._config.entity_pressure;
+    if (!entity || !this.hass.states[entity]) return null;
+    const stateObj = this.hass.states[entity];
+    const raw = entity.match('^weather.') === null ? stateObj.state : stateObj.attributes.pressure;
+    const value = Number(raw);
+    if (isNaN(value)) return null;
+    const uom = this._config.pressure_units
+      ? this._config.pressure_units
+      : entity.match('^weather.') === null
+        ? stateObj.attributes.unit_of_measurement
+        : stateObj.attributes.pressure_unit;
+    let pressure = pressureToHpa(value, uom);
+    const altitude = Number(this._config.option_forecast_altitude);
+    if (isFinite(altitude) && altitude > 0) {
+      const tempEntity = this._config.entity_temperature;
+      const tempC = tempEntity && this.hass.states[tempEntity]
+        ? Number(this.hass.states[tempEntity].state) : NaN;
+      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
+    }
+    return pressure;
+  }
+
+  // Pressure change in hPa per hour, with the atmospheric tide removed.
+  private get pressureTrendHpaPerHour(): number | null {
+    const trendEntity = this._config.entity_pressure_trend;
+    if (!trendEntity || !this.hass.states[trendEntity]) return null;
+    const raw = Number(this.hass.states[trendEntity].state);
+    if (!isFinite(raw)) return null;
+    const lat = this.hass.config?.latitude;
+    const lon = this.hass.config?.longitude;
+    if (lat === undefined || lon === undefined) return raw;
+    const window = Number(this._config.option_trend_window_hours);
+    return raw - tidalTrendHpaPerHour(new Date(), lat, lon,
+      isNaN(window) || window <= 0 ? 3 : window);
+  }
+
+  // Sager takes the same barometer as Zambretti but also the sky and the way the
+  // wind has turned, which is why it can call an overcast morning cloudy where a
+  // purely barometric method calls it fine.
+  //
+  // It needs the wind bearing from six hours ago, which a frontend cannot
+  // remember across a page reload — hence the explicit entity. Without it the
+  // card falls back to Zambretti rather than guessing.
+  get sagerForecastText(): string | null {
+    if (this._config.option_forecast_algorithm !== 'sager') return null;
+
+    const pressure = this._forecastPressureHpa;
+    if (pressure === null) return null;
+
+    // The six-hour bearing sharpens one branch — a backing wind under a falling
+    // barometer is a front arriving — but the other five inputs stand on their
+    // own. Refusing to run without it would throw away the sky measurement,
+    // which is the reason to choose Sager in the first place.
+    const sixHourEntity = this._config.entity_wind_bearing_6h;
+    const sixHourState = sixHourEntity ? this.hass.states[sixHourEntity] : undefined;
+    const sixHourBearing = sixHourState
+      && sixHourState.state !== 'unknown' && sixHourState.state !== 'unavailable'
+      ? Number(sixHourState.state) : NaN;
+
+    const bearingEntity = this._config.entity_wind_bearing;
+    const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
+    const bearing = bearingState
+      && bearingState.state !== 'unknown' && bearingState.state !== 'unavailable'
+      ? Number(bearingState.state) : NaN;
+
+    const result = sagerForecast({
+      pressureHpa: pressure,
+      trendHpaPerHour: this.pressureTrendHpaPerHour ?? 0,
+      windBearingDeg: isFinite(bearing) ? bearing : null,
+      windBearingSixHoursAgoDeg: isFinite(sixHourBearing) ? sixHourBearing : null,
+      cloudCover: this.forecastCloudFraction,
+      rainRateMmH: this.forecastRainRate,
+      northernHemisphere: (this.hass.config?.latitude ?? 0) >= 0,
+    });
+    if (result === null) return null;
+
+    // Sager's phrases are terse — 'Fair' where Zambretti manages a sentence — so
+    // the card fills them out with what it has actually measured. The sky is
+    // named rather than left implicit, since a forecast of fair weather reads
+    // very differently under a clear sky and under a covered one.
+    let text = tSager(this.locale, result.weather);
+    if (text && !/[.!?]$/.test(text)) text += '.';
+
+    // The sky goes in a sentence of its own rather than trailing the forecast:
+    // several of Sager's phrases already end in a temperature clause, and
+    // 'cooler under overcast' reads as one muddled thought.
+    const cloud = this.forecastCloudFraction;
+    if (cloud !== null) {
+      const sky = tSager(this.locale, cloud < 0.25 ? 'sky_clear'
+        : cloud < 0.50 ? 'sky_partly'
+        : cloud < 0.85 ? 'sky_cloudy'
+        : 'sky_overcast');
+      if (sky) text += ` ${sky}.`;
+    }
+
+    if (this._config.option_local_forecast_verbose === true) {
+      // Only worth their line when they say something: 'no important change' is
+      // Sager's commonest outcome for both wind and temperature.
+      if (result.windChange !== 'U') {
+        const wind = tSager(this.locale, `wind_${result.windChange}`);
+        if (wind) text += ` ${tSager(this.locale, 'wind_label')} ${wind.toLowerCase()}.`;
+      }
+      // Several forecasts already carry the tendency in their own wording
+      // ('Precipitation and warmer'), so repeating it would be clumsy.
+      const alreadySaid = /[A-Z]?(warmer|cooler)/i.test(tSager('en', result.weather));
+      if (result.temperature !== 'steady' && !alreadySaid) {
+        const temp = tSager(this.locale, `temp_${result.temperature}`);
+        if (temp) text += ` ${tSager(this.locale, 'temp_label')} ${temp.toLowerCase()}.`;
+      }
+    }
+    return text;
+  }
+
   // Local Zambretti nowcast computed from entity_pressure (+trend, +wind bearing).
   // Returns the localized one-line forecast text, or null when inputs are unusable.
   get localForecastText(): string | null {
@@ -2664,6 +2836,50 @@ export class PlatinumWeatherCard extends LitElement {
     return isFinite(rate) ? rate : null;
   }
 
+  // Cloud cover for the forecast, which unlike the slot would rather have a
+  // stale figure than none: a pyranometer says nothing after dark, and the sky
+  // seldom turns over completely between dusk and dawn. Falls back to the last
+  // daylight reading, and gives up once that is a day old.
+  // Rain rate for the forecast, which unlike the slot should not forget a shower
+  // the moment it stops. On 27 August it rained at 20:00, stopped for two hours
+  // and resumed at 23:00 — and in the gap the forecast read 'fair, cooler',
+  // which nobody standing outside would have agreed with.
+  //
+  // The slot keeps showing the true instantaneous rate; only the forecast holds
+  // on, and only for ninety minutes, which is about the length of a gap between
+  // showers in one convective spell rather than the start of a dry evening.
+  get forecastRainRate(): number | null {
+    const cls = this.constructor as typeof PlatinumWeatherCard;
+    const now = this.measuredRainRate;
+    if (now !== null && now > 0) {
+      cls._lastRain = { t: Date.now(), rate: now };
+      return now;
+    }
+    const last = cls._lastRain;
+    if (last === null) return now;
+    if (Date.now() - last.t > 5400000) return now;
+    // Report it as showery rather than at full strength: it is not raining this
+    // minute, but the spell has not ended either.
+    return Math.min(last.rate, 1);
+  }
+
+  get forecastCloudFraction(): number | null {
+    const cls = this.constructor as typeof PlatinumWeatherCard;
+    const now = this.measuredCloudFraction;
+    if (now !== null) {
+      cls._lastDaylightCloud = { t: Date.now(), f: now };
+      return now;
+    }
+    const last = cls._lastDaylightCloud;
+    if (last === null) return null;
+    // Six hours, not a day. Checked against a real frontal event: the sky was
+    // last measured at 38% on a Saturday afternoon, that figure was still being
+    // reported through the night, and by the time rain arrived at six the next
+    // morning the cloud had reached 84%. A fourteen-hour-old reading is not
+    // information about the present sky, it is a memory of a different one.
+    return Date.now() - last.t <= 21600000 ? last.f : null;
+  }
+
   get measuredCloudFraction(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const instant = this._instantCloudFraction;
@@ -2695,7 +2911,20 @@ export class PlatinumWeatherCard extends LitElement {
     const measured = Number(solarState.state);
     const elevation = Number(sunState.attributes?.elevation);
     if (isNaN(measured) || isNaN(elevation)) return null;
-    return cloudCoverFraction(measured, elevation, Number(this._config.option_forecast_altitude) || 0);
+
+    // Morning and evening cut-offs are separate because obstructions rarely
+    // are: a building to the west shades the late sun while the eastern
+    // horizon stays clear, and a single threshold then has to be set for the
+    // worse side and throws away good readings on the other.
+    const azimuth = Number(sunState.attributes?.azimuth);
+    const evening = isFinite(azimuth) ? azimuth > 180 : false;
+    const configured = Number(evening
+      ? this._config.option_cloud_min_elevation_pm
+      : this._config.option_cloud_min_elevation_am);
+    const minElevation = isFinite(configured) && configured > 0 ? configured : 10;
+
+    return cloudCoverFraction(measured, elevation,
+      Number(this._config.option_forecast_altitude) || 0, minElevation);
   }
 
   get slotCloudCover(): TemplateResult {
@@ -3260,8 +3489,23 @@ export class PlatinumWeatherCard extends LitElement {
       // whether it is raining here, now. It outranks both — but only over a
       // plain sky icon, since a provider reporting snow, hail or a storm knows
       // something about the precipitation that a tipping bucket does not.
-      const isPlainSky = /^(clear|cloudy(-[123])?)-(day|night)$/.test(adjusted);
+      // 'cloudy' has no day/night variant — it is the same grey either way — so
+      // the suffix must be optional here. Requiring it meant a provider
+      // reporting plain overcast was the one sky state the correction could not
+      // touch, which is also the state it most often gets wrong: seen reporting
+      // cloudy against a measured 17%.
+      let isPlainSky = /^(clear|cloudy(-[123])?)(-(day|night))?$/.test(adjusted);
       const rate = this.measuredRainRate;
+
+      // A provider reporting rain, snow or a storm usually knows something the
+      // sensors cannot see — but not when they flatly contradict it. Full
+      // sunshine on the pyranometer and a dry gauge rule out a thunderstorm
+      // overhead, whatever the forecast area as a whole is doing: a provider
+      // covers a region, a station covers a garden.
+      const cloud = this.measuredCloudFraction;
+      const contradicted = cloud !== null && cloud < 0.15
+        && (rate === null || rate === 0);
+      if (contradicted && !isPlainSky) isPlainSky = true;
 
       if (isPlainSky && rate !== null && rate > 0) {
         // Same meteorological bands the slot uses, so icon and reading agree.

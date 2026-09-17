@@ -622,6 +622,14 @@ get _forecast_type(): string {
     return this._config?.option_show_precipitation_chart === true; // default off
   }
 
+  get _option_forecast_algorithm(): string {
+    return this._config?.option_forecast_algorithm || 'zambretti';
+  }
+
+  get _entity_wind_bearing_6h(): string {
+    return this._config?.entity_wind_bearing_6h || '';
+  }
+
   get _option_pressure_decimals(): pressureDecimals | null {
     return this._config?.option_pressure_decimals || null;
   }
@@ -1215,6 +1223,23 @@ get _forecast_type(): string {
       ${this._config?.option_local_forecast === true ? html`
       <div class="side-by-side">
         <div>
+          <label class='mdc-label'>${this._t('forecast_algorithm')}</label>
+          <select class='ha-select-compat' .configValue=${'option_forecast_algorithm'} .value=${this._option_forecast_algorithm} @change=${this._valueChanged}>
+            <option value="zambretti">Zambretti (1915)</option>
+            <option value="sager">Sager Weathercaster (1942)</option>
+          </select>
+          <div class="help-text">${this._t('forecast_algorithm_hint')}</div>
+        </div>
+        <div>
+          ${this._config?.option_forecast_algorithm === 'sager' ? html`
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_wind_bearing_6h'} .value=${this._config?.entity_wind_bearing_6h || ''} .includeDomains=${['sensor']}
+            name="entity_wind_bearing_6h" label=${this._t("entity_wind_bearing_6h")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+          <div class="help-text">${this._t("entity_wind_bearing_6h_hint")}</div>` : html``}
+        </div>
+      </div>
+      <div class="side-by-side">
+        <div>
           <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
           </ha-input>
           <div class="help-text">${this._t("forecast_altitude_hint")}</div>
@@ -1238,6 +1263,34 @@ get _forecast_type(): string {
         </ha-entity-picker>
       </div>
       <div class="help-text">${this._t("entity_warning_hint")}</div>
+      <div class="side-by-side">
+        <div>
+          <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_lightning_distance || ''}
+            .configValue=${'entity_lightning_distance'} @value-changed=${this._valueChangedPicker}
+            .includeDomains=${['sensor']}
+            name="entity_lightning_distance" label=${this._t("entity_lightning_distance")} allow-custom-entity>
+          </ha-entity-picker>
+        </div>
+        <div>
+          <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_lightning_azimuth || ''}
+            .configValue=${'entity_lightning_azimuth'} @value-changed=${this._valueChangedPicker}
+            .includeDomains=${['sensor']}
+            name="entity_lightning_azimuth" label=${this._t("entity_lightning_azimuth")} allow-custom-entity>
+          </ha-entity-picker>
+        </div>
+      </div>
+      ${this._config?.entity_lightning_distance ? html`
+      <div class="side-by-side">
+        <div>
+          <ha-input type="number" label=${this._t("lightning_max_distance")}
+            .value=${this._config?.option_lightning_max_distance ?? ''}
+            .configValue=${'option_lightning_max_distance'} @change=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("lightning_max_distance_hint")}</div>
+        </div>
+        <div></div>
+      </div>` : html``}
+      <div class="help-text">${this._t("entity_lightning_hint")}</div>
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
@@ -1826,6 +1879,23 @@ get _forecast_type(): string {
         <div></div>
       </div>
       ${this._config?.entity_solar_radiation ? html`
+      <div class="side-by-side">
+        <div>
+          <ha-input type="number" label=${this._t("cloud_min_elevation_am")}
+            .value=${this._config?.option_cloud_min_elevation_am ?? ''}
+            .configValue=${'option_cloud_min_elevation_am'} @change=${this._valueChangedNumber}>
+          </ha-input>
+        </div>
+        <div>
+          <ha-input type="number" label=${this._t("cloud_min_elevation_pm")}
+            .value=${this._config?.option_cloud_min_elevation_pm ?? ''}
+            .configValue=${'option_cloud_min_elevation_pm'} @change=${this._valueChangedNumber}>
+          </ha-input>
+        </div>
+      </div>
+      <div class="side-by-side full-width">
+        <div class="full-width"><div class="help-text">${this._t("cloud_min_elevation_hint")}</div></div>
+      </div>
       <div class="side-by-side">
         <div>
           <div class="toggle-row">

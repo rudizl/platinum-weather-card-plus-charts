@@ -57,6 +57,13 @@ export function tWarning(locale: string | undefined, key: string): string {
   return TRANSLATIONS[l]?.warning?.[key] ?? TRANSLATIONS.en.warning[key] ?? '';
 }
 
+// Sager forecast wording by key: a letter for the forecast itself ('A', 'M'),
+// 'wind_' plus a letter for the wind, 'temp_' plus a word for the tendency.
+export function tSager(locale: string | undefined, key: string): string {
+  const l = (locale || 'en').split('-')[0].toLowerCase();
+  return TRANSLATIONS[l]?.sager?.[key] ?? TRANSLATIONS.en.sager[key] ?? '';
+}
+
 export function tWindDirections(locale: string | undefined): string[] {
   const l = (locale || 'en').split('-')[0].toLowerCase();
   const dirs = TRANSLATIONS[l]?.windDirections;

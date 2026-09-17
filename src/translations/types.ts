@@ -4,6 +4,7 @@ export interface Translation {
   zambretti: Record<string, string>;
   zambrettiLong: Record<string, string>;
   warning: Record<string, string>;
+  sager: Record<string, string>;
   moonPhases: Record<string, string>;
   windDirections: string[];
   units?: Record<string, string>;
