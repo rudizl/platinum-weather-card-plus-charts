@@ -72,6 +72,10 @@ export class PlatinumWeatherCard extends LitElement {
   // subscription entirely, which is the part that already works.
   @state() private _hourlySubscribed?: Promise<() => void>;
   @state() private _hourlyEvent?: ForecastEvent;
+  // Which of the two the reader is looking at. Deliberately not config: it is a
+  // glance, not a preference, and writing it to the dashboard on every tap
+  // would be both surprising and slow.
+  @state() private _showHourly = false;
 
   // https://lit.dev/docs/components/properties/
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -159,7 +163,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
 
     // ── section_order: only valid section names ────────────────────────────
-    const validSections = ['warnings', 'overview', 'extended', 'slots', 'daily_forecast', 'hourly_forecast', 'charts'];
+    const validSections = ['warnings', 'overview', 'extended', 'slots', 'daily_forecast', 'charts'];
     if (config.section_order) {
       if (!Array.isArray(config.section_order)) {
         throw new Error('platinum-weather-card: section_order must be an array.');
@@ -1638,10 +1642,20 @@ export class PlatinumWeatherCard extends LitElement {
       ? html`<div class="hourly-total">${total.toFixed(1)}${this._precipUnit(undefined)}</div>`
       : html``;
 
+    // Give every hour a minimum width and let the strip scroll sideways rather
+    // than squeezing 48 of them into a phone. Below that count it simply fills
+    // the card, so a short span does not sit in a corner.
+    const MIN_HOUR_PX = 34;
+    const inner = `min-width:100%;width:${Math.max(100, n * MIN_HOUR_PX / 3.4)}%;`;
+
     return html`
       <div class="hourly-section">
-        <div class="hourly-chart">${unsafeHTML(svg)}</div>
-        <div class="hourly-labels" style="grid-template-columns: repeat(${n}, 1fr);">${labels}</div>
+        <div class="hourly-scroll">
+          <div class="hourly-inner" style="${inner}">
+            <div class="hourly-chart">${unsafeHTML(svg)}</div>
+            <div class="hourly-labels" style="grid-template-columns: repeat(${n}, 1fr);">${labels}</div>
+          </div>
+        </div>
         ${summary}
       </div>
     `;
@@ -1800,14 +1814,37 @@ export class PlatinumWeatherCard extends LitElement {
     </div>`;
   }
 
-     private _renderDailyForecastSection(): TemplateResult {
+  // The two views share a section and a pair of tabs, the way Home Assistant's
+  // own more-info dialog does. Hours and days answer different questions —
+  // "will I get wet walking home" against "is the weekend any good" — and the
+  // familiar shape for that is a switch, not two blocks of the card.
+  private _renderForecastTabs(): TemplateResult {
+    if (!this._config?.entity_hourly) return html``;
+    if (!this.hourlyForecast) return html``;
+    const pick = (hourly: boolean) => () => { this._showHourly = hourly; };
+    return html`
+      <div class="forecast-tabs">
+        <button class="forecast-tab ${this._showHourly ? '' : 'active'}"
+                @click=${pick(false)}>${tCard(this.locale, 'tab_daily')}</button>
+        <button class="forecast-tab ${this._showHourly ? 'active' : ''}"
+                @click=${pick(true)}>${tCard(this.locale, 'tab_hourly')}</button>
+      </div>
+    `;
+  }
+
+  private _renderDailyForecastSection(): TemplateResult {
     if (this._config?.show_section_daily_forecast === false) return html``;
 
-    if (this._config.daily_forecast_layout !== 'vertical') {
-      return this._renderHorizontalDailyForecastSection();
-    } else {
-      return this._renderVerticalDailyForecastSection();
+    const tabs = this._renderForecastTabs();
+    // Falling back rather than showing an empty frame: the tabs only appear
+    // when there are hours to show, so this can only be reached mid-load.
+    if (this._showHourly && this.hourlyForecast) {
+      return html`${tabs}${this._renderHourlyForecastSection()}`;
     }
+    const days = this._config.daily_forecast_layout !== 'vertical'
+      ? this._renderHorizontalDailyForecastSection()
+      : this._renderVerticalDailyForecastSection();
+    return html`${tabs}${days}`;
   }
 
   protected render(): TemplateResult | void {
@@ -1861,11 +1898,11 @@ export class PlatinumWeatherCard extends LitElement {
             break;
           case 'daily_forecast':
             sections.push(this._renderDailyForecastSection());
-            sections.push(this._renderChartSection());
+            // The hourly view carries its own chart; showing the daily one
+            // underneath it would be two charts of different things.
+            if (!this._showHourly) sections.push(this._renderChartSection());
             break;
-          case 'hourly_forecast':
-            sections.push(this._renderHourlyForecastSection());
-            break;
+
         }
       });
     }
@@ -4248,6 +4285,37 @@ export class PlatinumWeatherCard extends LitElement {
          lines up beside the temperature rather than under it. */
       .hourly-section {
         padding: 0 12px 8px;
+      }
+      .hourly-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        /* A trackpad flick should not drag the dashboard sideways with it */
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
+      }
+      .hourly-inner {
+        /* width is set inline: it depends on how many hours there are */
+      }
+      .forecast-tabs {
+        display: flex;
+        gap: 4px;
+        padding: 0 12px 6px;
+      }
+      .forecast-tab {
+        flex: 1;
+        padding: 4px 0;
+        font: inherit;
+        font-size: 0.8em;
+        color: var(--primary-text-color);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        opacity: 0.55;
+        cursor: pointer;
+      }
+      .forecast-tab.active {
+        opacity: 1;
+        border-bottom-color: var(--primary-color);
       }
       .hourly-chart {
         position: relative;

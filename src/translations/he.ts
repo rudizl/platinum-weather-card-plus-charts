@@ -305,6 +305,8 @@ const he: Translation = {
     "opt_24hour": "24 שעות"
   },
   "card": {
+    "tab_daily": "ימים",
+    "tab_hourly": "שעות",
     "comfort_dry": "יבש",
     "comfort_pleasant": "נעים",
     "comfort_comfortable": "נוח",

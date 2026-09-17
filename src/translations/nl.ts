@@ -305,6 +305,8 @@ const nl: Translation = {
     "opt_24hour": "24 uur"
   },
   "card": {
+    "tab_daily": "Dagen",
+    "tab_hourly": "Uren",
     "comfort_dry": "Droog",
     "comfort_pleasant": "Aangenaam",
     "comfort_comfortable": "Comfortabel",

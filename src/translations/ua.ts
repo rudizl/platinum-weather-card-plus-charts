@@ -305,6 +305,8 @@ const ua: Translation = {
     "opt_24hour": "24 години"
   },
   "card": {
+    "tab_daily": "Дні",
+    "tab_hourly": "Години",
     "comfort_dry": "Сухо",
     "comfort_pleasant": "Приємно",
     "comfort_comfortable": "Комфортно",

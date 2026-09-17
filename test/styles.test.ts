@@ -69,7 +69,6 @@ describe('the editor stylesheet matches its markup', () => {
     // stable hooks for anyone styling the editor from outside
     'edit-overview-section', 'edit-warnings-section', 'edit-extended-section',
     'edit-slots-section', 'edit-daily-forecast-section', 'edit-charts-section',
-    'edit-hourly-forecast-section',
     // Home Assistant's own classes, styled by HA
     'mdc-label',
     // fragment of 'toggle-label', picked up by the two-branch class matcher

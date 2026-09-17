@@ -93,53 +93,66 @@ describe('the chart', () => {
   });
 });
 
-describe('the section is wired in like any other', () => {
-  it('is dispatched from section_order', () => {
-    expect(card).toMatch(/case 'hourly_forecast':/);
+describe('the two views share one section', () => {
+  // First attempt made hours a section of their own, sitting under the days.
+  // Home Assistant's own more-info dialog uses tabs, and so should this: hours
+  // and days answer different questions — "will I get wet walking home"
+  // against "is the weekend any good" — and you want one at a time.
+
+  it('switches with tabs rather than stacking', () => {
+    expect(card).toContain('_renderForecastTabs');
+    expect(card).toMatch(/forecast-tab/);
+    expect(card, 'hours are still dispatched as their own section')
+      .not.toMatch(/case 'hourly_forecast':/);
   });
 
-  it('has a row in the editor with the usual controls', () => {
-    const row = /case 'hourly_forecast':[\s\S]*?`;/.exec(editor)![0];
-    for (const control of ['pwc-switch', 'down-icon', 'up-icon', 'edit-icon']) {
-      expect(row, `the row is missing ${control}`).toContain(control);
-    }
+  it('keeps the choice in component state, not config', () => {
+    // A glance is not a preference; writing it to the dashboard on every tap
+    // would be surprising and slow.
+    expect(card).toMatch(/@state\(\) private _showHourly/);
+    expect(card, 'the tab choice is being written to config')
+      .not.toMatch(/_config\.\w*show_hourly/);
   });
 
-  it('has a settings panel behind the pencil', () => {
-    expect(editor).toContain('_sectionHourlyForecastEditor');
-    expect(editor).toMatch(/case 'section_hourly_forecast':/);
+  it('shows no tabs at all without an hourly entity', () => {
+    // Most people will not configure one, and a single lonely tab is worse
+    // than none.
+    const fn = /_renderForecastTabs\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/if \(!this\._config\?\.entity_hourly\) return html``;/);
+    expect(fn).toMatch(/if \(!this\.hourlyForecast\) return html``;/);
+  });
+
+  it('does not draw the daily chart under the hourly view', () => {
+    // Two charts of different things, stacked, with no label saying which.
+    expect(card).toMatch(/if \(!this\._showHourly\) sections\.push\(this\._renderChartSection\(\)\)/);
+  });
+
+  it('scrolls sideways rather than squeezing every hour in', () => {
+    // Forty-eight hours across a phone is a line with no readable labels.
+    const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
+    expect(fn).toContain('MIN_HOUR_PX');
+    expect(card).toMatch(/\.hourly-scroll \{[^}]*overflow-x: auto/);
+  });
+
+  it('contains the sideways scroll so it does not drag the dashboard', () => {
+    expect(card).toMatch(/overscroll-behavior-x: contain/);
+  });
+
+  it('fills the card when there are few enough hours to fit', () => {
+    const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
+    expect(fn).toMatch(/min-width:100%/);
+    expect(fn).toMatch(/Math\.max\(100/);
+  });
+
+  it('has its settings with the forecast it belongs to', () => {
+    // Not a panel of its own behind a pencil in the section list — the hours
+    // are a view of the forecast, so their entity and span live with it.
+    expect(editor).toContain('_hourlyForecastOptions');
+    expect(editor).toMatch(/_sectionDailyForecastEditor[\s\S]*?_hourlyForecastOptions\(\)/);
   });
 
   it('offers only weather entities for the source', () => {
-    const panel = /_sectionHourlyForecastEditor\(\)[\s\S]*?\n  \}/.exec(editor)![0];
+    const panel = /_hourlyForecastOptions\(\)[\s\S]*?\n  \}/.exec(editor)![0];
     expect(panel).toMatch(/includeDomains=\$\{\['weather'\]\}/);
-  });
-});
-
-describe('the section list agrees with itself', () => {
-  // Adding a section means touching four places. setConfig rejects anything not
-  // on its allow-list, so forgetting that one turns the whole card into a
-  // config error the moment the section is used — which is what happened.
-  it('accepts every section the card can render', () => {
-    const allowed = /const validSections = \[([^\]]+)\]/.exec(card);
-    expect(allowed, 'no validSections list').not.toBeNull();
-    const names = Array.from(allowed![1].matchAll(/'(\w+)'/g)).map((m) => m[1]);
-    const rendered = Array.from(card.matchAll(/^\s+case '(\w+)':\n\s+sections\.push/gm))
-      .map((m) => m[1]);
-    expect(rendered.length).toBeGreaterThan(4);
-    for (const section of rendered) {
-      expect(names, `'${section}' renders but setConfig rejects it`).toContain(section);
-    }
-  });
-
-  it('offers every allowed section in the editor', () => {
-    const allowed = /const validSections = \[([^\]]+)\]/.exec(card)![1];
-    const names = Array.from(allowed.matchAll(/'(\w+)'/g)).map((m) => m[1]);
-    for (const section of names) {
-      // 'charts' has no row of its own — it is drawn with the daily forecast
-      if (section === 'charts') continue;
-      expect(editor, `'${section}' has no row in the editor`)
-        .toContain(`case '${section}':`);
-    }
   });
 });

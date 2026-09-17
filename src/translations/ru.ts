@@ -305,6 +305,8 @@ const ru: Translation = {
     "opt_24hour": "24 часа"
   },
   "card": {
+    "tab_daily": "Дни",
+    "tab_hourly": "Часы",
     "comfort_dry": "Сухо",
     "comfort_pleasant": "Приятно",
     "comfort_comfortable": "Комфортно",

@@ -1253,7 +1253,7 @@ get _forecast_type(): string {
     `;
   }
 
-  private _sectionHourlyForecastEditor(): TemplateResult {
+  private _hourlyForecastOptions(): TemplateResult {
     return html`
       <div class="side-by-side">
         <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_hourly || ''}
@@ -1714,6 +1714,7 @@ get _forecast_type(): string {
           name="entity_fire_danger_1" label=${this._t("entity_fire_danger_1")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : ``}
+      ${this._hourlyForecastOptions()}
     `;
   }
 
@@ -1998,8 +1999,6 @@ get _forecast_type(): string {
       case 'option_overview':
         subel.push(this._optionOverviewEditor());
         break;
-      case 'section_hourly_forecast':
-        return this._sectionHourlyForecastEditor();
       case 'section_warnings':
         subel.push(this._sectionWarningsEditor());
         break;
@@ -2088,25 +2087,6 @@ get _forecast_type(): string {
               <ha-icon-button class="up-icon" .value=${'warnings'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
               </ha-icon-button>
               <ha-icon-button class="edit-icon" .value=${'section_warnings'} .path=${mdiPencil} @click="${this._editSubmenu}">
-              </ha-icon-button>
-              <div class="no-icon"></div>
-            </div>
-          </div>
-        `;
-      case 'hourly_forecast':
-        return html`
-          <div class="section-flex edit-hourly-forecast-section">
-            <div class="section-label">
-              <span class=${this._config?.show_section_hourly_forecast !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_hourly_forecast'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:chart-timeline-variant"></ha-icon>
-              <span class="section-title">${this._t("hourly_forecast_section")}</span>
-            </div>
-            <div>
-              <ha-icon-button class="down-icon" .value=${'hourly_forecast'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
-              </ha-icon-button>
-              <ha-icon-button class="up-icon" .value=${'hourly_forecast'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
-              </ha-icon-button>
-              <ha-icon-button class="edit-icon" .value=${'section_hourly_forecast'} .path=${mdiPencil} @click="${this._editSubmenu}">
               </ha-icon-button>
               <div class="no-icon"></div>
             </div>
