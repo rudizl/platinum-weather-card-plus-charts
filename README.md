@@ -468,7 +468,58 @@ Point **Wind bearing six hours ago** at that helper. It is not required: without
 
 That branch is a backing wind under a falling barometer, which is the classic signature of a warm front arriving. Worth knowing before you rely on it at a coastal site: a sea breeze turns the wind through the same angles every day regardless of the weather, so the signal is noisier there than inland.
 
-The forecasts are Sager's own, with his lettering (A through Y), so the output is comparable with any other implementation of the instrument. His wording is condensed for the card: *"Precipitation or showers/flurries followed by improvement (within 12 hours) and becoming cooler"* was written for a printed manual.
+The forecasts are Sager's own, with his lettering (A through Y), so the output is comparable with any other implementation of the instrument. His wording is condensed for the card: *"Precipitation or showers/flurries followed by improvement (within 12 hours) and becoming cooler"* was written for a printed manual, not for a phone.
+
+<details>
+<summary>The twenty-one forecasts</summary>
+
+| | |
+| --- | --- |
+| A | Fair |
+| B | Fair and warmer |
+| C | Fair and cooler |
+| D | Unsettled |
+| E | Unsettled and warmer |
+| F | Unsettled and cooler |
+| G | Increasing cloud, then precipitation |
+| H | Increasing cloud, then precipitation; warmer |
+| J | Showers |
+| K | Showers and warmer |
+| L | Showers and cooler |
+| M | Precipitation |
+| N | Precipitation and warmer |
+| P | Precipitation, turning cooler; improving within 24 hours |
+| R | Precipitation, improving within 12 hours |
+| S | Precipitation, improving within 12 hours; cooler |
+| T | Precipitation, improving within 6 hours |
+| U | Precipitation, improving within 6 hours; cooler |
+| W | Precipitation, then fair within 6 hours; cooler |
+| X | Unsettled, then fair |
+| Y | Unsettled, then fair within 6 hours; cooler |
+
+Every one of them is reachable, which the tests assert — a phrase translated into thirteen languages that no combination of inputs can produce would be thirteen translations wasted.
+
+</details>
+
+In verbose mode a wind clause and a temperature clause follow, but only when they have something to say: *no important change* is Sager's commonest outcome for both, and a line spent reporting that nothing is happening is a line wasted. Several of his forecasts already carry the temperature in their own wording, and the clause is suppressed for those rather than repeating it.
+
+The quadrants mirror south of the equator, since the circulation does — but east stays east, because ahead of a depression the air arrives from the east in both hemispheres.
+
+#### How well it actually does
+
+Measured against a station on the Bulgarian coast over six weeks, because a forecast algorithm that has not been checked against what happened is a decoration.
+
+**Summer convection — where it earns its place.** Of four rain events, three were warned an hour ahead and there were no false alarms at all: the ten hours it called wet were the ten hours it rained. Through all four the barometer said nothing — it was steady or *rising* each time, so a purely barometric forecast read *fine weather* throughout. The whole signal came from the sky: cloud went from 31% to 81% in the hour before the first one.
+
+**Frontal rain — where it does not.** A nine-hour front with an 18 mm/h peak arrived at six in the morning and Sager gave no warning whatever. Three separate reasons, and none of them fixable here:
+
+- the rain arrived before dawn, when a pyranometer can see nothing at all
+- the barometer dipped gently and then rose through the entire event
+- the wind veered south to north — a *cold* front, where rain falls at the boundary, while Sager's frontal branch is tuned for a warm one, where it falls ahead
+
+A lightning detector covering 100 km recorded no strikes that day, which independently confirms there was no convection to see. A numerical model had the event two days in advance.
+
+The line between the two cases is worth stating plainly: **convection builds over you for hours, and local sensors watch it happen. A front is assembled somewhere else and arrives finished.** For the second kind, a forecast provider will beat any instrument in your garden, and no amount of tuning changes that.
 
 Cloud cover comes from the pyranometer if you have one configured, and rain from the gauge. The forecast holds on to a shower for ninety minutes after it stops, since a dry gap in the middle of a convective spell is not fine weather — on one evening here it rained at eight, stopped for two hours and resumed at eleven, and in the gap the forecast read *fair*. The rain rate slot is unaffected and still reports what the gauge says this minute. Without a pyranometer Sager still works, assuming partly cloudy — it simply loses the advantage that made it worth choosing.
 
@@ -486,7 +537,7 @@ It follows that the algorithm is blind to anything that does not move the barome
 
 Where it does well is the thing your forecast provider is often slowest on: a front arriving earlier or later than the model said. The barometer at your own location knows before the model updates.
 
-None of this is fixable within Zambretti; the missing input is cloud cover, which is what later algorithms such as Sager (1942) use alongside pressure and wind change. If your station has a pyranometer the card can now measure that — see [Cloud cover from a pyranometer](#cloud-cover-from-a-pyranometer) — but feeding it into the forecast rather than just displaying it would mean a different algorithm, not a tweak to this one.
+None of this is fixable within Zambretti; the missing input is cloud cover, which is what later algorithms use alongside pressure and wind change. That is exactly what [the Sager Weathercaster](#the-sager-weathercaster) below does, and why it is offered as an alternative rather than as a setting on this one — it is a different instrument, not a tweak.
 
 > **Your pressure sensor must report sea-level (relative) pressure — check this first.**
 > Zambretti reads the absolute pressure level, so an uncalibrated station throws the forecast off by several categories, permanently. A station at 150 m altitude reads roughly 18 hPa below sea level: the algorithm sees 1002 hPa ("changeable, some rain") when the real sea-level pressure is 1020 hPa ("settled fair"), and the card then predicts rain on a cloudless day.
