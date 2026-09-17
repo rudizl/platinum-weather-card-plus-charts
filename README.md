@@ -34,6 +34,23 @@ The card is in the HACS default store:
 <details>
 <summary><strong>Changelog</strong></summary>
 
+**v2.4.0**
+
+**The Sager Weathercaster, as a second forecast algorithm.** Zambretti reads only the barometer, which is why an overcast morning under a rising high comes out as *fine weather* — it has no way to see the sky. Sager (1942) reads six things rather than three, the sky among them. Choose it under **Forecast algorithm**; Zambretti remains the default.
+
+Cloud comes from the pyranometer and rain from the gauge, both already configured if the icon correction is in use. After dark, when a pyranometer says nothing, the forecast falls back to the last daylight reading for six hours. A **Wind bearing six hours ago** helper sharpens one branch — a backing wind under a falling barometer is a warm front arriving — but is not required.
+
+Measured against a real station: of four summer convective events, three were warned an hour ahead with no false alarms, while the barometer stayed silent throughout. Against a front arriving before dawn it added nothing, and that limit is structural — documented rather than papered over.
+
+**A nearby storm warns in the warnings section.** Point **Lightning distance entity** at a strike detector and a storm within range gets a row beside any provider warning, coloured by distance: red within 15 km, amber to 30. Add the bearing and the row says which way it lies.
+
+**Fixes**
+- Plain overcast was the one sky state the icon correction could not touch: the guard required a day/night suffix that `cloudy` does not have, which is also the state providers most often get wrong
+- A provider claiming a storm over a sunlit, dry garden is now overruled — under 15% cloud and a dry gauge rule out a thunderstorm overhead, whatever the region is doing
+- A gap between showers read as fine weather; the forecast now remembers rain for ninety minutes
+
+---
+
 **v2.3.4**
 - Four slots existed with no documentation: `cloud_cover`, `rain_rate`, `uv_index` and `wind_gust`. Now in the slot table
 - `rain_rate` appeared twice in the slot dropdown, and its duplicate `case` in the editor was unreachable — the empty one won, so the gauge entity was never requested
