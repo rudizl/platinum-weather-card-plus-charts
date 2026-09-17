@@ -778,6 +778,18 @@ Hovering a column shows the full forecast for that day, including the precipitat
 
 Two layout options: **Horizontal** (default, up to 5 days) and **Vertical** (up to 7 days).
 
+### Hourly forecast
+
+The section can hold a second view. Point **Hourly weather entity** at a provider that publishes hourly forecasts and a pair of tabs appears — **Daily** and **Hourly** — the way Home Assistant's own more-info dialog does it. Without one configured there are no tabs and nothing changes.
+
+The hourly view is a column per hour: time, icon, temperature, with the rainfall underneath only where there is any. It scrolls sideways, each column keeping a minimum width, so twenty-four or forty-eight hours stays readable rather than being squeezed across a phone. Set the span with **Hours to show** — twelve by default, up to forty-eight.
+
+It is a **separate weather entity** rather than a second forecast type on the one used for the days, and that is deliberate. Most people already run more than one provider, and the one that is better at hours is often not the one they prefer for days: Met.no publishes forty-eight hours, needs no API key and works anywhere, which makes it a common second source even for people whose daily forecast comes from elsewhere. The card subscribes to the two independently.
+
+Two things follow from having both. The temperature and precipitation charts belong to the days, so they are hidden while the hourly view is open — two unlabelled charts of different things, stacked, would be worse than one. And which tab is open is not written to the dashboard: it is a glance rather than a preference, and saving it on every tap would be both surprising and slow.
+
+Hours and days answer different questions — *will I get wet walking home* against *is the weekend any good* — which is why this is a switch rather than two blocks of the card.
+
 Hovering over any forecast day column shows a tooltip with date, weather description, max/min temperatures, precipitation, and wind speed/direction. The tooltip content is identical to the Charts section tooltip.
 
 | Option | Type | Description |
@@ -1007,6 +1019,8 @@ double_tap_action:
 | `entity_lightning_distance` | String | none | Strike detector distance sensor — adds its own warning row |
 | `entity_lightning_azimuth` | String | none | Strike detector bearing sensor, for the direction |
 | `option_lightning_max_distance` | Number | `50` | Storms further away than this are ignored |
+| `entity_hourly` | String | none | Weather entity for the hourly view — enables the Daily/Hourly tabs |
+| `hourly_forecast_hours` | Number | `12` | Hours to show, 1 to 48 |
 | `show_section_warnings` | Boolean | `true` | Show the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |

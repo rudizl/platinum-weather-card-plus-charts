@@ -305,8 +305,8 @@ const fr: Translation = {
     "opt_24hour": "24 heures"
   },
   "card": {
-    "tab_daily": "Jours",
-    "tab_hourly": "Heures",
+    "tab_daily": "Quotidien",
+    "tab_hourly": "Horaire",
     "comfort_dry": "Sec",
     "comfort_pleasant": "Agréable",
     "comfort_comfortable": "Confortable",

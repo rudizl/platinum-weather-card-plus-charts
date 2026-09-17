@@ -305,8 +305,8 @@ const bg: Translation = {
     "opt_24hour": "24-часов"
   },
   "card": {
-    "tab_daily": "Дни",
-    "tab_hourly": "Часове",
+    "tab_daily": "Дневна",
+    "tab_hourly": "Почасова",
     "comfort_dry": "Сухо",
     "comfort_pleasant": "Приятно",
     "comfort_comfortable": "Комфортно",

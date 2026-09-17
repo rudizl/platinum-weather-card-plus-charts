@@ -273,7 +273,6 @@ export class PlatinumWeatherCard extends LitElement {
     this._unsubscribeHourly();
     const entity = this._config?.entity_hourly;
     if (!this.isConnected || !this.hass || !this._config || !entity) return;
-    if (this._config.show_section_hourly_forecast === false) return;
     if (!this.hass.states[entity]) return;
     this._hourlySubscribed = subscribeForecast(
       this.hass, entity, 'hourly', (event) => { this._hourlyEvent = event; },

@@ -22,7 +22,10 @@ describe('the hourly section reads its own entity', () => {
   it('does not subscribe without an entity, or when the section is off', () => {
     const fn = /async _subscribeHourly\(\)[\s\S]*?\n  \}/.exec(card)![0];
     expect(fn).toMatch(/if \(!this\.isConnected[\s\S]*?!entity\) return;/);
-    expect(fn).toContain('show_section_hourly_forecast === false');
+    // Configuring the entity is what turns the hours on; there is no separate
+    // switch, because the tabs are absent without it anyway.
+    expect(fn, 'a dead show_section flag is still being checked')
+      .not.toContain('show_section_hourly_forecast');
   });
 
   it('unsubscribes before resubscribing, as the daily one does', () => {

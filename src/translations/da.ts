@@ -305,8 +305,8 @@ const da: Translation = {
     "opt_24hour": "24 timer"
   },
   "card": {
-    "tab_daily": "Dage",
-    "tab_hourly": "Timer",
+    "tab_daily": "Daglig",
+    "tab_hourly": "Time",
     "comfort_dry": "Tørt",
     "comfort_pleasant": "Behageligt",
     "comfort_comfortable": "Komfortabelt",
