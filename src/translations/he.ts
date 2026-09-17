@@ -141,6 +141,7 @@ const he: Translation = {
     "hourly_mode": "איזו תחזית להציג",
     "hourly_heading": "תחזית שעתית",
     "entity_hourly_hint": "ישות מזג אוויר התומכת בתחזית שעתית — לרוב ספק אחר מזה של הימים",
+    "hourly_switch_hint": "אם גם התחזית היומית פעילה, לשוניות מאפשרות לבחור; אם היא כבויה, מוצגות רק השעות.",
     "hourly_forecast_hours": "שעות להצגה",
     "hourly_forecast_hours_hint": "1 עד 48",
     "entity_warning": "ישות התרעות",

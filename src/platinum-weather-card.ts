@@ -1802,10 +1802,18 @@ export class PlatinumWeatherCard extends LitElement {
   // own more-info dialog does. Hours and days answer different questions —
   // "will I get wet walking home" against "is the weekend any good" — and the
   // familiar shape for that is a switch, not two blocks of the card.
-  private get _forecastMode(): 'daily' | 'hourly' | 'both' {
-    const mode = this._config?.hourly_forecast_mode;
-    if (!this._config?.entity_hourly) return 'daily';
-    return mode === 'hourly' || mode === 'both' ? mode : 'daily';
+  // Two switches rather than a three-way select: the daily section already has
+  // one, so giving the hours theirs produces the three useful states on its own
+  // — days, hours, or both with tabs — and a fourth that simply shows nothing,
+  // which is what turning both off ought to do anyway.
+  private get _forecastMode(): 'daily' | 'hourly' | 'both' | 'none' {
+    const days = this._config?.show_section_daily_forecast !== false;
+    const hours = this._config?.show_section_hourly_forecast === true
+      && !!this._config?.entity_hourly;
+    if (days && hours) return 'both';
+    if (hours) return 'hourly';
+    if (days) return 'daily';
+    return 'none';
   }
 
   private _renderForecastTabs(): TemplateResult {
@@ -1825,10 +1833,10 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   private _renderDailyForecastSection(): TemplateResult {
-    if (this._config?.show_section_daily_forecast === false) return html``;
+    const mode = this._forecastMode;
+    if (mode === 'none') return html``;
 
     const tabs = this._renderForecastTabs();
-    const mode = this._forecastMode;
     // Hours only: no tabs, and the days are not drawn at all.
     if (mode === 'hourly' && this.hourlyForecast) {
       return this._renderHourlyForecastSection();

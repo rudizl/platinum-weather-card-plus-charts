@@ -141,6 +141,7 @@ const nl: Translation = {
     "hourly_mode": "Welke verwachting",
     "hourly_heading": "Uurlijkse verwachting",
     "entity_hourly_hint": "Een weer-entiteit met uurverwachting — vaak een andere aanbieder dan die voor de dagen",
+    "hourly_switch_hint": "Staat de dagelijkse verwachting ook aan, dan verschijnen tabs; staat die uit, dan zie je alleen de uren.",
     "hourly_forecast_hours": "Uren tonen",
     "hourly_forecast_hours_hint": "1 tot 48",
     "entity_warning": "Waarschuwingsentiteit",

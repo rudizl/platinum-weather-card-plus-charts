@@ -141,6 +141,7 @@ const bg: Translation = {
     "hourly_mode": "Коя прогноза да се показва",
     "hourly_heading": "Почасова прогноза",
     "entity_hourly_hint": "Weather entity с поддръжка на почасова прогноза — често друг доставчик от този за дните",
+    "hourly_switch_hint": "При включена и Дневна прогноза се появяват табове за избор; при изключена се показват само часовете.",
     "hourly_forecast_hours": "Показвай часове",
     "hourly_forecast_hours_hint": "От 1 до 48",
     "entity_warning": "Сензор за предупреждения",

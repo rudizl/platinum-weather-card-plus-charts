@@ -155,13 +155,14 @@ describe('the two views share one section', () => {
     expect(editor).toMatch(/case 'option_hourly_forecast':/);
   });
 
-  it('has no reorder arrows or visibility switch on that row', () => {
-    // It is a view of the forecast, not a section: there is nothing to reorder
-    // and nothing to hide, since the mode select decides which view shows.
+  it('carries a switch but no reorder arrows', () => {
+    // The switch is what decides whether the hours show; there is nothing to
+    // reorder, because they sit with the forecast they are a view of.
     const row = /case 'hourly_forecast':[\s\S]*?\n        `;/.exec(editor)![0];
+    expect(row).toContain('pwc-switch');
+    expect(row).toContain('show_section_hourly_forecast');
     expect(row).not.toContain('down-icon');
-    expect(row).not.toContain('pwc-switch');
-    expect(row).toContain('edit-icon');
+    expect(row).not.toContain('up-icon');
   });
 
   it('offers only weather entities for the source', () => {
@@ -171,30 +172,33 @@ describe('the two views share one section', () => {
 });
 
 describe('the hourly settings', () => {
-  it('offers days, hours, or both', () => {
-    const panel = /_hourlyForecastOptions\(\)[\s\S]*?\n  \}/.exec(editor)![0];
-    for (const mode of ['daily', 'hourly', 'both']) {
-      expect(panel, `no '${mode}' option`).toContain(`value="${mode}"`);
-    }
-  });
-
-  it('gives that select a getter, like every other one', () => {
-    // A select without one renders blank however the config reads — the fault
-    // that left two dropdowns permanently empty back in v2.2.2.
-    expect(editor).toMatch(/get _hourly_forecast_mode\(\): string \{/);
-    expect(editor).toMatch(/\.value=\$\{this\._hourly_forecast_mode\}/);
-  });
-
-  it('falls back to daily for an unrecognised mode', () => {
-    // Someone editing YAML by hand can write anything at all.
+  it('derives the three views from two switches', () => {
+    // A three-way select was the first attempt. The daily section already has a
+    // switch, so giving the hours theirs produces days, hours, and both on its
+    // own — and a fourth state, neither, which is what turning both off ought
+    // to do anyway.
     const fn = /private get _forecastMode\(\)[\s\S]*?\n  \}/.exec(card)![0];
-    expect(fn).toMatch(/mode === 'hourly' \|\| mode === 'both' \? mode : 'daily'/);
+    expect(fn).toMatch(/if \(days && hours\) return 'both';/);
+    expect(fn).toMatch(/if \(hours\) return 'hourly';/);
+    expect(fn).toMatch(/if \(days\) return 'daily';/);
+    expect(fn).toMatch(/return 'none';/);
   });
 
-  it('forces daily when no hourly entity is configured', () => {
-    // Otherwise a leftover mode: 'hourly' would leave the card showing nothing.
+  it('needs an entity before the hours can be switched on', () => {
+    // Otherwise the switch would turn on a view with nothing behind it.
     const fn = /private get _forecastMode\(\)[\s\S]*?\n  \}/.exec(card)![0];
-    expect(fn).toMatch(/if \(!this\._config\?\.entity_hourly\) return 'daily';/);
+    expect(fn).toMatch(/&& !!this\._config\?\.entity_hourly/);
+  });
+
+  it('has no mode select left over', () => {
+    expect(editor, 'the replaced select is still in the editor')
+      .not.toContain('hourly_forecast_mode');
+    expect(card).not.toContain('hourly_forecast_mode');
+  });
+
+  it('draws nothing when both are off', () => {
+    const fn = /_renderDailyForecastSection\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/if \(mode === 'none'\) return html``;/);
   });
 
   it('thins the columns with a step rather than shortening the span', () => {

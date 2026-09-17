@@ -141,6 +141,7 @@ const fr: Translation = {
     "hourly_mode": "Quelle prévision",
     "hourly_heading": "Prévision horaire",
     "entity_hourly_hint": "Une entité météo prenant en charge les prévisions horaires — souvent un fournisseur différent de celui des jours",
+    "hourly_switch_hint": "Avec la prévision quotidienne également activée, des onglets permettent de choisir ; désactivée, seules les heures s'affichent.",
     "hourly_forecast_hours": "Heures affichées",
     "hourly_forecast_hours_hint": "1 à 48",
     "entity_warning": "Entité de vigilance",

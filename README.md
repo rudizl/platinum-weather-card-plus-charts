@@ -782,7 +782,15 @@ Two layout options: **Horizontal** (default, up to 5 days) and **Vertical** (up 
 
 The section can hold a second view. Point **Hourly weather entity** at a provider that publishes hourly forecasts and a pair of tabs appears — **Daily** and **Hourly** — the way Home Assistant's own more-info dialog does it. Without one configured there are no tabs and nothing changes.
 
-**Which forecast to show** picks between *daily only*, *hourly only*, and *both, with tabs*. Tabs appear only in the last: with a single view configured they would be a control that does nothing.
+**Hourly forecast** has a switch of its own in the section list, beside the one the daily forecast already has. Between them they give the three useful arrangements without a setting for it:
+
+| Daily | Hourly | |
+| --- | --- | --- |
+| on | off | days only |
+| on | on | both, with a pair of tabs |
+| off | on | hours only |
+
+Turning both off shows nothing, which is what it ought to do.
 
 The hourly view is a column per hour — time, icon, temperature — and it scrolls sideways, each column keeping a minimum width, so the span stays readable rather than being squeezed across a phone.
 
@@ -1034,7 +1042,7 @@ double_tap_action:
 | `entity_hourly` | String | none | Weather entity for the hourly view — enables the Daily/Hourly tabs |
 | `hourly_forecast_hours` | Number | `12` | Hours to show, 1 to 48 |
 | `hourly_forecast_step` | Number | `1` | Take every nth hour |
-| `hourly_forecast_mode` | String | `daily` | `daily`, `hourly` or `both` |
+| `show_section_hourly_forecast` | Boolean | `false` | Show the hourly view |
 | `option_hourly_shade_night` | Boolean | `true` | Shade the hours the sun is down |
 | `option_hourly_precipitation` | Boolean | `true` | Rainfall under the hours expecting some |
 | `option_hourly_wind` | Boolean | `false` | Wind speed under each hour |

@@ -141,6 +141,7 @@ const cs: Translation = {
     "hourly_mode": "Kterou předpověď zobrazit",
     "hourly_heading": "Hodinová předpověď",
     "entity_hourly_hint": "Entita počasí s podporou hodinové předpovědi — často jiný poskytovatel než pro dny",
+    "hourly_switch_hint": "Je-li zapnutá i denní předpověď, objeví se záložky pro volbu; je-li vypnutá, zobrazí se jen hodiny.",
     "hourly_forecast_hours": "Zobrazit hodin",
     "hourly_forecast_hours_hint": "1 až 48",
     "entity_warning": "Entita výstrah",

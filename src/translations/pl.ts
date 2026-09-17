@@ -141,6 +141,7 @@ const pl: Translation = {
     "hourly_mode": "Która prognoza",
     "hourly_heading": "Prognoza godzinowa",
     "entity_hourly_hint": "Encja pogodowa obsługująca prognozę godzinową — często inny dostawca niż dla dni",
+    "hourly_switch_hint": "Gdy prognoza dzienna też jest włączona, pojawiają się zakładki; wyłączona — widać tylko godziny.",
     "hourly_forecast_hours": "Godziny do pokazania",
     "hourly_forecast_hours_hint": "Od 1 do 48",
     "entity_warning": "Encja ostrzeżeń",

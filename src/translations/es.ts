@@ -141,6 +141,7 @@ const es: Translation = {
     "hourly_mode": "Qué pronóstico mostrar",
     "hourly_heading": "Pronóstico horario",
     "entity_hourly_hint": "Una entidad que admita pronóstico horario — a menudo un proveedor distinto del usado para los días",
+    "hourly_switch_hint": "Con el pronóstico diario también activo, unas pestañas permiten elegir; desactivado, solo se muestran las horas.",
     "hourly_forecast_hours": "Horas a mostrar",
     "hourly_forecast_hours_hint": "1 a 48",
     "entity_warning": "Entidad de avisos",

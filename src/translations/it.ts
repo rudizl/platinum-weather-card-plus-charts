@@ -141,6 +141,7 @@ const it: Translation = {
     "hourly_mode": "Quale previsione",
     "hourly_heading": "Previsione oraria",
     "entity_hourly_hint": "Un'entità meteo che supporti previsioni orarie — spesso un provider diverso da quello usato per i giorni",
+    "hourly_switch_hint": "Con anche la previsione giornaliera attiva, delle schede permettono di scegliere; disattivata, si vedono solo le ore.",
     "hourly_forecast_hours": "Ore da mostrare",
     "hourly_forecast_hours_hint": "Da 1 a 48",
     "entity_warning": "Entità di allerta",

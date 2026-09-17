@@ -141,6 +141,7 @@ const da: Translation = {
     "hourly_mode": "Hvilken prognose",
     "hourly_heading": "Timeprognose",
     "entity_hourly_hint": "En vejrentitet med timeprognose — ofte en anden udbyder end den til dagene",
+    "hourly_switch_hint": "Er den daglige prognose også slået til, får du faner at vælge med; er den slået fra, vises kun timerne.",
     "hourly_forecast_hours": "Timer der vises",
     "hourly_forecast_hours_hint": "1 til 48",
     "entity_warning": "Varslingsentitet",

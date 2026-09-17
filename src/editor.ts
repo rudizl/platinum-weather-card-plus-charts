@@ -622,10 +622,6 @@ get _forecast_type(): string {
     return this._config?.option_show_precipitation_chart === true; // default off
   }
 
-  get _hourly_forecast_mode(): string {
-    return this._config?.hourly_forecast_mode || 'daily';
-  }
-
   get _option_forecast_algorithm(): string {
     return this._config?.option_forecast_algorithm || 'zambretti';
   }
@@ -1269,20 +1265,8 @@ get _forecast_type(): string {
         </ha-entity-picker>
       </div>
       <div class="help-text">${this._t("entity_hourly_hint")}</div>
+      <div class="help-text">${this._t("hourly_switch_hint")}</div>
       ${hasEntity ? html`
-      <div class="side-by-side">
-        <div>
-          <label class='mdc-label'>${this._t('hourly_mode')}</label>
-          <select class='ha-select-compat' .configValue=${'hourly_forecast_mode'}
-            .value=${this._hourly_forecast_mode} @change=${this._valueChanged}>
-            <option value="daily">${this._t('hourly_mode_daily')}</option>
-            <option value="hourly">${this._t('hourly_mode_hourly')}</option>
-            <option value="both">${this._t('hourly_mode_both')}</option>
-          </select>
-          <div class="help-text">${this._t('hourly_mode_hint')}</div>
-        </div>
-        <div></div>
-      </div>
       <div class="side-by-side">
         <div>
           <ha-input type="number" label=${this._t("hourly_forecast_hours")}
@@ -2230,7 +2214,7 @@ get _forecast_type(): string {
         return html`
           <div class="section-flex">
             <div class="section-label">
-              <div class="visibility-spacer"></div>
+              <span class=${this._config?.show_section_hourly_forecast === true ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_hourly_forecast'} @click=${this._toggleVisibility}></span>
               <ha-icon class="section-icon" icon="mdi:clock-outline"></ha-icon>
               <span class="section-title">${this._t("hourly_heading")}</span>
             </div>

@@ -141,6 +141,7 @@ const en: Translation = {
     "hourly_mode": "Which forecast to show",
     "hourly_heading": "Hourly forecast",
     "entity_hourly_hint": "A weather entity that supports hourly forecasts — often a different provider from the one used for the days",
+    "hourly_switch_hint": "With the Daily Forecast switch also on, a pair of tabs lets you choose; with it off, only the hours show.",
     "hourly_forecast_hours": "Hours to show",
     "hourly_forecast_hours_hint": "1 to 48",
     "entity_warning": "Warning entity",

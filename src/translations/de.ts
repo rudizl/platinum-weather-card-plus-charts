@@ -141,6 +141,7 @@ const de: Translation = {
     "hourly_mode": "Welche Vorhersage",
     "hourly_heading": "Stündliche Vorhersage",
     "entity_hourly_hint": "Eine Wetter-Entität mit stündlicher Vorhersage — oft ein anderer Anbieter als der für die Tage",
+    "hourly_switch_hint": "Ist auch die tägliche Vorhersage an, erscheinen Tabs zur Auswahl; ist sie aus, werden nur die Stunden gezeigt.",
     "hourly_forecast_hours": "Stunden anzeigen",
     "hourly_forecast_hours_hint": "1 bis 48",
     "entity_warning": "Warnungs-Entität",
