@@ -1564,99 +1564,57 @@ export class PlatinumWeatherCard extends LitElement {
   // do, and an hourly temperature is one number rather than a max and a min —
   // so this is a chart first, with the hours labelled beneath it, rather than
   // the daily section at a finer grain.
+  // Columns, like the daily strip, rather than a line chart. An hourly
+  // temperature is one number and the hours want reading one at a time — which
+  // is what a column does and a line does not. It also keeps one visual
+  // language across the card: the days above look like this too.
   private _renderHourlyForecastSection(): TemplateResult {
-    if (this._config?.show_section_hourly_forecast === false) return html``;
     const forecast = this.hourlyForecast;
-    if (!forecast || forecast.length < 2) return html``;
+    if (!forecast || forecast.length === 0) return html``;
 
-    const points = forecast.map((f) => ({
-      t: new Date(f.datetime),
-      temp: Number(f.temperature),
-      precip: Number(f.precipitation ?? 0),
-      condition: String(f.condition ?? ''),
-    })).filter((p) => !isNaN(p.t.getTime()) && isFinite(p.temp));
-    if (points.length < 2) return html``;
+    const decimals = this._config?.option_today_temperature_decimals === true ? 1 : 0;
+    const anyRain = forecast.some((f) => Number(f.precipitation) > 0);
 
-    const TEMP_H = 60;
-    const PRECIP_H = 26;
-    const totalH = TEMP_H + PRECIP_H;
+    const columns = forecast.map((f) => {
+      const when = new Date(f.datetime);
+      const time = isNaN(when.getTime()) ? '' : when.toLocaleTimeString(this.locale, {
+        hour: '2-digit', minute: '2-digit',
+      });
 
-    const temps = points.map((p) => p.temp);
-    let lo = Math.min(...temps);
-    let hi = Math.max(...temps);
-    // A flat night would otherwise draw a line through the middle with no scale
-    // at all; give it a couple of degrees to breathe in.
-    if (hi - lo < 2) { const mid = (hi + lo) / 2; lo = mid - 1; hi = mid + 1; }
-    const pad = (hi - lo) * 0.18;
-    lo -= pad; hi += pad;
-    const ty = (v: number) => TEMP_H - ((v - lo) / (hi - lo)) * (TEMP_H - 14) - 7;
+      const condition = String(f.condition ?? '');
+      const url = this._getIconUrl(condition ? this._weatherIcon(condition) : 'unknown', true);
 
-    const n = points.length;
-    const cw = 100 / n;
-    const cx = (i: number) => (i + 0.5) * cw;
+      const t = Number(f.temperature);
+      const temp = isFinite(t)
+        ? `${t.toLocaleString(this.locale, {
+            minimumFractionDigits: decimals, maximumFractionDigits: decimals })}°`
+        : '---';
 
-    const line = points.map((p, i) => `${cx(i)},${ty(p.temp)}`).join(' ');
-    const maxPrecip = Math.max(...points.map((p) => p.precip), 0);
+      const p = Number(f.precipitation);
+      // Only where something is expected: a column of zeroes is noise, and the
+      // row is dropped entirely when the whole span is dry.
+      const rain = anyRain
+        ? html`<div class="hourly-rain">${p > 0
+            ? `${p.toLocaleString(this.locale, {
+                minimumFractionDigits: 1, maximumFractionDigits: 1 })}${this._precipUnit(undefined)}`
+            : ''}</div>`
+        : html``;
 
-    // Where now falls along the strip, so the chart says which end you are at.
-    const first = points[0].t.getTime();
-    const last = points[n - 1].t.getTime();
-    const nowFrac = last > first
-      ? (Date.now() - first) / (last - first) : 0;
-    const nowX = nowFrac >= 0 && nowFrac <= 1
-      ? cx(0) + nowFrac * (cx(n - 1) - cx(0)) : null;
-
-    const precipBars = maxPrecip > 0 ? points.map((p, i) => {
-      if (!(p.precip > 0)) return '';
-      const h = Math.max(1.5, (p.precip / maxPrecip) * (PRECIP_H - 4));
-      return `<rect x="${cx(i) - cw * 0.34}" y="${totalH - h}" width="${cw * 0.68}" height="${h}"`
-        + ` fill="rgba(115,198,239,0.55)"/>`;
-    }).join('') : '';
-
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${totalH}"`
-      + ` preserveAspectRatio="none" style="width:100%;height:${totalH}px;overflow:visible;">`
-      + `<line x1="0" y1="${TEMP_H}" x2="100" y2="${TEMP_H}" stroke="rgba(115,198,239,0.2)"`
-      + ` stroke-width="0.5" vector-effect="non-scaling-stroke"/>`
-      + precipBars
-      + `<polyline points="${line}" fill="none" stroke="rgba(255,152,0,0.9)" stroke-width="1.5"`
-      + ` vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`
-      + (nowX !== null
-        ? `<line x1="${nowX}" y1="0" x2="${nowX}" y2="${totalH}" stroke="var(--primary-text-color)"`
-          + ` stroke-width="1" stroke-dasharray="2,2" opacity="0.45" vector-effect="non-scaling-stroke"/>`
-        : '')
-      + `</svg>`;
-
-    // Label roughly every third hour, and always the ends, so a short span is
-    // not left with one lonely label in the middle.
-    const step = Math.max(1, Math.round(n / 6));
-    const labels = points.map((p, i) => {
-      const show = i === 0 || i === n - 1 || i % step === 0;
-      const hhmm = show
-        ? p.t.toLocaleTimeString(this.locale, { hour: '2-digit', minute: '2-digit' })
-        : '';
-      return html`<div class="hourly-label">${hhmm}</div>`;
+      return html`
+        <div class="hourly-col">
+          <div class="hourly-time">${time}</div>
+          <i class="icon hourly-icon" style="background: none, url(${url}) no-repeat; background-size: contain;"></i>
+          <div class="hourly-temp">${temp}</div>
+          ${rain}
+        </div>
+      `;
     });
-
-    const total = points.reduce((sum, p) => sum + (isFinite(p.precip) ? p.precip : 0), 0);
-    const summary = total > 0
-      ? html`<div class="hourly-total">${total.toFixed(1)}${this._precipUnit(undefined)}</div>`
-      : html``;
-
-    // Give every hour a minimum width and let the strip scroll sideways rather
-    // than squeezing 48 of them into a phone. Below that count it simply fills
-    // the card, so a short span does not sit in a corner.
-    const MIN_HOUR_PX = 34;
-    const inner = `min-width:100%;width:${Math.max(100, n * MIN_HOUR_PX / 3.4)}%;`;
 
     return html`
       <div class="hourly-section">
         <div class="hourly-scroll">
-          <div class="hourly-inner" style="${inner}">
-            <div class="hourly-chart">${unsafeHTML(svg)}</div>
-            <div class="hourly-labels" style="grid-template-columns: repeat(${n}, 1fr);">${labels}</div>
-          </div>
+          <div class="hourly-row">${columns}</div>
         </div>
-        ${summary}
       </div>
     `;
   }
@@ -4281,21 +4239,6 @@ export class PlatinumWeatherCard extends LitElement {
         position: relative;
         line-height: 74%;
       }
-      /* Its own row: .apparent-temp is a table-row, so anything placed inside it
-         lines up beside the temperature rather than under it. */
-      .hourly-section {
-        padding: 0 12px 8px;
-      }
-      .hourly-scroll {
-        overflow-x: auto;
-        overflow-y: hidden;
-        /* A trackpad flick should not drag the dashboard sideways with it */
-        overscroll-behavior-x: contain;
-        scrollbar-width: thin;
-      }
-      .hourly-inner {
-        /* width is set inline: it depends on how many hours there are */
-      }
       .forecast-tabs {
         display: flex;
         gap: 4px;
@@ -4317,25 +4260,43 @@ export class PlatinumWeatherCard extends LitElement {
         opacity: 1;
         border-bottom-color: var(--primary-color);
       }
-      .hourly-chart {
-        position: relative;
+      .hourly-section {
+        padding: 0 4px 6px;
       }
-      .hourly-labels {
-        display: grid;
-        font-size: 0.7em;
-        opacity: 0.7;
-        margin-top: 2px;
+      .hourly-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        /* A trackpad flick should not drag the dashboard sideways with it */
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
       }
-      .hourly-label {
+      .hourly-row {
+        display: flex;
+      }
+      .hourly-col {
+        flex: 0 0 auto;
+        /* Wide enough for 'HH:MM' at this size, so the times never collide */
+        min-width: 62px;
         text-align: center;
-        white-space: nowrap;
-        overflow: visible;
+        padding: 2px 0;
       }
-      .hourly-total {
-        text-align: right;
-        font-size: 0.75em;
+      .hourly-time {
+        font-size: 0.78em;
         opacity: 0.75;
-        margin-top: 2px;
+      }
+      .hourly-icon {
+        display: block;
+        width: 30px;
+        height: 30px;
+        margin: 2px auto;
+      }
+      .hourly-temp {
+        font-size: 0.92em;
+      }
+      .hourly-rain {
+        font-size: 0.72em;
+        color: var(--pwcc-rain, #73c6ef);
+        min-height: 1em;
       }
       .comfort-row {
         display: table-row;

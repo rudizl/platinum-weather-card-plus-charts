@@ -264,15 +264,18 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
       <div class="daily-forecast-vert-section section">
         ${r}
       </div>
-    `}_getForecastPropFromWeather(t,e,i){if(!t)return;const o=e.toDateString(),n=t.filter(t=>new Date(t.datetime).toDateString()===o);if(1===n.length)return void 0!==n[0][i]?String(n[0][i]):void 0;if(2===n.length){const t=n.find(t=>!0===t.daytime),e=n.find(t=>!1===t.daytime);return"templow"===i?e&&void 0!==e.temperature?String(e.temperature):void 0:t&&void 0!==t[i]?String(t[i]):void 0}}_getCardSizeDailyForecastSection(){var t=0;return!1!==this._config.show_section_daily_forecast&&("vertical"!==this._config.daily_forecast_layout?t+=146:(t+=18+87*(this._config.daily_forecast_days||5),0!==this._config.daily_extended_forecast_days&&(t+=48*Math.min(this._config.daily_forecast_days||5,this._config.daily_extended_forecast_days||7)))),t}_getWindUnit(){var t,e,i,o,n,s;const a=this._config.entity?null===(e=null===(t=this.hass.states[this._config.entity])||void 0===t?void 0:t.attributes)||void 0===e?void 0:e.wind_speed_unit:void 0;if(a)return a;const r=null===(o=null===(i=this.hass.config)||void 0===i?void 0:i.unit_system)||void 0===o?void 0:o.wind_speed;return r&&"m/s"!==r?r:"km"===(null===(s=null===(n=this.hass.config)||void 0===n?void 0:n.unit_system)||void 0===s?void 0:s.length)?"km/h":"mph"}_localizeUnit(t){var e;return function(t,e){var i,o,n;const s=(t||"en").split("-")[0].toLowerCase();return null!==(n=null===(o=null===(i=St[s])||void 0===i?void 0:i.units)||void 0===o?void 0:o[e])&&void 0!==n?n:e}(this.locale||(null===(e=this.hass)||void 0===e?void 0:e.language),t)}static _escapeHtml(t){return String(null!=t?t:"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}_buildTooltipRows(t){const{date:e,condition:i,maxT:o,minT:n,precip:s,windSpeed:a,windBearDeg:r,uomPrecip:l="",uomWind:_=""}=t;let c="";const d=t=>this.constructor._escapeHtml(t);e&&(c+=`<div class="fcasttooltiptext" style="color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.25);padding-bottom:3px;margin-bottom:4px;">${d(e)}</div>`),i&&(c+=`<div class="fcasttooltiptext" style="color:#fff;margin-bottom:2px;">${d(i)}</div>`);const h=t=>"number"==typeof t&&isFinite(t);if(h(o)&&(c+=`<div class="fcasttooltiptext" style="color:#fff;margin-top:2px;"><b style="color:#ef5350;">↑ ${Math.round(o)}°</b>&nbsp;&nbsp;<b style="color:#90caf9;">↓ ${h(n)?Math.round(n)+"°":"---"}</b></div>`),h(s)&&s>0&&(c+=`<div class="fcasttooltiptext" style="color:#fff;">💧 ${s.toFixed(1)} ${d(this._localizeUnit(l))}</div>`),null!=a){c+=`<div class="fcasttooltiptext" style="color:#fff;">${null!=r&&isFinite(Number(r))?`<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" style="transform:rotate(${(Number(r)+180)%360}deg);display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`:""}${a} ${d(this._localizeUnit(_))}</div>`}return c}_renderHourlyForecastSection(){var t;if(!1===(null===(t=this._config)||void 0===t?void 0:t.show_section_hourly_forecast))return L``;const e=this.hourlyForecast;if(!e||e.length<2)return L``;const i=e.map(t=>{var e,i;return{t:new Date(t.datetime),temp:Number(t.temperature),precip:Number(null!==(e=t.precipitation)&&void 0!==e?e:0),condition:String(null!==(i=t.condition)&&void 0!==i?i:"")}}).filter(t=>!isNaN(t.t.getTime())&&isFinite(t.temp));if(i.length<2)return L``;const o=i.map(t=>t.temp);let n=Math.min(...o),s=Math.max(...o);if(s-n<2){const t=(s+n)/2;n=t-1,s=t+1}const a=.18*(s-n);n-=a,s+=a;const r=i.length,l=100/r,_=t=>(t+.5)*l,c=i.map((t,e)=>`${_(e)},${(t=>60-(t-n)/(s-n)*46-7)(t.temp)}`).join(" "),d=Math.max(...i.map(t=>t.precip),0),h=i[0].t.getTime(),u=i[r-1].t.getTime(),p=u>h?(Date.now()-h)/(u-h):0,m=p>=0&&p<=1?_(0)+p*(_(r-1)-_(0)):null,g=d>0?i.map((t,e)=>{if(!(t.precip>0))return"";const i=Math.max(1.5,t.precip/d*22);return`<rect x="${_(e)-.34*l}" y="${86-i}" width="${.68*l}" height="${i}" fill="rgba(115,198,239,0.55)"/>`}).join(""):"",v='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 86" preserveAspectRatio="none" style="width:100%;height:86px;overflow:visible;"><line x1="0" y1="60" x2="100" y2="60" stroke="rgba(115,198,239,0.2)" stroke-width="0.5" vector-effect="non-scaling-stroke"/>'+g+`<polyline points="${c}" fill="none" stroke="rgba(255,152,0,0.9)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`+(null!==m?`<line x1="${m}" y1="0" x2="${m}" y2="86" stroke="var(--primary-text-color)" stroke-width="1" stroke-dasharray="2,2" opacity="0.45" vector-effect="non-scaling-stroke"/>`:"")+"</svg>",y=Math.max(1,Math.round(r/6)),f=i.map((t,e)=>{const i=0===e||e===r-1||e%y===0?t.t.toLocaleTimeString(this.locale,{hour:"2-digit",minute:"2-digit"}):"";return L`<div class="hourly-label">${i}</div>`}),b=i.reduce((t,e)=>t+(isFinite(e.precip)?e.precip:0),0),w=b>0?L`<div class="hourly-total">${b.toFixed(1)}${this._precipUnit(void 0)}</div>`:L``,$=`min-width:100%;width:${Math.max(100,34*r/3.4)}%;`;return L`
+    `}_getForecastPropFromWeather(t,e,i){if(!t)return;const o=e.toDateString(),n=t.filter(t=>new Date(t.datetime).toDateString()===o);if(1===n.length)return void 0!==n[0][i]?String(n[0][i]):void 0;if(2===n.length){const t=n.find(t=>!0===t.daytime),e=n.find(t=>!1===t.daytime);return"templow"===i?e&&void 0!==e.temperature?String(e.temperature):void 0:t&&void 0!==t[i]?String(t[i]):void 0}}_getCardSizeDailyForecastSection(){var t=0;return!1!==this._config.show_section_daily_forecast&&("vertical"!==this._config.daily_forecast_layout?t+=146:(t+=18+87*(this._config.daily_forecast_days||5),0!==this._config.daily_extended_forecast_days&&(t+=48*Math.min(this._config.daily_forecast_days||5,this._config.daily_extended_forecast_days||7)))),t}_getWindUnit(){var t,e,i,o,n,s;const a=this._config.entity?null===(e=null===(t=this.hass.states[this._config.entity])||void 0===t?void 0:t.attributes)||void 0===e?void 0:e.wind_speed_unit:void 0;if(a)return a;const r=null===(o=null===(i=this.hass.config)||void 0===i?void 0:i.unit_system)||void 0===o?void 0:o.wind_speed;return r&&"m/s"!==r?r:"km"===(null===(s=null===(n=this.hass.config)||void 0===n?void 0:n.unit_system)||void 0===s?void 0:s.length)?"km/h":"mph"}_localizeUnit(t){var e;return function(t,e){var i,o,n;const s=(t||"en").split("-")[0].toLowerCase();return null!==(n=null===(o=null===(i=St[s])||void 0===i?void 0:i.units)||void 0===o?void 0:o[e])&&void 0!==n?n:e}(this.locale||(null===(e=this.hass)||void 0===e?void 0:e.language),t)}static _escapeHtml(t){return String(null!=t?t:"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}_buildTooltipRows(t){const{date:e,condition:i,maxT:o,minT:n,precip:s,windSpeed:a,windBearDeg:r,uomPrecip:l="",uomWind:_=""}=t;let c="";const d=t=>this.constructor._escapeHtml(t);e&&(c+=`<div class="fcasttooltiptext" style="color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.25);padding-bottom:3px;margin-bottom:4px;">${d(e)}</div>`),i&&(c+=`<div class="fcasttooltiptext" style="color:#fff;margin-bottom:2px;">${d(i)}</div>`);const h=t=>"number"==typeof t&&isFinite(t);if(h(o)&&(c+=`<div class="fcasttooltiptext" style="color:#fff;margin-top:2px;"><b style="color:#ef5350;">↑ ${Math.round(o)}°</b>&nbsp;&nbsp;<b style="color:#90caf9;">↓ ${h(n)?Math.round(n)+"°":"---"}</b></div>`),h(s)&&s>0&&(c+=`<div class="fcasttooltiptext" style="color:#fff;">💧 ${s.toFixed(1)} ${d(this._localizeUnit(l))}</div>`),null!=a){c+=`<div class="fcasttooltiptext" style="color:#fff;">${null!=r&&isFinite(Number(r))?`<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" style="transform:rotate(${(Number(r)+180)%360}deg);display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="5,0 8.5,9 5,6.5 1.5,9" fill="currentColor"/></svg>`:""}${a} ${d(this._localizeUnit(_))}</div>`}return c}_renderHourlyForecastSection(){var t;const e=this.hourlyForecast;if(!e||0===e.length)return L``;const i=!0===(null===(t=this._config)||void 0===t?void 0:t.option_today_temperature_decimals)?1:0,o=e.some(t=>Number(t.precipitation)>0),n=e.map(t=>{var e;const n=new Date(t.datetime),s=isNaN(n.getTime())?"":n.toLocaleTimeString(this.locale,{hour:"2-digit",minute:"2-digit"}),a=String(null!==(e=t.condition)&&void 0!==e?e:""),r=this._getIconUrl(a?this._weatherIcon(a):"unknown",!0),l=Number(t.temperature),_=isFinite(l)?`${l.toLocaleString(this.locale,{minimumFractionDigits:i,maximumFractionDigits:i})}°`:"---",c=Number(t.precipitation),d=o?L`<div class="hourly-rain">${c>0?`${c.toLocaleString(this.locale,{minimumFractionDigits:1,maximumFractionDigits:1})}${this._precipUnit(void 0)}`:""}</div>`:L``;return L`
+        <div class="hourly-col">
+          <div class="hourly-time">${s}</div>
+          <i class="icon hourly-icon" style="background: none, url(${r}) no-repeat; background-size: contain;"></i>
+          <div class="hourly-temp">${_}</div>
+          ${d}
+        </div>
+      `});return L`
       <div class="hourly-section">
         <div class="hourly-scroll">
-          <div class="hourly-inner" style="${$}">
-            <div class="hourly-chart">${kt(v)}</div>
-            <div class="hourly-labels" style="grid-template-columns: repeat(${r}, 1fr);">${f}</div>
-          </div>
+          <div class="hourly-row">${n}</div>
         </div>
-        ${w}
       </div>
     `}_renderChartSection(){var t,e,i,o,n,s;if(!1===this._config.show_section_charts)return L``;const a=!0===this._config.option_show_temperature_chart,r=!0===this._config.option_show_precipitation_chart;if(!a&&!r)return L``;if(!this.forecast1||0===this.forecast1.length)return L``;const l=this._config.daily_forecast_days||5,_=this.constructor.COMPASS_DEG,c=[];for(let n=0;n<l;n++){const s=new Date;s.setDate(s.getDate()+n+(this._config.option_show_current_day?0:1));const a=t=>this._getForecastPropFromWeather(this.forecast1,s,t);if(void 0===a("condition"))break;const r=a("temperature"),l=a("templow"),d=a("wind_speed"),h=a("wind_bearing");let u=null;if(void 0!==h){const e=Number(h);u=isNaN(e)?null!==(t=_[String(h).toUpperCase().trim()])&&void 0!==t?t:null:e}c.push({maxT:Number(null!=r?r:0),minT:Number(null!==(e=null!=l?l:r)&&void 0!==e?e:0),precip:Number(null!==(i=a("precipitation"))&&void 0!==i?i:0),windSpeed:void 0!==d?Math.round(Number(d)):null,windBear:u,datetime:String(null!==(o=a("datetime"))&&void 0!==o?o:"")})}if(0===c.length)return L``;const d=a?75:52,h=d+(r?16:0),u=a?c.flatMap(t=>[t.maxT,t.minT]).filter(t=>isFinite(t)):[],p=a&&u.length?Math.max(...u):0,m=a&&u.length?Math.min(...u):0,g=p-m||1,v=d-16,y=t=>16+(p-t)/g*(v-16),f=c.map(t=>{let e=y(t.maxT),i=y(t.minT);const o=i-e;if(o<18){const t=(18-o)/2;e-=t,i+=t}return{maxY:e,minY:i}}),b=100/c.length,w=t=>(t+.5)*b,$=a?(()=>{const t=f.map((t,e)=>isFinite(t.maxY)?`${w(e)},${t.maxY}`:"").filter(Boolean).join(" "),e=f.map((t,e)=>isFinite(t.minY)?`${w(e)},${t.minY}`:"").filter(Boolean).join(" ");return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${h}" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:${h}px;overflow:visible;pointer-events:none;"><polyline points="${t}" fill="none" stroke="rgba(255,152,0,0.9)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${e}" fill="none" stroke="rgba(90,150,210,0.9)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`+(r?`<line x1="0" y1="${d}" x2="100" y2="${d}" stroke="rgba(115,198,239,0.2)" stroke-width="0.5" vector-effect="non-scaling-stroke"/>`:"")+"</svg>"})():"",x=this._localizeUnit((this._config.entity?null===(s=null===(n=this.hass.states[this._config.entity])||void 0===n?void 0:n.attributes)||void 0===s?void 0:s.precipitation_unit:void 0)||this.getUOM("precipitation")),k=c.map((t,e)=>{var i,o,n,s,l;let _="";if(a&&isFinite(f[e].maxY)&&isFinite(f[e].minY)){const i=f[e].maxY-6.5,o=f[e].minY-6.5;_+=`<div style="position:absolute;top:${i}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:rgba(10,14,24,0.85);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${Math.round(t.maxT)}°</div>`,_+=`<div style="position:absolute;top:${o}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:rgba(10,14,24,0.85);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${Math.round(t.minT)}°</div>`}if(r){const e=Math.max(...c.map(t=>t.precip),.1),i=.85*d;if(t.precip>0){const o=Math.max(t.precip/e*i,2),n=d-o,s=this.constructor._escapeHtml((t.precip%1==0?String(t.precip):t.precip.toFixed(1))+" "+x);_=`<div style="position:absolute;top:${n}px;left:0;right:0;height:${o}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>`+_,_+=`<div style="position:absolute;top:${d-6}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:rgba(10,14,24,0.9);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${s}</div>`}else _+=`<div style="position:absolute;top:${d-1}px;left:0;right:0;height:2px;background:rgba(151,230,255,0.15);border-radius:1px;"></div>`}const u=h,p=this.locale,m=t.datetime?new Date(t.datetime).toLocaleDateString(p,{weekday:"long",month:"short",day:"numeric"}):"",g=!!this._config.entity_summary_1&&this._config.entity_summary_1.match(/(\d+)(?!.*\d)/g);let v="";if(null===(i=this._config.entity_summary_1)||void 0===i?void 0:i.match("^weather.")){const e=t.datetime?new Date(t.datetime):null,i=t=>e?this._getForecastPropFromWeather(this.forecast1,e,t):void 0;v=String(null!==(n=null!==(o=i("detailed_description"))&&void 0!==o?o:i("condition"))&&void 0!==n?n:"")}else if(g&&this._config.entity_summary_1){const t=this._config.entity_summary_1.replace(/(\d+)(?!.*\d)/g,String(Number(g)+e));v=this.hass.states[t]?this.hass.states[t].state:""}const y=this._getWindUnit(),b=(this._config.entity?null===(l=null===(s=this.hass.states[this._config.entity])||void 0===s?void 0:s.attributes)||void 0===l?void 0:l.precipitation_unit:void 0)||this.getUOM("precipitation"),w=this._buildTooltipRows({date:m,condition:v,maxT:a?t.maxT:null,minT:a?t.minT:null,precip:t.precip,windSpeed:t.windSpeed,windBearDeg:t.windBear,uomPrecip:b,uomWind:y});return`<div class="day-horiz fcasttooltip" style="position:relative;height:${u}px;overflow:visible;">${`<div class="fcasttooltipblock" style="width:${100*c.length}%;left:-${100*e}%;">`+w+`<span style="position:absolute;top:100%;left:${100/c.length/2+e*(100/c.length)}%;margin-left:-7.5px;border-width:7.5px;border-style:solid;border-color:#FFA100 transparent transparent transparent;"></span></div>`}${_}</div>`}).join("");return L`<div class="daily-forecast-horiz-section section"
         style="position:relative;margin-top:4px;margin-bottom:4px;padding-top:0;padding-bottom:0;">
@@ -691,21 +694,6 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         position: relative;
         line-height: 74%;
       }
-      /* Its own row: .apparent-temp is a table-row, so anything placed inside it
-         lines up beside the temperature rather than under it. */
-      .hourly-section {
-        padding: 0 12px 8px;
-      }
-      .hourly-scroll {
-        overflow-x: auto;
-        overflow-y: hidden;
-        /* A trackpad flick should not drag the dashboard sideways with it */
-        overscroll-behavior-x: contain;
-        scrollbar-width: thin;
-      }
-      .hourly-inner {
-        /* width is set inline: it depends on how many hours there are */
-      }
       .forecast-tabs {
         display: flex;
         gap: 4px;
@@ -727,25 +715,43 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         opacity: 1;
         border-bottom-color: var(--primary-color);
       }
-      .hourly-chart {
-        position: relative;
+      .hourly-section {
+        padding: 0 4px 6px;
       }
-      .hourly-labels {
-        display: grid;
-        font-size: 0.7em;
-        opacity: 0.7;
-        margin-top: 2px;
+      .hourly-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        /* A trackpad flick should not drag the dashboard sideways with it */
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
       }
-      .hourly-label {
+      .hourly-row {
+        display: flex;
+      }
+      .hourly-col {
+        flex: 0 0 auto;
+        /* Wide enough for 'HH:MM' at this size, so the times never collide */
+        min-width: 62px;
         text-align: center;
-        white-space: nowrap;
-        overflow: visible;
+        padding: 2px 0;
       }
-      .hourly-total {
-        text-align: right;
-        font-size: 0.75em;
+      .hourly-time {
+        font-size: 0.78em;
         opacity: 0.75;
-        margin-top: 2px;
+      }
+      .hourly-icon {
+        display: block;
+        width: 30px;
+        height: 30px;
+        margin: 2px auto;
+      }
+      .hourly-temp {
+        font-size: 0.92em;
+      }
+      .hourly-rain {
+        font-size: 0.72em;
+        color: var(--pwcc-rain, #73c6ef);
+        min-height: 1em;
       }
       .comfort-row {
         display: table-row;

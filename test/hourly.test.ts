@@ -56,40 +56,43 @@ describe('the hours shown', () => {
   });
 });
 
-describe('the chart', () => {
+describe('the hourly view is columns, like the days above it', () => {
+  // A line chart came first. Columns read better for this: an hourly
+  // temperature is one number and the hours want reading one at a time, which
+  // is what a column does. It also keeps one visual language across the card.
   const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
 
-  it('needs at least two points to draw a line', () => {
-    expect(fn).toMatch(/forecast\.length < 2/);
-    expect(fn).toMatch(/points\.length < 2/);
+  it('draws a time, an icon and a temperature per hour', () => {
+    for (const cls of ['hourly-time', 'hourly-icon', 'hourly-temp']) {
+      expect(fn, `no ${cls}`).toContain(cls);
+    }
   });
 
-  it('gives a flat span room to breathe', () => {
-    // A still night would otherwise draw a straight line through the middle
-    // with no scale at all.
-    expect(fn).toMatch(/hi - lo < 2/);
+  it('uses the card\'s own icon resolution', () => {
+    // So the hours follow whichever icon pack is selected, rather than
+    // introducing a second set.
+    expect(fn).toContain('this._getIconUrl');
+    expect(fn).toContain('this._weatherIcon');
   });
 
-  it('marks where now falls', () => {
-    // Without it the chart does not say which end you are standing at.
-    expect(fn).toContain('nowX');
-    expect(fn).toContain('stroke-dasharray');
+  it('shows rainfall only where there is some', () => {
+    // A column of zeroes is noise.
+    expect(fn).toContain('anyRain');
+    expect(fn).toMatch(/p > 0/);
   });
 
-  it('keeps the colours of the daily chart', () => {
-    // Orange for temperature and blue for precipitation, so the two sections
-    // read as one card rather than two.
-    expect(fn).toContain('255,152,0');
-    expect(fn).toContain('115,198,239');
+  it('drops the rain row entirely when the whole span is dry', () => {
+    expect(fn).toMatch(/anyRain\s*\?[\s\S]*?: html``/);
   });
 
-  it('always labels both ends', () => {
-    // A short span would otherwise get one lonely label in the middle.
-    expect(fn).toMatch(/i === 0 \|\| i === n - 1/);
+  it('falls back rather than printing NaN', () => {
+    // Providers do occasionally send a null temperature for a single hour.
+    expect(fn).toMatch(/isFinite\(t\)/);
+    expect(fn).toContain("'---'");
   });
 
-  it('draws nothing rather than an empty frame', () => {
-    expect(fn).toMatch(/if \(!forecast \|\| forecast\.length < 2\) return html``;/);
+  it('draws nothing at all with no data', () => {
+    expect(fn).toMatch(/if \(!forecast \|\| forecast\.length === 0\) return html``;/);
   });
 });
 
@@ -128,20 +131,14 @@ describe('the two views share one section', () => {
   });
 
   it('scrolls sideways rather than squeezing every hour in', () => {
-    // Forty-eight hours across a phone is a line with no readable labels.
-    const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
-    expect(fn).toContain('MIN_HOUR_PX');
+    // Forty-eight columns across a phone would be unreadable; each keeps a
+    // minimum width and the strip slides instead.
     expect(card).toMatch(/\.hourly-scroll \{[^}]*overflow-x: auto/);
+    expect(card).toMatch(/\.hourly-col \{[^}]*min-width/);
   });
 
   it('contains the sideways scroll so it does not drag the dashboard', () => {
     expect(card).toMatch(/overscroll-behavior-x: contain/);
-  });
-
-  it('fills the card when there are few enough hours to fit', () => {
-    const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
-    expect(fn).toMatch(/min-width:100%/);
-    expect(fn).toMatch(/Math\.max\(100/);
   });
 
   it('has its settings with the forecast it belongs to', () => {
