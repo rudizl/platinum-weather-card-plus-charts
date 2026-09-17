@@ -159,7 +159,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
 
     // ── section_order: only valid section names ────────────────────────────
-    const validSections = ['warnings', 'overview', 'extended', 'slots', 'daily_forecast', 'charts'];
+    const validSections = ['warnings', 'overview', 'extended', 'slots', 'daily_forecast', 'hourly_forecast', 'charts'];
     if (config.section_order) {
       if (!Array.isArray(config.section_order)) {
         throw new Error('platinum-weather-card: section_order must be an array.');

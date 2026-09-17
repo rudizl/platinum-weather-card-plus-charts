@@ -115,3 +115,31 @@ describe('the section is wired in like any other', () => {
     expect(panel).toMatch(/includeDomains=\$\{\['weather'\]\}/);
   });
 });
+
+describe('the section list agrees with itself', () => {
+  // Adding a section means touching four places. setConfig rejects anything not
+  // on its allow-list, so forgetting that one turns the whole card into a
+  // config error the moment the section is used — which is what happened.
+  it('accepts every section the card can render', () => {
+    const allowed = /const validSections = \[([^\]]+)\]/.exec(card);
+    expect(allowed, 'no validSections list').not.toBeNull();
+    const names = Array.from(allowed![1].matchAll(/'(\w+)'/g)).map((m) => m[1]);
+    const rendered = Array.from(card.matchAll(/^\s+case '(\w+)':\n\s+sections\.push/gm))
+      .map((m) => m[1]);
+    expect(rendered.length).toBeGreaterThan(4);
+    for (const section of rendered) {
+      expect(names, `'${section}' renders but setConfig rejects it`).toContain(section);
+    }
+  });
+
+  it('offers every allowed section in the editor', () => {
+    const allowed = /const validSections = \[([^\]]+)\]/.exec(card)![1];
+    const names = Array.from(allowed.matchAll(/'(\w+)'/g)).map((m) => m[1]);
+    for (const section of names) {
+      // 'charts' has no row of its own — it is drawn with the daily forecast
+      if (section === 'charts') continue;
+      expect(editor, `'${section}' has no row in the editor`)
+        .toContain(`case '${section}':`);
+    }
+  });
+});
