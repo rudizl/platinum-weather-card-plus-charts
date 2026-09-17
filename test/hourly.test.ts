@@ -275,3 +275,32 @@ describe('the tabs do not trigger the card\'s own tap action', () => {
     expect(card).toMatch(/this\.addEventListener\('click'/);
   });
 });
+
+describe('units in the hourly columns come from the entity', () => {
+  // Issue #20 all over again, reintroduced in new code: the wind was labelled
+  // from the system unit system while the number came from the forecast
+  // entity. Met.no publishes km/h and a metric Home Assistant says m/s, so
+  // 12 km/h was displayed as '12 m/s' — three times the actual wind.
+  const fn = /_renderHourlyForecastSection\(\)[\s\S]*?\n  \}\n/.exec(card)![0];
+
+  it('reads the wind unit from the hourly entity', () => {
+    expect(fn).toMatch(/_entityUnit\(this\._config\?\.entity_hourly, 'wind_speed_unit'\)/);
+  });
+
+  it('falls back to the system only when the entity states nothing', () => {
+    // Removing the fallback would leave the figure bare for a provider that
+    // does not declare its units.
+    expect(fn).toMatch(/\?\? this\.getUOM\('wind_speed'\)/);
+  });
+
+  it('never takes a unit from the system while the value comes from elsewhere', () => {
+    // The general rule, stated as a rule: every getUOM in this renderer must be
+    // a fallback behind an _entityUnit, never the first choice.
+    const bare = Array.from(fn.matchAll(/this\.getUOM\('[\w]+'\)/g));
+    for (const m of bare) {
+      const before = fn.slice(Math.max(0, m.index! - 120), m.index!);
+      expect(before, `getUOM at ${m[0]} is not behind an entity lookup`)
+        .toMatch(/_entityUnit|\?\?\s*$/);
+    }
+  });
+});

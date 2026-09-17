@@ -1611,7 +1611,14 @@ export class PlatinumWeatherCard extends LitElement {
       if (showWind) {
         const ws = Number(f.wind_speed);
         if (isFinite(ws)) {
-          windBits.push(`${Math.round(ws)}${this.getUOM('wind_speed')}`);
+          // The unit comes from the entity the number came from, not from the
+          // system settings — the mistake behind #20, and the forecast entity
+          // is exactly where the two are most likely to disagree: Met.no
+          // publishes km/h while a metric system says m/s, so labelling from
+          // the system turns 12 km/h into '12 m/s'.
+          const unit = this._entityUnit(this._config?.entity_hourly, 'wind_speed_unit')
+            ?? this.getUOM('wind_speed');
+          windBits.push(`${Math.round(ws)}${unit}`);
         }
       }
 
