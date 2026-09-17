@@ -65,6 +65,13 @@ export class PlatinumWeatherCard extends LitElement {
   //  https://github/homeassistant/frontend/src/panels/lovelace/cards/hui-weather-forecast-card.ts
   @state() private _subscribed?: Promise<() => void>;
   @state() private _forecastEvent?: ForecastEvent;
+  // A second, independent subscription. The hourly section reads its own weather
+  // entity rather than a second forecast type from the same one: most people
+  // already have two providers, and one of them is often better at hours than
+  // the one they prefer for days. It also keeps this clear of the daily
+  // subscription entirely, which is the part that already works.
+  @state() private _hourlySubscribed?: Promise<() => void>;
+  @state() private _hourlyEvent?: ForecastEvent;
 
   // https://lit.dev/docs/components/properties/
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -251,6 +258,38 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
 
+  _unsubscribeHourly() {
+    if (this._hourlySubscribed) {
+      this._hourlySubscribed.then((unsub) => unsub());
+      this._hourlySubscribed = undefined;
+    }
+  }
+
+  async _subscribeHourly() {
+    this._unsubscribeHourly();
+    const entity = this._config?.entity_hourly;
+    if (!this.isConnected || !this.hass || !this._config || !entity) return;
+    if (this._config.show_section_hourly_forecast === false) return;
+    if (!this.hass.states[entity]) return;
+    this._hourlySubscribed = subscribeForecast(
+      this.hass, entity, 'hourly', (event) => { this._hourlyEvent = event; },
+    );
+  }
+
+  // The hours the section will draw, trimmed to the configured span. Unlike the
+  // daily forecast this counts from now rather than from a date, so entries
+  // already in the past are dropped first — a provider that updates hourly
+  // leaves the current hour in place for most of it.
+  get hourlyForecast(): ForecastAttribute[] | undefined {
+    const data = this._hourlyEvent?.forecast;
+    if (!data?.length) return undefined;
+    const hours = Number(this._config?.hourly_forecast_hours);
+    const span = isFinite(hours) && hours > 0 ? Math.min(hours, 48) : 12;
+    const cutoff = Date.now() - 3600000;
+    const upcoming = data.filter((f) => new Date(f.datetime).getTime() >= cutoff);
+    return (upcoming.length ? upcoming : data).slice(0, span);
+  }
+
   //tjl from bramkragten's weather-card
   // Stable bound references so removeEventListener can find them
   private _boundPointerDown = this._onPointerDown.bind(this);
@@ -261,6 +300,7 @@ export class PlatinumWeatherCard extends LitElement {
     super.connectedCallback();
     if (this.hasUpdated && this._config && this.hass) {
       this._subscribeForecastEvents();
+      this._subscribeHourly();
     }
     this.addEventListener('pointerdown', this._boundPointerDown);
     this.addEventListener('pointercancel', this._boundPointerCancel);
@@ -351,6 +391,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
     if (changedProps.has("_config") || !this._subscribed) {
       this._subscribeForecastEvents();
+      this._subscribeHourly();
     }
     // mark tappable slots so CSS can show a pointer cursor only where a tap will work
     this.renderRoot.querySelectorAll('li[data-slot]').forEach((el) => {
@@ -1514,6 +1555,98 @@ export class PlatinumWeatherCard extends LitElement {
     return rows;
   }
 
+  // Hourly forecast: a continuous line over time, which is the shape the data
+  // actually has. Twenty-four hours will not fit as columns the way five days
+  // do, and an hourly temperature is one number rather than a max and a min —
+  // so this is a chart first, with the hours labelled beneath it, rather than
+  // the daily section at a finer grain.
+  private _renderHourlyForecastSection(): TemplateResult {
+    if (this._config?.show_section_hourly_forecast === false) return html``;
+    const forecast = this.hourlyForecast;
+    if (!forecast || forecast.length < 2) return html``;
+
+    const points = forecast.map((f) => ({
+      t: new Date(f.datetime),
+      temp: Number(f.temperature),
+      precip: Number(f.precipitation ?? 0),
+      condition: String(f.condition ?? ''),
+    })).filter((p) => !isNaN(p.t.getTime()) && isFinite(p.temp));
+    if (points.length < 2) return html``;
+
+    const TEMP_H = 60;
+    const PRECIP_H = 26;
+    const totalH = TEMP_H + PRECIP_H;
+
+    const temps = points.map((p) => p.temp);
+    let lo = Math.min(...temps);
+    let hi = Math.max(...temps);
+    // A flat night would otherwise draw a line through the middle with no scale
+    // at all; give it a couple of degrees to breathe in.
+    if (hi - lo < 2) { const mid = (hi + lo) / 2; lo = mid - 1; hi = mid + 1; }
+    const pad = (hi - lo) * 0.18;
+    lo -= pad; hi += pad;
+    const ty = (v: number) => TEMP_H - ((v - lo) / (hi - lo)) * (TEMP_H - 14) - 7;
+
+    const n = points.length;
+    const cw = 100 / n;
+    const cx = (i: number) => (i + 0.5) * cw;
+
+    const line = points.map((p, i) => `${cx(i)},${ty(p.temp)}`).join(' ');
+    const maxPrecip = Math.max(...points.map((p) => p.precip), 0);
+
+    // Where now falls along the strip, so the chart says which end you are at.
+    const first = points[0].t.getTime();
+    const last = points[n - 1].t.getTime();
+    const nowFrac = last > first
+      ? (Date.now() - first) / (last - first) : 0;
+    const nowX = nowFrac >= 0 && nowFrac <= 1
+      ? cx(0) + nowFrac * (cx(n - 1) - cx(0)) : null;
+
+    const precipBars = maxPrecip > 0 ? points.map((p, i) => {
+      if (!(p.precip > 0)) return '';
+      const h = Math.max(1.5, (p.precip / maxPrecip) * (PRECIP_H - 4));
+      return `<rect x="${cx(i) - cw * 0.34}" y="${totalH - h}" width="${cw * 0.68}" height="${h}"`
+        + ` fill="rgba(115,198,239,0.55)"/>`;
+    }).join('') : '';
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${totalH}"`
+      + ` preserveAspectRatio="none" style="width:100%;height:${totalH}px;overflow:visible;">`
+      + `<line x1="0" y1="${TEMP_H}" x2="100" y2="${TEMP_H}" stroke="rgba(115,198,239,0.2)"`
+      + ` stroke-width="0.5" vector-effect="non-scaling-stroke"/>`
+      + precipBars
+      + `<polyline points="${line}" fill="none" stroke="rgba(255,152,0,0.9)" stroke-width="1.5"`
+      + ` vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`
+      + (nowX !== null
+        ? `<line x1="${nowX}" y1="0" x2="${nowX}" y2="${totalH}" stroke="var(--primary-text-color)"`
+          + ` stroke-width="1" stroke-dasharray="2,2" opacity="0.45" vector-effect="non-scaling-stroke"/>`
+        : '')
+      + `</svg>`;
+
+    // Label roughly every third hour, and always the ends, so a short span is
+    // not left with one lonely label in the middle.
+    const step = Math.max(1, Math.round(n / 6));
+    const labels = points.map((p, i) => {
+      const show = i === 0 || i === n - 1 || i % step === 0;
+      const hhmm = show
+        ? p.t.toLocaleTimeString(this.locale, { hour: '2-digit', minute: '2-digit' })
+        : '';
+      return html`<div class="hourly-label">${hhmm}</div>`;
+    });
+
+    const total = points.reduce((sum, p) => sum + (isFinite(p.precip) ? p.precip : 0), 0);
+    const summary = total > 0
+      ? html`<div class="hourly-total">${total.toFixed(1)}${this._precipUnit(undefined)}</div>`
+      : html``;
+
+    return html`
+      <div class="hourly-section">
+        <div class="hourly-chart">${unsafeHTML(svg)}</div>
+        <div class="hourly-labels" style="grid-template-columns: repeat(${n}, 1fr);">${labels}</div>
+        ${summary}
+      </div>
+    `;
+  }
+
   private _renderChartSection(): TemplateResult {
     if (this._config.show_section_charts === false) return html``;
     const showTemp   = this._config.option_show_temperature_chart === true;
@@ -1729,6 +1862,9 @@ export class PlatinumWeatherCard extends LitElement {
           case 'daily_forecast':
             sections.push(this._renderDailyForecastSection());
             sections.push(this._renderChartSection());
+            break;
+          case 'hourly_forecast':
+            sections.push(this._renderHourlyForecastSection());
             break;
         }
       });
@@ -4110,6 +4246,29 @@ export class PlatinumWeatherCard extends LitElement {
       }
       /* Its own row: .apparent-temp is a table-row, so anything placed inside it
          lines up beside the temperature rather than under it. */
+      .hourly-section {
+        padding: 0 12px 8px;
+      }
+      .hourly-chart {
+        position: relative;
+      }
+      .hourly-labels {
+        display: grid;
+        font-size: 0.7em;
+        opacity: 0.7;
+        margin-top: 2px;
+      }
+      .hourly-label {
+        text-align: center;
+        white-space: nowrap;
+        overflow: visible;
+      }
+      .hourly-total {
+        text-align: right;
+        font-size: 0.75em;
+        opacity: 0.75;
+        margin-top: 2px;
+      }
       .comfort-row {
         display: table-row;
         margin-left: auto;

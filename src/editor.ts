@@ -1253,6 +1253,29 @@ get _forecast_type(): string {
     `;
   }
 
+  private _sectionHourlyForecastEditor(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_hourly || ''}
+          .configValue=${'entity_hourly'} @value-changed=${this._valueChangedPicker}
+          .includeDomains=${['weather']}
+          name="entity_hourly" label=${this._t("entity_hourly")} allow-custom-entity>
+        </ha-entity-picker>
+      </div>
+      <div class="help-text">${this._t("entity_hourly_hint")}</div>
+      <div class="side-by-side">
+        <div>
+          <ha-input type="number" label=${this._t("hourly_forecast_hours")}
+            .value=${this._config?.hourly_forecast_hours ?? ''}
+            .configValue=${'hourly_forecast_hours'} @change=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("hourly_forecast_hours_hint")}</div>
+        </div>
+        <div></div>
+      </div>
+    `;
+  }
+
   private _sectionWarningsEditor(): TemplateResult {
     return html`
       <div class="side-by-side">
@@ -1975,6 +1998,8 @@ get _forecast_type(): string {
       case 'option_overview':
         subel.push(this._optionOverviewEditor());
         break;
+      case 'section_hourly_forecast':
+        return this._sectionHourlyForecastEditor();
       case 'section_warnings':
         subel.push(this._sectionWarningsEditor());
         break;
@@ -2063,6 +2088,25 @@ get _forecast_type(): string {
               <ha-icon-button class="up-icon" .value=${'warnings'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
               </ha-icon-button>
               <ha-icon-button class="edit-icon" .value=${'section_warnings'} .path=${mdiPencil} @click="${this._editSubmenu}">
+              </ha-icon-button>
+              <div class="no-icon"></div>
+            </div>
+          </div>
+        `;
+      case 'hourly_forecast':
+        return html`
+          <div class="section-flex edit-hourly-forecast-section">
+            <div class="section-label">
+              <span class=${this._config?.show_section_hourly_forecast !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_hourly_forecast'} @click=${this._toggleVisibility}></span>
+              <ha-icon class="section-icon" icon="mdi:chart-timeline-variant"></ha-icon>
+              <span class="section-title">${this._t("hourly_forecast_section")}</span>
+            </div>
+            <div>
+              <ha-icon-button class="down-icon" .value=${'hourly_forecast'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
+              </ha-icon-button>
+              <ha-icon-button class="up-icon" .value=${'hourly_forecast'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
+              </ha-icon-button>
+              <ha-icon-button class="edit-icon" .value=${'section_hourly_forecast'} .path=${mdiPencil} @click="${this._editSubmenu}">
               </ha-icon-button>
               <div class="no-icon"></div>
             </div>
