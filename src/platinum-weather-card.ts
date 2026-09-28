@@ -3693,14 +3693,31 @@ export class PlatinumWeatherCard extends LitElement {
       const rate = this.measuredRainRate;
 
       // A provider reporting rain, snow or a storm usually knows something the
-      // sensors cannot see — but not when they flatly contradict it. Full
-      // sunshine on the pyranometer and a dry gauge rule out a thunderstorm
-      // overhead, whatever the forecast area as a whole is doing: a provider
-      // covers a region, a station covers a garden.
+      // sensors cannot see — but not when they flatly contradict it. Two ways
+      // that can happen, and they are not the same.
       const cloud = this.measuredCloudFraction;
-      const contradicted = cloud !== null && cloud < 0.15
+
+      // One: full sunshine and a dry gauge rule out a thunderstorm overhead,
+      // whatever the forecast area as a whole is doing. A provider covers a
+      // region, a station covers a garden.
+      const sunlitAndDry = cloud !== null && cloud < 0.15
         && (rate === null || rate === 0);
-      if (contradicted && !isPlainSky) isPlainSky = true;
+
+      // Two: the provider says it is raining and the gauge says it is not. A
+      // pyranometer cannot see rain, so cloud has no bearing here — but a gauge
+      // measures precisely the claim being made, and under an overcast sky that
+      // is the only instrument that can settle it. Requiring clear sky as well
+      // meant the commonest disagreement of all went uncorrected: cloudy,
+      // provider claims rain, nothing falling.
+      //
+      // Snow, hail and storms are excluded: a tipping bucket reads snow poorly
+      // and cannot see lightning at all.
+      const claimsRain = /^(rainy|pouring|drizzle)/.test(adjusted);
+      const gaugeSaysDry = this._config?.entity_rain_rate !== undefined
+        && rate !== null && rate === 0;
+      const rainDenied = claimsRain && gaugeSaysDry;
+
+      if ((sunlitAndDry || rainDenied) && !isPlainSky) isPlainSky = true;
 
       if (isPlainSky && rate !== null && rate > 0) {
         // Same meteorological bands the slot uses, so icon and reading agree.

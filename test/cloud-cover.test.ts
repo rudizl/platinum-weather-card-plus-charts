@@ -536,42 +536,79 @@ describe('the elevation cut-off is separate for morning and evening', () => {
   });
 });
 
-describe('a clear measurement overrules a provider claiming a storm', () => {
-  // Weather Underground reported lightning-rainy while the pyranometer read
-  // 551 W/m² against a clear-sky expectation of 538, and the gauge was dry.
-  // A reading above the theoretical maximum rules out cloud in front of the
-  // sun, let alone a thunderstorm overhead.
+describe('the sensors can overrule a provider, in two different ways', () => {
   const card = readFileSync(join(__dirname, '..', 'src', 'platinum-weather-card.ts'), 'utf8');
 
-  it('treats a flat contradiction as grounds to correct anyway', () => {
-    const block = /(const|let) isPlainSky[\s\S]{0,900}?contradicted[\s\S]{0,200}?;/.exec(card);
-    expect(block, 'no contradiction check').not.toBeNull();
-    expect(block![0], 'the sky measurement is not consulted').toContain('measuredCloudFraction');
-    expect(block![0], 'the gauge is not consulted').toMatch(/rate === null \|\| rate === 0/);
+  describe('sunlit and dry beats a claimed storm', () => {
+    // Weather Underground reported lightning-rainy while the pyranometer read
+    // 551 W/m² against a clear-sky expectation of 538, and the gauge was dry.
+    // A reading above the theoretical maximum rules out cloud in front of the
+    // sun, let alone a thunderstorm overhead.
+    const rule = /const sunlitAndDry = [\s\S]{0,240}?;/.exec(card);
+
+    it('exists and consults both instruments', () => {
+      expect(rule, 'no sunlit-and-dry rule').not.toBeNull();
+      expect(rule![0]).toContain('cloud');
+      expect(rule![0]).toMatch(/rate === null \|\| rate === 0/);
+    });
+
+    it('sets a demanding threshold', () => {
+      // 15% is nearly cloudless. Looser, and the card would start second-
+      // guessing a provider that can see more than one garden.
+      const threshold = /cloud < (0\.\d+)/.exec(rule![0]);
+      expect(threshold).not.toBeNull();
+      expect(Number(threshold![1])).toBeLessThanOrEqual(0.2);
+    });
+
+    it('requires both, not either', () => {
+      expect(rule![0]).toContain('&&');
+    });
   });
 
-  it('requires both a clear sky and a dry gauge', () => {
-    // Either alone is not enough: a pyranometer can read high through thin
-    // cloud, and a dry gauge says nothing about a storm a mile away.
-    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card);
-    expect(block, 'no contradiction rule').not.toBeNull();
-    expect(block![0]).toContain('&&');
+  describe('a dry gauge beats a claimed rain, whatever the sky', () => {
+    // The commonest disagreement of all, and the first rule missed it: overcast
+    // at 55%, provider claiming rain, gauge reading 0.0 mm/h with 0.0 mm for the
+    // whole day. A pyranometer cannot see rain, so cloud has no bearing — but a
+    // gauge measures precisely the claim being made.
+    const rule = /const rainDenied = [\s\S]{0,200}?;/.exec(card);
+
+    it('exists', () => {
+      expect(rule, 'no rain-denied rule').not.toBeNull();
+    });
+
+    it('does not consult the cloud at all', () => {
+      const block = /const claimsRain = [\s\S]*?const rainDenied = [^;]*;/.exec(card)![0];
+      expect(block, 'cloud is being consulted for a claim it cannot judge')
+        .not.toContain('cloud');
+    });
+
+    it('applies to rain but not to snow, hail or storms', () => {
+      // A tipping bucket reads snow poorly and cannot see lightning at all.
+      const claims = /const claimsRain = (\/[^/]+\/)/.exec(card);
+      expect(claims, 'no rain-claim test').not.toBeNull();
+      // eslint-disable-next-line no-eval
+      const re = eval(claims![1]) as RegExp;
+      for (const wet of ['rainy-1-day', 'rainy-3', 'drizzle', 'pouring']) {
+        expect(re.test(wet), `${wet} should be judged by the gauge`).toBe(true);
+      }
+      for (const other of ['rain-and-snow-mix', 'rain-and-sleet-mix', 'snowy-1-day',
+                           'hail', 'thunderstorms', 'isolated-thunderstorms-day']) {
+        expect(re.test(other), `${other} should be left to the provider`).toBe(false);
+      }
+    });
+
+    it('needs a gauge to be configured before it decides anything', () => {
+      // Without one, rate is null and the provider must stand; treating "no
+      // gauge" as "no rain" would silently delete everyone else's rain icons.
+      const guard = /const gaugeSaysDry = [\s\S]{0,200}?;/.exec(card);
+      expect(guard, 'no gauge guard').not.toBeNull();
+      expect(guard![0]).toContain('entity_rain_rate');
+      expect(guard![0]).toMatch(/rate !== null && rate === 0/);
+    });
   });
 
-  it('sets a demanding threshold for it', () => {
-    // 15% is nearly cloudless. Anything looser and the card would start
-    // second-guessing a provider that can see more than one garden.
-    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card)![0];
-    const threshold = /cloud < (0\.\d+)/.exec(block);
-    expect(threshold, 'no cloud threshold').not.toBeNull();
-    expect(Number(threshold![1])).toBeLessThanOrEqual(0.2);
-  });
-
-  it('still leaves a provider alone when the sky is not clear', () => {
-    // Rain, snow and storms remain the provider's to report whenever the
-    // measurement does not actively disagree.
-    const block = /const contradicted = [\s\S]{0,200}?;/.exec(card)![0];
-    expect(block).toContain('cloud !== null');
+  it('either route opens the same correction', () => {
+    expect(card).toMatch(/\(sunlitAndDry \|\| rainDenied\) && !isPlainSky/);
   });
 });
 
