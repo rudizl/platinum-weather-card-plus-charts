@@ -2190,8 +2190,11 @@ export class PlatinumWeatherCard extends LitElement {
     // A press that starts on a tappable reading belongs to that reading, not to the
     // card: its click handler calls stopPropagation, but pointerdown has already
     // travelled, so without this the card's hold action would still fire.
-    const target = e.target as HTMLElement | null;
-    if (target?.closest('li.slot-tappable, .overview-tappable')) return;
+    // The listener is on the card's own element, so e.target has been retargeted to that
+    // element by the time it gets here, and closest() could never find the reading the
+    // press began on. composedPath() still starts at the real target, inside the card.
+    const target = (e.composedPath?.()[0] ?? e.target) as HTMLElement | null;
+    if (target?.closest?.('li.slot-tappable, .overview-tappable')) return;
     this._pHoldFired = false;
     clearTimeout(this._pHoldTimer);
     if (this.hass && this._config && hasAction(this._config?.hold_action)) {
