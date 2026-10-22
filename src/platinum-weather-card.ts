@@ -128,11 +128,11 @@ export class PlatinumWeatherCard extends LitElement {
   // What the card picker puts in a new card, and previews: a weather entity and the
   // sections that need nothing else, which is the overview, the slots, the days and
   // the charts. Home Assistant passes the entities no card on the dashboard uses
-  // yet, then all of them; with none to offer there is nothing to preview, and the
-  // card is left empty for the editor, as before.
-  public static getStubConfig(hass?: HomeAssistant, unused?: string[], all?: string[]): Record<string, unknown> {
+  // yet, then the ones that are already used; with none to offer there is nothing to
+  // preview, and the card is left empty for the editor, as before.
+  public static getStubConfig(hass?: HomeAssistant, unused?: string[], used?: string[]): Record<string, unknown> {
     const states = hass?.states ?? {};
-    const ids = Object.keys(states).length > 0 ? Object.keys(states) : (all ?? unused ?? []);
+    const ids = Object.keys(states).length > 0 ? Object.keys(states) : [...(unused ?? []), ...(used ?? [])];
     const weather = ids.filter((id) => id.startsWith('weather.'));
     const free = new Set(unused ?? []);
     // prefer one that can do days (the daily bit of supported_features): the strip and the charts are made of them

@@ -196,7 +196,7 @@ describe('the card picker, by entity', () => {
 });
 
 describe('the card picker', () => {
-  type Card = { getStubConfig: (hass?: unknown, unused?: string[], all?: string[]) => Record<string, unknown> };
+  type Card = { getStubConfig: (hass?: unknown, unused?: string[], used?: string[]) => Record<string, unknown> };
   const cls = () => customElements.get('platinum-weather-card-plus-charts') as unknown as Card;
 
   it('is offered a live preview', () => {
@@ -215,7 +215,8 @@ describe('the card picker', () => {
       'weather.shown': { state: 'cloudy', attributes: { supported_features: 3 } },
       'weather.free': { state: 'cloudy', attributes: { supported_features: 3 } },
     });
-    expect(cls().getStubConfig(hass, ['weather.free'], ['weather.shown', 'weather.free']).weather_entity).toBe('weather.free');
+    // Home Assistant's second argument is the entities no card uses yet, the third those already used
+    expect(cls().getStubConfig(hass, ['weather.free'], ['weather.shown']).weather_entity).toBe('weather.free');
   });
   it('still puts days before being unused', () => {
     const hass = makeHass({
@@ -225,7 +226,9 @@ describe('the card picker', () => {
     expect(cls().getStubConfig(hass, ['weather.hours_free']).weather_entity).toBe('weather.days');
   });
   it('takes the entity lists when hass has no states', () => {
-    expect(cls().getStubConfig(undefined, ['weather.free'], ['weather.shown', 'weather.free']).weather_entity).toBe('weather.free');
+    // both lists are candidates, the unused one first
+    expect(cls().getStubConfig(undefined, ['weather.free'], ['weather.shown']).weather_entity).toBe('weather.free');
+    expect(cls().getStubConfig(undefined, [], ['weather.shown']).weather_entity).toBe('weather.shown');
   });
   it('falls back to the first weather entity when none says it can do days', () => {
     const hass = makeHass({ 'weather.a': { state: 'cloudy' }, 'weather.b': { state: 'cloudy' } });
