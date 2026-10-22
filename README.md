@@ -840,7 +840,7 @@ The bands are the meteorological ones rather than wide safety margins. A sensor 
 
 The provider supplies a condition, and the card draws it — but two things can overrule that, and both are about the card being able to see something the provider only predicts.
 
-**The sun decides day or night.** Providers pick the day or night variant from their own forecast periods, and some switch to the night daypart in mid-afternoon: they report `clear-night` with the sun still 35° up, and the card would dutifully draw a moon. When a **sun entity** is configured, it decides: the icon is the day variant from the moment Home Assistant's sun entity says `above_horizon`, the same instant the sunrise and sunset slots count from. If the state is anything else, the card falls back to the elevation, taking the sun as up above −0.83°, the horizon Home Assistant uses. This is on by default (**Day/night icon from sun**); switch it off to take the provider's word.
+**The sun decides day or night.** Providers pick the day or night variant from their own forecast periods, and some switch to the night daypart in mid-afternoon: they report `clear-night` with the sun still 35° up, and the card would dutifully draw a moon. The **sun entity** decides — `sun.sun` unless you name another: the icon is the day variant from the moment Home Assistant's sun entity says `above_horizon`, the same instant the sunrise and sunset slots count from. If the state is anything else, the card falls back to the elevation, taking the sun as up above −0.83°, the horizon Home Assistant uses. This is on by default (**Day/night icon from sun**); switch it off to take the provider's word.
 
 **The measurement can correct the condition itself.** That one is off by default and is described under [Cloud cover from a pyranometer](#cloud-cover-from-a-pyranometer) — briefly, a pyranometer and a rain gauge can contradict a forecast written hours ago for a region rather than a garden.
 
@@ -1162,7 +1162,7 @@ double_tap_action:
 | `entity_wind_speed_kt` | String | none | Required for `wind_kt` |
 | `entity_wind_gust_kt` | String | none | Required for `wind_kt` |
 | `entity_visibility` | String | none | Required for `visibility` |
-| `entity_sun` | String | none | Required for `sun_next`, `sun_following` |
+| `entity_sun` | String | `sun.sun` | Required for `sun_next`, `sun_following`; also decides day or night for the icon. Left out, it is `sun.sun` |
 | `entity_moon` | String | none | Required for `moon` (HA Moon integration sensor) |
 | `custom1_value`–`custom4_value` | String | none | Entity for custom slot |
 | `custom1_icon`–`custom4_icon` | Icon | none | MDI icon for custom slot |

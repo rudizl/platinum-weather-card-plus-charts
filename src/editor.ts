@@ -923,7 +923,7 @@ get _forecast_type(): string {
 
     const entity_uv_index = entities.has("entity_uv_index") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_uv_index'} .value=${this._config?.entity_uv_index || ''} .includeDomains=${['sensor']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_uv_index'} .value=${this._config?.entity_uv_index || ''} .includeDomains=${['sensor', 'weather']}
           name="entity_uv_index" label=${this._t("entity_uv_index")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : '';
@@ -1161,7 +1161,7 @@ get _forecast_type(): string {
     return html`
       <div class="side-by-side">
         <div>
-          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_dew_point'} .value=${this._config?.entity_dew_point || ''} .includeDomains=${['sensor']}
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_dew_point'} .value=${this._config?.entity_dew_point || ''} .includeDomains=${['sensor', 'weather']}
             name="entity_dew_point" label=${this._t("entity_dew_point")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
           </ha-entity-picker>
         </div>

@@ -127,14 +127,22 @@ export class PlatinumWeatherCard extends LitElement {
 
   // What the card picker puts in a new card, and previews: a weather entity and the
   // sections that need nothing else, which is the overview, the slots, the days and
-  // the charts. Home Assistant passes its entities; with none to offer there is
-  // nothing to preview, and the card is left empty for the editor, as before.
-  public static getStubConfig(hass?: HomeAssistant, entities?: string[]): Record<string, unknown> {
+  // the charts. Home Assistant passes the entities no card on the dashboard uses
+  // yet, then all of them; with none to offer there is nothing to preview, and the
+  // card is left empty for the editor, as before.
+  public static getStubConfig(hass?: HomeAssistant, unused?: string[], all?: string[]): Record<string, unknown> {
     const states = hass?.states ?? {};
-    const ids = Object.keys(states).length > 0 ? Object.keys(states) : (entities ?? []);
+    const ids = Object.keys(states).length > 0 ? Object.keys(states) : (all ?? unused ?? []);
     const weather = ids.filter((id) => id.startsWith('weather.'));
+    const free = new Set(unused ?? []);
     // prefer one that can do days (the daily bit of supported_features): the strip and the charts are made of them
-    const entity = weather.find((id) => ((forecastFeatures(hass, id) ?? 0) & 1) === 1) ?? weather[0];
+    const days = (id: string) => ((forecastFeatures(hass, id) ?? 0) & 1) === 1;
+    // and, among those, one the dashboard does not show yet: a second card of the
+    // same forecast is rarely what someone adding a weather card has in mind
+    const entity = weather.find((id) => days(id) && free.has(id))
+      ?? weather.find(days)
+      ?? weather.find((id) => free.has(id))
+      ?? weather[0];
     if (!entity) return {};
     return weatherEntityCard(hass, entity);
   }
@@ -316,6 +324,14 @@ export class PlatinumWeatherCard extends LitElement {
           this._impliedKeys.add(k);
         }
       }
+    }
+
+    // sun.sun is the only sun entity Home Assistant has, so a card that names none
+    // means it. Every reader checks the entity exists, so where the sun
+    // integration is not loaded this behaves exactly as no entity_sun did.
+    if (!cfg.entity_sun) {
+      cfg.entity_sun = 'sun.sun';
+      this._impliedKeys.add('entity_sun');
     }
   }
 
