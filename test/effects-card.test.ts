@@ -16,7 +16,7 @@ afterEach(() => vi.useRealTimers());
 
 type St = { state: string; attributes?: Record<string, unknown> };
 type Card = HTMLElement & { hass: unknown; updateComplete: Promise<unknown> };
-interface Scene { condition?: string; rain?: string | null; solar?: string; sunState?: 'above_horizon' | 'below_horizon'; elevation?: number; wind?: string | null }
+interface Scene { condition?: string; rain?: string | null; solar?: string; sunState?: 'above_horizon' | 'below_horizon'; elevation?: number; wind?: string | null; km?: string | null }
 
 function states(s: Scene = {}): Record<string, St> {
   const st: Record<string, St> = {
@@ -26,6 +26,7 @@ function states(s: Scene = {}): Record<string, St> {
     'sun.sun': { state: s.sunState ?? 'above_horizon', attributes: { elevation: s.elevation ?? 30, azimuth: 150 } },
   };
   if (s.rain !== null) st['sensor.rain'] = { state: s.rain ?? '0.0' };
+  if (s.km !== null && s.km !== undefined) st['sensor.km'] = { state: s.km, attributes: { unit_of_measurement: 'km' } };
   if (s.wind !== null && s.wind !== undefined) st['sensor.wind'] = { state: s.wind, attributes: { unit_of_measurement: 'km/h' } };
   return st;
 }
@@ -33,6 +34,7 @@ const config = (extra: Record<string, unknown> = {}) => baseConfig({
   section_order: ['overview'], overview_layout: 'complete', entity_temperature: 'sensor.temp', entity_forecast_icon: 'sensor.condition',
   entity_sun: 'sun.sun', entity_solar_radiation: 'sensor.solar', entity_rain_rate: 'sensor.rain', entity_wind_speed: 'sensor.wind',
   option_cloud_overrides_icon: true, option_cloud_min_elevation_am: 10, option_cloud_min_elevation_pm: 25,
+  entity_lightning_distance: 'sensor.km',
   ...extra,
 } as never);
 async function mount(scene: Scene, extra: Record<string, unknown> = {}) {
@@ -191,6 +193,32 @@ describe('when the numbers change, the picture goes on', () => {
     const el = await mount({ condition: 'cloudy', wind: '10', solar: '40' }, { option_effects: 'full' });
     await swap(el, { condition: 'cloudy', wind: '30', solar: '90' });
     expect(all(el, '.fx-cloud').length).toBeGreaterThan(0);
+  });
+});
+
+describe('lightning seen by the detector', () => {
+  it('flashes behind the card when a storm is in range, under a clear sky too, in both settings', async () => {
+    for (const q of ['subtle', 'full']) {
+      expect(all(await mount({ condition: 'sunny', km: '22' }, { option_effects: q }), '.fx-flash'), q).toHaveLength(1);
+    }
+  });
+  it('and not when there is no storm, or none in range', async () => {
+    expect(all(await mount({ condition: 'sunny', km: null }, { option_effects: 'full' }), '.fx-flash')).toHaveLength(0);
+    expect(all(await mount({ condition: 'sunny', km: '80' }, { option_effects: 'full' }), '.fx-flash')).toHaveLength(0);
+    expect(all(await mount({ condition: 'sunny', km: 'unavailable' }, { option_effects: 'full' }), '.fx-flash')).toHaveLength(0);
+  });
+  it('the range is the one of the warning: option_lightning_max_distance', async () => {
+    expect(all(await mount({ condition: 'sunny', km: '22' }, { option_effects: 'full', option_lightning_max_distance: 20 }), '.fx-flash')).toHaveLength(0);
+    expect(all(await mount({ condition: 'sunny', km: '22' }, { option_effects: 'full', option_lightning_max_distance: 30 }), '.fx-flash')).toHaveLength(1);
+  });
+  it('is the same flash when the storm comes closer: faster, not made again', async () => {
+    stubAnimations();
+    const el = await mount({ condition: 'sunny', km: '40' }, { option_effects: 'full' });
+    const flash = all(el, '.fx-flash')[0];
+    const r0 = rate(flash);
+    await swap(el, { condition: 'sunny', km: '9' });
+    expect(all(el, '.fx-flash')[0]).toBe(flash);
+    expect(rate(flash)).toBeGreaterThan(r0);
   });
 });
 

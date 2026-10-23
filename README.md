@@ -765,6 +765,8 @@ The colour of the row follows the warning level — yellow, orange or red.
 
 A **lightning detector** can add a row of its own. Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row alongside any provider warning, coloured by how close it is: red within 15 km, amber to 30, yellow beyond. Add the bearing entity and the row says which way it lies. **Warn within** sets the range, 50 km by default.
 
+**Soft or classic.** The warning rows come in two styles, chosen in the editor under **Appearance** or by `option_warning_style`. The soft style, the default, takes the colour out of the background: the row is a stripe on the left, in the colour of the level, that fades out to the right, and the icon has the colour too. A storm far away is not given a row at all: beyond 30 km it is a small pill with the distance and the direction, which takes almost no room, and from 30 km in it is a bar, and from 15 km in a bolder one. The classic style is the flat bar of a fixed tint with a hard edge on its left, as the card had it before.
+
 This is deliberately part of the warnings section rather than a slot. An approaching storm is a warning in the same sense a rain alert is, and the section already appears and vanishes on its own, where a slot would sit empty most of the time — six weeks of readings at the station this was built against recorded no strikes at all. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
 
 ![Warnings section](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/warnings-section.png)
@@ -894,6 +896,7 @@ Behind the top part of the card, or the whole of it, the weather moves: clouds d
 - **It is light.** Nothing runs in JavaScript for each frame: every movement is a CSS animation of position or opacity, which the browser hands to the graphics card, and the pictures are small tiles drawn in the stylesheet. `subtle` has fewer clouds and one layer of rain and no flash of lightning; `full` has all of it.
 - **It is still when you ask for less motion.** Where the device is set to reduce motion, the sky is drawn but nothing in it moves.
 - **It stays out of the way.** It is hidden from screen readers, does not take clicks, and sits behind the text.
+- **Lightning flashes follow the detector.** If you have a **Lightning distance entity** and a storm is within range, the sky flashes, under any sky and in both settings: a faint flicker now and then for a storm 45 km away, brighter and more often as it comes closer. It is the same storm, and the same range, as in the warning row. A storm that only the provider reports flashes in the full setting.
 
 ## Daily Forecast Section
 
@@ -1081,6 +1084,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
 | `icon_pack` | String | `default` | Icon pack: `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, `custom` |
 | `option_effects` | String | `off` | The weather behind the card (experimental): `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Appearance |
+| `option_warning_style` | String | `soft` | The style of the warning rows: `soft` (a stripe that fades out, a small pill for a storm far away) or `classic` (the flat tinted bar) |
 | `option_effects_area` | String | `overview` | Where it is drawn: behind the top part of the card (`overview`) or behind the whole card (`card`) |
 | `icon_pack_path` | String | — | Path template for custom icon pack |
 

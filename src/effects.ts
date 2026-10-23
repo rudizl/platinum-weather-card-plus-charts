@@ -26,6 +26,8 @@ export interface EffectsInput {
   rainRateMmH: number | null;
   cloudFraction: number | null;
   beaufort: number | null;
+  // how far a storm is that a detector has seen, in range, or null: none, no detector, or too far to matter
+  lightningKm?: number | null;
   quality: EffectsQuality;
 }
 
@@ -40,6 +42,8 @@ export interface EffectPlan {
   fog: boolean;
   stars: boolean;
   flash: boolean;
+  flashPeak: number; // how bright, 0 to 1
+  flashSeconds: number; // how often: one flash in about this many
   glow: boolean;
 }
 
@@ -110,6 +114,17 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
   const base = { clear: 0.66, partly: 0.66, cloudy: 0.7, overcast: 0.65, storm: 0.62, fog: 0.35 }[look.sky];
   const cloudOpacity = round(measured ? 0.32 + 0.38 * clamp(i.cloudFraction as number, 0, 1) : base);
 
+  // Lightning: the provider's storm flashes in the full setting only, as it did. A storm that a detector
+  // has seen flashes under any sky and in both settings, as a distant storm does: the nearer, the
+  // brighter and the more often, and a long way off a faint flicker now and then. Both together are
+  // the stronger of the two.
+  const km = i.lightningKm ?? null;
+  const detected = km !== null && isFinite(km) && km >= 0;
+  const stormFlash = look.storm && full;
+  const flash = stormFlash || detected;
+  const detectorPeak = detected ? clamp(0.85 - (km as number) / 55, 0.2, 0.65) : 0;
+  const detectorSeconds = detected ? clamp(6 + (km as number) / 4, 7, 18) : Infinity;
+
   const clearish = look.sky === 'clear' || look.sky === 'partly';
   return {
     night: i.night,
@@ -121,7 +136,9 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
     snow,
     fog: look.fog,
     stars: i.night && clearish,
-    flash: look.storm && full,
+    flash,
+    flashPeak: flash ? round(Math.max(stormFlash ? 0.65 : 0, detectorPeak)) : 0,
+    flashSeconds: flash ? round(Math.min(stormFlash ? 9 : Infinity, detectorSeconds)) : 0,
     glow: !i.night && look.sky === 'clear',
   };
 }
@@ -142,6 +159,7 @@ const CLOUDS = [
 // element and it begins again, so everything jumps back to its start. Neither is seen this way.
 const BASE_DRIFT = 100; // seconds for a cloud to cross, at the pace of a light wind
 const BASE_FALL = 1; // seconds for one tile of rain to fall, at the pace of a moderate rain
+const BASE_FLASH = 10; // seconds from one flash to the next, at the pace of a storm that is not far
 
 // The layers, as a template. Lit changes only what differs from the last time, so a number that
 // moves (the sky is thicker, the wind has risen) is a property on an element that stays, and a
@@ -168,7 +186,7 @@ export function effectsTemplate(plan: EffectPlan, area: EffectsArea): TemplateRe
       <div class="fx-snow fx-snow-1" style="--op:${round(snow.opacity)};--fall:${round(snow.fallSeconds)}s"></div>
       ${snow.layers > 1 ? html`<div class="fx-snow fx-snow-2" style="--op:${round(snow.opacity * 0.6)};--fall:${round(snow.fallSeconds * 1.4)}s"></div>` : nothing}
     </div>` : nothing}
-    ${plan.flash ? html`<div class="fx-flash"></div>` : nothing}
+    ${plan.flash ? html`<div class="fx-flash" style="--flash-peak:${plan.flashPeak}"></div>` : nothing}
   </div>`;
 }
 
@@ -195,6 +213,7 @@ export function applyEffectRates(root: Element | null, plan: EffectPlan): void {
   };
   setRate('.fx-cloud', BASE_DRIFT / plan.driftSeconds);
   if (plan.rain) setRate('.fx-rain', BASE_FALL / plan.rain.fallSeconds);
+  if (plan.flash) setRate('.fx-flash', BASE_FLASH / plan.flashSeconds);
 }
 
 // For a page that draws the layer by itself, as the demo does: draw, then set the rates.
@@ -314,7 +333,7 @@ export const EFFECTS_CSS = `
 
 .fx-flash {
   inset: 0; opacity: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 14%, rgba(255, 255, 255, 0.85), rgba(210, 225, 255, 0) 75%);
+  background: radial-gradient(ellipse 70% 60% at 50% 14%, rgba(255, 255, 255, var(--flash-peak, 0.85)), rgba(210, 225, 255, 0) 75%);
 }
 
 @keyframes fx-drift {
@@ -339,9 +358,9 @@ export const EFFECTS_CSS = `
 }
 @keyframes fx-flash {
   0%, 91% { opacity: 0; }
-  92% { opacity: 0.85; }
-  93.5% { opacity: 0.12; }
-  95% { opacity: 0.6; }
+  92% { opacity: 1; }
+  93.5% { opacity: 0.14; }
+  95% { opacity: 0.7; }
   97.5% { opacity: 0; }
   100% { opacity: 0; }
 }
@@ -358,7 +377,7 @@ export const EFFECTS_CSS = `
   .fx-stars { animation: fx-twinkle 5s ease-in-out infinite alternate; }
   .fx-stars-2 { animation-duration: 7s; animation-delay: -2s; }
   .fx-glow { animation: fx-breathe 9s ease-in-out infinite alternate; }
-  .fx-flash { animation: fx-flash 9s linear infinite; }
+  .fx-flash { animation: fx-flash 10s linear infinite; }
   .fx-fog { animation: fx-fogdrift 70s linear infinite; will-change: transform; }
   .fx-fog-2 { animation-duration: 110s; animation-direction: reverse; }
 }

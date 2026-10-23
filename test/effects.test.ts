@@ -6,7 +6,7 @@ import { effectPlan, effectsHtml, EFFECTS_CSS, type EffectsInput } from '../src/
 // (so the picture and the effect cannot disagree) and from what the sensors measure, and
 // drawn by CSS alone. This file tests the decision, not the look.
 
-const base: EffectsInput = { iconName: 'clear-day', night: false, rainRateMmH: null, cloudFraction: null, beaufort: null, quality: 'full' };
+const base: EffectsInput = { iconName: 'clear-day', night: false, rainRateMmH: null, cloudFraction: null, beaufort: null, lightningKm: null, quality: 'full' };
 const plan = (over: Partial<EffectsInput>) => effectPlan({ ...base, ...over });
 
 describe('when there is nothing to draw', () => {
@@ -165,6 +165,68 @@ describe('storms', () => {
   });
   it('no flash for rain without a storm', () => {
     expect(plan({ iconName: 'rainy-3-day' })!.flash).toBe(false);
+  });
+});
+
+describe('lightning that a detector has seen', () => {
+  // The icon is the provider's word for a storm; the detector says one is there, and how far. It flashes
+  // on a clear sky too, because the storm is somewhere else.
+  it('flashes under any sky, when a storm is in range, in both settings', () => {
+    for (const quality of ['subtle', 'full'] as const) {
+      expect(plan({ iconName: 'clear-day', lightningKm: 22, quality })!.flash, quality).toBe(true);
+    }
+    expect(plan({ iconName: 'cloudy', lightningKm: 22, quality: 'subtle' })!.flash).toBe(true);
+    expect(plan({ iconName: 'clear-night', night: true, lightningKm: 30 })!.flash).toBe(true);
+  });
+  it('does not, when there is no storm, or no detector', () => {
+    expect(plan({ iconName: 'clear-day', lightningKm: null })!.flash).toBe(false);
+    expect(plan({ iconName: 'cloudy', lightningKm: null, quality: 'subtle' })!.flash).toBe(false);
+  });
+  it('is brighter and more often the closer it is, and no more than it is', () => {
+    const at = (km: number) => plan({ iconName: 'clear-day', lightningKm: km })!;
+    expect(at(8).flashPeak).toBeGreaterThan(at(22).flashPeak);
+    expect(at(22).flashPeak).toBeGreaterThan(at(45).flashPeak);
+    expect(at(8).flashSeconds).toBeLessThan(at(22).flashSeconds);
+    expect(at(22).flashSeconds).toBeLessThan(at(45).flashSeconds);
+    for (const km of [0, 8, 22, 45, 49, 200]) {
+      // never so bright that it bleaches white text for the moment it lasts
+      expect(at(km).flashPeak, `${km} km`).toBeLessThanOrEqual(0.65);
+      expect(at(km).flashPeak, `${km} km`).toBeGreaterThanOrEqual(0.2);
+      expect(at(km).flashSeconds, `${km} km`).toBeGreaterThanOrEqual(7);
+      expect(at(km).flashSeconds, `${km} km`).toBeLessThanOrEqual(18);
+    }
+  });
+  it('a distant storm is a faint, rare flicker: a long way off it hardly shows', () => {
+    const far = plan({ iconName: 'clear-day', lightningKm: 45 })!;
+    expect(far.flashPeak).toBeLessThan(0.35);
+    expect(far.flashSeconds).toBeGreaterThan(14);
+  });
+  it('and the provider\'s storm and the detector\'s together flash as the stronger of the two', () => {
+    const both = plan({ iconName: 'scattered-thunderstorms-day', lightningKm: 45 })!;
+    const only = plan({ iconName: 'scattered-thunderstorms-day' })!;
+    expect(both.flashPeak).toBe(only.flashPeak);
+    expect(both.flashSeconds).toBe(only.flashSeconds);
+  });
+  it('a storm in the icon alone: full only, as it was, and as bright as the closest detected one', () => {
+    const p = plan({ iconName: 'scattered-thunderstorms-day' })!;
+    expect(p.flash).toBe(true);
+    expect(p.flashPeak).toBe(0.65);
+    expect(p.flashSeconds).toBe(9);
+    expect(plan({ iconName: 'scattered-thunderstorms-day', quality: 'subtle' })!.flash).toBe(false);
+  });
+  it('is off when everything is, and a condition with no picture has none', () => {
+    expect(plan({ iconName: 'clear-day', lightningKm: 5, quality: 'off' })).toBeNull();
+    expect(plan({ iconName: 'unknown', lightningKm: 5 })).toBeNull();
+  });
+  it('the flash layer is there, with its strength as a property, and no stray numbers', () => {
+    const html = effectsHtml(plan({ iconName: 'clear-day', lightningKm: 22 })!, 'overview');
+    expect(html).toContain('fx-flash');
+    expect(html).toMatch(/--flash-peak:0\.\d+/);
+    expect(html).not.toMatch(/undefined|NaN|null/);
+  });
+  it('and it is one trip of ten seconds, whose speed is set on it, not its length', () => {
+    expect(EFFECTS_CSS).toMatch(/animation:\s*fx-flash\s+10s\s+linear\s+infinite/);
+    expect(EFFECTS_CSS).toMatch(/rgba\(255,\s*255,\s*255,\s*var\(--flash-peak/);
   });
 });
 

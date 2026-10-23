@@ -4027,6 +4027,7 @@ export class PlatinumWeatherCard extends LitElement {
       rainRateMmH: this._gaugeRateForIcon(),
       cloudFraction: this.measuredCloudFraction,
       beaufort: Number.isFinite(force) ? force : null,
+      lightningKm: this._lightningDistance(),
       quality,
     });
   }
