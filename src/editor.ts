@@ -607,6 +607,10 @@ get _forecast_type(): string {
     return v === 'subtle' || v === 'full' ? v : 'off';
   }
 
+  get _option_warning_style(): string {
+    return this._config?.option_warning_style === 'classic' ? 'classic' : 'soft';
+  }
+
   get _option_effects_area(): string {
     return this._config?.option_effects_area === 'card' ? 'card' : 'overview';
   }
@@ -2058,6 +2062,15 @@ get _forecast_type(): string {
       </div>
       <div class="side-by-side full-width">
         <div class="full-width"><div class="help-text">${this._t("effects_hint")}</div></div>
+      </div>
+      <div class="side-by-side">
+        <div class="full-width">
+          <label class="label">${this._t("warning_style")}</label>
+          <select class='ha-select-compat' .configValue=${'option_warning_style'} .value=${this._option_warning_style} @change=${this._valueChanged}>
+            <option value='soft'>${this._t("warning_style_soft")}</option>
+            <option value='classic'>${this._t("warning_style_classic")}</option>
+          </select>
+        </div>
       </div>
     `;
   }

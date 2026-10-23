@@ -152,6 +152,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_hourly_group?: boolean;
   option_effects?: 'off' | 'subtle' | 'full';
   option_effects_area?: 'overview' | 'card';
+  option_warning_style?: 'soft' | 'classic';
   entity_lightning_distance?: string;
   entity_lightning_azimuth?: string;
   option_lightning_max_distance?: number;

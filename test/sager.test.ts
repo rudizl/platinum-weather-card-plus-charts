@@ -716,16 +716,18 @@ describe('a nearby storm warns in the warnings section', () => {
   });
 
   it('ignores a storm beyond the configured distance', () => {
-    const fn = /_renderLightningWarning\(\)[\s\S]*?\n  \}/.exec(card)![0];
+    // the distance and the range are worked out in one place, which the bar and the effects both ask
+    const fn = /_lightningDistance\(\): number \| null \{[\s\S]*?\n  \}/.exec(card)![0];
     expect(fn).toContain('option_lightning_max_distance');
     expect(fn, 'no default for the threshold').toMatch(/threshold > 0 \? threshold : 50/);
   });
 
   it('says nothing at all without a distance entity', () => {
     // Most people have no detector, and the section must not appear for them.
-    const fn = /_renderLightningWarning\(\)[\s\S]*?\n  \}/.exec(card)![0];
-    expect(fn).toMatch(/if \(!distEntity\) return html``/);
+    const fn = /_lightningDistance\(\): number \| null \{[\s\S]*?\n  \}/.exec(card)![0];
+    expect(fn).toMatch(/if \(!distEntity\) return null/);
     expect(fn).toContain("'unavailable'");
+    expect(/_renderLightningWarning\(\)[\s\S]*?\n  \}/.exec(card)![0]).toMatch(/if \(distance === null\) return html``/);
   });
 
   it('adds the bearing only when there is one', () => {

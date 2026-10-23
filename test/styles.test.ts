@@ -44,6 +44,8 @@ const KNOWN_PREFIXES = [
   'error', 'warning', 'success', 'disabled', 'divider', 'app', 'text', 'state',
   'accent', 'dark', 'light', 'input', 'sidebar', 'table', 'code', 'energy',
   'history', 'markdown', 'rgb', 'shadow', 'pwcc', 'parentWidth',
+  // the colour of a warning's severity, set on the bar and read by its stripe, icon and fade
+  'sev',
 ];
 
 function knownPrefixViolations(css: string): string[] {

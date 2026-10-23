@@ -964,17 +964,30 @@ export class PlatinumWeatherCard extends LitElement {
   // MeteoAlarm row is, so it belongs in the same section rather than in a slot
   // that would sit empty almost always. The severity comes from the distance,
   // which is the only thing a strike detector can tell you about urgency.
-  private _renderLightningWarning(): TemplateResult {
-    const distEntity = this._config.entity_lightning_distance;
-    if (!distEntity) return html``;
-    const distState = this.hass.states[distEntity];
-    if (!distState || distState.state === 'unknown' || distState.state === 'unavailable') return html``;
+  // How far away the storm is, in the unit the sensor gives, or null: no sensor, no reading, or beyond
+  // the range (option_lightning_max_distance, fifty by default). The bar and the weather behind the
+  // card both ask here, so they speak of the same storm.
+  private _lightningDistance(): number | null {
+    const distEntity = this._config?.entity_lightning_distance;
+    if (!distEntity) return null;
+    const distState = this.hass?.states?.[distEntity];
+    if (!distState || distState.state === 'unknown' || distState.state === 'unavailable') return null;
     const distance = Number(distState.state);
-    if (!isFinite(distance)) return html``;
-
+    if (!isFinite(distance)) return null;
     const threshold = Number(this._config.option_lightning_max_distance);
     const limit = isFinite(threshold) && threshold > 0 ? threshold : 50;
-    if (distance > limit) return html``;
+    return distance > limit ? null : distance;
+  }
+
+  // soft (the default) or classic: a word it does not know is the default
+  private get _warningStyle(): 'soft' | 'classic' {
+    return this._config?.option_warning_style === 'classic' ? 'classic' : 'soft';
+  }
+
+  private _renderLightningWarning(): TemplateResult {
+    const distance = this._lightningDistance();
+    if (distance === null) return html``;
+    const distState = this.hass.states[this._config.entity_lightning_distance as string];
 
     // Red within fifteen kilometres — near enough that the next strike could be
     // overhead; amber to thirty; yellow beyond.
@@ -986,19 +999,38 @@ export class PlatinumWeatherCard extends LitElement {
       : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
 
     const unit = distState.attributes?.unit_of_measurement ?? 'km';
-    let headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)}${unit}`;
-
+    let direction = '';
     const bearingEntity = this._config.entity_lightning_azimuth;
     const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
     const bearing = bearingState ? Number(bearingState.state) : NaN;
     if (isFinite(bearing)) {
       const points = tWindDirections(this.locale);
-      headline += ` ${points[Math.round(((bearing % 360) + 360) % 360 / 22.5) % 16]}`;
+      direction = ` ${points[Math.round(((bearing % 360) + 360) % 360 / 22.5) % 16]}`;
     }
+    const headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)}${unit}${direction}`;
 
+    if (this._warningStyle === 'classic') {
+      return html`
+        <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});">
+          <ha-icon class="warning-icon" style="color: ${colour};" icon="mdi:flash"></ha-icon>
+          <div class="warning-text">${headline}</div>
+        </div>
+      `;
+    }
+    // Soft: quiet while the storm is far, louder as it comes. Beyond thirty kilometres there is nothing
+    // to do about it, and it takes a small pill and not a line of the card; from thirty in it is a
+    // bar, from fifteen in a bolder one. The colour is in the stylesheet, from --sev.
+    if (levelNum === '2') {
+      return html`
+        <div class="warning-pill" style="--sev: ${colour};" role="status" aria-label="${headline}" title="${headline}">
+          <ha-icon class="warning-icon" icon="mdi:flash"></ha-icon>
+          <span>${Math.round(distance)} ${unit}${direction}</span>
+        </div>
+      `;
+    }
     return html`
-      <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});">
-        <ha-icon class="warning-icon" style="color: ${colour};" icon="mdi:flash"></ha-icon>
+      <div class="${levelClass} soft" style="--sev: ${colour};">
+        <ha-icon class="warning-icon" icon="mdi:flash"></ha-icon>
         <div class="warning-text">${headline}</div>
       </div>
     `;
@@ -1052,6 +1084,15 @@ export class PlatinumWeatherCard extends LitElement {
       }
     }
 
+    if (this._warningStyle === 'soft') {
+      return html`
+        <div class="${levelClass} soft" style="--sev: ${colour};" title="${String(a.description ?? a.instruction ?? '')}">
+          <ha-icon class="warning-icon" icon="${icon}"></ha-icon>
+          <div class="warning-text">${headline}</div>
+          ${expiry ? html`<div class="warning-expiry">${expiry}</div>` : html``}
+        </div>
+      `;
+    }
     return html`
       <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});"
            title="${String(a.description ?? a.instruction ?? '')}">
@@ -4896,6 +4937,56 @@ export class PlatinumWeatherCard extends LitElement {
       .warning-icon {
         flex: 0 0 auto;
         --mdc-icon-size: 20px;
+      }
+      /* the soft style: the colour is the stripe and the icon, and it fades out to the right */
+      .warning-row.soft,
+      .warning-row.soft.level-orange,
+      .warning-row.soft.level-red {
+        position: relative;
+        overflow: hidden;
+        border-left: 0;
+        border-radius: 10px;
+        padding: 8px 12px 8px 14px;
+        background: linear-gradient(90deg,
+          color-mix(in srgb, var(--sev) 32%, transparent),
+          color-mix(in srgb, var(--sev) 7%, transparent) 65%,
+          transparent);
+      }
+      .warning-row.soft::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 7px;
+        bottom: 7px;
+        width: 3px;
+        border-radius: 3px;
+        background: var(--sev);
+      }
+      .warning-row.soft .warning-icon { color: var(--sev); }
+      .warning-row.soft.level-red {
+        padding: 10px 12px 10px 14px;
+        background: linear-gradient(90deg,
+          color-mix(in srgb, var(--sev) 44%, transparent),
+          color-mix(in srgb, var(--sev) 12%, transparent) 70%,
+          transparent);
+      }
+      .warning-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 0 4px;
+        padding: 4px 12px 4px 8px;
+        border-radius: 999px;
+        font-size: 0.9em;
+        background: color-mix(in srgb, var(--primary-text-color, #fff) 9%, transparent);
+        border: 1px solid color-mix(in srgb, var(--primary-text-color, #fff) 16%, transparent);
+        color: var(--secondary-text-color, var(--primary-text-color));
+      }
+      .warning-pill .warning-icon {
+        --mdc-icon-size: 16px;
+        color: var(--sev);
       }
       .warning-text {
         flex: 1 1 auto;
