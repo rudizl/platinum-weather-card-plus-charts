@@ -187,7 +187,7 @@ describe('the icon packs and the names the card can produce', () => {
   // card of anyone using Meteocons (22 October, 09:49).
   const CONDITIONS = ['sunny', 'clear-night', 'partlycloudy', 'cloudy', 'rainy', 'pouring', 'snowy', 'snowy-rainy', 'fog', 'hail', 'lightning', 'lightning-rainy', 'windy', 'windy-variant', 'exceptional'];
   const BANDS = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'].flatMap((b) => [`${b}-day`, `${b}-night`]);
-  const PACKS = ['default', 'meteocons-fill', 'meteocons-line', 'ha-official', 'wcc-2'];
+  const PACKS = ['default', 'photoreal', 'meteocons-fill', 'meteocons-line', 'ha-official', 'wcc-2'];
 
   it('every pack has a real icon for every name the card can produce', async () => {
     const lost: string[] = [];

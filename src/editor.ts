@@ -2005,6 +2005,7 @@ get _forecast_type(): string {
           <label class="label">${this._t("icon_pack")}</label>
           <select class='ha-select-compat' .configValue=${'icon_pack'} .value=${this._icon_pack} @change=${this._valueChanged}>
             <option value='default'>Default (built-in animated)</option>
+            <option value='photoreal'>Photorealistic (built-in, experimental)</option>
             <option value='meteocons-fill'>Meteocons — Fill (CDN, basmilius)</option>
             <option value='meteocons-line'>Meteocons — Line (CDN, basmilius)</option>
             <option value='ha-official'>Home Assistant official (CDN, scinos)</option>

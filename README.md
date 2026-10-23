@@ -863,6 +863,7 @@ The card supports multiple icon packs, selectable from the editor's **Appearance
 | Value | Description | Requirement |
 |---|---|---|
 | `default` | Built-in animated SVG icons (bundled with the card) | None |
+| `photoreal` | Photorealistic pictures: a real sun and moon, volumetric clouds, drops, snowflakes, hail, lightning (bundled with the card; experimental) | None |
 | `meteocons-fill` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — filled style | Internet (jsDelivr CDN) |
 | `meteocons-line` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — line style | Internet (jsDelivr CDN) |
 | `wcc-2` | [ammap Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
@@ -882,6 +883,8 @@ For `custom`, set `icon_pack_path` to a path template such as `/local/my-icons/{
 | [amCharts Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) (via `rudizl/weather-chart-card`, `wcc-2`) | amCharts / ammap.com | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — free including commercial use, attribution required |
 
 > **Note:** The card's **default built-in icons** are also based on amCharts weather icons, extended by [@makin-things](https://github.com/Makin-Things/weather-icons).
+
+**The `photoreal` pack.** The fifteen pictures were generated with Google's Gemini by the card's author and cut out of their backgrounds by hand; they are PNGs of 384 pixels with a transparent background, bundled with the card, 1.6 MB in all. The sun and the moon are single pictures, and partly cloudy is made of them and the set's cloud. They are experimental: their licence terms are to be reviewed and settled before the next stable release, and until then the pack is part of the pre-releases only. They do not change colour with the theme, and the white ones (hail, snowflakes) are easy to lose on a white card.
 
 ## Weather effects (experimental)
 
@@ -1071,7 +1074,7 @@ So a card with the precipitation chart on and the temperature chart off shows th
 
 | Option | Type | Description |
 | ------ | ---- | ----------- |
-| Icon Pack | String | `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, or `custom` |
+| Icon Pack | String | `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, or `custom` |
 | Icon Pack Path | String | Path template for `custom` icon pack (e.g. `/local/icons/{condition}.svg`) |
 | Show Static Icons | Boolean | Disable animated icons |
 | Time Format | String | `system` (follows HA Settings → Profile), `12hour`, or `24hour` |
@@ -1102,7 +1105,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `hold_action` | Action | none | Action on hold |
 | `double_tap_action` | Action | none | Action on double-tap |
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
-| `icon_pack` | String | `default` | Icon pack: `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, `custom` |
+| `icon_pack` | String | `default` | Icon pack: `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, `custom` |
 | `option_effects` | String | `off` | The weather behind the card (experimental): `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Appearance |
 | `option_warning_style` | String | `soft` | The style of the warning rows: `soft` (a stripe that fades out, a small pill for a storm far away) or `classic` (the flat tinted bar) |
 | `option_effects_area` | String | `overview` | Where it is drawn: behind the top part of the card (`overview`) or behind the whole card (`card`) |

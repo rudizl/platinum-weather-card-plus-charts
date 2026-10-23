@@ -4210,6 +4210,8 @@ export class PlatinumWeatherCard extends LitElement {
     const metName = this._iconToMeteocons(adjusted);
     if (pack === 'meteocons-fill') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/${metName}.svg`;
     if (pack === 'meteocons-line') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/${metName}.svg`;
+    // The photoreal pack is fifteen PNGs beside the card (p-<name>.png), the same names as the custom pack asks for
+    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + wccName + '.png';
     if (pack === 'custom' && this._config?.icon_pack_path)
       return this._config.icon_pack_path.replace('{condition}', wccName);
 
