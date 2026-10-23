@@ -122,16 +122,75 @@ describe('it draws what the card says the weather is', () => {
   });
 });
 
+// jsdom has no Web Animations: a stand-in with a rate to set, one animation for each element
+const animations = new WeakMap<Element, { playbackRate: number; animationName: string }[]>();
+function stubAnimations() {
+  (HTMLElement.prototype as unknown as { getAnimations: () => unknown }).getAnimations = function (this: Element) {
+    if (!animations.has(this)) animations.set(this, [{ playbackRate: 1, animationName: 'fx' }]);
+    return animations.get(this);
+  };
+}
+afterEach(() => { delete (HTMLElement.prototype as unknown as { getAnimations?: unknown }).getAnimations; });
+const rate = (e: Element | undefined) => (e ? animations.get(e)?.[0].playbackRate : undefined) ?? 1;
+
 describe('the wind moves the clouds', () => {
-  const drift = (el: HTMLElement) => parseInt(/--dur:(\d+)s/.exec(all(el, '.fx-cloud')[0]?.getAttribute('style') ?? '')?.[1] ?? '0', 10);
-  it('faster in a stronger wind', async () => {
+  it('faster in a stronger wind: the rate of the animation, not its length', async () => {
+    stubAnimations();
     const calm = await mount({ condition: 'cloudy', wind: '2', solar: '40' }, { option_effects: 'full' });
     const strong = await mount({ condition: 'cloudy', wind: '55', solar: '40' }, { option_effects: 'full' });
-    expect(drift(calm)).toBeGreaterThan(0);
-    expect(drift(strong)).toBeLessThan(drift(calm));
+    expect(rate(all(strong, '.fx-cloud')[0])).toBeGreaterThan(rate(all(calm, '.fx-cloud')[0]));
   });
   it('and at a pace of their own when the wind is not measured', async () => {
-    expect(drift(await mount({ condition: 'cloudy', wind: null, solar: '40' }, { option_effects: 'full' }))).toBeGreaterThan(0);
+    stubAnimations();
+    expect(rate(all(await mount({ condition: 'cloudy', wind: null, solar: '40' }, { option_effects: 'full' }), '.fx-cloud')[0])).toBeGreaterThan(0);
+  });
+});
+
+describe('when the numbers change, the picture goes on', () => {
+  // seen on the card, in a recording: at the moment a sensor changed (the feels-like went from 15.0 to
+  // 14.0) the clouds jumped to where they start. A change in any number the effect is made of replaced
+  // the whole layer, and every animation in it began again.
+  it('the clouds are the same elements after a sensor update, so nothing starts again', async () => {
+    const el = await mount({ condition: 'cloudy', wind: '10', solar: '40' }, { option_effects: 'full' });
+    const before = all(el, '.fx-cloud');
+    expect(before.length).toBeGreaterThan(0);
+    await swap(el, { condition: 'cloudy', wind: '30', solar: '90' });
+    const after = all(el, '.fx-cloud');
+    expect(after).toHaveLength(before.length);
+    after.forEach((c, i) => expect(c, `cloud ${i} was made again`).toBe(before[i]));
+  });
+  it('the wind changes how fast they go, and not how long a trip they make', async () => {
+    stubAnimations();
+    const el = await mount({ condition: 'cloudy', wind: '10', solar: '40' }, { option_effects: 'full' });
+    const dur = (e: Element) => /--dur:(\d+)s/.exec(e.getAttribute('style') ?? '')?.[1];
+    const first = all(el, '.fx-cloud')[0];
+    const d0 = dur(first); const r0 = rate(first);
+    await swap(el, { condition: 'cloudy', wind: '60', solar: '40' });
+    expect(all(el, '.fx-cloud')[0]).toBe(first);
+    expect(dur(first), 'the length of the trip changed').toBe(d0);
+    expect(rate(first), 'the rate did not').toBeGreaterThan(r0);
+  });
+  it('rain starting does not start the clouds again', async () => {
+    const el = await mount({ condition: 'rainy', rain: '0.0', solar: '40' }, { option_effects: 'full' });
+    const clouds = all(el, '.fx-cloud');
+    expect(all(el, '.fx-rain')).toHaveLength(0);
+    await swap(el, { condition: 'rainy', rain: '2.4', solar: '40' });
+    expect(all(el, '.fx-rain').length).toBeGreaterThan(0);
+    all(el, '.fx-cloud').slice(0, clouds.length).forEach((c, i) => expect(c, `cloud ${i} was made again`).toBe(clouds[i]));
+  });
+  it('and the rain, once it falls, goes on falling when it falls harder', async () => {
+    stubAnimations();
+    const el = await mount({ condition: 'rainy', rain: '1.2', solar: '40' }, { option_effects: 'full' });
+    const layer = all(el, '.fx-rain-1')[0];
+    const r0 = rate(layer);
+    await swap(el, { condition: 'rainy', rain: '9', solar: '40' });
+    expect(all(el, '.fx-rain-1')[0]).toBe(layer);
+    expect(rate(layer)).toBeGreaterThan(r0);
+  });
+  it('the card does not mind a browser that has no animations to give', async () => {
+    const el = await mount({ condition: 'cloudy', wind: '10', solar: '40' }, { option_effects: 'full' });
+    await swap(el, { condition: 'cloudy', wind: '30', solar: '90' });
+    expect(all(el, '.fx-cloud').length).toBeGreaterThan(0);
   });
 });
 

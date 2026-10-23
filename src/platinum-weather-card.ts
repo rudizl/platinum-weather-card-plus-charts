@@ -8,7 +8,7 @@ import { stringComputeStateDisplay } from './compute_state_display';
 //tjl add ifDefined in support of tap action
 import { ifDefined } from "lit/directives/if-defined";
 import { unsafeHTML } from "lit/directives/unsafe-html";
-import { effectPlan, effectsHtml, EFFECTS_CSS, EffectPlan, EffectsArea } from './effects';
+import { effectPlan, effectsTemplate, applyEffectRates, EFFECTS_CSS, EffectPlan, EffectsArea } from './effects';
 
 //tjl add HassFormatentity state formatting
 //  This is the new method for formatting state data to the user and includes localization from user's profile.
@@ -578,6 +578,8 @@ export class PlatinumWeatherCard extends LitElement {
     if (!this.hass || !this._config) {
       return;
     }
+    // the weather behind the card: its speeds are set on the animations already running
+    if (this._fxPlan) applyEffectRates(this.shadowRoot?.querySelector('.fx') ?? null, this._fxPlan);
     if (changedProps.has("_config") || !this._subscribed) {
       this._subscribeForecastEvents();
     }
@@ -3998,7 +4000,7 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   private _fxLayer(area: EffectsArea): TemplateResult {
-    return this._fxPlan && this._fxArea === area ? html`${unsafeHTML(effectsHtml(this._fxPlan, area))}` : html``;
+    return this._fxPlan && this._fxArea === area ? effectsTemplate(this._fxPlan, area) : html``;
   }
 
   // The name the card settles on for the icon: the provider's, then the sun's word on day

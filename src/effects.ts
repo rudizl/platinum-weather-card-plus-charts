@@ -1,6 +1,8 @@
 // The weather behind the overview: clouds that drift, rain that falls, snow, stars, fog and
 // the flash of a storm, drawn by CSS alone.
 //
+import { html, nothing, render, TemplateResult } from 'lit';
+
 // Three decisions are kept apart, so that each can be tested without a browser:
 //   effectPlan()   what there is to draw, from the name the card settled on for its icon
 //                  and from what the sensors measure
@@ -134,36 +136,71 @@ const CLOUDS = [
   { y: 36, w: 58, speed: 0.8, start: 34 },
 ];
 
+// The lengths of the trips are fixed, once and for all. What the wind and the rain change is how
+// fast the animation runs (its playbackRate, below), never how long it is: change the length of a
+// running CSS animation and it keeps its time but not its place, so everything jumps; change the
+// element and it begins again, so everything jumps back to its start. Neither is seen this way.
+const BASE_DRIFT = 100; // seconds for a cloud to cross, at the pace of a light wind
+const BASE_FALL = 1; // seconds for one tile of rain to fall, at the pace of a moderate rain
+
+// The layers, as a template. Lit changes only what differs from the last time, so a number that
+// moves (the sky is thicker, the wind has risen) is a property on an element that stays, and a
+// layer that comes or goes (the rain starts) does not touch the others.
+export function effectsTemplate(plan: EffectPlan, area: EffectsArea): TemplateResult {
+  const cloudOp = round(plan.cloudOpacity * (area === 'card' ? 0.85 : 1)); // over the whole card there is more text
+  const rain = plan.rain;
+  const snow = plan.snow;
+  return html`<div class="fx fx-${area}" aria-hidden="true" data-sky=${plan.sky} ?data-night=${plan.night}
+      style="--fx-cloud-op:${cloudOp}">
+    <div class="fx-sky"></div>
+    ${plan.glow ? html`<div class="fx-glow"></div>` : nothing}
+    ${plan.stars ? html`<div class="fx-stars"></div><div class="fx-stars fx-stars-2"></div>` : nothing}
+    ${CLOUDS.slice(0, plan.clouds).map((k) => {
+      const dur = round(BASE_DRIFT * k.speed, 0);
+      return html`<div class="fx-cloud" style="--y:${k.y}px;--w:${k.w}%;--dur:${dur}s;--delay:-${round(dur * k.start / 100, 0)}s;--x0:${k.start}%"></div>`;
+    })}
+    ${plan.fog ? html`<div class="fx-fog"></div><div class="fx-fog fx-fog-2"></div>` : nothing}
+    ${rain ? html`<div class="fx-rain-wrap" style="--fx-slant:${rain.slantDeg}deg">
+      <div class="fx-rain fx-rain-1" style="--op:${round(rain.opacity)};--fall:${BASE_FALL}s"></div>
+      ${rain.layers > 1 ? html`<div class="fx-rain fx-rain-2" style="--op:${round(rain.opacity * 0.65)};--fall:${round(BASE_FALL * 1.3)}s"></div>` : nothing}
+    </div>` : nothing}
+    ${snow ? html`<div class="fx-snow-wrap" style="--fx-sway:${snow.swayPx}px">
+      <div class="fx-snow fx-snow-1" style="--op:${round(snow.opacity)};--fall:${round(snow.fallSeconds)}s"></div>
+      ${snow.layers > 1 ? html`<div class="fx-snow fx-snow-2" style="--op:${round(snow.opacity * 0.6)};--fall:${round(snow.fallSeconds * 1.4)}s"></div>` : nothing}
+    </div>` : nothing}
+    ${plan.flash ? html`<div class="fx-flash"></div>` : nothing}
+  </div>`;
+}
+
+// Markup as a string, for a test or a page that has no use for a template.
 export function effectsHtml(plan: EffectPlan, area: EffectsArea): string {
-  const out: string[] = [];
-  const attrs = `class="fx fx-${area}" aria-hidden="true" data-sky="${plan.sky}"${plan.night ? ' data-night' : ''}`
-    // over the whole card there is more text for a cloud to lie behind: fainter
-    + ` style="--fx-cloud-op:${round(plan.cloudOpacity * (area === 'card' ? 0.85 : 1))}"`;
-  out.push(`<div ${attrs}>`);
-  out.push('<div class="fx-sky"></div>');
-  if (plan.glow) out.push('<div class="fx-glow"></div>');
-  if (plan.stars) out.push('<div class="fx-stars"></div><div class="fx-stars fx-stars-2"></div>');
-  for (let c = 0; c < plan.clouds; c++) {
-    const k = CLOUDS[c % CLOUDS.length];
-    const dur = round(plan.driftSeconds * k.speed, 0);
-    out.push(`<div class="fx-cloud" style="--y:${k.y}px;--w:${k.w}%;--dur:${dur}s;--delay:-${round(dur * k.start / 100, 0)}s;--x0:${k.start}%"></div>`);
-  }
-  if (plan.fog) out.push('<div class="fx-fog"></div><div class="fx-fog fx-fog-2"></div>');
-  if (plan.rain) {
-    const r = plan.rain;
-    const layers = [1, 2].slice(0, r.layers).map((n) =>
-      `<div class="fx-rain fx-rain-${n}" style="--op:${round(r.opacity * (n === 1 ? 1 : 0.65))};--fall:${round(r.fallSeconds * (n === 1 ? 1 : 1.3))}s"></div>`);
-    out.push(`<div class="fx-rain-wrap" style="--fx-slant:${r.slantDeg}deg">${layers.join('')}</div>`);
-  }
-  if (plan.snow) {
-    const s = plan.snow;
-    const layers = [1, 2].slice(0, s.layers).map((n) =>
-      `<div class="fx-snow fx-snow-${n}" style="--op:${round(s.opacity * (n === 1 ? 1 : 0.6))};--fall:${round(s.fallSeconds * (n === 1 ? 1 : 1.4))}s"></div>`);
-    out.push(`<div class="fx-snow-wrap" style="--fx-sway:${s.swayPx}px">${layers.join('')}</div>`);
-  }
-  if (plan.flash) out.push('<div class="fx-flash"></div>');
-  out.push('</div>');
-  return out.join('');
+  const box = document.createElement('div');
+  render(effectsTemplate(plan, area), box);
+  return box.innerHTML;
+}
+
+// How fast the layers run: the wind moves the clouds, the rain falls faster the harder it rains.
+// Set on the animations that are already running, so that they go on from where they are.
+export function applyEffectRates(root: Element | null, plan: EffectPlan): void {
+  if (!root) return;
+  const setRate = (selector: string, rate: number) => {
+    root.querySelectorAll(selector).forEach((el) => {
+      const get = (el as Element & { getAnimations?: () => { playbackRate: number; animationName?: string }[] }).getAnimations;
+      if (typeof get !== 'function') return; // no animations to speak of, or a browser that has none to give
+      for (const a of get.call(el)) {
+        // the animations, not the transitions of opacity that share the element
+        if (a.animationName !== undefined && a.playbackRate !== rate) a.playbackRate = rate;
+      }
+    });
+  };
+  setRate('.fx-cloud', BASE_DRIFT / plan.driftSeconds);
+  if (plan.rain) setRate('.fx-rain', BASE_FALL / plan.rain.fallSeconds);
+}
+
+// For a page that draws the layer by itself, as the demo does: draw, then set the rates.
+export function renderEffects(container: HTMLElement, plan: EffectPlan | null, area: EffectsArea): void {
+  render(plan ? effectsTemplate(plan, area) : nothing, container);
+  if (plan) applyEffectRates(container.querySelector('.fx'), plan);
 }
 
 // ── stylesheet ────────────────────────────────────────────────────────────
@@ -314,8 +351,9 @@ export const EFFECTS_CSS = `
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .fx-cloud { animation: fx-drift var(--dur) linear infinite; animation-delay: var(--delay); will-change: transform; }
-  .fx-rain, .fx-snow { animation: fx-fall var(--fall) linear infinite; will-change: transform; }
+  .fx-cloud { animation: fx-drift var(--dur) linear infinite; animation-delay: var(--delay); will-change: transform; transition: opacity 4s linear; }
+  .fx-rain, .fx-snow { animation: fx-fall var(--fall) linear infinite; will-change: transform; transition: opacity 2s linear; }
+  .fx-rain-wrap { transition: transform 3s ease-out; }
   .fx-snow-wrap { animation: fx-sway 4.5s ease-in-out infinite alternate; will-change: transform; }
   .fx-stars { animation: fx-twinkle 5s ease-in-out infinite alternate; }
   .fx-stars-2 { animation-duration: 7s; animation-delay: -2s; }
