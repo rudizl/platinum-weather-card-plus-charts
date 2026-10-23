@@ -4028,8 +4028,59 @@ export class PlatinumWeatherCard extends LitElement {
       cloudFraction: this.measuredCloudFraction,
       beaufort: Number.isFinite(force) ? force : null,
       lightningKm: this._lightningDistance(),
+      temperatureC: this._temperatureC,
+      visibilityKm: this._visibilityKm,
+      sunElevation: this._sunAttribute('elevation'),
+      sunMorning: (() => { const az = this._sunAttribute('azimuth'); return az === null ? null : az < 180; })(),
+      minutesSinceRain: this._minutesSinceRain(),
       quality,
     });
+  }
+
+  // The readings the effects work from, as numbers in the units the effects want. The card's own getters
+  // return text, in the language of the card, which is no use to arithmetic.
+  private _reading(entity: string | undefined, weatherAttribute: string, unitAttribute: string): { value: number; unit: string } | null {
+    if (!entity) return null;
+    const st = this.hass?.states?.[entity];
+    if (!st) return null;
+    const fromWeather = entity.match('^weather.') !== null;
+    const raw = fromWeather ? st.attributes?.[weatherAttribute] : (st.state === 'unknown' || st.state === 'unavailable' ? undefined : st.state);
+    const value = raw === undefined || raw === null || raw === '' ? NaN : Number(raw);
+    if (!isFinite(value)) return null;
+    return { value, unit: String(st.attributes?.[fromWeather ? unitAttribute : 'unit_of_measurement'] ?? '') };
+  }
+
+  private get _temperatureC(): number | null {
+    const r = this._reading(this._config?.entity_temperature, 'temperature', 'temperature_unit');
+    if (!r) return null;
+    const unit = r.unit || this.getUOM('temperature');
+    return /F/i.test(unit) ? (r.value - 32) * 5 / 9 : r.value;
+  }
+
+  private get _visibilityKm(): number | null {
+    const r = this._reading(this._config?.entity_visibility, 'visibility', 'visibility_unit');
+    if (!r) return null;
+    const unit = (r.unit || this.getUOM('length')).trim().toLowerCase();
+    if (unit.startsWith('mi')) return r.value * 1.609344;
+    if (unit === 'm') return r.value / 1000;
+    if (unit === 'ft') return r.value * 0.0003048;
+    return r.value;
+  }
+
+  // How long ago the gauge last read rain, in minutes: null when it rains now, when there is no gauge, or
+  // when it has not been seen to rain.
+  private _minutesSinceRain(): number | null {
+    const live = this.measuredRainRate;
+    if (live === null || live > 0) return null;
+    const last = (this.constructor as typeof PlatinumWeatherCard)._gaugeRain;
+    if (!last || last.entity !== this._config.entity_rain_rate) return null;
+    return (Date.now() - last.t) / 60000;
+  }
+
+  private _sunAttribute(name: 'elevation' | 'azimuth'): number | null {
+    const entity = this._config?.entity_sun;
+    const v = entity ? Number(this.hass?.states?.[entity]?.attributes?.[name]) : NaN;
+    return isFinite(v) ? v : null;
   }
 
   private get _fxArea(): EffectsArea {

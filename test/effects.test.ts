@@ -6,7 +6,7 @@ import { effectPlan, effectsHtml, EFFECTS_CSS, type EffectsInput } from '../src/
 // (so the picture and the effect cannot disagree) and from what the sensors measure, and
 // drawn by CSS alone. This file tests the decision, not the look.
 
-const base: EffectsInput = { iconName: 'clear-day', night: false, rainRateMmH: null, cloudFraction: null, beaufort: null, lightningKm: null, quality: 'full' };
+const base: EffectsInput = { iconName: 'clear-day', night: false, rainRateMmH: null, cloudFraction: null, beaufort: null, lightningKm: null, temperatureC: null, visibilityKm: null, sunElevation: null, sunMorning: null, minutesSinceRain: null, quality: 'full' };
 const plan = (over: Partial<EffectsInput>) => effectPlan({ ...base, ...over });
 
 describe('when there is nothing to draw', () => {
@@ -109,7 +109,8 @@ describe('rain', () => {
     const windy = plan({ iconName: 'rainy-2', beaufort: 7 })!.rain!.slantDeg;
     const storm = plan({ iconName: 'rainy-2', beaufort: 12 })!.rain!.slantDeg;
     expect(windy).toBeGreaterThan(calm);
-    expect(storm).toBeLessThanOrEqual(30);
+    expect(storm).toBeLessThanOrEqual(45);
+    expect(storm).toBeGreaterThan(windy);
   });
   it('sits under a sky of cloud, never a clear one', () => {
     const p = plan({ iconName: 'rainy-2-day' })!;
@@ -130,8 +131,8 @@ describe('snow, sleet and hail', () => {
     expect(p.snow!.fallSeconds).toBeGreaterThan(6);
     expect(p.snow!.swayPx).toBeGreaterThan(0);
   });
-  it('sways more in a wind', () => {
-    expect(plan({ iconName: 'snowy-3', beaufort: 8 })!.snow!.swayPx).toBeGreaterThan(plan({ iconName: 'snowy-3', beaufort: 0 })!.snow!.swayPx);
+  it('sways more in a wind, until it is a blizzard', () => {
+    expect(plan({ iconName: 'snowy-3', beaufort: 5 })!.snow!.swayPx).toBeGreaterThan(plan({ iconName: 'snowy-3', beaufort: 0 })!.snow!.swayPx);
   });
   it('sleet is snow with some rain in it, and rain and sleet is rain with some snow', () => {
     const a = plan({ iconName: 'snow-and-sleet-mix' })!;
@@ -141,8 +142,12 @@ describe('snow, sleet and hail', () => {
     expect(b.rain!.intensity).toBeGreaterThan(plan({ iconName: 'snow-and-sleet-mix' })!.rain!.intensity);
     expect(b.snow).not.toBeNull();
   });
-  it('hail is heavy rain', () => {
-    expect(plan({ iconName: 'hail' })!.rain!.intensity).toBeGreaterThan(0.7);
+  it('hail is pellets, with some rain among them', () => {
+    const p = plan({ iconName: 'hail' })!;
+    expect(p.hail).not.toBeNull();
+    expect(p.hail!.fallSeconds).toBeLessThan(2);
+    expect(p.rain).not.toBeNull();
+    expect(p.rain!.intensity).toBeLessThan(0.7);
   });
 });
 
@@ -227,6 +232,187 @@ describe('lightning that a detector has seen', () => {
   it('and it is one trip of ten seconds, whose speed is set on it, not its length', () => {
     expect(EFFECTS_CSS).toMatch(/animation:\s*fx-flash\s+10s\s+linear\s+infinite/);
     expect(EFFECTS_CSS).toMatch(/rgba\(255,\s*255,\s*255,\s*var\(--flash-peak/);
+  });
+});
+
+describe('a blizzard, which no provider has a word for: snow, and a wind', () => {
+  const snow = (over: Partial<EffectsInput>) => plan({ iconName: 'snowy-3', ...over })!;
+  it('is snow driven by a strong wind: from force six', () => {
+    expect(snow({ beaufort: 5 }).blizzard).toBe(false);
+    expect(snow({ beaufort: 6 }).blizzard).toBe(true);
+    expect(snow({ beaufort: 11 }).blizzard).toBe(true);
+    expect(snow({ beaufort: null }).blizzard).toBe(false);
+  });
+  it('and only snow: rain in a wind is not one, nor is sleet', () => {
+    expect(plan({ iconName: 'rainy-3-day', beaufort: 9 })!.blizzard).toBe(false);
+    expect(plan({ iconName: 'snow-and-sleet-mix', beaufort: 9 })!.blizzard).toBe(false);
+  });
+  it('flies almost sideways, faster and thicker, and does not sway', () => {
+    const calm = snow({ beaufort: 2 }).snow!;
+    const b = snow({ beaufort: 8 }).snow!;
+    expect(calm.slantDeg).toBe(0);
+    expect(b.slantDeg).toBeGreaterThanOrEqual(50);
+    expect(b.slantDeg).toBeLessThanOrEqual(72);
+    expect(b.fallSeconds).toBeLessThan(calm.fallSeconds);
+    expect(b.opacity).toBeGreaterThan(calm.opacity);
+    expect(b.swayPx).toBe(0);
+  });
+  it('slants more in a harder wind, and no more than that', () => {
+    expect(snow({ beaufort: 10 }).snow!.slantDeg).toBeGreaterThan(snow({ beaufort: 6 }).snow!.slantDeg);
+    expect(snow({ beaufort: 12 }).snow!.slantDeg).toBeLessThanOrEqual(72);
+  });
+  it('whites the sky out, the more the less one can see', () => {
+    const at = (km: number | null) => snow({ beaufort: 8, visibilityKm: km });
+    expect(at(0.3).fog).toBe(true);
+    expect(at(0.3).fogOpacity).toBeGreaterThan(at(2).fogOpacity);
+    expect(at(2).fogOpacity).toBeGreaterThan(at(8).fogOpacity);
+    expect(at(null).fogOpacity).toBeGreaterThan(0.3);
+    expect(snow({ beaufort: 2 }).fog).toBe(false);
+  });
+  it('and the clouds go over fast', () => {
+    expect(snow({ beaufort: 9 }).driftSeconds).toBeLessThanOrEqual(45);
+  });
+});
+
+describe('fog that is as thick as it is measured', () => {
+  const fog = (km: number | null) => plan({ iconName: 'fog-day', visibilityKm: km })!;
+  it('is thicker the less one can see, and thin where one can see far', () => {
+    expect(fog(0.2).fogOpacity).toBeGreaterThan(fog(1).fogOpacity);
+    expect(fog(1).fogOpacity).toBeGreaterThan(fog(3).fogOpacity);
+    expect(fog(3).fogOpacity).toBeGreaterThan(fog(9).fogOpacity);
+    expect(fog(9).fogOpacity).toBeGreaterThan(0);
+  });
+  it('is of a middling thickness where nothing measures it', () => {
+    expect(fog(null).fogOpacity).toBeGreaterThan(0.3);
+    expect(fog(null).fogOpacity).toBeLessThan(0.7);
+  });
+  it('is never so thick that it hides the card', () => {
+    expect(fog(0).fogOpacity).toBeLessThanOrEqual(0.9);
+  });
+  it('is sand-coloured for dust, and plain for the rest', () => {
+    expect(plan({ iconName: 'dust' })!.tint).toBe('dust');
+    for (const n of ['fog-day', 'haze-night', 'clear-day', 'rainy-2']) expect(plan({ iconName: n })!.tint, n).toBe('plain');
+  });
+});
+
+describe('ice: freezing rain and frost', () => {
+  it('rain at or below freezing is freezing rain', () => {
+    expect(plan({ iconName: 'rainy-3-day', temperatureC: 0 })!.freezing).toBe(true);
+    expect(plan({ iconName: 'rainy-1-day', temperatureC: -4 })!.freezing).toBe(true);
+    expect(plan({ iconName: 'rainy-3-day', temperatureC: 1 })!.freezing).toBe(false);
+    expect(plan({ iconName: 'rainy-3-day', temperatureC: null })!.freezing).toBe(false);
+  });
+  it('and nothing else is: snow and a clear sky have no freezing rain', () => {
+    expect(plan({ iconName: 'snowy-3', temperatureC: -5 })!.freezing).toBe(false);
+    expect(plan({ iconName: 'clear-day', temperatureC: -5 })!.freezing).toBe(false);
+  });
+  it('a clear sky at or below freezing has frost, day or night', () => {
+    expect(plan({ iconName: 'clear-day', temperatureC: -2 })!.frost).toBe(true);
+    expect(plan({ iconName: 'clear-night', night: true, temperatureC: 0 })!.frost).toBe(true);
+    expect(plan({ iconName: 'frost-night', night: true, temperatureC: -3 })!.frost).toBe(true);
+  });
+  it('and not above it, nor under cloud, nor without a temperature', () => {
+    expect(plan({ iconName: 'clear-day', temperatureC: 1 })!.frost).toBe(false);
+    expect(plan({ iconName: 'cloudy', temperatureC: -5 })!.frost).toBe(false);
+    expect(plan({ iconName: 'clear-day', temperatureC: null })!.frost).toBe(false);
+  });
+});
+
+describe('heat', () => {
+  it('a clear or half clear day from thirty-three degrees shimmers', () => {
+    expect(plan({ iconName: 'clear-day', temperatureC: 33 })!.heat).toBe(true);
+    expect(plan({ iconName: 'cloudy-1-day', temperatureC: 38 })!.heat).toBe(true);
+    expect(plan({ iconName: 'clear-day', temperatureC: 32.9 })!.heat).toBe(false);
+  });
+  it('not at night, not under cloud, not without a temperature', () => {
+    expect(plan({ iconName: 'clear-night', night: true, temperatureC: 36 })!.heat).toBe(false);
+    expect(plan({ iconName: 'cloudy', temperatureC: 36 })!.heat).toBe(false);
+    expect(plan({ iconName: 'clear-day', temperatureC: null })!.heat).toBe(false);
+  });
+});
+
+describe('golden hour', () => {
+  const g = (elev: number | null, over: Partial<EffectsInput> = {}) => plan({ iconName: 'clear-day', sunElevation: elev, ...over })!.golden;
+  it('is strongest with the sun just above the horizon, and gone high up or far below', () => {
+    expect(g(2)).toBeGreaterThan(g(7));
+    expect(g(2)).toBeGreaterThan(g(-3));
+    expect(g(2)).toBeLessThanOrEqual(1);
+    expect(g(25)).toBe(0);
+    expect(g(-10)).toBe(0);
+    expect(g(null)).toBe(0);
+  });
+  it('is weaker under cloud, and fainter still in rain and fog', () => {
+    expect(g(2, { iconName: 'cloudy' })).toBeLessThan(g(2));
+    expect(g(2, { iconName: 'rainy-3-day' })).toBeLessThan(g(2, { iconName: 'cloudy' }));
+    expect(g(2, { iconName: 'fog-day' })).toBeLessThan(g(2, { iconName: 'cloudy' }));
+  });
+  it('knows a morning from an evening', () => {
+    expect(plan({ iconName: 'clear-day', sunElevation: 2, sunMorning: true })!.goldenMorning).toBe(true);
+    expect(plan({ iconName: 'clear-day', sunElevation: 2, sunMorning: false })!.goldenMorning).toBe(false);
+  });
+  it('comes also with the sun a little under the horizon, at dawn and dusk, when the sky is lit', () => {
+    expect(plan({ iconName: 'clear-night', night: true, sunElevation: -2 })!.golden).toBeGreaterThan(0);
+  });
+});
+
+describe('a rainbow', () => {
+  const rb = (over: Partial<EffectsInput>) => plan({ iconName: 'cloudy-2-day', sunElevation: 20, minutesSinceRain: 4, ...over })!.rainbow;
+  // The card holds rain on its icon for fifteen minutes after the last tick of the gauge; a rainbow cannot
+  // sit behind a rain icon, so it has the time after that: from fifteen to forty minutes.
+  it('comes when the rain has stopped and the sun is out, and fades over forty minutes', () => {
+    expect(rb({})).toBeGreaterThan(0);
+    expect(rb({ minutesSinceRain: 1 })).toBeGreaterThan(rb({ minutesSinceRain: 10 }));
+    expect(rb({ minutesSinceRain: 10 })).toBeGreaterThan(rb({ minutesSinceRain: 19 }));
+    expect(rb({ minutesSinceRain: 39 })).toBeGreaterThan(0);
+    expect(rb({ minutesSinceRain: 41 })).toBe(0);
+  });
+  it('and never so strong that it is the first thing on the card', () => {
+    expect(rb({ minutesSinceRain: 0 })).toBeLessThanOrEqual(0.6);
+  });
+  it('not while it rains, nor if the rain was long ago, nor if it is not known', () => {
+    expect(rb({ minutesSinceRain: null })).toBe(0);
+    expect(plan({ iconName: 'rainy-3-day', sunElevation: 20, minutesSinceRain: 3 })!.rainbow).toBe(0);
+  });
+  it('only with the sun high enough to make one, and low enough', () => {
+    expect(rb({ sunElevation: 1 })).toBe(0);
+    expect(rb({ sunElevation: 60 })).toBe(0);
+    expect(rb({ sunElevation: null })).toBe(0);
+  });
+  it('only by day, and not under a sky that is all cloud', () => {
+    expect(rb({ night: true })).toBe(0);
+    expect(rb({ iconName: 'cloudy' })).toBe(0);
+    expect(rb({ iconName: 'clear-day' })).toBeGreaterThan(0);
+  });
+});
+
+describe('what the new layers say in the markup', () => {
+  const html = (iconName: string, over: Partial<EffectsInput> = {}) => effectsHtml(plan({ iconName, ...over })!, 'card');
+  it('each is there when it is wanted, and not when it is not', () => {
+    expect(html('hail')).toContain('fx-hail');
+    expect(html('rainy-3-day')).not.toContain('fx-hail');
+    expect(html('clear-day', { temperatureC: -3 })).toContain('fx-frost');
+    expect(html('clear-day', { temperatureC: 12 })).not.toContain('fx-frost');
+    expect(html('clear-day', { temperatureC: 36 })).toContain('fx-heat');
+    expect(html('clear-day', { sunElevation: 2 })).toContain('fx-golden');
+    expect(html('clear-day', { sunElevation: 30 })).not.toContain('fx-golden');
+    expect(html('cloudy-2-day', { sunElevation: 20, minutesSinceRain: 3 })).toContain('fx-rainbow');
+    expect(html('cloudy-2-day', { sunElevation: 20 })).not.toContain('fx-rainbow');
+  });
+  it('freezing rain and dust are said on the layer, for the stylesheet', () => {
+    expect(html('rainy-3-day', { temperatureC: -2 })).toContain('data-freezing');
+    expect(html('rainy-3-day', { temperatureC: 6 })).not.toContain('data-freezing');
+    expect(html('dust')).toContain('data-tint="dust"');
+  });
+  it('a blizzard has its snow slanted, and its whiteout, and no stray numbers', () => {
+    const h = html('snowy-3', { beaufort: 9, visibilityKm: 0.5 });
+    expect(h).toMatch(/--fx-snow-slant:\d+(\.\d+)?deg/);
+    expect(h).toContain('fx-fog');
+    expect(h).not.toMatch(/undefined|NaN|null/);
+  });
+  it('no new layer leaves a stray number in', () => {
+    for (const n of ['hail', 'clear-day', 'cloudy-2-day', 'snowy-3', 'rainy-3-day', 'dust', 'fog-day']) {
+      expect(html(n, { temperatureC: -3, visibilityKm: 1, sunElevation: 3, sunMorning: true, minutesSinceRain: 5, beaufort: 9 }), n).not.toMatch(/undefined|NaN|null/);
+    }
   });
 });
 

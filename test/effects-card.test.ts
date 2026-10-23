@@ -16,16 +16,18 @@ afterEach(() => vi.useRealTimers());
 
 type St = { state: string; attributes?: Record<string, unknown> };
 type Card = HTMLElement & { hass: unknown; updateComplete: Promise<unknown> };
-interface Scene { condition?: string; rain?: string | null; solar?: string; sunState?: 'above_horizon' | 'below_horizon'; elevation?: number; wind?: string | null; km?: string | null }
+interface Scene { condition?: string; rain?: string | null; solar?: string; sunState?: 'above_horizon' | 'below_horizon'; elevation?: number; wind?: string | null; km?: string | null;
+  temp?: string; tempUnit?: string; vis?: string | null; visUnit?: string; azimuth?: number }
 
 function states(s: Scene = {}): Record<string, St> {
   const st: Record<string, St> = {
     'sensor.condition': { state: s.condition ?? 'sunny' },
-    'sensor.temp': { state: '12', attributes: { unit_of_measurement: '°C' } },
+    'sensor.temp': { state: s.temp ?? '12', attributes: { unit_of_measurement: s.tempUnit ?? '°C' } },
     'sensor.solar': { state: s.solar ?? '300' },
-    'sun.sun': { state: s.sunState ?? 'above_horizon', attributes: { elevation: s.elevation ?? 30, azimuth: 150 } },
+    'sun.sun': { state: s.sunState ?? 'above_horizon', attributes: { elevation: s.elevation ?? 30, azimuth: s.azimuth ?? 150 } },
   };
   if (s.rain !== null) st['sensor.rain'] = { state: s.rain ?? '0.0' };
+  if (s.vis !== null && s.vis !== undefined) st['sensor.vis'] = { state: s.vis, attributes: { unit_of_measurement: s.visUnit ?? 'km' } };
   if (s.km !== null && s.km !== undefined) st['sensor.km'] = { state: s.km, attributes: { unit_of_measurement: 'km' } };
   if (s.wind !== null && s.wind !== undefined) st['sensor.wind'] = { state: s.wind, attributes: { unit_of_measurement: 'km/h' } };
   return st;
@@ -34,7 +36,7 @@ const config = (extra: Record<string, unknown> = {}) => baseConfig({
   section_order: ['overview'], overview_layout: 'complete', entity_temperature: 'sensor.temp', entity_forecast_icon: 'sensor.condition',
   entity_sun: 'sun.sun', entity_solar_radiation: 'sensor.solar', entity_rain_rate: 'sensor.rain', entity_wind_speed: 'sensor.wind',
   option_cloud_overrides_icon: true, option_cloud_min_elevation_am: 10, option_cloud_min_elevation_pm: 25,
-  entity_lightning_distance: 'sensor.km',
+  entity_lightning_distance: 'sensor.km', entity_visibility: 'sensor.vis',
   ...extra,
 } as never);
 async function mount(scene: Scene, extra: Record<string, unknown> = {}) {
@@ -219,6 +221,98 @@ describe('lightning seen by the detector', () => {
     await swap(el, { condition: 'sunny', km: '9' });
     expect(all(el, '.fx-flash')[0]).toBe(flash);
     expect(rate(flash)).toBeGreaterThan(r0);
+  });
+});
+
+describe('the weather that the card works out from what it measures', () => {
+  const root = (el: HTMLElement) => el.shadowRoot?.querySelector('.fx') ?? null;
+  const slant = (el: HTMLElement) => parseFloat(/--fx-snow-slant:([\d.]+)deg/.exec(el.shadowRoot?.querySelector('.fx-snow-rot')?.getAttribute('style') ?? '')?.[1] ?? '-1');
+  const fogOp = (el: HTMLElement) => parseFloat(/--fog-op:([\d.]+)/.exec(el.shadowRoot?.querySelector('.fx-fog')?.getAttribute('style') ?? '')?.[1] ?? '-1');
+
+  it('a blizzard: snow and a strong wind, the snow flying, the sky white', async () => {
+    const calm = await mount({ condition: 'snowy', wind: '10' }, { option_effects: 'full' });
+    expect(slant(calm)).toBe(0);
+    expect(all(calm, '.fx-fog')).toHaveLength(0);
+    const blow = await mount({ condition: 'snowy', wind: '60', vis: '0.4' }, { option_effects: 'full' });
+    expect(slant(blow)).toBeGreaterThanOrEqual(50);
+    expect(all(blow, '.fx-fog').length).toBeGreaterThan(0);
+  });
+  it('and the less one can see, the whiter', async () => {
+    const dense = await mount({ condition: 'snowy', wind: '60', vis: '0.2' }, { option_effects: 'full' });
+    const thin = await mount({ condition: 'snowy', wind: '60', vis: '6' }, { option_effects: 'full' });
+    expect(fogOp(dense)).toBeGreaterThan(fogOp(thin));
+  });
+  it('fog is as thick as the visibility says, in kilometres or miles', async () => {
+    const thick = await mount({ condition: 'fog', vis: '0.3' }, { option_effects: 'full' });
+    const thin = await mount({ condition: 'fog', vis: '8' }, { option_effects: 'full' });
+    expect(fogOp(thick)).toBeGreaterThan(fogOp(thin));
+    // 0.2 miles is 320 metres: as thick as 0.3 km
+    const miles = await mount({ condition: 'fog', vis: '0.2', visUnit: 'mi' }, { option_effects: 'full' });
+    expect(fogOp(miles)).toBe(fogOp(thick));
+  });
+  it('fog that nothing measures is of a middling thickness', async () => {
+    const el = await mount({ condition: 'fog', vis: null }, { option_effects: 'full' });
+    expect(fogOp(el)).toBeGreaterThan(0.3);
+    expect(fogOp(el)).toBeLessThan(0.7);
+  });
+  it('freezing rain: rain, and a temperature at or below freezing, in degrees Celsius or Fahrenheit', async () => {
+    expect(root(await mount({ condition: 'rainy', rain: '1.2', temp: '-2' }, { option_effects: 'full' }))?.hasAttribute('data-freezing')).toBe(true);
+    expect(root(await mount({ condition: 'rainy', rain: '1.2', temp: '5' }, { option_effects: 'full' }))?.hasAttribute('data-freezing')).toBe(false);
+    expect(root(await mount({ condition: 'rainy', rain: '1.2', temp: '28', tempUnit: '°F' }, { option_effects: 'full' }))?.hasAttribute('data-freezing')).toBe(true);
+    expect(root(await mount({ condition: 'rainy', rain: '1.2', temp: '41', tempUnit: '°F' }, { option_effects: 'full' }))?.hasAttribute('data-freezing')).toBe(false);
+  });
+  it('frost: a clear sky and a freezing temperature', async () => {
+    expect(all(await mount({ condition: 'sunny', temp: '-3' }, { option_effects: 'full' }), '.fx-frost')).toHaveLength(1);
+    expect(all(await mount({ condition: 'sunny', temp: '12' }, { option_effects: 'full' }), '.fx-frost')).toHaveLength(0);
+  });
+  it('heat: a clear day of thirty-three degrees or more, in either unit', async () => {
+    expect(all(await mount({ condition: 'sunny', temp: '36' }, { option_effects: 'full' }), '.fx-heat')).toHaveLength(1);
+    expect(all(await mount({ condition: 'sunny', temp: '95', tempUnit: '°F' }, { option_effects: 'full' }), '.fx-heat')).toHaveLength(1);
+    expect(all(await mount({ condition: 'sunny', temp: '90', tempUnit: '°F' }, { option_effects: 'full' }), '.fx-heat')).toHaveLength(0);
+  });
+  it('the golden hour: the sun just over the horizon, rose in the morning and gold in the evening', async () => {
+    const morning = await mount({ condition: 'sunny', elevation: 2, azimuth: 100, solar: '100' }, { option_effects: 'full' });
+    expect(all(morning, '.fx-golden')).toHaveLength(1);
+    expect(all(morning, '.fx-golden[data-morning]')).toHaveLength(1);
+    const evening = await mount({ condition: 'sunny', elevation: 2, azimuth: 250, solar: '100' }, { option_effects: 'full' });
+    expect(all(evening, '.fx-golden')).toHaveLength(1);
+    expect(all(evening, '.fx-golden[data-morning]')).toHaveLength(0);
+    expect(all(await mount({ condition: 'sunny', elevation: 35 }, { option_effects: 'full' }), '.fx-golden')).toHaveLength(0);
+  });
+});
+
+describe('a rainbow, after the rain', () => {
+  const minutes = (n: number) => n * 60000;
+  const T0 = new Date('2026-10-19T08:00:00Z').getTime();
+  const sunny = { condition: 'partlycloudy', elevation: 22, solar: '300' };
+  // as on a card that has a gauge and a pyranometer: the corrections on, and with them the fifteen minutes
+  const cfg = { option_effects: 'full', option_cloud_overrides_icon: true };
+  it('comes when the gauge has been quiet for a while and the sun is out, and goes', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(T0);
+    const el = await mount({ ...sunny, rain: '2.4' }, cfg);
+    expect(all(el, '.fx-rainbow'), 'while it rains').toHaveLength(0);
+    vi.setSystemTime(T0 + minutes(8));
+    await swap(el, { ...sunny, rain: '0.0' });
+    expect(all(el, '.fx-rainbow'), 'the icon still holds the rain').toHaveLength(0);
+    vi.setSystemTime(T0 + minutes(20));
+    await swap(el, { ...sunny, rain: '0.0' });
+    expect(all(el, '.fx-rainbow'), 'twenty minutes after').toHaveLength(1);
+    vi.setSystemTime(T0 + minutes(50));
+    await swap(el, { ...sunny, rain: '0.0' });
+    expect(all(el, '.fx-rainbow'), 'long after').toHaveLength(0);
+  });
+  it('not for a card that has never seen the gauge read rain, nor one with no gauge', async () => {
+    expect(all(await mount({ ...sunny, rain: '0.0' }, cfg), '.fx-rainbow')).toHaveLength(0);
+    expect(all(await mount({ ...sunny, rain: null }, { ...cfg, entity_rain_rate: undefined }), '.fx-rainbow')).toHaveLength(0);
+  });
+  it('and not at night, nor with the sun too high', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(T0);
+    const high = await mount({ ...sunny, rain: '2.4', elevation: 60 }, cfg);
+    vi.setSystemTime(T0 + minutes(20));
+    await swap(high, { ...sunny, rain: '0.0', elevation: 60 });
+    expect(all(high, '.fx-rainbow')).toHaveLength(0);
   });
 });
 
