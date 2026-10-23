@@ -230,6 +230,52 @@ describe('the look of the edges', () => {
   });
 });
 
+describe('clouds that suit a card of any height and any theme', () => {
+  // seen on a whole card: sized by the card's height they became two huge blurred blobs, and white
+  // ones, behind white text
+  it('are sized by their width, not by the height of what they sit in', () => {
+    const cloud = /\.fx-cloud\s*\{([^}]*)\}/.exec(EFFECTS_CSS)![1];
+    expect(cloud).toMatch(/aspect-ratio:/);
+    expect(cloud).not.toMatch(/height:\s*\d+%/);
+  });
+  it('sit in the sky: a distance from the top in pixels, so a tall card does not spread them down it', () => {
+    const html = effectsHtml(plan({ iconName: 'cloudy' })!, 'card');
+    const ys = [...html.matchAll(/--y:(\d+)(\w+)/g)];
+    expect(ys.length).toBeGreaterThan(0);
+    for (const m of ys) { expect(m[2]).toBe('px'); expect(+m[1]).toBeLessThan(120); }
+  });
+  it('take their colour from the card\'s own theme, so they sit under its text and not against it', () => {
+    expect(EFFECTS_CSS).toMatch(/--fx-cloud:[^;]*color-mix\([^;]*var\(--fx-ink/);
+    expect(EFFECTS_CSS).toMatch(/--fx-ink:\s*var\(--primary-text-color/);
+    expect(EFFECTS_CSS).toMatch(/--fx-bg:\s*var\(--ha-card-background/);
+    // never a plain white
+    expect(EFFECTS_CSS).not.toMatch(/--fx-cloud:\s*rgba\(\s*255,\s*255,\s*255/);
+  });
+  it('are fainter over the whole card than behind the top part, where there is more text over them', () => {
+    const op = (area: 'overview' | 'card') => +(/--fx-cloud-op:([\d.]+)/.exec(effectsHtml(plan({ iconName: 'cloudy' })!, area))![1]);
+    expect(op('card')).toBeLessThan(op('overview'));
+  });
+  it('are never so thick that they cover what they sit behind', () => {
+    for (const n of ['cloudy', 'cloudy-3-day', 'rainy-3-day', 'scattered-thunderstorms-day']) {
+      expect(plan({ iconName: n, cloudFraction: 1 })!.cloudOpacity, n).toBeLessThanOrEqual(0.7);
+    }
+  });
+});
+
+describe('rain and snow on a light card as well as a dark one', () => {
+  const tile = (name: string) => decodeURIComponent(new RegExp(`--fx-${name}:\\s*url\\("data:image/svg\\+xml,([^"]+)"\\)`).exec(EFFECTS_CSS)![1]);
+  it('rain is a mid blue, which shows on both, not a pale one that vanishes on white', () => {
+    for (const n of ['rain-1', 'rain-2']) {
+      const colours = [...tile(n).matchAll(/stroke="rgb\((\d+),(\d+),(\d+)\)"/g)];
+      expect(colours.length, n).toBeGreaterThan(0);
+      for (const c of colours) expect(+c[1], `${n}: red channel`).toBeLessThanOrEqual(190);
+    }
+  });
+  it('snow has an outline, so that a white flake shows on a light card', () => {
+    for (const n of ['snow-1', 'snow-2']) expect(tile(n), n).toMatch(/stroke="rgb\(\d+,\d+,\d+\)"/);
+  });
+});
+
 describe('the stylesheet', () => {
   it('moves nothing when the reader asks for less motion: every animation sits inside a no-preference query', () => {
     const outside = EFFECTS_CSS.replace(/@media \(prefers-reduced-motion: no-preference\)\s*\{([\s\S]*?)\n\}\n?/g, '');

@@ -105,8 +105,8 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
     : null;
 
   const measured = i.cloudFraction !== null && ['clear', 'partly', 'cloudy', 'overcast'].includes(look.sky);
-  const base = { clear: 0.6, partly: 0.6, cloudy: 0.7, overcast: 0.75, storm: 0.9, fog: 0.3 }[look.sky];
-  const cloudOpacity = round(measured ? 0.35 + 0.55 * clamp(i.cloudFraction as number, 0, 1) : base);
+  const base = { clear: 0.45, partly: 0.45, cloudy: 0.5, overcast: 0.55, storm: 0.7, fog: 0.3 }[look.sky];
+  const cloudOpacity = round(measured ? 0.25 + 0.4 * clamp(i.cloudFraction as number, 0, 1) : base);
 
   const clearish = look.sky === 'clear' || look.sky === 'partly';
   return {
@@ -129,15 +129,16 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
 // where each cloud sits, how wide it is, how long it takes relative to the others, and how
 // far along its way it starts, so that the sky is not a row of copies
 const CLOUDS = [
-  { y: 4, w: 64, speed: 1, start: 12 },
-  { y: 26, w: 52, speed: 1.35, start: 58 },
-  { y: 12, w: 58, speed: 0.8, start: 34 },
+  { y: 6, w: 64, speed: 1, start: 12 },
+  { y: 78, w: 52, speed: 1.35, start: 58 },
+  { y: 36, w: 58, speed: 0.8, start: 34 },
 ];
 
 export function effectsHtml(plan: EffectPlan, area: EffectsArea): string {
   const out: string[] = [];
   const attrs = `class="fx fx-${area}" aria-hidden="true" data-sky="${plan.sky}"${plan.night ? ' data-night' : ''}`
-    + ` style="--fx-cloud-op:${plan.cloudOpacity}"`;
+    // over the whole card there is more text for a cloud to lie behind: fainter
+    + ` style="--fx-cloud-op:${round(plan.cloudOpacity * (area === 'card' ? 0.75 : 1))}"`;
   out.push(`<div ${attrs}>`);
   out.push('<div class="fx-sky"></div>');
   if (plan.glow) out.push('<div class="fx-glow"></div>');
@@ -145,7 +146,7 @@ export function effectsHtml(plan: EffectPlan, area: EffectsArea): string {
   for (let c = 0; c < plan.clouds; c++) {
     const k = CLOUDS[c % CLOUDS.length];
     const dur = round(plan.driftSeconds * k.speed, 0);
-    out.push(`<div class="fx-cloud" style="--y:${k.y}%;--w:${k.w}%;--dur:${dur}s;--delay:-${round(dur * k.start / 100, 0)}s;--x0:${k.start}%"></div>`);
+    out.push(`<div class="fx-cloud" style="--y:${k.y}px;--w:${k.w}%;--dur:${dur}s;--delay:-${round(dur * k.start / 100, 0)}s;--x0:${k.start}%"></div>`);
   }
   if (plan.fog) out.push('<div class="fx-fog"></div><div class="fx-fog fx-fog-2"></div>');
   if (plan.rain) {
@@ -178,13 +179,13 @@ const svg = (w: number, h: number, body: string) =>
   `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`)}")`;
 
 const RAIN_1 = svg(160, 200, scatter(30, 160, 200, 7).map(([x, y, r]) =>
-  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 9 + r * 20).toFixed(1)}" stroke="rgb(205,222,255)" stroke-opacity="${(0.3 + r * 0.55).toFixed(2)}" stroke-width="${(0.8 + r * 0.6).toFixed(1)}" stroke-linecap="round"/>`).join(''));
+  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 9 + r * 20).toFixed(1)}" stroke="rgb(150,176,226)" stroke-opacity="${(0.3 + r * 0.55).toFixed(2)}" stroke-width="${(0.8 + r * 0.6).toFixed(1)}" stroke-linecap="round"/>`).join(''));
 const RAIN_2 = svg(96, 130, scatter(22, 96, 130, 21).map(([x, y, r]) =>
-  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 6 + r * 11).toFixed(1)}" stroke="rgb(205,222,255)" stroke-opacity="${(0.25 + r * 0.45).toFixed(2)}" stroke-width="0.8" stroke-linecap="round"/>`).join(''));
+  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 6 + r * 11).toFixed(1)}" stroke="rgb(150,176,226)" stroke-opacity="${(0.25 + r * 0.45).toFixed(2)}" stroke-width="0.8" stroke-linecap="round"/>`).join(''));
 const SNOW_1 = svg(200, 200, scatter(26, 200, 200, 33).map(([x, y, r]) =>
-  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.9 + r * 1.4).toFixed(1)}" fill="rgb(255,255,255)" fill-opacity="${(0.55 + r * 0.4).toFixed(2)}"/>`).join(''));
+  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.9 + r * 1.4).toFixed(1)}" fill="rgb(255,255,255)" fill-opacity="${(0.7 + r * 0.3).toFixed(2)}" stroke="rgb(120,140,172)" stroke-opacity="0.45" stroke-width="0.6"/>`).join(''));
 const SNOW_2 = svg(130, 130, scatter(18, 130, 130, 55).map(([x, y, r]) =>
-  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.6 + r * 0.9).toFixed(1)}" fill="rgb(255,255,255)" fill-opacity="${(0.45 + r * 0.4).toFixed(2)}"/>`).join(''));
+  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.6 + r * 0.9).toFixed(1)}" fill="rgb(255,255,255)" fill-opacity="${(0.6 + r * 0.3).toFixed(2)}" stroke="rgb(120,140,172)" stroke-opacity="0.4" stroke-width="0.5"/>`).join(''));
 const STARS_1 = svg(240, 160, scatter(15, 240, 160, 91).map(([x, y, r]) =>
   `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.5 + r * 0.9).toFixed(1)}" fill="rgba(255,255,255,0.95)"/>`).join(''));
 const STARS_2 = svg(180, 130, scatter(11, 180, 130, 123).map(([x, y, r]) =>
@@ -194,16 +195,20 @@ export const EFFECTS_CSS = `
 .fx {
   position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit;
   z-index: 0; contain: paint; isolation: isolate;
-  --fx-cloud: rgba(255, 255, 255, 0.92);
+  /* a cloud is a little of the text colour in the card's own background: lighter than the card in a
+     dark theme, darker in a light one, and never a white that the text has to be read against */
+  --fx-ink: var(--primary-text-color, #fff);
+  --fx-bg: var(--ha-card-background, var(--card-background-color, #1c1c1c));
+  --fx-cloud: color-mix(in srgb, var(--fx-ink) 22%, var(--fx-bg));
   --fx-rain-1: ${RAIN_1}; --fx-rain-2: ${RAIN_2};
   --fx-snow-1: ${SNOW_1}; --fx-snow-2: ${SNOW_2};
   --fx-stars-1: ${STARS_1}; --fx-stars-2: ${STARS_2};
 }
-.fx[data-night] { --fx-cloud: rgba(120, 134, 168, 0.9); }
-.fx[data-sky="overcast"] { --fx-cloud: rgba(176, 186, 200, 0.92); }
-.fx[data-sky="overcast"][data-night] { --fx-cloud: rgba(78, 88, 112, 0.92); }
-.fx[data-sky="storm"] { --fx-cloud: rgba(104, 114, 134, 0.95); }
-.fx[data-sky="storm"][data-night] { --fx-cloud: rgba(58, 64, 84, 0.95); }
+.fx[data-night] { --fx-cloud: color-mix(in srgb, #000 22%, color-mix(in srgb, var(--fx-ink) 22%, var(--fx-bg))); }
+.fx[data-sky="overcast"] { --fx-cloud: color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg)); }
+.fx[data-sky="overcast"][data-night] { --fx-cloud: color-mix(in srgb, #000 30%, color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg))); }
+.fx[data-sky="storm"] { --fx-cloud: color-mix(in srgb, #000 35%, color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg))); }
+.fx[data-sky="storm"][data-night] { --fx-cloud: color-mix(in srgb, #000 50%, color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg))); }
 .fx > * { position: absolute; }
 /* Behind the top part the layer does not stop at the section, which would show as a box:
    it reaches past it to the edges of the card, which clips it, and fades out downwards. */
@@ -231,7 +236,7 @@ export const EFFECTS_CSS = `
 .fx-stars-2 { background-image: var(--fx-stars-2); background-size: 180px 130px; background-position: 60px 40px; }
 
 .fx-cloud {
-  top: var(--y); left: 0; width: var(--w); height: 46%; opacity: var(--fx-cloud-op);
+  top: var(--y); left: 0; width: var(--w); aspect-ratio: 2.6 / 1; opacity: var(--fx-cloud-op);
   transform: translate3d(var(--x0), 0, 0);
   background:
     radial-gradient(closest-side, var(--fx-cloud), transparent) 0% 52% / 42% 62% no-repeat,
