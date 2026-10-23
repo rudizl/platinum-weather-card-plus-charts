@@ -107,8 +107,8 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
     : null;
 
   const measured = i.cloudFraction !== null && ['clear', 'partly', 'cloudy', 'overcast'].includes(look.sky);
-  const base = { clear: 0.6, partly: 0.6, cloudy: 0.65, overcast: 0.62, storm: 0.62, fog: 0.35 }[look.sky];
-  const cloudOpacity = round(measured ? 0.3 + 0.35 * clamp(i.cloudFraction as number, 0, 1) : base);
+  const base = { clear: 0.66, partly: 0.66, cloudy: 0.7, overcast: 0.65, storm: 0.62, fog: 0.35 }[look.sky];
+  const cloudOpacity = round(measured ? 0.32 + 0.38 * clamp(i.cloudFraction as number, 0, 1) : base);
 
   const clearish = look.sky === 'clear' || look.sky === 'partly';
   return {
@@ -236,7 +236,7 @@ export const EFFECTS_CSS = `
      dark theme, darker in a light one, and never a white that the text has to be read against */
   --fx-ink: var(--primary-text-color, #fff);
   --fx-bg: var(--ha-card-background, var(--card-background-color, #1c1c1c));
-  --fx-cloud: color-mix(in srgb, var(--fx-ink) 34%, var(--fx-bg));
+  --fx-cloud: color-mix(in srgb, var(--fx-ink) 38%, var(--fx-bg));
   /* the card's own colour, darkened, for a tint of the sky; and a fog, which is cloud on the ground */
   --fx-dim: color-mix(in srgb, #000 55%, var(--fx-bg));
   --fx-fog: color-mix(in srgb, var(--fx-ink) 30%, var(--fx-bg));
@@ -244,8 +244,8 @@ export const EFFECTS_CSS = `
   --fx-snow-1: ${SNOW_1}; --fx-snow-2: ${SNOW_2};
   --fx-stars-1: ${STARS_1}; --fx-stars-2: ${STARS_2};
 }
-.fx[data-night] { --fx-cloud: color-mix(in srgb, #000 22%, color-mix(in srgb, var(--fx-ink) 34%, var(--fx-bg))); }
-.fx[data-sky="overcast"] { --fx-cloud: color-mix(in srgb, var(--fx-ink) 35%, var(--fx-bg)); }
+.fx[data-night] { --fx-cloud: color-mix(in srgb, #000 22%, color-mix(in srgb, var(--fx-ink) 38%, var(--fx-bg))); }
+.fx[data-sky="overcast"] { --fx-cloud: color-mix(in srgb, var(--fx-ink) 36%, var(--fx-bg)); }
 .fx[data-sky="overcast"][data-night] { --fx-cloud: color-mix(in srgb, #000 30%, color-mix(in srgb, var(--fx-ink) 35%, var(--fx-bg))); }
 .fx[data-sky="storm"] { --fx-cloud: color-mix(in srgb, #000 12%, color-mix(in srgb, var(--fx-ink) 30%, var(--fx-bg))); }
 .fx[data-sky="storm"][data-night] { --fx-cloud: color-mix(in srgb, #000 24%, color-mix(in srgb, var(--fx-ink) 30%, var(--fx-bg))); }
