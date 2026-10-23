@@ -215,6 +215,21 @@ describe('the markup', () => {
   });
 });
 
+describe('the look of the edges', () => {
+  it('the layer behind the top part reaches past the section and fades out downwards: no box', () => {
+    expect(EFFECTS_CSS).toMatch(/\.fx-overview\s*\{[^}]*inset:\s*-\d+px\s+-\d+px\s+0\s+-\d+px/);
+    expect(EFFECTS_CSS).toMatch(/\.fx-overview\s*\{[^}]*mask-image:\s*linear-gradient\(to bottom,[^)]*transparent/);
+  });
+  it('the host does not clip it: the card does', () => {
+    const host = /\.fx-host\s*\{([^}]*)\}/.exec(EFFECTS_CSS)![1];
+    expect(host).toContain('position: relative');
+    expect(host).not.toContain('overflow');
+  });
+  it('fog fades at the top and the bottom, so that it has no edge', () => {
+    expect(EFFECTS_CSS).toMatch(/\.fx-fog\s*\{[^}]*mask-image:\s*linear-gradient\(to bottom,\s*transparent/);
+  });
+});
+
 describe('the stylesheet', () => {
   it('moves nothing when the reader asks for less motion: every animation sits inside a no-preference query', () => {
     const outside = EFFECTS_CSS.replace(/@media \(prefers-reduced-motion: no-preference\)\s*\{([\s\S]*?)\n\}\n?/g, '');

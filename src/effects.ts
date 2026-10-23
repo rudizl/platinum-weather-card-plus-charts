@@ -63,7 +63,7 @@ function lookOf(name: string): Look | null {
   if (/^cloudy-1(-|$)/.test(n)) return sky('partly', [1, 1]);
   if (/^cloudy-2(-|$)/.test(n)) return sky('partly', [1, 2]);
   if (/^cloudy(-3)?(-|$)/.test(n)) return sky('overcast', [2, 3]);
-  if (/^(fog|haze|dust)(-|$)/.test(n)) return sky('fog', [1, 2], { fog: true });
+  if (/^(fog|haze|dust)(-|$)/.test(n)) return sky('fog', [0, 1], { fog: true });
   if (/^tropical-storm/.test(n)) return sky('storm', [2, 3], { rain: 0.95, storm: true, fast: 40 });
   if (/thunderstorm/.test(n)) return sky('storm', [2, 3], { rain: 0.7, storm: true });
   if (/^hail/.test(n)) return sky('overcast', [2, 3], { rain: 0.9 });
@@ -105,7 +105,7 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
     : null;
 
   const measured = i.cloudFraction !== null && ['clear', 'partly', 'cloudy', 'overcast'].includes(look.sky);
-  const base = { clear: 0.6, partly: 0.6, cloudy: 0.7, overcast: 0.75, storm: 0.9, fog: 0.5 }[look.sky];
+  const base = { clear: 0.6, partly: 0.6, cloudy: 0.7, overcast: 0.75, storm: 0.9, fog: 0.3 }[look.sky];
   const cloudOpacity = round(measured ? 0.35 + 0.55 * clamp(i.cloudFraction as number, 0, 1) : base);
 
   const clearish = look.sky === 'clear' || look.sky === 'partly';
@@ -177,14 +177,14 @@ function scatter(count: number, w: number, h: number, seed: number): [number, nu
 const svg = (w: number, h: number, body: string) =>
   `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`)}")`;
 
-const RAIN_1 = svg(160, 200, scatter(14, 160, 200, 7).map(([x, y, r]) =>
-  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 14 + r * 22).toFixed(1)}" stroke="rgba(205,222,255,0.85)" stroke-width="${(1 + r * 0.6).toFixed(1)}" stroke-linecap="round"/>`).join(''));
-const RAIN_2 = svg(96, 130, scatter(10, 96, 130, 21).map(([x, y, r]) =>
-  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 8 + r * 12).toFixed(1)}" stroke="rgba(205,222,255,0.8)" stroke-width="0.9" stroke-linecap="round"/>`).join(''));
-const SNOW_1 = svg(200, 200, scatter(12, 200, 200, 33).map(([x, y, r]) =>
-  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(1.3 + r * 1.7).toFixed(1)}" fill="rgba(255,255,255,0.92)"/>`).join(''));
-const SNOW_2 = svg(130, 130, scatter(9, 130, 130, 55).map(([x, y, r]) =>
-  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.8 + r * 1.0).toFixed(1)}" fill="rgba(255,255,255,0.85)"/>`).join(''));
+const RAIN_1 = svg(160, 200, scatter(30, 160, 200, 7).map(([x, y, r]) =>
+  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 9 + r * 20).toFixed(1)}" stroke="rgb(205,222,255)" stroke-opacity="${(0.3 + r * 0.55).toFixed(2)}" stroke-width="${(0.8 + r * 0.6).toFixed(1)}" stroke-linecap="round"/>`).join(''));
+const RAIN_2 = svg(96, 130, scatter(22, 96, 130, 21).map(([x, y, r]) =>
+  `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 6 + r * 11).toFixed(1)}" stroke="rgb(205,222,255)" stroke-opacity="${(0.25 + r * 0.45).toFixed(2)}" stroke-width="0.8" stroke-linecap="round"/>`).join(''));
+const SNOW_1 = svg(200, 200, scatter(26, 200, 200, 33).map(([x, y, r]) =>
+  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.9 + r * 1.4).toFixed(1)}" fill="rgb(255,255,255)" fill-opacity="${(0.55 + r * 0.4).toFixed(2)}"/>`).join(''));
+const SNOW_2 = svg(130, 130, scatter(18, 130, 130, 55).map(([x, y, r]) =>
+  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.6 + r * 0.9).toFixed(1)}" fill="rgb(255,255,255)" fill-opacity="${(0.45 + r * 0.4).toFixed(2)}"/>`).join(''));
 const STARS_1 = svg(240, 160, scatter(15, 240, 160, 91).map(([x, y, r]) =>
   `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.5 + r * 0.9).toFixed(1)}" fill="rgba(255,255,255,0.95)"/>`).join(''));
 const STARS_2 = svg(180, 130, scatter(11, 180, 130, 123).map(([x, y, r]) =>
@@ -205,6 +205,13 @@ export const EFFECTS_CSS = `
 .fx[data-sky="storm"] { --fx-cloud: rgba(104, 114, 134, 0.95); }
 .fx[data-sky="storm"][data-night] { --fx-cloud: rgba(58, 64, 84, 0.95); }
 .fx > * { position: absolute; }
+/* Behind the top part the layer does not stop at the section, which would show as a box:
+   it reaches past it to the edges of the card, which clips it, and fades out downwards. */
+.fx-overview {
+  inset: -14px -28px 0 -28px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
 
 .fx-sky { inset: 0; }
 .fx[data-night] .fx-sky { background: linear-gradient(180deg, rgba(8, 16, 48, 0.5), rgba(8, 16, 48, 0) 88%); }
@@ -238,8 +245,12 @@ export const EFFECTS_CSS = `
   left: 0; width: 200%; background-repeat: repeat-x; background-size: 50% 100%;
   background-image: linear-gradient(90deg, rgba(225, 230, 235, 0), rgba(225, 230, 235, 0.42) 45%, rgba(225, 230, 235, 0) 100%);
 }
-.fx-fog:not(.fx-fog-2) { top: 32%; height: 42%; }
-.fx-fog-2 { top: 54%; height: 46%; opacity: 0.8; }
+.fx-fog {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 32%, #000 68%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 32%, #000 68%, transparent);
+}
+.fx-fog:not(.fx-fog-2) { top: 26%; height: 52%; }
+.fx-fog-2 { top: 50%; height: 56%; opacity: 0.8; }
 
 .fx-rain-wrap { inset: -30%; transform: rotate(var(--fx-slant)); }
 .fx-rain, .fx-snow {
@@ -307,6 +318,6 @@ export const EFFECTS_CSS = `
 }
 
 /* what the effect sits behind must sit above it */
-.fx-host { position: relative; overflow: hidden; border-radius: 12px; }
+.fx-host { position: relative; }
 .fx-host > :not(.fx) { position: relative; z-index: 1; }
 `;

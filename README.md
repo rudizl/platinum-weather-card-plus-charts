@@ -881,6 +881,20 @@ For `custom`, set `icon_pack_path` to a path template such as `/local/my-icons/{
 
 > **Note:** The card's **default built-in icons** are also based on amCharts weather icons, extended by [@makin-things](https://github.com/Makin-Things/weather-icons).
 
+## Weather effects (experimental)
+
+```yaml
+option_effects: subtle    # off, subtle or full
+option_effects_area: overview    # overview or card
+```
+
+Behind the top part of the card, or the whole of it, the weather moves: clouds drift across at the speed of the wind, rain falls and slants with it, snow sways, stars come out on a clear night, fog rolls in and a storm flashes. It is off unless you ask for it, and for now it is set in YAML only.
+
+- **It follows the icon.** The effect is chosen from the same name the card has settled on for its icon, after the rain gauge and the pyranometer have corrected the provider. If your gauge reads 0.0, there is no rain behind a cloud, whatever the provider says; if the gauge reads rain and the provider missed it, it rains. The harder the gauge says it rains, the harder it falls.
+- **It is light.** Nothing runs in JavaScript for each frame: every movement is a CSS animation of position or opacity, which the browser hands to the graphics card, and the pictures are small tiles drawn in the stylesheet. `subtle` has fewer clouds and one layer of rain and no flash of lightning; `full` has all of it.
+- **It is still when you ask for less motion.** Where the device is set to reduce motion, the sky is drawn but nothing in it moves.
+- **It stays out of the way.** It is hidden from screen readers, does not take clicks, and sits behind the text.
+
 ## Daily Forecast Section
 
 Hovering a column shows the full forecast for that day, including the precipitation amount:
@@ -1066,6 +1080,8 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `double_tap_action` | Action | none | Action on double-tap |
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
 | `icon_pack` | String | `default` | Icon pack: `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, `custom` |
+| `option_effects` | String | `off` | The weather behind the card (experimental): `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Not in the editor yet |
+| `option_effects_area` | String | `overview` | Where it is drawn: behind the top part of the card (`overview`) or behind the whole card (`card`) |
 | `icon_pack_path` | String | — | Path template for custom icon pack |
 
 ## Actions
