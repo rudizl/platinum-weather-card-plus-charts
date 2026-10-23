@@ -119,6 +119,7 @@ const srLatn: Translation = {
   },
   "editor": {
     "global_options": "Globalne opcije",
+    "appearance": "Izgled",
     "overview_section": "Pregled",
     "extended_section": "Prošireno",
     "extended_separator": "Svaki izvor u svom redu",

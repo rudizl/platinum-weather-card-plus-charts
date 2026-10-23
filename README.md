@@ -492,7 +492,7 @@ Features added along the way: the `moon` slot with its phase icons, `option_show
 
 Each row has a switch to hide the section entirely and arrows to reorder it. The pencil opens the entities the section reads from; the second icon, where present, opens its display options. **Hourly Forecast** is the exception: it is a view of the daily forecast rather than a section, so it has a switch and one settings button, holding both its entity and its options, and no arrows.
 
-**Global Options** at the top is not a section of the card; it holds the settings that several sections draw on, such as the locale, the icon pack and the station sensors.
+**Global Options** and **Appearance** at the top are not sections of the card. Global Options holds the settings that several sections draw on, such as the locale and the station sensors; Appearance holds how the card looks: the icon pack, the static icons, how close the slots sit, and the weather effects.
 
 ## Overview Section
 
@@ -856,7 +856,7 @@ The two are independent: the sun override only changes day to night and back, ne
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-icon-pack.png" alt="Choosing an icon pack" width="720">
 </p>
 
-The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
+The card supports multiple icon packs, selectable from the editor's **Appearance → Icon Pack** dropdown (in earlier versions it was under Global Options).
 
 | Value | Description | Requirement |
 |---|---|---|
@@ -888,7 +888,7 @@ option_effects: subtle    # off, subtle or full
 option_effects_area: overview    # overview or card
 ```
 
-Behind the top part of the card, or the whole of it, the weather moves: clouds drift across at the speed of the wind, rain falls and slants with it, snow sways, stars come out on a clear night, fog rolls in and a storm flashes. It is off unless you ask for it. You can set it in the editor, under Global Options, next to the icon pack, or in YAML.
+Behind the top part of the card, or the whole of it, the weather moves: clouds drift across at the speed of the wind, rain falls and slants with it, snow sways, stars come out on a clear night, fog rolls in and a storm flashes. It is off unless you ask for it. You can set it in the editor, under **Appearance**, next to the icon pack, or in YAML.
 
 - **It follows the icon.** The effect is chosen from the same name the card has settled on for its icon, after the rain gauge and the pyranometer have corrected the provider. If your gauge reads 0.0, there is no rain behind a cloud, whatever the provider says; if the gauge reads rain and the provider missed it, it rains. The harder the gauge says it rains, the harder it falls.
 - **It is light.** Nothing runs in JavaScript for each frame: every movement is a CSS animation of position or opacity, which the browser hands to the graphics card, and the pictures are small tiles drawn in the stylesheet. `subtle` has fewer clouds and one layer of rain and no flash of lightning; `full` has all of it.
@@ -1080,7 +1080,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `double_tap_action` | Action | none | Action on double-tap |
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
 | `icon_pack` | String | `default` | Icon pack: `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, `custom` |
-| `option_effects` | String | `off` | The weather behind the card (experimental): `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Global Options |
+| `option_effects` | String | `off` | The weather behind the card (experimental): `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Appearance |
 | `option_effects_area` | String | `overview` | Where it is drawn: behind the top part of the card (`overview`) or behind the whole card (`card`) |
 | `icon_pack_path` | String | — | Path template for custom icon pack |
 

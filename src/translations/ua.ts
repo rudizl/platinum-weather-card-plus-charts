@@ -119,6 +119,7 @@ const ua: Translation = {
   },
   "editor": {
     "global_options": "Глобальні налаштування",
+    "appearance": "Вигляд",
     "overview_section": "Огляд",
     "extended_section": "Розширений",
     "extended_separator": "Кожне джерело з нового рядка",

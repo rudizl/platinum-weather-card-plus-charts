@@ -119,6 +119,7 @@ const sr: Translation = {
   },
   "editor": {
     "global_options": "Глобалне опције",
+    "appearance": "Изглед",
     "overview_section": "Преглед",
     "extended_section": "Проширено",
     "extended_separator": "Сваки извор у свом реду",

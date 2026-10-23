@@ -119,6 +119,7 @@ const nl: Translation = {
   },
   "editor": {
     "global_options": "Globale opties",
+    "appearance": "Uiterlijk",
     "overview_section": "Overzicht",
     "extended_section": "Uitgebreid",
     "extended_separator": "Elke bron op een eigen regel",

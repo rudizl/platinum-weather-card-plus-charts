@@ -5,12 +5,12 @@ import '../src/editor';
 import { TRANSLATIONS } from '../src/translations';
 import { makeHass } from './helpers';
 
-// The two effects options in the visual editor, in Global Options beside the icon pack:
+// The two effects options in the visual editor, in the Appearance panel beside the icon pack:
 // the choice of how much, and the choice of where.
 
 type Editor = HTMLElement & {
   setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown>;
-  _optionGlobalOptionsEditor: () => unknown; _valueChanged: (ev: unknown) => void;
+  _optionAppearanceEditor: () => unknown; _valueChanged: (ev: unknown) => void;
 };
 
 async function editor(config: Record<string, unknown> = {}) {
@@ -20,7 +20,7 @@ async function editor(config: Record<string, unknown> = {}) {
   document.body.appendChild(el);
   await el.updateComplete;
   const box = document.createElement('div');
-  render(el._optionGlobalOptionsEditor() as never, box);
+  render(el._optionAppearanceEditor() as never, box);
   return { el, box };
 }
 const select = (box: HTMLElement, key: string) =>
@@ -76,7 +76,7 @@ describe('the effects choice in the editor', () => {
 });
 
 describe('the words, in every language', () => {
-  const KEYS = ['effects', 'effects_hint', 'effects_off', 'effects_subtle', 'effects_full', 'effects_area', 'effects_area_overview', 'effects_area_card'];
+  const KEYS = ['appearance', 'effects', 'effects_hint', 'effects_off', 'effects_subtle', 'effects_full', 'effects_area', 'effects_area_overview', 'effects_area_card'];
   it('are all there, and not left in English where the language is not', () => {
     const en = (TRANSLATIONS as Record<string, { editor?: Record<string, string> } & Record<string, unknown>>).en;
     for (const [lang, t] of Object.entries(TRANSLATIONS as Record<string, Record<string, unknown>>)) {

@@ -119,6 +119,7 @@ const bg: Translation = {
   },
   "editor": {
     "global_options": "Глобални настройки",
+    "appearance": "Изглед",
     "overview_section": "Преглед",
     "extended_section": "Разширена",
     "extended_separator": "Всеки източник на нов ред",

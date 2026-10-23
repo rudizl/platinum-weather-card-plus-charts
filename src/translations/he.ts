@@ -119,6 +119,7 @@ const he: Translation = {
   },
   "editor": {
     "global_options": "הגדרות כלליות",
+    "appearance": "מראה",
     "overview_section": "סקירה",
     "extended_section": "מורחב",
     "extended_separator": "כל מקור בשורה נפרדת",

@@ -1882,29 +1882,6 @@ get _forecast_type(): string {
       </ha-input>
       <div class="side-by-side">
         <div>
-          <div class="toggle-row">
-              <span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("show_static_icons")}</span>
-          </div>
-        </div>
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_compact_slots ? "pwc-switch active" : "pwc-switch"} .value=${'option_compact_slots'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("compact_slots")}</span>
-            </div>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_sun_overrides_icon !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_sun_overrides_icon'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("sun_overrides_icon")}</span>
-            </div>
-        </div>
-        <div></div>
-      </div>
-      <div class="side-by-side">
-        <div>
           <label class='mdc-label'>${this._t('time_format')}</label>
           <select class='ha-select-compat' .configValue=${'option_time_format'} .value=${this._option_time_format ?? ''} @change=${this._valueChanged}>
             <option value=""></option>
@@ -1990,46 +1967,6 @@ get _forecast_type(): string {
             </div>
         </div>
       </div>` : html``}
-      <div class="side-by-side">
-        <div class="full-width">
-          <label class="label">${this._t("icon_pack")}</label>
-          <select class='ha-select-compat' .configValue=${'icon_pack'} .value=${this._icon_pack} @change=${this._valueChanged}>
-            <option value='default'>Default (built-in animated)</option>
-            <option value='meteocons-fill'>Meteocons — Fill (CDN, basmilius)</option>
-            <option value='meteocons-line'>Meteocons — Line (CDN, basmilius)</option>
-            <option value='ha-official'>Home Assistant official (CDN, scinos)</option>
-            <option value='wcc-2'>ammap Weather Icons (requires weather-chart-card)</option>
-            <option value='custom'>Custom path...</option>
-          </select>
-        </div>
-        ${this._icon_pack === 'custom' ? html`
-        <div class="full-width">
-          <ha-input .label=${this._t("icon_path")} .value=${this._icon_pack_path}
-            .configValue=${'icon_pack_path'} @change=${this._valueChanged}>
-          </ha-input>
-          <div class="help-text">Use {condition} as placeholder — e.g. /local/icons/{condition}.svg</div>
-        </div>` : html``}
-      </div>
-      <div class="side-by-side">
-        <div>
-          <label class="label">${this._t("effects")}</label>
-          <select class='ha-select-compat' .configValue=${'option_effects'} .value=${this._option_effects} @change=${this._valueChanged}>
-            <option value='off'>${this._t("effects_off")}</option>
-            <option value='subtle'>${this._t("effects_subtle")}</option>
-            <option value='full'>${this._t("effects_full")}</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">${this._t("effects_area")}</label>
-          <select class='ha-select-compat' .configValue=${'option_effects_area'} .value=${this._option_effects_area} @change=${this._valueChanged}>
-            <option value='overview'>${this._t("effects_area_overview")}</option>
-            <option value='card'>${this._t("effects_area_card")}</option>
-          </select>
-        </div>
-      </div>
-      <div class="side-by-side full-width">
-        <div class="full-width"><div class="help-text">${this._t("effects_hint")}</div></div>
-      </div>
       <div style="padding: 8px 0 4px; font-weight: 500;">${this._t("actions")}</div>
       <hui-action-editor
         .label=${this._t("tap_action")}
@@ -2052,6 +1989,76 @@ get _forecast_type(): string {
         .actions=${["more-info","toggle","navigate","url","call-service","assist","none"]}
         @value-changed=${(ev) => this._valueChangedAction('double_tap_action', ev)}>
       </hui-action-editor>
+    `;
+  }
+
+  // How the card looks, as distinct from what it reads: the icons, how close the slots sit, and
+  // the weather that moves behind the card. The settings keep the keys they always had.
+  private _optionAppearanceEditor(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div class="full-width">
+          <label class="label">${this._t("icon_pack")}</label>
+          <select class='ha-select-compat' .configValue=${'icon_pack'} .value=${this._icon_pack} @change=${this._valueChanged}>
+            <option value='default'>Default (built-in animated)</option>
+            <option value='meteocons-fill'>Meteocons — Fill (CDN, basmilius)</option>
+            <option value='meteocons-line'>Meteocons — Line (CDN, basmilius)</option>
+            <option value='ha-official'>Home Assistant official (CDN, scinos)</option>
+            <option value='wcc-2'>ammap Weather Icons (requires weather-chart-card)</option>
+            <option value='custom'>Custom path...</option>
+          </select>
+        </div>
+        ${this._icon_pack === 'custom' ? html`
+        <div class="full-width">
+          <ha-input .label=${this._t("icon_path")} .value=${this._icon_pack_path}
+            .configValue=${'icon_pack_path'} @change=${this._valueChanged}>
+          </ha-input>
+          <div class="help-text">Use {condition} as placeholder — e.g. /local/icons/{condition}.svg</div>
+        </div>` : html``}
+      </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_static_icons")}</span>
+          </div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_compact_slots ? "pwc-switch active" : "pwc-switch"} .value=${'option_compact_slots'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("compact_slots")}</span>
+            </div>
+        </div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_sun_overrides_icon !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_sun_overrides_icon'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("sun_overrides_icon")}</span>
+            </div>
+        </div>
+        <div></div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <label class="label">${this._t("effects")}</label>
+          <select class='ha-select-compat' .configValue=${'option_effects'} .value=${this._option_effects} @change=${this._valueChanged}>
+            <option value='off'>${this._t("effects_off")}</option>
+            <option value='subtle'>${this._t("effects_subtle")}</option>
+            <option value='full'>${this._t("effects_full")}</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">${this._t("effects_area")}</label>
+          <select class='ha-select-compat' .configValue=${'option_effects_area'} .value=${this._option_effects_area} @change=${this._valueChanged}>
+            <option value='overview'>${this._t("effects_area_overview")}</option>
+            <option value='card'>${this._t("effects_area_card")}</option>
+          </select>
+        </div>
+      </div>
+      <div class="side-by-side full-width">
+        <div class="full-width"><div class="help-text">${this._t("effects_hint")}</div></div>
+      </div>
     `;
   }
 
@@ -2099,6 +2106,9 @@ get _forecast_type(): string {
         return this._hourlyForecastOptions();
       case 'option_global_options':
         subel.push(this._optionGlobalOptionsEditor());
+        break;
+      case 'option_appearance':
+        subel.push(this._optionAppearanceEditor());
         break;
     }
     return html`${subel}`;
@@ -2267,6 +2277,23 @@ get _forecast_type(): string {
             </div>
           </div>
         `;
+      case 'appearance':
+        return html`
+          <div class="section-flex">
+            <div class="section-label">
+              <div class="visibility-spacer"></div>
+              <ha-icon class="section-icon" icon="mdi:palette-outline"></ha-icon>
+              <span class="section-title">${this._t("appearance")}</span>
+            </div>
+            <div>
+              <div class="no-icon"></div>
+              <div class="no-icon"></div>
+              <div class="no-icon"></div>
+              <ha-icon-button class="edit-icon" .value=${'option_appearance'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
+              </ha-icon-button>
+            </div>
+          </div>
+        `;
       case 'global_options':
         return html`
           <div class="section-flex">
@@ -2299,6 +2326,7 @@ get _forecast_type(): string {
     const slots = this._section_order || [];
 
     htmlConfig.push(this.getConfigBlock('global_options', false, false));
+    htmlConfig.push(this.getConfigBlock('appearance', false, false));
     slots.forEach((slot, index) => {
       htmlConfig.push(this.getConfigBlock(slot, index === 0, index + 1 === slots.length));
       // Directly beneath the forecast it belongs to, rather than at the end of

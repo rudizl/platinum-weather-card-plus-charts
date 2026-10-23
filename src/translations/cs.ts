@@ -119,6 +119,7 @@ const cs: Translation = {
   },
   "editor": {
     "global_options": "Globální nastavení",
+    "appearance": "Vzhled",
     "overview_section": "Přehled",
     "extended_section": "Rozšířená",
     "extended_separator": "Každý zdroj na vlastním řádku",

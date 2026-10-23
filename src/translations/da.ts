@@ -119,6 +119,7 @@ const da: Translation = {
   },
   "editor": {
     "global_options": "Globale indstillinger",
+    "appearance": "Udseende",
     "overview_section": "Oversigt",
     "extended_section": "Udvidet",
     "extended_separator": "Hver kilde på sin egen linje",

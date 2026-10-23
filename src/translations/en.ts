@@ -119,6 +119,7 @@ const en: Translation = {
   },
   "editor": {
     "global_options": "Global Options",
+    "appearance": "Appearance",
     "overview_section": "Overview",
     "extended_section": "Extended",
     "extended_separator": "Each source on its own line",

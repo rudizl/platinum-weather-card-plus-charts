@@ -119,6 +119,7 @@ const ru: Translation = {
   },
   "editor": {
     "global_options": "Глобальные настройки",
+    "appearance": "Внешний вид",
     "overview_section": "Обзор",
     "extended_section": "Расширенный",
     "extended_separator": "Каждый источник с новой строки",
