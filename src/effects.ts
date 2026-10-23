@@ -137,7 +137,7 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
       ? { layers: full ? 2 : 1, opacity: 0.9, fallSeconds: 3.2, swayPx: 0, slantDeg: round(clamp(50 + (b - 6) * 4, 50, 72), 0) }
       : { layers: full ? 2 : 1, opacity: 0.8, fallSeconds: 10, swayPx: round(Math.min(40, 8 + 3 * b), 0), slantDeg: 0 }
     : null;
-  const hail: EffectPlan['hail'] = look.hail ? { opacity: 0.85, fallSeconds: 1.4 } : null;
+  const hail: EffectPlan['hail'] = look.hail ? { opacity: 0.7, fallSeconds: 1.4 } : null;
 
   // How thick a fog is: as far as one can see, where something measures it; the provider's word alone
   // makes it middling. A blizzard's whiteout is the same.
@@ -243,7 +243,7 @@ export function effectsTemplate(plan: EffectPlan, area: EffectsArea): TemplateRe
   const rain = plan.rain;
   const snow = plan.snow;
   return html`<div class="fx fx-${area}" aria-hidden="true" data-sky=${plan.sky} data-tint=${plan.tint}
-      ?data-night=${plan.night} ?data-freezing=${plan.freezing} style="--fx-cloud-op:${cloudOp}">
+      ?data-night=${plan.night} ?data-freezing=${plan.freezing} ?data-blizzard=${plan.blizzard} style="--fx-cloud-op:${cloudOp}">
     <div class="fx-sky"></div>
     ${plan.glow ? html`<div class="fx-glow"></div>` : nothing}
     ${plan.heat ? html`<div class="fx-heat"></div>` : nothing}
@@ -329,8 +329,8 @@ const ICE_1 = svg(160, 200, scatter(30, 160, 200, 7).map(([x, y, r], k) =>
     : `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 8 + r * 14).toFixed(1)}" stroke="rgb(140,190,235)" stroke-opacity="${(0.4 + r * 0.5).toFixed(2)}" stroke-width="${(0.8 + r * 0.4).toFixed(1)}" stroke-linecap="round"/>`).join(''));
 const ICE_2 = svg(96, 130, scatter(22, 96, 130, 21).map(([x, y, r]) =>
   `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + 5 + r * 8).toFixed(1)}" stroke="rgb(150,195,235)" stroke-opacity="${(0.3 + r * 0.4).toFixed(2)}" stroke-width="0.8" stroke-linecap="round"/>`).join(''));
-const HAIL = svg(140, 180, scatter(16, 140, 180, 77).map(([x, y, r]) =>
-  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(1.6 + r * 1.8).toFixed(1)}" fill="rgb(245,250,255)" fill-opacity="0.95" stroke="rgb(110,135,170)" stroke-opacity="0.55" stroke-width="0.7"/>`).join(''));
+const HAIL = svg(140, 180, scatter(11, 140, 180, 77).map(([x, y, r]) =>
+  `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(1.4 + r * 1.4).toFixed(1)}" fill="rgb(245,250,255)" fill-opacity="0.9" stroke="rgb(110,135,170)" stroke-opacity="0.55" stroke-width="0.7"/>`).join(''));
 // a glint is a four-pointed star, a little cross with a bright middle
 const FROST = svg(200, 140, scatter(11, 200, 140, 311).map(([x, y, r]) => {
   const a = (2.2 + r * 2.6).toFixed(1);
@@ -359,6 +359,7 @@ export const EFFECTS_CSS = `
   --fx-hail: ${HAIL}; --fx-frost: ${FROST};
 }
 .fx[data-freezing] { --fx-rain-1: ${ICE_1}; --fx-rain-2: ${ICE_2}; }
+.fx[data-blizzard] { --fx-fog: color-mix(in srgb, var(--fx-ink) 46%, var(--fx-bg)); }
 .fx[data-tint="dust"] { --fx-fog: color-mix(in srgb, #b8935a 42%, var(--fx-bg)); }
 .fx[data-night] { --fx-cloud: color-mix(in srgb, #000 22%, color-mix(in srgb, var(--fx-ink) 38%, var(--fx-bg))); }
 .fx[data-sky="overcast"] { --fx-cloud: color-mix(in srgb, var(--fx-ink) 36%, var(--fx-bg)); }
@@ -422,7 +423,7 @@ export const EFFECTS_CSS = `
 .fx-rain-1 { --tile-w: 160px; --tile-h: 200px; background-image: var(--fx-rain-1); }
 .fx-rain-2 { --tile-w: 96px; --tile-h: 130px; background-image: var(--fx-rain-2); }
 .fx-snow-rot { inset: -30%; transform: rotate(var(--fx-snow-slant, 0deg)); }
-.fx-snow-wrap { inset: 0; }
+.fx-snow-wrap { position: absolute; inset: 0; }
 .fx-snow-1 { --tile-w: 200px; --tile-h: 200px; background-image: var(--fx-snow-1); }
 .fx-snow-2 { --tile-w: 130px; --tile-h: 130px; background-image: var(--fx-snow-2); }
 .fx-hail { --tile-w: 140px; --tile-h: 180px; background-image: var(--fx-hail); }
@@ -442,10 +443,10 @@ export const EFFECTS_CSS = `
 }
 .fx-golden {
   inset: 0; opacity: var(--g);
-  background: linear-gradient(to top, color-mix(in srgb, #ff8a3d 50%, transparent), color-mix(in srgb, #ff7a50 22%, transparent) 38%, transparent 72%);
+  background: linear-gradient(to top, color-mix(in srgb, #ff8a3d 34%, transparent), color-mix(in srgb, #ff7a50 14%, transparent) 38%, transparent 72%);
 }
 .fx-golden[data-morning] {
-  background: linear-gradient(to top, color-mix(in srgb, #ff7aa8 42%, transparent), color-mix(in srgb, #ffb36b 20%, transparent) 38%, transparent 72%);
+  background: linear-gradient(to top, color-mix(in srgb, #ff7aa8 30%, transparent), color-mix(in srgb, #ffb36b 13%, transparent) 38%, transparent 72%);
 }
 /* a rainbow is a ring of colours, half of which shows: an ellipse as wide as the box and twice as high as it is */
 .fx-rainbow {

@@ -545,6 +545,38 @@ describe('rain and snow on a light card as well as a dark one', () => {
   });
 });
 
+describe('a whiteout that shows', () => {
+  it('a blizzard says so on the layer, and its fog is paler than an ordinary one', () => {
+    expect(effectsHtml(plan({ iconName: 'snowy-3', beaufort: 9 })!, 'card')).toContain('data-blizzard');
+    expect(effectsHtml(plan({ iconName: 'snowy-3', beaufort: 2 })!, 'card')).not.toContain('data-blizzard');
+    expect(effectsHtml(plan({ iconName: 'fog-day' })!, 'card')).not.toContain('data-blizzard');
+    const mix = (sel: string) => +new RegExp(`${sel}\\s*\\{\\s*--fx-fog:\\s*color-mix\\(in srgb,\\s*var\\(--fx-ink\\)\\s+(\\d+)%`).exec(EFFECTS_CSS)![1];
+    expect(mix('\\.fx\\[data-blizzard\\]')).toBeGreaterThan(30);
+  });
+});
+
+describe('layers that sit inside another', () => {
+  // seen on the demo: the snow wrapper was moved into a rotating one and stopped being a direct child of
+  // the layer, which is what made every layer absolute, so the snow had no height and was not there
+  it('every layer that is not a direct child of the effect is positioned by a rule of its own', () => {
+    const html = effectsHtml(plan({ iconName: 'snowy-3', beaufort: 9, visibilityKm: 1 })!, 'card');
+    const box = document.createElement('div'); box.innerHTML = html;
+    const nested = [...box.querySelectorAll('.fx *')].filter((e) => e.parentElement && !e.parentElement.classList.contains('fx'));
+    const wrappers = nested.filter((e) => e.children.length > 0).map((e) => [...e.classList][0]);
+    expect(wrappers).toContain('fx-snow-wrap');
+    for (const cls of wrappers) {
+      const rule = new RegExp(`\\.${cls}\\s*\\{([^}]*)\\}`).exec(EFFECTS_CSS);
+      expect(rule, `${cls} has no rule`).not.toBeNull();
+      expect(rule![1], `${cls} is not positioned`).toMatch(/position:\s*absolute|inset:/);
+    }
+  });
+  it('and the snow wrapper is absolute, with a size', () => {
+    const rule = /\.fx-snow-wrap\s*\{([^}]*)\}/.exec(EFFECTS_CSS)![1];
+    expect(rule).toMatch(/position:\s*absolute/);
+    expect(rule).toMatch(/inset:\s*0/);
+  });
+});
+
 describe('the stylesheet', () => {
   it('moves nothing when the reader asks for less motion: every animation sits inside a no-preference query', () => {
     const outside = EFFECTS_CSS.replace(/@media \(prefers-reduced-motion: no-preference\)\s*\{([\s\S]*?)\n\}\n?/g, '');

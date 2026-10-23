@@ -892,6 +892,26 @@ option_effects_area: overview    # overview or card
 
 Behind the top part of the card, or the whole of it, the weather moves: clouds drift across at the speed of the wind, rain falls and slants with it, snow sways, stars come out on a clear night, fog rolls in and a storm flashes. It is off unless you ask for it. You can set it in the editor, under **Appearance**, next to the icon pack, or in YAML.
 
+- **It draws a good deal of weather,** much of it worked out from what the card measures, since Home Assistant has no state for it. A reading that is not there simply leaves its effect out.
+
+  | The weather | What you see | Worked out from |
+  | --- | --- | --- |
+  | Clear sky | a glow by day, stars at night | the icon |
+  | Clouds | one to three, drifting at the pace of the wind | the icon, the pyranometer, the wind |
+  | Rain | falling in three strengths, slanting with the wind as far as 45° | the icon, the rain gauge, the wind |
+  | Freezing rain | icy streaks | rain, and a temperature of 0 °C or below |
+  | Snow, sleet | flakes that sway; snow with rain in it | the icon |
+  | **Blizzard** | snow flying nearly sideways, faster and thicker, and a whiteout | snow, and a wind of force 6 or more (and how far one can see) |
+  | Hail | white pellets | the icon |
+  | Storm | a dark sky, and flashes | the icon, and a lightning detector |
+  | Fog, haze | a bank of fog, as thick as one can see | the icon, and the visibility |
+  | Dust | a sand-coloured fog | the icon |
+  | Frost | glints | a clear sky at 0 °C or below |
+  | Heat | a warm shimmer | a clear day of 33 °C or more |
+  | **Golden hour** | a warm band, rose in the morning, gold in the evening | the sun between 4° under and 8° over the horizon |
+  | **Rainbow** | a faint arc that fades | the rain gauge quiet for 15 to 40 minutes, with the sun out and between 3° and 42° |
+
+  They need the settings they read: the temperature, the visibility, the sun entity, the rain rate, the lightning distance.
 - **It follows the icon.** The effect is chosen from the same name the card has settled on for its icon, after the rain gauge and the pyranometer have corrected the provider. If your gauge reads 0.0, there is no rain behind a cloud, whatever the provider says; if the gauge reads rain and the provider missed it, it rains. The harder the gauge says it rains, the harder it falls.
 - **It is light.** Nothing runs in JavaScript for each frame: every movement is a CSS animation of position or opacity, which the browser hands to the graphics card, and the pictures are small tiles drawn in the stylesheet. `subtle` has fewer clouds and one layer of rain and no flash of lightning; `full` has all of it.
 - **It is still when you ask for less motion.** Where the device is set to reduce motion, the sky is drawn but nothing in it moves.
