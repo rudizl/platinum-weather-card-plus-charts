@@ -48,15 +48,15 @@ describe('the files', () => {
 describe('the pack in the card', () => {
   it('is a picture beside the card, named after the condition', async () => {
     const el = await card();
-    expect(el._getIconUrl('clear-day')).toMatch(/\/p-clear-day\.png$/);
-    expect(el._getIconUrl('rainy-3-day')).toMatch(/\/p-rain\.png$/);
-    expect(el._getIconUrl('rainy-3')).toMatch(/\/p-pouring\.png$/);
-    expect(el._getIconUrl('cloudy-2-night')).toMatch(/\/p-partlycloudy-night\.png$/);
+    expect(el._getIconUrl('clear-day')).toMatch(/\/p-clear-day\.png\?r=\d+$/);
+    expect(el._getIconUrl('rainy-3-day')).toMatch(/\/p-rain\.png\?r=\d+$/);
+    expect(el._getIconUrl('rainy-3')).toMatch(/\/p-pouring\.png\?r=\d+$/);
+    expect(el._getIconUrl('cloudy-2-night')).toMatch(/\/p-partlycloudy-night\.png\?r=\d+$/);
   });
   it('and is the same place as the card itself, not the Internet and not a path the user has to make', async () => {
     const url = (await card())._getIconUrl('snowy-3');
     expect(url).not.toMatch(/^https?:\/\/(cdn|raw)/);
-    expect(url).toMatch(/p-snow\.png$/);
+    expect(url).toMatch(/p-snow\.png\?r=\d+$/);
   });
   it('has a picture for every name the card can produce, and the picture is in dist', async () => {
     const el = await card();
@@ -67,17 +67,29 @@ describe('the pack in the card', () => {
     const missing: string[] = [];
     for (const n of names) {
       const url = el._getIconUrl(n);
-      const file = url.split('/').pop()!;
+      const file = url.split('/').pop()!.split('?')[0];
       if (!/^p-.*\.png$/.test(file) || !existsSync(resolve(DIST, file))) missing.push(`${n} -> ${file}`);
     }
     expect(missing, 'names that land on a picture that is not there').toEqual([]);
   });
   it('the forecast strips use it too', async () => {
-    expect((await card())._getIconUrl('rainy-3-day', true)).toMatch(/p-rain\.png$/);
+    expect((await card())._getIconUrl('rainy-3-day', true)).toMatch(/p-rain\.png\?r=\d+$/);
   });
   it('another pack is not changed by it', async () => {
     const el = await card({ icon_pack: 'default' });
     expect(el._getIconUrl('clear-day')).toMatch(/a-clear-day\.svg$/);
+  });
+});
+
+describe('pictures that change without changing their names', () => {
+  // Home Assistant serves them with a cache of 31 days (max-age=2678400, seen on 23 October), so a phone that has
+  // the old p-rain.png keeps it for a month unless the address changes. The revision is in the address, and
+  // Home Assistant does not mind it.
+  it('the address carries the revision of the pack, the same for every picture', async () => {
+    const el = await card();
+    const revs = new Set(NAMES.map((n) => /\?r=(\d+)$/.exec(el._getIconUrl(n === 'partlycloudy-day' ? 'cloudy-1-day' : n === 'clear-night' ? 'clear-night' : 'clear-day'))![1]));
+    expect(revs.size).toBe(1);
+    expect(+[...revs][0]).toBeGreaterThanOrEqual(2);
   });
 });
 

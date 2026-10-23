@@ -26,6 +26,9 @@ import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
 import { sagerForecast } from './sager';
 
+
+// the revision of the photoreal pictures (dist/p-*.png): 1 was the first release, 2 the partly cloudy, the fog and the alignment
+const PHOTOREAL_REVISION = 2;
 // What the overview and the slots read their figures from: today's condition, the
 // measurements, and today's high and low. A card that has a weather_entity and
 // none of these takes them all from that entity, which the card can already read
@@ -4211,7 +4214,9 @@ export class PlatinumWeatherCard extends LitElement {
     if (pack === 'meteocons-fill') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/${metName}.svg`;
     if (pack === 'meteocons-line') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/${metName}.svg`;
     // The photoreal pack is fifteen PNGs beside the card (p-<name>.png), the same names as the custom pack asks for
-    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + wccName + '.png';
+    // The revision is in the address: Home Assistant serves the pictures with a cache of 31 days, so a picture that is
+    // redrawn under the same name would not reach a phone that has the old one. Raise it when a picture changes.
+    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + wccName + '.png?r=' + PHOTOREAL_REVISION;
     if (pack === 'custom' && this._config?.icon_pack_path)
       return this._config.icon_pack_path.replace('{condition}', wccName);
 
