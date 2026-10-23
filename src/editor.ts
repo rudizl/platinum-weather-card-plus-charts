@@ -601,6 +601,16 @@ get _forecast_type(): string {
     return this._config?.icon_pack || 'default';
   }
 
+  // the weather effects behind the card: what the card reads, so a word it does not know shows as the default
+  get _option_effects(): string {
+    const v = this._config?.option_effects;
+    return v === 'subtle' || v === 'full' ? v : 'off';
+  }
+
+  get _option_effects_area(): string {
+    return this._config?.option_effects_area === 'card' ? 'card' : 'overview';
+  }
+
   get _icon_pack_path(): string {
     return this._config?.icon_pack_path || '';
   }
@@ -1999,6 +2009,26 @@ get _forecast_type(): string {
           </ha-input>
           <div class="help-text">Use {condition} as placeholder — e.g. /local/icons/{condition}.svg</div>
         </div>` : html``}
+      </div>
+      <div class="side-by-side">
+        <div>
+          <label class="label">${this._t("effects")}</label>
+          <select class='ha-select-compat' .configValue=${'option_effects'} .value=${this._option_effects} @change=${this._valueChanged}>
+            <option value='off'>${this._t("effects_off")}</option>
+            <option value='subtle'>${this._t("effects_subtle")}</option>
+            <option value='full'>${this._t("effects_full")}</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">${this._t("effects_area")}</label>
+          <select class='ha-select-compat' .configValue=${'option_effects_area'} .value=${this._option_effects_area} @change=${this._valueChanged}>
+            <option value='overview'>${this._t("effects_area_overview")}</option>
+            <option value='card'>${this._t("effects_area_card")}</option>
+          </select>
+        </div>
+      </div>
+      <div class="side-by-side full-width">
+        <div class="full-width"><div class="help-text">${this._t("effects_hint")}</div></div>
       </div>
       <div style="padding: 8px 0 4px; font-weight: 500;">${this._t("actions")}</div>
       <hui-action-editor
