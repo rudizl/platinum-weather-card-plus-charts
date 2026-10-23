@@ -105,8 +105,8 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
     : null;
 
   const measured = i.cloudFraction !== null && ['clear', 'partly', 'cloudy', 'overcast'].includes(look.sky);
-  const base = { clear: 0.45, partly: 0.45, cloudy: 0.5, overcast: 0.55, storm: 0.7, fog: 0.3 }[look.sky];
-  const cloudOpacity = round(measured ? 0.25 + 0.4 * clamp(i.cloudFraction as number, 0, 1) : base);
+  const base = { clear: 0.6, partly: 0.6, cloudy: 0.65, overcast: 0.62, storm: 0.62, fog: 0.35 }[look.sky];
+  const cloudOpacity = round(measured ? 0.3 + 0.35 * clamp(i.cloudFraction as number, 0, 1) : base);
 
   const clearish = look.sky === 'clear' || look.sky === 'partly';
   return {
@@ -138,7 +138,7 @@ export function effectsHtml(plan: EffectPlan, area: EffectsArea): string {
   const out: string[] = [];
   const attrs = `class="fx fx-${area}" aria-hidden="true" data-sky="${plan.sky}"${plan.night ? ' data-night' : ''}`
     // over the whole card there is more text for a cloud to lie behind: fainter
-    + ` style="--fx-cloud-op:${round(plan.cloudOpacity * (area === 'card' ? 0.75 : 1))}"`;
+    + ` style="--fx-cloud-op:${round(plan.cloudOpacity * (area === 'card' ? 0.85 : 1))}"`;
   out.push(`<div ${attrs}>`);
   out.push('<div class="fx-sky"></div>');
   if (plan.glow) out.push('<div class="fx-glow"></div>');
@@ -199,16 +199,19 @@ export const EFFECTS_CSS = `
      dark theme, darker in a light one, and never a white that the text has to be read against */
   --fx-ink: var(--primary-text-color, #fff);
   --fx-bg: var(--ha-card-background, var(--card-background-color, #1c1c1c));
-  --fx-cloud: color-mix(in srgb, var(--fx-ink) 22%, var(--fx-bg));
+  --fx-cloud: color-mix(in srgb, var(--fx-ink) 34%, var(--fx-bg));
+  /* the card's own colour, darkened, for a tint of the sky; and a fog, which is cloud on the ground */
+  --fx-dim: color-mix(in srgb, #000 55%, var(--fx-bg));
+  --fx-fog: color-mix(in srgb, var(--fx-ink) 30%, var(--fx-bg));
   --fx-rain-1: ${RAIN_1}; --fx-rain-2: ${RAIN_2};
   --fx-snow-1: ${SNOW_1}; --fx-snow-2: ${SNOW_2};
   --fx-stars-1: ${STARS_1}; --fx-stars-2: ${STARS_2};
 }
-.fx[data-night] { --fx-cloud: color-mix(in srgb, #000 22%, color-mix(in srgb, var(--fx-ink) 22%, var(--fx-bg))); }
-.fx[data-sky="overcast"] { --fx-cloud: color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg)); }
-.fx[data-sky="overcast"][data-night] { --fx-cloud: color-mix(in srgb, #000 30%, color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg))); }
-.fx[data-sky="storm"] { --fx-cloud: color-mix(in srgb, #000 35%, color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg))); }
-.fx[data-sky="storm"][data-night] { --fx-cloud: color-mix(in srgb, #000 50%, color-mix(in srgb, var(--fx-ink) 28%, var(--fx-bg))); }
+.fx[data-night] { --fx-cloud: color-mix(in srgb, #000 22%, color-mix(in srgb, var(--fx-ink) 34%, var(--fx-bg))); }
+.fx[data-sky="overcast"] { --fx-cloud: color-mix(in srgb, var(--fx-ink) 35%, var(--fx-bg)); }
+.fx[data-sky="overcast"][data-night] { --fx-cloud: color-mix(in srgb, #000 30%, color-mix(in srgb, var(--fx-ink) 35%, var(--fx-bg))); }
+.fx[data-sky="storm"] { --fx-cloud: color-mix(in srgb, #000 12%, color-mix(in srgb, var(--fx-ink) 30%, var(--fx-bg))); }
+.fx[data-sky="storm"][data-night] { --fx-cloud: color-mix(in srgb, #000 24%, color-mix(in srgb, var(--fx-ink) 30%, var(--fx-bg))); }
 .fx > * { position: absolute; }
 /* Behind the top part the layer does not stop at the section, which would show as a box:
    it reaches past it to the edges of the card, which clips it, and fades out downwards. */
@@ -219,11 +222,11 @@ export const EFFECTS_CSS = `
 }
 
 .fx-sky { inset: 0; }
-.fx[data-night] .fx-sky { background: linear-gradient(180deg, rgba(8, 16, 48, 0.5), rgba(8, 16, 48, 0) 88%); }
-.fx[data-sky="overcast"] .fx-sky { background: linear-gradient(180deg, rgba(118, 128, 144, 0.22), rgba(118, 128, 144, 0) 85%); }
-.fx[data-sky="overcast"][data-night] .fx-sky { background: linear-gradient(180deg, rgba(6, 10, 28, 0.55), rgba(6, 10, 28, 0) 90%); }
-.fx[data-sky="storm"] .fx-sky { background: linear-gradient(180deg, rgba(22, 28, 44, 0.5), rgba(22, 28, 44, 0) 90%); }
-.fx[data-sky="fog"] .fx-sky { background: rgba(205, 210, 216, 0.14); }
+.fx[data-night] .fx-sky { background: linear-gradient(180deg, color-mix(in srgb, var(--fx-dim) 45%, transparent), transparent 88%); }
+.fx[data-sky="overcast"] .fx-sky { background: linear-gradient(180deg, color-mix(in srgb, var(--fx-dim) 22%, transparent), transparent 85%); }
+.fx[data-sky="overcast"][data-night] .fx-sky { background: linear-gradient(180deg, color-mix(in srgb, var(--fx-dim) 48%, transparent), transparent 90%); }
+.fx[data-sky="storm"] .fx-sky { background: linear-gradient(180deg, color-mix(in srgb, var(--fx-dim) 40%, transparent), transparent 90%); }
+.fx[data-sky="fog"] .fx-sky { background: color-mix(in srgb, var(--fx-fog) 22%, transparent); }
 
 .fx-glow {
   inset: 0; opacity: 0.7;
@@ -248,7 +251,7 @@ export const EFFECTS_CSS = `
 
 .fx-fog {
   left: 0; width: 200%; background-repeat: repeat-x; background-size: 50% 100%;
-  background-image: linear-gradient(90deg, rgba(225, 230, 235, 0), rgba(225, 230, 235, 0.42) 45%, rgba(225, 230, 235, 0) 100%);
+  background-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--fx-fog) 55%, transparent) 45%, transparent 100%);
 }
 .fx-fog {
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 32%, #000 68%, transparent);

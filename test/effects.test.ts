@@ -262,6 +262,27 @@ describe('clouds that suit a card of any height and any theme', () => {
   });
 });
 
+describe('a tint and a fog that suit the theme', () => {
+  // measured on the demo: white-ish fog gave white text 2.6:1, and a fixed dark navy tint behind dark text
+  // in a light theme 3.8:1; a reader needs 4.5:1
+  it('the sky\'s tint is the card\'s own colour, darkened: no fixed colour in it', () => {
+    const rules = EFFECTS_CSS.split('\n').filter((l) => /\.fx-sky/.test(l) && /background/.test(l));
+    expect(rules.length).toBeGreaterThan(3);
+    for (const r of rules) expect(r, r).not.toMatch(/rgba?\(/);
+    expect(EFFECTS_CSS).toMatch(/--fx-dim:\s*color-mix\(in srgb,\s*#000[^;]*var\(--fx-bg\)/);
+  });
+  it('fog is a tint of the theme too, not a fixed pale colour', () => {
+    expect(EFFECTS_CSS).toMatch(/--fx-fog:\s*color-mix\(in srgb,\s*var\(--fx-ink\)/);
+    const fog = /\.fx-fog\s*\{[^}]*background-image:([^;]*);/.exec(EFFECTS_CSS)![1];
+    expect(fog).toContain('var(--fx-fog)');
+    expect(fog).not.toMatch(/rgba\(\s*22\d/);
+  });
+  it('a storm cloud has only a little black in it by day, so that dark text can still be read over it', () => {
+    const n = +/data-sky="storm"\]\s*\{\s*--fx-cloud:\s*color-mix\(in srgb,\s*#000\s+(\d+)%/.exec(EFFECTS_CSS)![1];
+    expect(n).toBeLessThanOrEqual(15);
+  });
+});
+
 describe('rain and snow on a light card as well as a dark one', () => {
   const tile = (name: string) => decodeURIComponent(new RegExp(`--fx-${name}:\\s*url\\("data:image/svg\\+xml,([^"]+)"\\)`).exec(EFFECTS_CSS)![1]);
   it('rain is a mid blue, which shows on both, not a pale one that vanishes on white', () => {
