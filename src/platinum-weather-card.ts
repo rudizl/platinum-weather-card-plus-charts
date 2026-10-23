@@ -8,6 +8,7 @@ import { stringComputeStateDisplay } from './compute_state_display';
 //tjl add ifDefined in support of tap action
 import { ifDefined } from "lit/directives/if-defined";
 import { unsafeHTML } from "lit/directives/unsafe-html";
+import { effectPlan, effectsHtml, EFFECTS_CSS, EffectPlan, EffectsArea } from './effects';
 
 //tjl add HassFormatentity state formatting
 //  This is the new method for formatting state data to the user and includes localization from user's profile.
@@ -801,7 +802,7 @@ export class PlatinumWeatherCard extends LitElement {
     //html`<div class="forecast-text">${entityComputeStateDisplay(this.hass.localize, this.hass.states[this._config.entity_summary], getLocale(this.hass))}</div>` ?? html`<div class="forecast-text">---</div>` : html``;
 
     return html`
-      <div class="overview-section section">
+      <div class="overview-section section${this._fxHost('overview')}">${this._fxLayer('overview')}
         ${this._config.text_card_title ? html`<div class="card-header">${this._config.text_card_title}</div>` : html``}
         ${this._config.text_card_title_2 ? html`<div class="card-header">${this._config.text_card_title_2}</div>` : html``}
         ${this._config.entity_update_time ? html`<div class="updated">${this._config.text_update_time_prefix ? this._config.text_update_time_prefix + ' ' : ''}${this._renderUpdateTime()}</div>` : html``}
@@ -841,12 +842,12 @@ export class PlatinumWeatherCard extends LitElement {
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
     return html`
-      <div class="overview-section section${stack}">
+      <div class="overview-section section${stack}${this._fxHost('overview')}">${this._fxLayer('overview')}
         ${this._config.text_card_title ? html`<div class="card-header">${this._config.text_card_title}</div>` : html``}
         ${this._config.text_card_title_2 ? html`<div class="card-header">${this._config.text_card_title_2}</div>` : html``}
         ${this._config.entity_update_time ? html`<div class="updated">${this._config.text_update_time_prefix ? this._config.text_update_time_prefix + ' ' : ''}${this._renderUpdateTime()}</div>` : html``}
       </div>
-      <div class="overview-section section">
+      <div class="overview-section section${this._fxHost('overview')}">${this._fxLayer('overview')}
         <div class="overview-top">
           <div class="top-left-obs"></div>
           <div class="currentTemps">${currentTemp}${apparentTemp}</div>
@@ -892,7 +893,7 @@ export class PlatinumWeatherCard extends LitElement {
   //  html`<div class="forecast-text-right">${entityComputeStateDisplay(this.hass.localize, this.hass.states[this._config.entity_summary], getLocale(this.hass))}</div>` ?? html`<div class="forecast-text-right">---</div>` : html``;
 
     return html`
-      <div class="overview-section section">
+      <div class="overview-section section${this._fxHost('overview')}">${this._fxLayer('overview')}
         ${this._config.text_card_title ? html`<div class="card-header">${this._config.text_card_title}</div>` : html``}
         ${this._config.text_card_title_2 ? html`<div class="card-header">${this._config.text_card_title_2}</div>` : html``}
         ${this._config.entity_update_time ? html`<div class="updated">${this._config.text_update_time_prefix ? this._config.text_update_time_prefix + ' ' : ''}${this._renderUpdateTime()}</div>` : html``}
@@ -2115,6 +2116,9 @@ export class PlatinumWeatherCard extends LitElement {
     //tjl added. Extend Hass to include "formatEntityState"
     this.hassExtended = this.hass as HassFormatEntityState;
 
+    // the weather behind the card, if it is asked for
+    this._fxPlan = this._effectsPlan();
+
     //tjl added/modified
     //  from: https://github.com/home-assistant/frontend/blob/dev/src/panels/lovelace/cards/hui-weather-forecast-card.ts
     const forecastData = getForecast(
@@ -2177,13 +2181,13 @@ export class PlatinumWeatherCard extends LitElement {
 
     htmlCode.push(html`
       <style>
-        ${this.styles}
+        ${this.styles}${this._fxPlan ? EFFECTS_CSS : ''}
       </style>
-      <ha-card class="card"
+      <ha-card class="card${this._fxHost('card')}"
         tabindex=${ifDefined(
           hasAction(this._config.tap_action) ? "0" : undefined
         )}
-        ><div class="content">
+        >${this._fxLayer('card')}<div class="content">
           ${sections}
         </div>
       </ha-card>
@@ -3966,9 +3970,41 @@ export class PlatinumWeatherCard extends LitElement {
     }
   }
 
-  // get the icon that matches the current conditions
-  private _getIconUrl(iconName: string, forForecast = false): string {
-    const pack = this._config?.icon_pack ?? 'default';
+  // The weather behind the card (see effects.ts). Worked out once per draw, from the name the
+  // card settled on for its icon, so that the picture and the effect cannot disagree.
+  private _fxPlan: EffectPlan | null = null;
+
+  private _effectsPlan(): EffectPlan | null {
+    const quality = this._config?.option_effects;
+    if (quality !== 'subtle' && quality !== 'full') return null;
+    const force = Number(this.currentBeaufort);
+    return effectPlan({
+      iconName: this._effectiveIconName(this._weatherIcon(this.forecastIcon)),
+      night: this.dayOrNight === 'night',
+      rainRateMmH: this._gaugeRateForIcon(),
+      cloudFraction: this.measuredCloudFraction,
+      beaufort: Number.isFinite(force) ? force : null,
+      quality,
+    });
+  }
+
+  private get _fxArea(): EffectsArea {
+    return this._config?.option_effects_area === 'card' ? 'card' : 'overview';
+  }
+
+  // the class that makes a section a host for the layer, and the layer itself
+  private _fxHost(area: EffectsArea): string {
+    return this._fxPlan && this._fxArea === area ? ' fx-host' : '';
+  }
+
+  private _fxLayer(area: EffectsArea): TemplateResult {
+    return this._fxPlan && this._fxArea === area ? html`${unsafeHTML(effectsHtml(this._fxPlan, area))}` : html``;
+  }
+
+  // The name the card settles on for the icon: the provider's, then the sun's word on day
+  // and night, then what the sensors can see. Everything that draws the weather from the
+  // state of the sky (the icon, and the effects behind it) asks here, so they cannot disagree.
+  private _effectiveIconName(iconName: string, forForecast = false): string {
     let adjusted = forForecast ? iconName.replace('-night', '-day') : iconName;
     // Providers can insist on a day/night variant that contradicts the sky — some
     // switch to their night daypart in mid-afternoon and report "clear-night" with
@@ -4058,6 +4094,13 @@ export class PlatinumWeatherCard extends LitElement {
         }
       }
     }
+    return adjusted;
+  }
+
+  // get the icon that matches the current conditions
+  private _getIconUrl(iconName: string, forForecast = false): string {
+    const pack = this._config?.icon_pack ?? 'default';
+    const adjusted = this._effectiveIconName(iconName, forForecast);
 
     if (pack === 'default') {
       const prefix = this._config?.option_static_icons ? 's-' : 'a-';
