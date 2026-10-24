@@ -1832,7 +1832,13 @@ export class PlatinumWeatherCard extends LitElement {
       });
 
       const condition = String(f.condition ?? '');
-      const url = this._getIconUrl(condition ? this._weatherIcon(condition) : 'unknown', true);
+      // Day or night, for the hour itself: what the provider says of it, else where the sun is then. Not what the sun entity
+      // says now: these hours have not happened yet. And not the shading of the nights, which is another choice.
+      const hourIsNight = typeof (f as { is_daytime?: unknown }).is_daytime === 'boolean'
+        ? !(f as { is_daytime: boolean }).is_daytime
+        : typeof lat === 'number' && typeof lon === 'number' && !isNaN(when.getTime())
+          && sunElevation(when, lat, lon) < -0.833;
+      const url = this._getIconUrl(condition ? this._weatherIcon(condition) : 'unknown', true, hourIsNight);
 
       const t = Number(f.temperature);
       const temp = isFinite(t)
@@ -4103,8 +4109,10 @@ export class PlatinumWeatherCard extends LitElement {
   // The name the card settles on for the icon: the provider's, then the sun's word on day
   // and night, then what the sensors can see. Everything that draws the weather from the
   // state of the sky (the icon, and the effects behind it) asks here, so they cannot disagree.
-  private _effectiveIconName(iconName: string, forForecast = false): string {
+  private _effectiveIconName(iconName: string, forForecast = false, night = false): string {
+    // A forecast icon is a day icon: a day's icon is the day's. An hour that is night is the exception, and says so.
     let adjusted = forForecast ? iconName.replace('-night', '-day') : iconName;
+    if (forForecast && night) adjusted = adjusted.replace('-day', '-night');
     // Providers can insist on a day/night variant that contradicts the sky — some
     // switch to their night daypart in mid-afternoon and report "clear-night" with
     // the sun 35° up. When a sun entity is configured, its elevation wins.
@@ -4197,9 +4205,9 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   // get the icon that matches the current conditions
-  private _getIconUrl(iconName: string, forForecast = false): string {
+  private _getIconUrl(iconName: string, forForecast = false, night = false): string {
     const pack = this._config?.icon_pack ?? 'default';
-    const adjusted = this._effectiveIconName(iconName, forForecast);
+    const adjusted = this._effectiveIconName(iconName, forForecast, night);
 
     if (pack === 'default') {
       const prefix = this._config?.option_static_icons ? 's-' : 'a-';
