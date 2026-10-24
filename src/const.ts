@@ -1,1 +1,1 @@
-export const CARD_VERSION = '2.6.0-effects.10';
+export const CARD_VERSION = '2.6.0-effects.11';
