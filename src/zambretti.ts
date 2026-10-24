@@ -175,8 +175,10 @@ export function cloudCoverOktas(fraction: number): number {
  *
  * The sun entity reports where the sun is now; shading the night hours of a
  * forecast means knowing where it will be, which nothing in Home Assistant
- * publishes. This is the standard NOAA approximation, good to a fraction of a
- * degree — far better than needed to decide whether it is dark.
+ * publishes. This is NOAA's solar calculator, with the equation of time in it:
+ * measured against Home Assistant's own sun entity it puts the sunrise and the
+ * sunset within two minutes, which is what deciding whether an hour is dark needs.
+ * Without the equation of time it was out by a quarter of an hour in the autumn.
  */
 export function sunElevation(when: Date, latitude: number, longitude: number): number {
   const rad = Math.PI / 180;
@@ -184,10 +186,19 @@ export function sunElevation(when: Date, latitude: number, longitude: number): n
   const dayOfYear = (when.getTime() - start) / 86400000;
   const hours = when.getUTCHours() + when.getUTCMinutes() / 60 + when.getUTCSeconds() / 3600;
 
+  // The fractional year, in radians (NOAA's solar calculator).
+  const g = 2 * Math.PI / 365 * (dayOfYear - 1 + (hours - 12) / 24);
+  // The equation of time, in minutes: the sun is not a clock. It runs up to a quarter of an hour ahead of it in November
+  // and behind it in February. Left out, the sunrise on 24 October came 22 minutes after Home Assistant's own, and the
+  // hour that the strip draws a moon for with the sun already up was not an hour of rounding.
+  const equationOfTime = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g)
+    - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
   // Declination: where the sun stands relative to the equator on this date.
-  const declination = 23.44 * rad * Math.sin(2 * Math.PI * (284 + dayOfYear) / 365);
+  const declination = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g)
+    - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g)
+    - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
   // Hour angle, from local solar noon.
-  const solarTime = hours + longitude / 15;
+  const solarTime = hours + longitude / 15 + equationOfTime / 60;
   const hourAngle = (solarTime - 12) * 15 * rad;
 
   const lat = latitude * rad;
