@@ -130,6 +130,8 @@ const bg: Translation = {
     "hourly_wind_hint": "Скорост под всеки час",
     "hourly_precipitation_hint": "Само под часовете, в които се очаква",
     "hourly_precipitation": "Показвай валеж",
+    "hourly_pop": "Показвай шанс за дъжд",
+    "hourly_pop_hint": "Процент под часовете, в които дъждът е възможен",
     "hourly_shade_night_hint": "Изчислява се по положението на слънцето, не се чете от сензор",
     "hourly_shade_night": "Затъмнявай нощните часове",
     "hourly_forecast_step_hint": "Взима всеки n-ти час — 3 превръща 24 часа в осем колони",

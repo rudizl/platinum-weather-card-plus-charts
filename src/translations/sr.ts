@@ -130,6 +130,8 @@ const sr: Translation = {
     "hourly_wind_hint": "Брзина испод сваког сата",
     "hourly_precipitation_hint": "Само испод сати у којима се очекују",
     "hourly_precipitation": "Прикажи падавине",
+    "hourly_pop": "Прикажи вероватноћу кише",
+    "hourly_pop_hint": "Проценат испод сати у којима је киша могућа",
     "hourly_shade_night_hint": "Израчунава се по положају сунца, не чита се са сензора",
     "hourly_shade_night": "Затамни ноћне сате",
     "hourly_forecast_step_hint": "Узима сваки n-ти сат — 3 претвара 24 сата у осам колона",

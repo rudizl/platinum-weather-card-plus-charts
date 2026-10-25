@@ -130,6 +130,8 @@ const ua: Translation = {
     "hourly_wind_hint": "Швидкість під кожною годиною",
     "hourly_precipitation_hint": "Лише під годинами, де вони очікуються",
     "hourly_precipitation": "Показувати опади",
+    "hourly_pop": "Показувати ймовірність дощу",
+    "hourly_pop_hint": "Відсоток під годинами, коли можливий дощ",
     "hourly_shade_night_hint": "Обчислюється за положенням сонця, не читається з сенсора",
     "hourly_shade_night": "Затемнювати нічні години",
     "hourly_forecast_step_hint": "Кожна n-та година — 3 перетворює 24 години на вісім стовпців",

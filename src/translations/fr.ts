@@ -130,6 +130,8 @@ const fr: Translation = {
     "hourly_wind_hint": "Vitesse sous chaque heure",
     "hourly_precipitation_hint": "Seulement sous les heures concernées",
     "hourly_precipitation": "Afficher les précipitations",
+    "hourly_pop": "Afficher la probabilité de pluie",
+    "hourly_pop_hint": "Un pourcentage sous les heures où la pluie est possible",
     "hourly_shade_night_hint": "Calculé d'après la position du soleil, pas lu d'un capteur",
     "hourly_shade_night": "Assombrir les heures de nuit",
     "hourly_forecast_step_hint": "Une heure sur n — 3 transforme 24 heures en huit colonnes",

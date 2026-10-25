@@ -130,6 +130,8 @@ const nl: Translation = {
     "hourly_wind_hint": "Snelheid onder elk uur",
     "hourly_precipitation_hint": "Alleen onder uren die neerslag verwachten",
     "hourly_precipitation": "Neerslag tonen",
+    "hourly_pop": "Kans op regen tonen",
+    "hourly_pop_hint": "Een percentage onder uren waarin regen mogelijk is",
     "hourly_shade_night_hint": "Berekend uit de zonnestand, niet uit een sensor",
     "hourly_shade_night": "Nachturen arceren",
     "hourly_forecast_step_hint": "Elk n-de uur — 3 maakt van 24 uur acht kolommen",

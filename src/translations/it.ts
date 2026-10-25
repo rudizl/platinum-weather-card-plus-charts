@@ -130,6 +130,8 @@ const it: Translation = {
     "hourly_wind_hint": "Velocità sotto ogni ora",
     "hourly_precipitation_hint": "Solo sotto le ore che le prevedono",
     "hourly_precipitation": "Mostra precipitazioni",
+    "hourly_pop": "Mostra la probabilità di pioggia",
+    "hourly_pop_hint": "Una percentuale sotto le ore in cui può piovere",
     "hourly_shade_night_hint": "Calcolato dalla posizione del sole, non letto da un sensore",
     "hourly_shade_night": "Ombreggia le ore notturne",
     "hourly_forecast_step_hint": "Un'ora ogni n — 3 trasforma 24 ore in otto colonne",
