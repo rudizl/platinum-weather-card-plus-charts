@@ -131,6 +131,8 @@ const he: Translation = {
     "hourly_wind_hint": "מהירות מתחת לכל שעה",
     "hourly_precipitation_hint": "רק מתחת לשעות שבהן צפויים",
     "hourly_precipitation": "הצג משקעים",
+    "hourly_pop": "הצג סיכוי לגשם",
+    "hourly_pop_hint": "אחוז מתחת לשעות שבהן גשם אפשרי",
     "hourly_shade_night_hint": "מחושב לפי מיקום השמש, לא נקרא מחיישן",
     "hourly_shade_night": "הצללת שעות הלילה",
     "hourly_forecast_step_hint": "כל שעה n — 3 הופך 24 שעות לשמונה עמודות",

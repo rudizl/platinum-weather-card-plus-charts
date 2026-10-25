@@ -1331,6 +1331,15 @@ get _forecast_type(): string {
           </div>
           <div class="help-text">${this._t("hourly_group_hint")}</div>
         </div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+            <span class=${this._config?.option_hourly_pop !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_hourly_pop'} @click=${this._toggleVisibility}></span>
+            <span class="toggle-label">${this._t("hourly_pop")}</span>
+          </div>
+          <div class="help-text">${this._t("hourly_pop_hint")}</div>
+        </div>
       </div>` : html``}
     `;
   }

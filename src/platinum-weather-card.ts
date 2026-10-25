@@ -463,6 +463,21 @@ export class PlatinumWeatherCard extends LitElement {
     return groups;
   }
 
+  // The entries of the first `days` dates of a forecast that is in order of time, however many entries a date has.
+  private static _firstDates(entries: ForecastAttribute[], days: number): ForecastAttribute[] {
+    const seen = new Set<string>();
+    const out: ForecastAttribute[] = [];
+    for (const e of entries) {
+      const date = new Date(e.datetime).toDateString();
+      if (!seen.has(date)) {
+        if (seen.size >= days) break;
+        seen.add(date);
+      }
+      out.push(e);
+    }
+    return out;
+  }
+
   // One entry standing for a run of hours. It keeps the time and the temperature of
   // the hour it starts on; the rain is added up, the wind takes the strongest, and the
   // weather is the worst of the group. Whatever the provider does not give stays absent.
@@ -1693,12 +1708,23 @@ export class PlatinumWeatherCard extends LitElement {
     if (!forecast) return undefined;
     const day = date.toDateString();
     const forecastForThisDay = forecast.filter(o => new Date(o.datetime).toDateString() === day);
+    // Home Assistant says is_daytime on the entries of a twice-daily forecast. The card read `daytime`, which no provider
+    // says, so for a date with two entries it found neither and the strip and the charts stayed empty (#35); the old name
+    // is still read, for whatever gave it.
+    const isDay = (o: any): boolean | undefined => (typeof o.is_daytime === 'boolean' ? o.is_daytime : o.daytime);
     if (forecastForThisDay.length === 1) {
-      return forecastForThisDay[0][propKey] !== undefined ? String(forecastForThisDay[0][propKey]) : undefined;
+      const only = forecastForThisDay[0];
+      // The one entry of a date can be a night, with no day before it: the evening's first entry of a twice-daily forecast.
+      // Its temperature is a low, and showing it as the high of the day was wrong.
+      if (isDay(only) === false) {
+        if (propKey === 'temperature') return undefined;
+        if (propKey === 'templow') return only.temperature !== undefined ? String(only.temperature) : undefined;
+      }
+      return only[propKey] !== undefined ? String(only[propKey]) : undefined;
     }
-    else if (forecastForThisDay.length === 2) {
-      const dayForecast = forecastForThisDay.find(o => o.daytime === true);
-      const nightForecast = forecastForThisDay.find(o => o.daytime === false);
+    else if (forecastForThisDay.length >= 2) {
+      const dayForecast = forecastForThisDay.find(o => isDay(o) === true);
+      const nightForecast = forecastForThisDay.find(o => isDay(o) === false);
 
       //Get low temp from night forecast
       if (propKey === 'templow') {
@@ -1820,6 +1846,10 @@ export class PlatinumWeatherCard extends LitElement {
     const decimals = this._config?.option_today_temperature_decimals === true ? 1 : 0;
     const showRain = this._config?.option_hourly_precipitation !== false
       && forecast.some((f) => Number(f.precipitation) > 0);
+    // The chance of rain, as the amount is: under the hours that have one, and the row is dropped when the whole span is dry or
+    // the provider gives none (discussion #34). On unless turned off: the strip is new in this version.
+    const showPop = this._config?.option_hourly_pop !== false
+      && forecast.some((f) => Math.round(Number(f.precipitation_probability)) > 0);
     const showWind = this._config?.option_hourly_wind === true;
     const shadeNight = this._config?.option_hourly_shade_night !== false;
     const lat = this.hass?.config?.latitude;
@@ -1866,6 +1896,11 @@ export class PlatinumWeatherCard extends LitElement {
         }
       }
 
+      const chance = Math.round(Number(f.precipitation_probability));
+      const pop = showPop
+        ? html`<div class="hourly-pop">${chance > 0 ? `${chance}%` : ''}</div>`
+        : html``;
+
       const p = Number(f.precipitation);
       // Only where something is expected: a column of zeroes is noise, and the
       // row is dropped entirely when the whole span is dry.
@@ -1881,6 +1916,7 @@ export class PlatinumWeatherCard extends LitElement {
           <div class="hourly-time">${time}</div>
           <i class="icon hourly-icon" style="background: none, url(${url}) no-repeat; background-size: contain;"></i>
           <div class="hourly-temp">${temp}</div>
+          ${pop}
           ${rain}
           ${showWind ? html`<div class="hourly-wind">${windBits.join('')}</div>` : html``}
         </div>
@@ -2193,9 +2229,13 @@ export class PlatinumWeatherCard extends LitElement {
     const forecastDays = this._config.daily_forecast_days
       ? this._config.daily_forecast_days : 5;
     const firstDay = this._config.option_show_current_day ? 0 : 1;
+    // A twice-daily forecast has two entries to a date, so the days are counted by date: counting entries kept two and a
+    // half days of five (#35). A daily forecast has one to a date and is cut as it always was.
     this.forecast1 =
       this._config.weather_entity && forecastData?.forecast?.length
-        ? forecastData.forecast.slice(0, firstDay + forecastDays)
+        ? (this._stripForecastType === 'twice_daily'
+          ? PlatinumWeatherCard._firstDates(forecastData.forecast, firstDay + forecastDays)
+          : forecastData.forecast.slice(0, firstDay + forecastDays))
         : undefined;
   
     if (this._checkForErrors()) htmlCode.push(this._showConfigWarning(this._error));
@@ -4869,6 +4909,11 @@ export class PlatinumWeatherCard extends LitElement {
       .hourly-wind {
         font-size: 0.7em;
         opacity: 0.65;
+        min-height: 1em;
+      }
+      .hourly-pop {
+        font-size: 0.72em;
+        color: var(--pwcc-rain, #73c6ef);
         min-height: 1em;
       }
       .hourly-rain {

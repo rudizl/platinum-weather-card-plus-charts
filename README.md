@@ -81,7 +81,13 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **A press on a reading that has an action of its own no longer also runs the card's hold action.** The card listens for presses on its own element, where the browser reports that element rather than what was pressed, so the check for a press that began on such a reading could never match, and a long press on it also ran the card's hold action. It now looks at where the press really began.
 
-A hundred and thirty-five new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
+**The hourly strip draws a moon at night.** A clear sky at 23:00 was a sun: every forecast icon is made a day icon, which is right for a day and wrong for an hour of the night. Each hour is now day or night by what the provider says of it (`is_daytime`) or, without that, by where the sun is at that hour, worked out for the card's place. The days are as they were. The same sum shades the night hours of the strip, and it was out by up to a quarter of an hour in the autumn, because the sun is not a clock and the formula left out the equation of time: on 24 October it put the sunrise 22 minutes after Home Assistant's own. It is now within two minutes of `sun.sun`'s sunrise and sunset, which a test checks.
+
+**A twice-daily forecast fills the strip and the charts** (#35, from @artbird309, who found the cause and wrote the fix). With the National Weather Service, which gives only `twice_daily` and `hourly`, the strip and the charts stayed empty. A date has two entries there, a day and a night, and the card told them apart by `daytime`, which Home Assistant does not say: it says `is_daytime`. The day's icon, high and chance of rain now come from the day entry and the low from the night entry; the old name is still read, for whatever gave it. The forecast was also cut to the days asked for by counting entries, two to a day, so five days kept two and a half; it is counted by date now, for a twice-daily forecast only. And in the evening, when a date has only its night, that temperature is shown as the low and no longer as the high of the day. Nine new tests run the card with a forecast like the National Weather Service's, and fail on the old code.
+
+**The chance of rain under the hours** (discussion #34, from @ChittyChittyBang). The hourly strip showed how much rain is expected but not how likely it is, which is what someone watching the washing wants to know. A percentage now goes under the temperature of each hour that has one, in the colour of the rain, and the row is dropped when the whole span is dry or the provider gives no chances. For hours grouped by `hourly_forecast_step` it is the highest of the group. It is on, and `option_hourly_pop: false` (or the switch in the editor, in all fifteen languages) takes it off; the amount of rain has its own switch and the two do not depend on each other. Nine new tests.
+
+A hundred and sixty-eight new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
 
 ---
 
@@ -936,7 +942,7 @@ Two layout options: **Horizontal** (default, up to 5 days) and **Vertical** (up 
 - **A weather entity.** Set `weather_entity` and that is all there is to it. The six per-day settings in the table below (icon, summary, minimum, maximum, chance of rain, possible rain) are that entity, unless you set any of them yourself. Set one, to a sensor or to the weather entity, and the card fills in none of the others.
 - **Per-day sensors**, the way the original Platinum Weather Card was configured. Set `entity_forecast_icon_1` and its siblings to the first sensor of a numbered series, such as `sensor.forecast_icon_1`, and the card steps the number up for each day.
 
-`forecast_type` is `daily` (the default) or `twice_daily`. An `hourly` in an existing configuration is read as `daily`: the strip needs one forecast entry for each day, and the hours have a section of their own.
+`forecast_type` is `daily` (the default) or `twice_daily`. An `hourly` in an existing configuration is read as `daily`: the strip needs one forecast entry for each day, and the hours have a section of their own. With `twice_daily` (the National Weather Service gives only that and `hourly`) each date has a day entry and a night entry, told apart by Home Assistant's `is_daytime`: the day's icon, high and chance of rain are the day's, and the low is the night's.
 
 The days can share the section with an hourly view, shown as a second tab or on its own. It has settings of its own, described under [Hourly Forecast Section](#hourly-forecast-section).
 
@@ -1002,6 +1008,7 @@ Opened with the settings button on the **Hourly forecast** row:
 | Combine the hours in a step | `option_hourly_group` | off | With a step above 1, the hours in each step are combined instead of every nth one being taken: the rain is added up, the wind is the strongest, the weather is the worst of them, and the time and the temperature are those of the hour the step starts on. Without it, the rain that falls in the hours that are skipped is not shown |
 | Shade the night hours | `option_hourly_shade_night` | on | A faint wash behind the hours the sun is down, so it is obvious where the day ends |
 | Show rainfall | `option_hourly_precipitation` | on | A figure under the hours expecting some; the row vanishes when the whole span is dry, rather than printing a column of zeroes |
+| Show chance of rain | `option_hourly_pop` | on | A percentage under the hours where rain is possible, in the colour of the rain; the row vanishes when the whole span is dry or the provider gives none. For grouped hours, the highest of the group |
 | Show wind | `option_hourly_wind` | off | Speed under each hour, in the unit the hourly entity reports |
 
 ### What it shows
@@ -1284,6 +1291,7 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 | `option_hourly_group` | Boolean | `false` | Combine the hours in each `hourly_forecast_step` (rain added up, strongest wind, worst weather) instead of taking every nth hour |
 | `option_hourly_shade_night` | Boolean | `true` | Shade the hours the sun is down; calculated from `latitude`/`longitude`, not read from a sensor |
 | `option_hourly_precipitation` | Boolean | `true` | Rainfall under the hours expecting some |
+| `option_hourly_pop` | Boolean | `true` | The chance of rain under the hours that have one |
 | `option_hourly_wind` | Boolean | `false` | Wind speed under each hour, in the hourly entity's unit |
 
 ## Charts Section

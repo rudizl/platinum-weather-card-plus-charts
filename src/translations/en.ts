@@ -131,6 +131,8 @@ const en: Translation = {
     "hourly_wind_hint": "Speed under each hour",
     "hourly_precipitation_hint": "Only under hours expecting some",
     "hourly_precipitation": "Show rainfall",
+    "hourly_pop": "Show chance of rain",
+    "hourly_pop_hint": "A percentage under the hours where rain is possible",
     "hourly_shade_night_hint": "Worked out from the sun's position, not read from a sensor",
     "hourly_shade_night": "Shade the night hours",
     "hourly_forecast_step_hint": "Take every nth hour — 3 turns 24 hours into eight columns",

@@ -131,6 +131,8 @@ const da: Translation = {
     "hourly_wind_hint": "Hastighed under hver time",
     "hourly_precipitation_hint": "Kun under timer hvor der ventes nedbør",
     "hourly_precipitation": "Vis nedbør",
+    "hourly_pop": "Vis regnchance",
+    "hourly_pop_hint": "En procent under timer hvor regn er muligt",
     "hourly_shade_night_hint": "Beregnet ud fra solens position, ikke læst fra en sensor",
     "hourly_shade_night": "Skyg nattetimerne",
     "hourly_forecast_step_hint": "Hver n-te time — 3 gør 24 timer til otte kolonner",
