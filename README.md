@@ -89,7 +89,9 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **An overcast sky and a moderate rain no longer draw a tornado with a custom pack.** The card names the icon for a cloud cover of 85% and over `cloudy-3`, and for a rain of 2.5 to 10 mm/h (measured by the rain gauge) `rainy-2`, with a day or a night, and the table of picture names that the `custom` and `wcc-2` packs use did not have those two: they fell to `exceptional`. Anyone who lets the sensors choose the icon had a tornado under an overcast sky or in a moderate rain. (It is in 2.5.2 too.) Both are in the table now, and a name that the table does not have takes the picture of its family; only what is meant to be exceptional (`dust`, `tropical-storm`, a condition that is not known) still does. Nine new tests go through the real choice, with a solar sensor and a rain gauge, and the four that matter fail on the old table.
 
-A hundred and seventy-seven new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
+**The cloud cover entity can be a weather entity.** The card reads it from the attribute `cloud_coverage` of a weather entity, or from the state of a sensor, but the picker in the editor offered sensors only, so that met.no's weather entity, which gives the number, could not be chosen for the cloud cover shown at night. Both pickers offer weather entities now, and only the ones that can be a sky: a weather entity that gives a cloud cover and a sensor in per cent, not the thousand sensors of a house (anything else can still be typed in). Seven new tests.
+
+A hundred and eighty-four new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
 
 ---
 
@@ -1193,7 +1195,7 @@ double_tap_action:
 | `option_sun_overrides_icon` | Boolean | `true` | Force the day/night variant of the current condition icon from the sun entity's state (its elevation as a fallback), overriding the provider |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
-| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help |
+| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help. A sensor in per cent, or a weather entity that gives `cloud_coverage` (met.no does) |
 | `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky, and drives the rain rate slot. Intensity follows the standard bands: light below 2.5 mm/h, moderate to 10, heavy to 50, violent above |
 | `entity_dew_point` | String | none | Dew point sensor, for the comfort line under the apparent temperature |
 | `option_show_comfort` | Boolean | `false` | Show how the air feels, in a word |
