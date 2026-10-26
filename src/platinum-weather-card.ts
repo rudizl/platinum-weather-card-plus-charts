@@ -3454,13 +3454,30 @@ export class PlatinumWeatherCard extends LitElement {
       return now;
     }
     const last = cls._lastDaylightCloud;
-    if (last === null) return null;
     // Six hours, not a day. Checked against a real frontal event: the sky was
     // last measured at 38% on a Saturday afternoon, that figure was still being
     // reported through the night, and by the time rain arrived at six the next
     // morning the cloud had reached 84%. A fourteen-hour-old reading is not
     // information about the present sky, it is a memory of a different one.
-    return Date.now() - last.t <= 21600000 ? last.f : null;
+    if (last !== null && Date.now() - last.t <= 21600000) return last.f;
+    // And when the card has nothing of its own, the provider's: better a sky from met.no than a forecast made blind.
+    return this.providerCloudFraction;
+  }
+
+  // The cloud cover that a weather entity gives (met.no does: the attribute cloud_coverage, in per cent), as a fraction, or null
+  // when there is none or it is not a percentage. The entity of the hourly forecast first, which is the one chosen for the near
+  // hours, then the card's own weather entity. It is used where the card has measured nothing and remembers nothing:
+  // after dark the pyranometer sees nothing, and on 26 October at 21:11 Sager said "fair and cooler" under a sky that met.no gave as
+  // 99% covered, for want of a sky to read.
+  get providerCloudFraction(): number | null {
+    for (const entity of [this._config.entity_hourly, this._config.weather_entity]) {
+      const raw = entity ? this.hass.states[entity]?.attributes?.cloud_coverage : undefined;
+      if (typeof raw !== 'number' && typeof raw !== 'string') continue;
+      if (typeof raw === 'string' && raw.trim() === '') continue;
+      const percent = Number(raw);
+      if (isFinite(percent) && percent >= 0 && percent <= 100) return percent / 100;
+    }
+    return null;
   }
 
   get measuredCloudFraction(): number | null {

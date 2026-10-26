@@ -222,3 +222,51 @@ describe('the rain', () => {
     expect(run(await card({ entity_rain_rate: undefined })).a?.rainRateMmH).toBeNull();
   });
 });
+
+// After dark the pyranometer sees nothing, and the last reading goes stale in six hours. A provider that says how much of the sky is
+// covered (met.no does, as the attribute cloud_coverage, in per cent) is better than a forecast made blind: on 26 October at 21:11 Sager
+// said "Fair and cooler" under a sky that met.no gave as 99% covered, because it had no sky to read. Only where nothing is measured.
+describe('the sky, when nothing is measured', () => {
+  const dark = (cloud?: unknown, entity = 'weather.hours'): Record<string, St> => states(cloud === undefined ? {} : { [entity]: { state: 'cloudy', attributes: { cloud_coverage: cloud } } });
+  it('is the provider\u2019s cloud cover, from the hourly entity, as a fraction', async () => {
+    expect(run(await card({ entity_hourly: 'weather.hours' }, dark(99.2))).a?.cloudCover).toBeCloseTo(0.992, 3);
+    forget();
+    expect(run(await card({ entity_hourly: 'weather.hours' }, dark(0))).a?.cloudCover).toBe(0);
+  });
+  it('or the card\u2019s own weather entity, when there is no hourly one', async () => {
+    expect(run(await card({ weather_entity: 'weather.home' }, dark(40, 'weather.home'))).a?.cloudCover).toBeCloseTo(0.4, 5);
+  });
+  it('the hourly entity first: it is the one chosen for the near hours', async () => {
+    const st = { ...dark(90, 'weather.hours'), 'weather.home': { state: 'cloudy', attributes: { cloud_coverage: 10 } } };
+    expect(run(await card({ entity_hourly: 'weather.hours', weather_entity: 'weather.home' }, st)).a?.cloudCover).toBeCloseTo(0.9, 5);
+  });
+  it('and is named in the forecast, so that it is not \u201cfair\u201d under a covered sky', async () => {
+    const covered = await card({ entity_hourly: 'weather.hours' }, dark(99));
+    const { text } = run(covered);
+    expect(text).toContain(tSager(covered.locale, 'sky_overcast'));
+    expect(text).not.toBe(run(await card()).text);
+  });
+  it('nothing the provider says is a number: not a sky, not a zero', async () => {
+    for (const bad of ['unknown', 'unavailable', null, '', 'cloudy', 140, -5, Number.NaN]) {
+      forget();
+      expect(run(await card({ entity_hourly: 'weather.hours' }, dark(bad))).a?.cloudCover, String(bad)).toBeNull();
+    }
+  });
+  it('an entity that has no cloud cover leaves it as it was: not known', async () => {
+    expect(run(await card({ entity_hourly: 'weather.hours' }, states({ 'weather.hours': { state: 'cloudy', attributes: { temperature: 12 } } }))).a?.cloudCover).toBeNull();
+  });
+  it('what the card measured comes first, now and for six hours', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(NOON);
+    // a clear midday by the pyranometer, a covered sky by the provider: the pyranometer is the card\u2019s own, and is right here
+    const el = await card({ entity_hourly: 'weather.hours' }, states({ ...day('620'), 'weather.hours': { state: 'cloudy', attributes: { cloud_coverage: 95 } } }));
+    const seen = run(el).a?.cloudCover as number;
+    expect(seen).toBeLessThan(0.25);
+    vi.setSystemTime(NOON + hours(5));
+    await swap(el, states({ 'weather.hours': { state: 'cloudy', attributes: { cloud_coverage: 95 } } }));
+    expect(run(el).a?.cloudCover, 'five hours on, in the dark: the last reading, not the provider').toBeCloseTo(seen, 5);
+    vi.setSystemTime(NOON + hours(6) + minutes(1));
+    await swap(el, states({ 'weather.hours': { state: 'cloudy', attributes: { cloud_coverage: 95 } } }));
+    expect(run(el).a?.cloudCover, 'past six hours: now the provider\u2019s').toBeCloseTo(0.95, 5);
+  });
+});
