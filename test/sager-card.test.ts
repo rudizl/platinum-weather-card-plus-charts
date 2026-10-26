@@ -270,3 +270,40 @@ describe('the sky, when nothing is measured', () => {
     expect(run(el).a?.cloudCover, 'past six hours: now the provider\u2019s').toBeCloseTo(0.95, 5);
   });
 });
+
+// The setting that was there before: entity_cloud_cover, "provider cloud cover, used at night when the pyranometer cannot help". The slot
+// read it, and Sager did not. A card that names a source for the sky at night means it for the forecast too, and it outranks the guess
+// that the card makes from the hourly entity and the weather entity when nothing is named.
+describe('the sky at night, from the entity that was named for it', () => {
+  const dark = (over: Record<string, St>) => states(over);
+  it('is a sensor, in per cent, as the slot reads it', async () => {
+    expect(run(await card({ entity_cloud_cover: 'sensor.cc' }, dark({ 'sensor.cc': { state: '88' } }))).a?.cloudCover).toBeCloseTo(0.88, 5);
+  });
+  it('or a weather entity, by its attribute cloud_coverage, as the slot reads it', async () => {
+    expect(run(await card({ entity_cloud_cover: 'weather.cc' }, dark({ 'weather.cc': { state: 'cloudy', attributes: { cloud_coverage: 61 } } }))).a?.cloudCover).toBeCloseTo(0.61, 5);
+  });
+  it('before the hourly entity and the weather entity, which are only a guess when nothing is named', async () => {
+    const st = dark({ 'sensor.cc': { state: '30' }, 'weather.hours': { state: 'cloudy', attributes: { cloud_coverage: 95 } }, 'weather.home': { state: 'cloudy', attributes: { cloud_coverage: 95 } } });
+    expect(run(await card({ entity_cloud_cover: 'sensor.cc', entity_hourly: 'weather.hours', weather_entity: 'weather.home' }, st)).a?.cloudCover).toBeCloseTo(0.3, 5);
+  });
+  it('and when it is not there, or gives no number, the guess takes over, and not a blind forecast', async () => {
+    for (const sensor of [{ state: 'unavailable' }, { state: 'unknown' }, { state: '' }, { state: 'dark' }, { state: '250' }, undefined]) {
+      forget();
+      const st = dark({ 'weather.hours': { state: 'cloudy', attributes: { cloud_coverage: 70 } }, ...(sensor ? { 'sensor.cc': sensor } : {}) });
+      expect(run(await card({ entity_cloud_cover: 'sensor.cc', entity_hourly: 'weather.hours' }, st)).a?.cloudCover, JSON.stringify(sensor)).toBeCloseTo(0.7, 5);
+    }
+  });
+  it('and when there is nothing else, the sky is not known: not a zero', async () => {
+    expect(run(await card({ entity_cloud_cover: 'sensor.cc' }, dark({ 'sensor.cc': { state: 'unavailable' } }))).a?.cloudCover).toBeNull();
+  });
+  it('what the card measured still comes first', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(NOON);
+    const el = await card({ entity_cloud_cover: 'sensor.cc' }, states({ ...day('620'), 'sensor.cc': { state: '95' } }));
+    expect(run(el).a?.cloudCover as number).toBeLessThan(0.25);
+  });
+  it('the named sky is the one in the forecast text', async () => {
+    const el = await card({ entity_cloud_cover: 'sensor.cc' }, dark({ 'sensor.cc': { state: '97' } }));
+    expect(run(el).text).toContain(tSager(el.locale, 'sky_overcast'));
+  });
+});
