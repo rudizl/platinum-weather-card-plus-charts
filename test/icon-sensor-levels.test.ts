@@ -43,3 +43,29 @@ describe('the rain gauge decides the icon, in three levels', () => {
     expect(picture(await card({ rain }))).toBe('rain');
   });
 });
+
+describe('no name the card can produce is a tornado, unless it is meant to be', () => {
+  // the names that every condition of Home Assistant gives, by day and by night, and the ones the two sensors give
+  it('is true of the table of picture names that the custom and wcc-2 packs use', async () => {
+    const ON_PURPOSE = new Set(['unknown', 'dust', 'tropical-storm']);
+    const names = new Set<string>(['cloudy']);
+    for (const state of ['above_horizon', 'below_horizon']) {
+      const hass = makeHass({ 'weather.home': { state: 'cloudy' }, 'sun.sun': { state, attributes: { elevation: state === 'above_horizon' ? 35 : -20, azimuth: 150 } } });
+      const el = (await renderCard(baseConfig({ entity_sun: 'sun.sun' } as never), hass)) as unknown as Record<string, unknown> & Card;
+      for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(el))) {
+        if (/^icon[A-Z]/.test(key)) names.add(String(el[key]));
+      }
+    }
+    for (const t of ['day', 'night']) for (const b of ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3', 'rainy-1', 'rainy-2', 'rainy-3']) names.add(`${b}-${t}`);
+    expect(names.size).toBeGreaterThan(30);
+    const el = (await card({})) as Card & { _iconToWcc: (n: string) => string };
+    const tornado = [...names].filter((n) => el._iconToWcc(n) === 'exceptional' && !ON_PURPOSE.has(n));
+    expect(tornado, 'names that are a tornado without meaning to be').toEqual([]);
+  });
+  it('and a name that is new takes the look of its family', async () => {
+    const el = (await card({})) as Card & { _iconToWcc: (n: string) => string };
+    for (const [n, want] of [['cloudy-4-day', 'cloudy'], ['rainy-9-night', 'rain'], ['snowy-7', 'snow'], ['clear-night', 'clear-night']] as const) expect(el._iconToWcc(n), n).toBe(want);
+    expect(el._iconToWcc('tornado')).toBe('exceptional');
+    expect(el._iconToWcc('something-new')).toBe('exceptional');
+  });
+});
