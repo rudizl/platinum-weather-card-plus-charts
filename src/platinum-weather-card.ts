@@ -4263,10 +4263,10 @@ export class PlatinumWeatherCard extends LitElement {
     const metName = this._iconToMeteocons(adjusted);
     if (pack === 'meteocons-fill') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/${metName}.svg`;
     if (pack === 'meteocons-line') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/${metName}.svg`;
-    // The photoreal pack is fifteen PNGs beside the card (p-<name>.png), the same names as the custom pack asks for
+    // The photoreal pack is twenty PNGs beside the card (p-<name>.png): the names of the custom pack, and five more for the levels
     // The revision is in the address: Home Assistant serves the pictures with a cache of 31 days, so a picture that is
     // redrawn under the same name would not reach a phone that has the old one. Raise it when a picture changes.
-    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + wccName + '.png?r=' + PHOTOREAL_REVISION;
+    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + this._iconToPhotoreal(adjusted) + '.png?r=' + PHOTOREAL_REVISION;
     if (pack === 'custom' && this._config?.icon_pack_path)
       return this._config.icon_pack_path.replace('{condition}', wccName);
 
@@ -4293,11 +4293,17 @@ export class PlatinumWeatherCard extends LitElement {
       'cloudy-2-day':                   'partlycloudy-day',
       'cloudy-2-night':                 'partlycloudy-night',
       'cloudy':                         'cloudy',
+      // The overcast band of the cloud cover (cloudy-3), which the table had not: it fell to 'exceptional', a tornado
+      'cloudy-3-day':                   'cloudy',
+      'cloudy-3-night':                 'cloudy',
       'haze-day':                       'fog',
       'haze-night':                     'fog',
       'frost-day':                      'snow',
       'frost-night':                    'snow',
       'rainy-2':                        'rain',
+      // The moderate band of the rain gauge (2.5 to 10 mm/h) is named with a day or a night, as the other two are
+      'rainy-2-day':                    'rain',
+      'rainy-2-night':                  'rain',
       'wind':                           'wind',
       'fog-day':                        'fog',
       'fog-night':                      'fog',
@@ -4318,7 +4324,33 @@ export class PlatinumWeatherCard extends LitElement {
       'isolated-thunderstorms-night':   'lightning',
       'unknown':                        'exceptional',
     };
-    return map[iconName] ?? 'exceptional';
+    return map[iconName] ?? this._guessWcc(iconName);
+  }
+
+  // A name that is not in the table is a new variant of a family that is, and should look like its family; it did look
+  // like a tornado, for 'cloudy-3-day' and for 'rainy-2-day'. Only what is meant to be a tornado, or is not known, is one.
+  private _guessWcc(n: string): string {
+    const night = /-night$/.test(n);
+    if (/^clear/.test(n)) return night ? 'clear-night' : 'clear-day';
+    if (/^(cloudy|overcast)/.test(n)) return 'cloudy';
+    if (/^(rainy|drizzle|showers?)/.test(n)) return 'rain';
+    if (/^(snowy|frost)/.test(n)) return 'snow';
+    if (/^(sleet|rain-and)/.test(n)) return 'sleet';
+    if (/^(fog|haze|mist)/.test(n)) return 'fog';
+    if (/^hail/.test(n)) return 'hail';
+    if (/^wind/.test(n)) return 'wind';
+    if (/thunder/.test(n)) return 'lightning-rain';
+    return 'exceptional';
+  }
+
+  // The photoreal pack has more pictures than the names of the custom pack, so that the levels of the sky and of the rain
+  // can be told apart: a small cloud, a partly cloudy sky, and a sun nearly hidden; a light rain beside the rain.
+  // The custom pack keeps to its fifteen names.
+  private _iconToPhotoreal(iconName: string): string {
+    const sky = /^cloudy-([123])-(day|night)$/.exec(iconName);
+    if (sky) return `${['mostlysunny', 'partlycloudy', 'mostlycloudy'][Number(sky[1]) - 1]}-${sky[2]}`;
+    if (/^rainy-1(-|$)/.test(iconName)) return 'lightrain';
+    return this._iconToWcc(iconName);
   }
 
   // Maps our internal icon names to Home Assistant's own weather icons, which

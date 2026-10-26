@@ -6,12 +6,14 @@ import '../src/editor';
 import { render } from 'lit';
 import { makeHass, baseConfig, renderCard } from './helpers';
 
-// The photoreal pack: fifteen PNG pictures with a transparent background, a flat file each beside the card's own
-// (the release uploads dist/* flat), named p-<name>.png after the names the custom pack asks for.
+// The photoreal pack: twenty PNG pictures with a transparent background, a flat file each beside the card's own
+// (the release uploads dist/* flat), named p-<name>.png: the fifteen names the custom pack asks for, and five more for
+// the levels of the sky and of the rain, which the custom pack does not ask for.
 
 const DIST = resolve(__dirname, '../dist');
 const NAMES = ['clear-day', 'clear-night', 'partlycloudy-day', 'partlycloudy-night', 'cloudy', 'fog', 'rain', 'pouring',
-  'snow', 'sleet', 'hail', 'lightning', 'lightning-rain', 'wind', 'exceptional'];
+  'snow', 'sleet', 'hail', 'lightning', 'lightning-rain', 'wind', 'exceptional',
+  'mostlysunny-day', 'mostlysunny-night', 'mostlycloudy-day', 'mostlycloudy-night', 'lightrain'];
 
 type Card = HTMLElement & { _getIconUrl: (n: string, f?: boolean) => string; _weatherIcon: (c: string) => string; _iconToWcc: (n: string) => string };
 
@@ -20,7 +22,7 @@ async function card(config: Record<string, unknown> = {}) {
 }
 
 describe('the files', () => {
-  it('there are fifteen, each p-<name>.png, in dist, where the release takes them from', () => {
+  it('there are twenty, each p-<name>.png, in dist, where the release takes them from', () => {
     for (const n of NAMES) expect(existsSync(resolve(DIST, `p-${n}.png`)), `p-${n}.png`).toBe(true);
     expect(readdirSync(DIST).filter((f) => /^p-.*\.png$/.test(f)).sort()).toEqual(NAMES.map((n) => `p-${n}.png`).sort());
   });
@@ -62,15 +64,22 @@ describe('the pack in the card', () => {
     const el = await card();
     const CONDITIONS = ['sunny', 'clear-night', 'partlycloudy', 'cloudy', 'rainy', 'pouring', 'snowy', 'snowy-rainy', 'fog', 'hail', 'lightning', 'lightning-rainy', 'windy', 'windy-variant', 'exceptional', 'drizzle', 'light-rain', 'showers'];
     const BANDS = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'].flatMap((b) => [`${b}-day`, `${b}-night`]);
-    const names = new Set<string>([...BANDS, 'cloudy']);
+    // what the rain gauge makes of a plain sky: rainy-1, rainy-2 and rainy-3, each with a day or a night (cloudy-3 and rainy-2
+    // were the two the table had not, and both fell to a tornado, which the test did not mind: the tornado is a picture too)
+    const RATES = ['rainy-1', 'rainy-2', 'rainy-3'].flatMap((b) => [`${b}-day`, `${b}-night`]);
+    const names = new Set<string>([...BANDS, ...RATES, 'cloudy']);
     for (const c of CONDITIONS) names.add(el._weatherIcon(c));
     const missing: string[] = [];
+    const tornado: string[] = [];
+    const ON_PURPOSE = new Set(['unknown', 'dust', 'tropical-storm']);
     for (const n of names) {
       const url = el._getIconUrl(n);
       const file = url.split('/').pop()!.split('?')[0];
       if (!/^p-.*\.png$/.test(file) || !existsSync(resolve(DIST, file))) missing.push(`${n} -> ${file}`);
+      if (file === 'p-exceptional.png' && !ON_PURPOSE.has(n)) tornado.push(n);
     }
     expect(missing, 'names that land on a picture that is not there').toEqual([]);
+    expect(tornado, 'names that land on the tornado without meaning to').toEqual([]);
   });
   it('the forecast strips use it too', async () => {
     expect((await card())._getIconUrl('rainy-3-day', true)).toMatch(/p-rain\.png\?r=\d+$/);
@@ -78,6 +87,42 @@ describe('the pack in the card', () => {
   it('another pack is not changed by it', async () => {
     const el = await card({ icon_pack: 'default' });
     expect(el._getIconUrl('clear-day')).toMatch(/a-clear-day\.svg$/);
+  });
+});
+
+describe('the levels of the sky and of the rain look different', () => {
+  const file = (el: Card, n: string) => el._getIconUrl(n).split('/').pop()!.split('?')[0];
+  it('four bands of cloud, four pictures, by day and by night', async () => {
+    const el = await card();
+    for (const t of ['day', 'night']) {
+      const f = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'].map((b) => file(el, `${b}-${t}`));
+      expect(new Set(f).size, `${t}: ${f.join(', ')}`).toBe(4);
+    }
+    expect(file(el, 'cloudy-1-day')).toBe('p-mostlysunny-day.png');
+    expect(file(el, 'cloudy-2-day')).toBe('p-partlycloudy-day.png');
+    expect(file(el, 'cloudy-3-day')).toBe('p-mostlycloudy-day.png');
+    expect(file(el, 'cloudy-3-night')).toBe('p-mostlycloudy-night.png');
+  });
+  it('three levels of rain, three pictures: light, rain, pouring', async () => {
+    const el = await card();
+    const f = [file(el, 'rainy-1-day'), file(el, 'rainy-2-day'), file(el, 'rainy-3')];
+    expect(f).toEqual(['p-lightrain.png', 'p-rain.png', 'p-pouring.png']);
+  });
+  it('and the pictures are not the same picture under other names', () => {
+    const sums = new Map<string, string>();
+    for (const n of NAMES) {
+      const key = readFileSync(resolve(DIST, `p-${n}.png`)).toString('base64');
+      expect(sums.has(key), `${n} is the same file as ${sums.get(key)}`).toBe(false);
+      sums.set(key, n);
+    }
+  });
+  it('a name the table has not got looks like its family, and not like a tornado', async () => {
+    const el = await card();
+    for (const [n, want] of [['cloudy-4-day', 'cloudy'], ['rainy-9-night', 'rain'], ['snowy-7', 'snow'], ['fog-night', 'fog'], ['clear-night', 'clear-night']] as const) {
+      expect(el._iconToWcc(n), n).toBe(want);
+    }
+    expect(el._iconToWcc('tornado')).toBe('exceptional');
+    expect(el._iconToWcc('something-new')).toBe('exceptional');
   });
 });
 
