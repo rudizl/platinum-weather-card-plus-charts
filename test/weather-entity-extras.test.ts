@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import '../src/platinum-weather-card';
+import '../src/editor';
 import { makeHass, baseConfig, renderCard } from './helpers';
 
 const editor = readFileSync(join(__dirname, '../src/editor.ts'), 'utf8');
@@ -57,5 +58,35 @@ describe('the cloud cover pickers', () => {
   });
   it('offer weather entities, and sensors', () => {
     for (const domains of all) { expect(domains).toContain("'weather'"); expect(domains).toContain("'sensor'"); }
+  });
+});
+
+// And it does not offer the whole house: this one has more than a thousand sensors, and a list that long is no help in choosing a sky.
+describe('what the cloud cover pickers offer', () => {
+  type St = { entity_id: string; attributes: Record<string, unknown> };
+  const e = (id: string, attributes: Record<string, unknown> = {}): St => ({ entity_id: id, attributes });
+  const Editor = customElements.get('platinum-weather-card-plus-charts-editor') as unknown as new () => { _cloudCoverFilter: (s: St) => boolean };
+  const keep = (s: St) => new Editor()._cloudCoverFilter(s);
+  it('both pickers filter, with the same function', () => {
+    expect([...editor.matchAll(/configValue=\$\{'entity_cloud_cover'\}[^>]*\.entityFilter=\$\{this\._cloudCoverFilter\}/g)]).toHaveLength(2);
+  });
+  it('a weather entity that gives a cloud cover is offered, and one that does not is not', () => {
+    expect(keep(e('weather.forecast_varna', { cloud_coverage: 99.2 }))).toBe(true);
+    expect(keep(e('weather.forecast_varna', { cloud_coverage: 0 }))).toBe(true);
+    expect(keep(e('weather.ivarna103', { temperature: 13 }))).toBe(false);
+    expect(keep(e('weather.x', { cloud_coverage: 'unknown' }))).toBe(false);
+  });
+  it('a sensor in per cent is offered', () => {
+    expect(keep(e('sensor.cloud', { unit_of_measurement: '%' }))).toBe(true);
+    expect(keep(e('sensor.cloud', { unit_of_measurement: '%', device_class: undefined }))).toBe(true);
+  });
+  it('a sensor that is a battery, a humidity or a moisture is not a sky, in per cent as it is', () => {
+    for (const device_class of ['battery', 'humidity', 'moisture', 'power_factor', 'signal_strength']) {
+      expect(keep(e('sensor.x', { unit_of_measurement: '%', device_class })), device_class).toBe(false);
+    }
+  });
+  it('a sensor in anything else is not', () => {
+    expect(keep(e('sensor.temperature', { unit_of_measurement: '\u00b0C', device_class: 'temperature' }))).toBe(false);
+    expect(keep(e('sensor.no_unit', {}))).toBe(false);
   });
 });

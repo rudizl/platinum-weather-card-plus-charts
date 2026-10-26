@@ -915,7 +915,7 @@ get _forecast_type(): string {
 
     const entity_cloud_cover = entities.has("entity_cloud_cover") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_cloud_cover'} .value=${this._config?.entity_cloud_cover || ''} .includeDomains=${['sensor', 'weather']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_cloud_cover'} .value=${this._config?.entity_cloud_cover || ''} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._cloudCoverFilter}
           name="entity_cloud_cover" label=${this._t("entity_cloud_cover")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
         <div class="side-by-side">
@@ -1933,7 +1933,7 @@ get _forecast_type(): string {
           <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
         </div>
         <div>
-          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_cloud_cover'} .value=${this._config?.entity_cloud_cover || ''} .includeDomains=${['sensor', 'weather']}
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_cloud_cover'} .value=${this._config?.entity_cloud_cover || ''} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._cloudCoverFilter}
             name="entity_cloud_cover" label=${this._t("entity_cloud_cover")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
           </ha-entity-picker>
         </div>
@@ -2136,6 +2136,16 @@ get _forecast_type(): string {
     }
     return html`${subel}`;
   }
+
+  // What the picker of the cloud cover entity offers: a weather entity that gives a cloud cover, and a sensor in per cent. Not every sensor
+  // and every weather entity of a house (this one has more than a thousand sensors): the card reads the sky from the attribute cloud_coverage of a weather entity,
+  // or from the state of a sensor in per cent. A battery, a humidity and a moisture are in per cent too and are not a sky. Anything else can still be typed in.
+  private _cloudCoverFilter = (entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean => {
+    const attrs = entity.attributes ?? {};
+    if (entity.entity_id.startsWith('weather.')) return typeof attrs.cloud_coverage === 'number';
+    if (attrs.unit_of_measurement !== '%') return false;
+    return !['battery', 'humidity', 'moisture', 'power_factor', 'signal_strength'].includes(String(attrs.device_class ?? ''));
+  };
 
   private _goBack(): void {
     this._subElementEditor = undefined;
