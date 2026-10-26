@@ -1368,7 +1368,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
         </ha-entity-picker>
         <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
       `:"",O=w.has("entity_cloud_cover")?U`
-        <ha-entity-picker .hass=${this.hass} .configValue=${"entity_cloud_cover"} .value=${(null===(v=this._config)||void 0===v?void 0:v.entity_cloud_cover)||""} .includeDomains=${["sensor"]}
+        <ha-entity-picker .hass=${this.hass} .configValue=${"entity_cloud_cover"} .value=${(null===(v=this._config)||void 0===v?void 0:v.entity_cloud_cover)||""} .includeDomains=${["sensor","weather"]}
           name="entity_cloud_cover" label=${this._t("entity_cloud_cover")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
         <div class="side-by-side">
@@ -2218,7 +2218,7 @@ const rt=t=>e=>"function"==typeof e?((t,e)=>(customElements.define(t,e),e))(t,e)
           <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
         </div>
         <div>
-          <ha-entity-picker .hass=${this.hass} .configValue=${"entity_cloud_cover"} .value=${(null===(i=this._config)||void 0===i?void 0:i.entity_cloud_cover)||""} .includeDomains=${["sensor"]}
+          <ha-entity-picker .hass=${this.hass} .configValue=${"entity_cloud_cover"} .value=${(null===(i=this._config)||void 0===i?void 0:i.entity_cloud_cover)||""} .includeDomains=${["sensor","weather"]}
             name="entity_cloud_cover" label=${this._t("entity_cloud_cover")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
           </ha-entity-picker>
         </div>

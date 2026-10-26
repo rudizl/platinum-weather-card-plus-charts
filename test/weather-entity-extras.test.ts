@@ -46,3 +46,16 @@ describe('entity_sun left out', () => {
     expect(el._config.entity_sun).toBe('sensor.my_sun');
   });
 });
+
+// The cloud cover entity is read from a weather entity's attribute cloud_coverage (the cloud cover slot, and Sager's sky at night), and the picker
+// offered only sensors: met.no's weather entity could not be chosen for it, though it is the one that gives the number. The picker is drawn in two
+// places, and both have to offer it.
+describe('the cloud cover pickers', () => {
+  const all = [...editor.matchAll(/configValue=\$\{'entity_cloud_cover'\}[^>]*includeDomains=\$\{\[([^\]]*)\]\}/g)].map((m) => m[1]);
+  it('are two, in the card\u2019s sources and in the global options', () => {
+    expect(all).toHaveLength(2);
+  });
+  it('offer weather entities, and sensors', () => {
+    for (const domains of all) { expect(domains).toContain("'weather'"); expect(domains).toContain("'sensor'"); }
+  });
+});
