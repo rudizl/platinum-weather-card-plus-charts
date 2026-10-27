@@ -3402,13 +3402,41 @@ export class PlatinumWeatherCard extends LitElement {
       return now;
     }
     const last = cls._lastDaylightCloud;
-    if (last === null) return null;
     // Six hours, not a day. Checked against a real frontal event: the sky was
     // last measured at 38% on a Saturday afternoon, that figure was still being
     // reported through the night, and by the time rain arrived at six the next
     // morning the cloud had reached 84%. A fourteen-hour-old reading is not
     // information about the present sky, it is a memory of a different one.
-    return Date.now() - last.t <= 21600000 ? last.f : null;
+    if (last !== null && Date.now() - last.t <= 21600000) return last.f;
+    // And when the card has nothing of its own, the provider's: better a sky from met.no than a forecast made blind.
+    return this.providerCloudFraction;
+  }
+
+  // The sky for the forecast when the card has measured nothing and remembers nothing: the provider's. First the entity that was named for
+  // exactly this, entity_cloud_cover ('provider cloud cover, used at night when the pyranometer cannot help'), read as the slot reads it:
+  // the attribute cloud_coverage of a weather entity, or the state of a sensor, in per cent. Then, when none is named or it gives no number, a guess:
+  // the entity of the hourly forecast and the card's own weather entity, by the same attribute (met.no gives it). On 26 October at 21:11 Sager
+  // said "fair and cooler" under a sky that met.no gave as 99% covered, for want of a sky to read. Null when nothing gives a number.
+  get providerCloudFraction(): number | null {
+    const named = this._config.entity_cloud_cover;
+    if (named && this.hass.states[named]) {
+      const st = this.hass.states[named];
+      const f = PlatinumWeatherCard._percentToFraction(named.startsWith('weather.') ? st.attributes?.cloud_coverage : st.state);
+      if (f !== null) return f;
+    }
+    for (const entity of [this._config.entity_hourly, this._config.weather_entity]) {
+      const f = PlatinumWeatherCard._percentToFraction(entity ? this.hass.states[entity]?.attributes?.cloud_coverage : undefined);
+      if (f !== null) return f;
+    }
+    return null;
+  }
+
+  // A percentage, 0 to 100, as a fraction; null for anything that is not one (unknown, unavailable, empty, text, out of range).
+  private static _percentToFraction(raw: unknown): number | null {
+    if (typeof raw !== 'number' && typeof raw !== 'string') return null;
+    if (typeof raw === 'string' && raw.trim() === '') return null;
+    const percent = Number(raw);
+    return isFinite(percent) && percent >= 0 && percent <= 100 ? percent / 100 : null;
   }
 
   get measuredCloudFraction(): number | null {

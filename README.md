@@ -637,6 +637,8 @@ Cloud cover comes from the pyranometer if you have one configured, and rain from
 
 After dark a pyranometer says nothing, which is precisely when that advantage would go missing, so the forecast falls back to the last reading taken in daylight — for six hours. That reaches from dusk into the small hours, where a stale figure is still roughly true. Longer than that it stops being information: on one frontal night here the sky was last measured at 38% on the Saturday afternoon, and by the time rain arrived at six the next morning it had reached 84%, with the old figure still being reported throughout. The cloud cover **slot** is unaffected and still shows `---` at night, since it reports a measurement rather than a forecast input.
 
+When the card has neither a measurement nor a reading from the last six hours, it asks the provider: first the entity named under **Cloud cover entity (night fallback)** (`entity_cloud_cover`), read as the slot reads it, the attribute `cloud_coverage` of a weather entity or the state of a sensor, in per cent; and when none is named, or it gives no number, a weather entity that gives `cloud_coverage` (met.no does), the entity of the hourly forecast first and then the card's own weather entity. A blind forecast is the one to avoid: on 26 October at 21:11 Sager said *fair and cooler* under a sky that met.no gave as 99% covered, and it is *unsettled*, with the sky named, when it can read it. What the card measured, now or in the last six hours, always comes first, and an entity that gives no number leaves the sky unknown as it was. The slot is unaffected here too.
+
 #### What it can and cannot do
 
 Zambretti is **purely barometric**. It infers the weather from the pressure level, which way the pressure is moving, and where the wind is coming from. That works because in the mid-latitude frontal weather it was built for — Britain in 1915 — pressure genuinely leads the weather: fronts announce themselves in the barometer hours before they arrive.
@@ -1195,7 +1197,7 @@ double_tap_action:
 | `option_sun_overrides_icon` | Boolean | `true` | Force the day/night variant of the current condition icon from the sun entity's state (its elevation as a fallback), overriding the provider |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
-| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help. A sensor in per cent, or a weather entity that gives `cloud_coverage` (met.no does) |
+| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help: by the cloud cover slot and by the Sager forecast. A sensor in per cent, or a weather entity that gives `cloud_coverage` (met.no does) |
 | `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky, and drives the rain rate slot. Intensity follows the standard bands: light below 2.5 mm/h, moderate to 10, heavy to 50, violent above |
 | `entity_dew_point` | String | none | Dew point sensor, for the comfort line under the apparent temperature |
 | `option_show_comfort` | Boolean | `false` | Show how the air feels, in a word |
