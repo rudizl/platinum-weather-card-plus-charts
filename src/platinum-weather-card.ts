@@ -4710,6 +4710,12 @@ export class PlatinumWeatherCard extends LitElement {
         width: 140px;
         position: relative;
       }
+      /* The box is wider than it is high, and the picture is told to be all of it. An SVG fits itself in and keeps its
+         proportions; a PNG, the photoreal pack or a custom one, was stretched to the box: the sun was an oval. */
+      .big-icon img {
+        object-fit: contain;
+        object-position: center;
+      }
       .unknown-forecast {
         position: relative;
         top: -30px;
