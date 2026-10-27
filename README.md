@@ -20,10 +20,10 @@ Based on the original Platinum Weather Card by [@makin-things](https://www.githu
 
 ## Installation
 
-The card is in the HACS default store:
+The card is in the HACS default store. From Home Assistant 2026.11 HACS is built in and called the **Marketplace** (Settings → Marketplace); the steps are the same in both, and the card stays where it is when you upgrade:
 
-1. HACS → search for **Platinum Weather Card Plus Charts**
-2. Download
+1. HACS or the Marketplace → search for **Platinum Weather Card Plus Charts**
+2. Download (or Install)
 3. Hard-refresh your browser
 4. Add the card to a dashboard. In *Add to dashboard*, pick a weather entity under *By entity* and the card is offered under *Community*, already set up for it (Home Assistant 2026.6 or later); under *By card* it has a preview, filled in with one of your weather entities. Or in YAML:
 
@@ -46,7 +46,7 @@ Add sensors and they are your choice, one group at a time. Set any one of the me
 
 If you used [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card), your configuration carries over: every option and slot name from its documentation is supported here, including the per-day `entity_forecast_*_1` sensors, so the card works without a weather entity, charts included: they are drawn from those sensors.
 
-1. Install this card from HACS, as above.
+1. Install this card from HACS or the Marketplace, as above.
 2. In your card's YAML, change `type: custom:platinum-weather-card` to `type: custom:platinum-weather-card-plus-charts`.
 3. Hard-refresh. The charts and the hourly forecast are extra sections you can switch on in the editor.
 
