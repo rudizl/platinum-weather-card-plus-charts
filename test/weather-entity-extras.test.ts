@@ -89,3 +89,61 @@ describe('what the cloud cover pickers offer', () => {
     expect(keep(e('sensor.no_unit', {}))).toBe(false);
   });
 });
+
+// And among the sensors in per cent, the ones that are named for a sky come first in the offer: a house that has such a sensor is offered those, and not its processors and its
+// disks, which are in per cent too; a house that has none is offered every sensor in per cent, as before, so that nothing is hidden from it.
+describe('the cloud cover pickers, by name', () => {
+  type St = { entity_id: string; state?: string; attributes: Record<string, unknown> };
+  const e = (id: string, attributes: Record<string, unknown> = {}): St => ({ entity_id: id, state: '1', attributes });
+  const Editor = customElements.get('platinum-weather-card-plus-charts-editor') as unknown as new () => { hass?: unknown; _cloudCoverFilter: (s: St) => boolean };
+  const withHouse = (houseStates: St[]) => {
+    const el = new Editor();
+    el.hass = { states: Object.fromEntries(houseStates.map((s) => [s.entity_id, s])) };
+    return (s: St) => el._cloudCoverFilter(s);
+  };
+  const pct = (id: string, name?: string, extra: Record<string, unknown> = {}) => e(id, { unit_of_measurement: '%', ...(name ? { friendly_name: name } : {}), ...extra });
+  const cpu = pct('sensor.ccr1009_cpu_load', 'CCR1009 CPU load');
+  const disk = pct('sensor.glances_disk_use_percent', '/etc/hostname използване на диска');
+  const cloud = pct('sensor.met_cloud_area_fraction', 'Cloud area fraction');
+  const bg = pct('sensor.obl_1', 'Облачност навън');
+  const weather = e('weather.forecast_varna', { cloud_coverage: 99.2 });
+  it('a house with a sky-named sensor in per cent is offered that one, and the weather entity, and not the processor or the disk', () => {
+    const keep = withHouse([cpu, disk, cloud, weather]);
+    expect([cpu, disk, cloud, weather].filter(keep).map((s) => s.entity_id)).toEqual(['sensor.met_cloud_area_fraction', 'weather.forecast_varna']);
+  });
+  it('by its name in the house\u2019s own language, or by its identifier, in any case', () => {
+    const keep = withHouse([cpu, bg, cloud]);
+    expect(keep(bg)).toBe(true);
+    expect(keep(pct('sensor.x', 'OVERCAST now'))).toBe(true);
+    expect(keep(pct('sensor.cloud_cover_station', undefined))).toBe(true);
+    expect(keep(cpu)).toBe(false);
+  });
+  it('a house with none of them is offered every sensor in per cent, as before', () => {
+    const keep = withHouse([cpu, disk, weather]);
+    expect([cpu, disk].filter(keep)).toHaveLength(2);
+    expect(keep(weather)).toBe(true);
+  });
+  it('and a battery, a humidity and a moisture are still not a sky, whatever they are called', () => {
+    const keep = withHouse([cpu, cloud]);
+    expect(keep(pct('sensor.cloud_battery', 'Cloud sensor battery', { device_class: 'battery' }))).toBe(false);
+    const none = withHouse([cpu]);
+    expect(none(pct('sensor.b', 'B', { device_class: 'humidity' }))).toBe(false);
+  });
+  it('the name has to be in a sensor in per cent: a cloud base in metres is not a cover', () => {
+    const keep = withHouse([cpu, e('sensor.cloud_base', { unit_of_measurement: 'm', friendly_name: 'Cloud base' })]);
+    expect(keep(e('sensor.cloud_base', { unit_of_measurement: 'm' }))).toBe(false);
+    expect(keep(cpu)).toBe(true);   // the only sensors in per cent are not named for a sky, so every one is offered
+  });
+  it('\u201csky\u201d is a word and not a part of one: a skylight is not a sky', () => {
+    const keep = withHouse([cpu, pct('sensor.skylight_open', 'Skylight position')]);
+    expect(keep(cpu)).toBe(true);
+  });
+  it('the decision follows the house: when a sky sensor appears, the others are not offered any more', () => {
+    const el = new Editor();
+    el.hass = { states: { [cpu.entity_id]: cpu } };
+    expect(el._cloudCoverFilter(cpu)).toBe(true);
+    el.hass = { states: { [cpu.entity_id]: cpu, [cloud.entity_id]: cloud } };
+    expect(el._cloudCoverFilter(cpu)).toBe(false);
+    expect(el._cloudCoverFilter(cloud)).toBe(true);
+  });
+});

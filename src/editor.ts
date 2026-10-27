@@ -2083,14 +2083,40 @@ get _forecast_type(): string {
     return html`${subel}`;
   }
 
-  // What the picker of the cloud cover entity offers: a weather entity that gives a cloud cover, and a sensor in per cent. Not every sensor
-  // and every weather entity of a house (this one has more than a thousand sensors): the card reads the sky from the attribute cloud_coverage of a weather entity,
-  // or from the state of a sensor in per cent. A battery, a humidity and a moisture are in per cent too and are not a sky. Anything else can still be typed in.
-  private _cloudCoverFilter = (entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean => {
+  // What the picker of the cloud cover entity offers: a weather entity that gives a cloud cover, and a sensor in per cent. Not every sensor and every
+  // weather entity of a house (this one has more than a thousand sensors): the card reads the sky from the attribute cloud_coverage of a weather entity, or from the
+  // state of a sensor in per cent. A battery, a humidity and a moisture are in per cent too and are not a sky. Among the sensors in per cent, the ones that are
+  // named for a sky (cloud, overcast, sky, облачност, bewölkung, nuages...) come alone when the house has any, and not its processors and its disks; a house that has none is
+  // offered every sensor in per cent, so that nothing is hidden from it. Anything else can still be typed in.
+  private static readonly _SKY_NAME = /cloud|overcast|\bsky\b|облач|облак|небе|покритост|bew[oö]lk|wolk|nuage|n[ée]bul|\bnub|nuvol|zachmurz|chmur|obla[cč]|zatažen|хмар|skyd[aæ]k/i;
+  private _skyMemo?: { states: unknown; any: boolean };
+
+  private static _isPercentSensor(entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean {
+    if (!entity.entity_id.startsWith('sensor.')) return false;
     const attrs = entity.attributes ?? {};
-    if (entity.entity_id.startsWith('weather.')) return typeof attrs.cloud_coverage === 'number';
     if (attrs.unit_of_measurement !== '%') return false;
     return !['battery', 'humidity', 'moisture', 'power_factor', 'signal_strength'].includes(String(attrs.device_class ?? ''));
+  }
+
+  private static _namedForSky(entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean {
+    // the identifier's dots and underscores are spaces, so that a sky is a word in it as it is in a name
+    const text = `${entity.entity_id} ${String(entity.attributes?.friendly_name ?? '')}`.replace(/[._]/g, ' ');
+    return WeatherCardEditor._SKY_NAME.test(text);
+  }
+
+  // Whether the house has a sensor in per cent that is named for a sky: worked out once for each state of the house, not for each entity of the list.
+  private _houseHasSkySensors(): boolean {
+    const states = this.hass?.states as Record<string, { entity_id: string; attributes?: Record<string, unknown> }> | undefined;
+    if (this._skyMemo && this._skyMemo.states === states) return this._skyMemo.any;
+    const any = !!states && Object.values(states).some((e) => WeatherCardEditor._isPercentSensor(e) && WeatherCardEditor._namedForSky(e));
+    this._skyMemo = { states, any };
+    return any;
+  }
+
+  private _cloudCoverFilter = (entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean => {
+    if (entity.entity_id.startsWith('weather.')) return typeof entity.attributes?.cloud_coverage === 'number';
+    if (!WeatherCardEditor._isPercentSensor(entity)) return false;
+    return !this._houseHasSkySensors() || WeatherCardEditor._namedForSky(entity);
   };
 
   private _goBack(): void {
