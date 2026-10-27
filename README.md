@@ -20,10 +20,10 @@ Based on the original Platinum Weather Card by [@makin-things](https://www.githu
 
 ## Installation
 
-The card is in the HACS default store:
+The card is in the HACS default store. From Home Assistant 2026.11 HACS is built in and called the **Marketplace** (Settings → Marketplace); the steps are the same in both, and the card stays where it is when you upgrade:
 
-1. HACS → search for **Platinum Weather Card Plus Charts**
-2. Download
+1. HACS or the Marketplace → search for **Platinum Weather Card Plus Charts**
+2. Download (or Install)
 3. Hard-refresh your browser
 4. Add the card to a dashboard. In *Add to dashboard*, pick a weather entity under *By entity* and the card is offered under *Community*, already set up for it (Home Assistant 2026.6 or later); under *By card* it has a preview, filled in with one of your weather entities. Or in YAML:
 
@@ -46,7 +46,7 @@ Add sensors and they are your choice, one group at a time. Set any one of the me
 
 If you used [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card), your configuration carries over: every option and slot name from its documentation is supported here, including the per-day `entity_forecast_*_1` sensors, so the card works without a weather entity, charts included: they are drawn from those sensors.
 
-1. Install this card from HACS, as above.
+1. Install this card from HACS or the Marketplace, as above.
 2. In your card's YAML, change `type: custom:platinum-weather-card` to `type: custom:platinum-weather-card-plus-charts`.
 3. Hard-refresh. The charts and the hourly forecast are extra sections you can switch on in the editor.
 
@@ -89,7 +89,17 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **An overcast sky and a moderate rain no longer draw a tornado with a custom pack.** The card names the icon for a cloud cover of 85% and over `cloudy-3`, and for a rain of 2.5 to 10 mm/h (measured by the rain gauge) `rainy-2`, with a day or a night, and the table of picture names that the `custom` and `wcc-2` packs use did not have those two: they fell to `exceptional`. Anyone who lets the sensors choose the icon had a tornado under an overcast sky or in a moderate rain. (It is in 2.5.2 too.) Both are in the table now, and a name that the table does not have takes the picture of its family; only what is meant to be exceptional (`dust`, `tropical-storm`, a condition that is not known) still does. Nine new tests go through the real choice, with a solar sensor and a rain gauge, and the four that matter fail on the old table.
 
-A hundred and seventy-seven new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
+**The cloud cover entity can be a weather entity.** The card reads it from the attribute `cloud_coverage` of a weather entity, or from the state of a sensor, but the picker in the editor offered sensors only, so that met.no's weather entity, which gives the number, could not be chosen for the cloud cover shown at night. Both pickers offer weather entities now, and only the ones that can be a sky: a weather entity that gives a cloud cover, and the sensors in per cent that are named for a sky (cloud, overcast, sky, облачност, bewölkung...), or every sensor in per cent when the house has none: not the thousand sensors of a house (anything else can still be typed in). Fourteen new tests.
+
+**Sager has a sky at night.** After dark the pyranometer sees nothing and the last reading is good for six hours; past that Sager had no sky to read and called a covered night *fair* (on 26 October at 21:11 it said *fair and cooler* under a sky that met.no gave as 99% covered). The cloud cover slot already read *Cloud cover entity (night fallback)* (`entity_cloud_cover`), and Sager did not. It reads it now, as the slot does (the attribute `cloud_coverage` of a weather entity, or the state of a sensor, in per cent), and when none is named, or it gives no number, `cloud_coverage` of the entity of the hourly forecast and of the card's weather entity. What the card measured comes first, now and for six hours. Fourteen new tests.
+
+**The slots of today read a twice-daily forecast as the strip does** (#35, the rest of it). The forecast high and low, the chance of rain and the possible rain took the first entry of the forecast as it came, and with the National Weather Service that is a day or, in the evening, a night: the high could be the night's temperature and the low was never there. For a twice-daily forecast they read the first date as the strip reads a day: the high from the day, the low from the night, and a date that has only its night has no high. A daily forecast is read as it was. Five new tests.
+
+**The big icon keeps the proportions of its picture.** The box of the big icon is 140 by 120 pixels and its picture was told to be all of it. An SVG fits itself in and keeps its proportions; a PNG, a custom pack's, was stretched to the box (a disc came out an oval, 1.17 to 1). Four new tests.
+
+**The lists of the editor offer what each field can read.** The pickers of the temperatures (eleven of them), of the humidity, of the pressure and of the wind (six) offered every sensor of the house, and this one has more than a thousand. They offer what the field can read: a sensor by its device class or its unit (a temperature in °C, °F or K, a pressure in hPa and the other units of pressure, a speed in km/h, m/s, mph or knots, a direction in degrees, a humidity in per cent with a name that says so), and a weather entity by the attribute that the field reads. A house that has no sensor that fits a field is offered every sensor for it, anything else can still be typed in, and **Offer every entity in the lists** (`option_editor_all_entities`), in the global options, turns the narrowing off. The other lists follow. Fourteen new tests.
+
+Two hundred and twenty-eight new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
 
 ---
 
@@ -1296,6 +1306,7 @@ Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressu
 | `option_hourly_shade_night` | Boolean | `true` | Shade the hours the sun is down; calculated from `latitude`/`longitude`, not read from a sensor |
 | `option_hourly_precipitation` | Boolean | `true` | Rainfall under the hours expecting some |
 | `option_hourly_pop` | Boolean | `true` | The chance of rain under the hours that have one |
+| `option_editor_all_entities` | Boolean | `false` | Editor only: offer every entity in the lists of the first pickers (temperatures, humidity, pressure, wind) instead of what each field can read |
 | `option_hourly_wind` | Boolean | `false` | Wind speed under each hour, in the hourly entity's unit |
 
 ## Charts Section

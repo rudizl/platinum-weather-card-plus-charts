@@ -133,6 +133,8 @@ const srLatn: Translation = {
     "hourly_precipitation": "Prikaži padavine",
     "hourly_pop": "Prikaži verovatnoću kiše",
     "hourly_pop_hint": "Procenat ispod sati u kojima je kiša moguća",
+    "all_entities": "Prikaži sve entitete na listama",
+    "all_entities_hint": "Liste nude samo ono što polje može da čita (senzor temperature za temperaturu). Uključite da vidite sve.",
     "hourly_shade_night_hint": "Izračunava se po položaju sunca, ne čita se sa senzora",
     "hourly_shade_night": "Zatamni noćne sate",
     "hourly_forecast_step_hint": "Uzima svaki n-ti sat — 3 pretvara 24 sata u osam kolona",

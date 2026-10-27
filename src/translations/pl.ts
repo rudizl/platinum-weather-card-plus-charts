@@ -133,6 +133,8 @@ const pl: Translation = {
     "hourly_precipitation": "Pokaż opady",
     "hourly_pop": "Pokaż szansę na deszcz",
     "hourly_pop_hint": "Wartość procentowa pod godzinami, w których możliwy jest deszcz",
+    "all_entities": "Pokaż wszystkie encje na listach",
+    "all_entities_hint": "Listy oferują tylko to, co dane pole potrafi odczytać (czujnik temperatury dla temperatury). Włącz, aby zobaczyć wszystko.",
     "hourly_shade_night_hint": "Obliczone z położenia słońca, nie z czujnika",
     "hourly_shade_night": "Przyciemnij godziny nocne",
     "hourly_forecast_step_hint": "Co n-ta godzina — 3 zamienia 24 godziny w osiem kolumn",

@@ -2481,9 +2481,19 @@ export class PlatinumWeatherCard extends LitElement {
     return html``;
   }
 
+  // The figure of the first day of the forecast, for the slots of today. A daily forecast has one entry for a day, and it is the first, as it always was. A twice-daily one has two for a
+  // date, a day and a night, and the first entry is a day or, in the evening, a night: the high of today is the day's temperature and the low is the night's, as the strip reads a day (#35).
+  // A date that has only its night has no high, and its temperature is a low.
+  private _firstDayProp(prop: string): any {
+    const f = this.forecast1;
+    if (f === undefined || f.length === 0) return undefined;
+    if (this._stripForecastType !== 'twice_daily') return (f[0] as any)[prop];
+    return this._getForecastPropFromWeather(f, new Date(f[0].datetime), prop);
+  }
+
   get slotPopForecast(): TemplateResult {
     //tjl use new forecast subscribe method below
-    const forecast_pop = this.forecast1 !== undefined ? this.forecast1[0].precipitation_probability : undefined;
+    const forecast_pop = this._firstDayProp('precipitation_probability');
 
     const pop = this._config.entity_pop && this.hass.states[this._config.entity_pop] !== undefined
       ? this._config.entity_pop.match('^weather.') === null
@@ -2494,7 +2504,7 @@ export class PlatinumWeatherCard extends LitElement {
       : "---";
     const pop_units = pop !== "---" ? html`<div class="slot-text unit">%</div>` : html``;
 
-    const forecast_pos = this.forecast1 !== undefined ? this.forecast1[0].precipitation : undefined;
+    const forecast_pos = this._firstDayProp('precipitation');
 
     const pos = this._config.entity_pos && this.hass.states[this._config.entity_pos] !== undefined
       ? this._config.entity_pos.match('^weather.') === null
@@ -2519,7 +2529,7 @@ export class PlatinumWeatherCard extends LitElement {
 
   get slotPop(): TemplateResult {
     //tjl using new forecast subscribe method.
-    const forecast_pop = this.forecast1 !== undefined ? this.forecast1[0].precipitation_probability : undefined;
+    const forecast_pop = this._firstDayProp('precipitation_probability');
 
     const pop = this._config.entity_pop && this.hass.states[this._config.entity_pop] !== undefined
       ? this._config.entity_pop.match('^weather.') === null
@@ -2547,7 +2557,7 @@ export class PlatinumWeatherCard extends LitElement {
 
   get slotPos(): TemplateResult {
     //tjl use new forecast subscribe method below
-    const forecast_pos = this.forecast1 !== undefined ? this.forecast1[0].precipitation : undefined;
+    const forecast_pos = this._firstDayProp('precipitation');
 
     const pos = this._config.entity_pos && this.hass.states[this._config.entity_pos] !== undefined
       ? this._config.entity_pos.match('^weather.') === null
@@ -3063,7 +3073,7 @@ export class PlatinumWeatherCard extends LitElement {
 
   get slotForecastMax(): TemplateResult {
     //tjl using new forecast subscribe method.
-    const temp_max = this.forecast1 !== undefined ? this.forecast1[0].temperature : undefined;
+    const temp_max = this._firstDayProp('temperature');
 
     const digits = this._config.option_today_temperature_decimals === true ? 1 : 0;
     
@@ -3095,7 +3105,7 @@ export class PlatinumWeatherCard extends LitElement {
 
   get slotForecastMin(): TemplateResult {
     //tjl using new forecast subscribe method.
-    const temp_low = this.forecast1 !== undefined ? this.forecast1[0].templow : undefined;
+    const temp_low = this._firstDayProp('templow');
 
     const digits = this._config.option_today_temperature_decimals === true ? 1 : 0;
     const temp = this._config.entity_forecast_min && this.hass.states[this._config.entity_forecast_min] !== undefined

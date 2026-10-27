@@ -133,6 +133,8 @@ const en: Translation = {
     "hourly_precipitation": "Show rainfall",
     "hourly_pop": "Show chance of rain",
     "hourly_pop_hint": "A percentage under the hours where rain is possible",
+    "all_entities": "Offer every entity in the lists",
+    "all_entities_hint": "The lists offer what each field can read (a temperature sensor for a temperature). Turn on to see every sensor.",
     "hourly_shade_night_hint": "Worked out from the sun's position, not read from a sensor",
     "hourly_shade_night": "Shade the night hours",
     "hourly_forecast_step_hint": "Take every nth hour — 3 turns 24 hours into eight columns",

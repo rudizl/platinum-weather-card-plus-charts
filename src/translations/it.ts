@@ -133,6 +133,8 @@ const it: Translation = {
     "hourly_precipitation": "Mostra precipitazioni",
     "hourly_pop": "Mostra la probabilità di pioggia",
     "hourly_pop_hint": "Una percentuale sotto le ore in cui può piovere",
+    "all_entities": "Mostra tutte le entità negli elenchi",
+    "all_entities_hint": "Gli elenchi propongono solo ciò che ogni campo può leggere (un sensore di temperatura per una temperatura). Attiva per vedere tutto.",
     "hourly_shade_night_hint": "Calcolato dalla posizione del sole, non letto da un sensore",
     "hourly_shade_night": "Ombreggia le ore notturne",
     "hourly_forecast_step_hint": "Un'ora ogni n — 3 trasforma 24 ore in otto colonne",

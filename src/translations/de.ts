@@ -133,6 +133,8 @@ const de: Translation = {
     "hourly_precipitation": "Niederschlag anzeigen",
     "hourly_pop": "Regenwahrscheinlichkeit anzeigen",
     "hourly_pop_hint": "Ein Prozentwert unter Stunden, in denen Regen möglich ist",
+    "all_entities": "Alle Entitäten in den Listen anzeigen",
+    "all_entities_hint": "Die Listen bieten nur an, was das Feld lesen kann (für eine Temperatur einen Temperatursensor). Einschalten, um alles zu sehen.",
     "hourly_shade_night_hint": "Aus dem Sonnenstand berechnet, nicht von einem Sensor",
     "hourly_shade_night": "Nachtstunden abdunkeln",
     "hourly_forecast_step_hint": "Jede n-te Stunde — 3 macht aus 24 Stunden acht Spalten",
