@@ -132,6 +132,8 @@ const da: Translation = {
     "hourly_precipitation": "Vis nedbør",
     "hourly_pop": "Vis regnchance",
     "hourly_pop_hint": "En procent under timer hvor regn er muligt",
+    "all_entities": "Vis alle entiteter i listerne",
+    "all_entities_hint": "Listerne viser kun det, feltet kan læse (en temperatursensor til en temperatur). Slå til for at se alt.",
     "hourly_shade_night_hint": "Beregnet ud fra solens position, ikke læst fra en sensor",
     "hourly_shade_night": "Skyg nattetimerne",
     "hourly_forecast_step_hint": "Hver n-te time — 3 gør 24 timer til otte kolonner",

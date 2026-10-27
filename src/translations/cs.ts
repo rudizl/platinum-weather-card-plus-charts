@@ -132,6 +132,8 @@ const cs: Translation = {
     "hourly_precipitation": "Zobrazit srážky",
     "hourly_pop": "Zobrazit pravděpodobnost deště",
     "hourly_pop_hint": "Procento pod hodinami, kdy je déšť možný",
+    "all_entities": "Nabízet všechny entity v seznamech",
+    "all_entities_hint": "Seznamy nabízejí jen to, co pole umí číst (u teploty čidlo teploty). Zapněte pro zobrazení všeho.",
     "hourly_shade_night_hint": "Vypočteno z polohy slunce, nečte se ze senzoru",
     "hourly_shade_night": "Ztmavit noční hodiny",
     "hourly_forecast_step_hint": "Každá n-tá hodina — 3 promění 24 hodin v osm sloupců",

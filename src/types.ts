@@ -148,6 +148,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   show_section_hourly_forecast?: boolean;
   option_hourly_precipitation?: boolean;
   option_hourly_pop?: boolean;
+  option_editor_all_entities?: boolean;
   option_hourly_wind?: boolean;
   option_hourly_shade_night?: boolean;
   option_hourly_group?: boolean;
