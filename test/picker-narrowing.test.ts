@@ -49,8 +49,9 @@ describe('every picker of the first batch has its rule', () => {
   });
   it('and the others are not narrowed here: no rule, no filter', () => {
     const el = house(HOUSE);
-    expect(el._filterFor('entity_hourly')).toBeUndefined();
+    expect(el._filterFor('entity_sun')).toBeUndefined();
     expect(el._filterFor('weather_entity')).toBeUndefined();
+    expect(el._filterFor('entity_summary')).toBeUndefined();
     expect(el._filterFor('entity_temperature')).toBeTypeOf('function');
     for (const key of BATCH) expect(el._filterFor(key), `a rule for ${key}`).toBeTypeOf('function');
   });
@@ -148,5 +149,102 @@ describe('the pickers as the editor draws them', () => {
     for (const p of found) expect(typeof p.entityFilter, p.configValue).toBe('function');
     const wspeed = found.find((p) => p.configValue === 'entity_wind_speed');
     if (wspeed) expect(HOUSE.filter(wspeed.entityFilter!).map((s) => s.entity_id)).toContain('sensor.wind');
+  });
+});
+
+
+// The second batch: the update time, the solar radiation, the rain, the UV index, the visibility, the moon, the lightning and the hourly weather entity.
+const BATCH2 = ['entity_update_time', 'entity_solar_radiation', 'entity_rain_rate', 'entity_rainfall', 'entity_pos', 'entity_pos_1', 'entity_possible_tomorrow', 'entity_uv_index', 'entity_visibility', 'entity_moon',
+  'entity_lightning_distance', 'entity_lightning_azimuth', 'entity_hourly'];
+const stamp = e('sensor.last_seen', { device_class: 'timestamp' });
+const solar = e('sensor.gw_solar', { unit_of_measurement: 'W/m\u00b2', device_class: 'irradiance' });
+const rate = e('sensor.gw_rain_rate', { unit_of_measurement: 'mm/h', device_class: 'precipitation_intensity' });
+const rain = e('sensor.gw_rain_today', { unit_of_measurement: 'mm', device_class: 'precipitation' });
+const uv = e('sensor.gw_uv_index', { unit_of_measurement: 'UV index' });
+const dist = e('sensor.car_range', { unit_of_measurement: 'km', device_class: 'distance' });
+const visi = e('sensor.visibility_km', { unit_of_measurement: 'km', device_class: 'distance' });
+const moon = e('sensor.moon_phase', { device_class: 'enum', options: ['new_moon', 'full_moon', 'last_quarter'] });
+const moonNamed = e('sensor.luna_template', { friendly_name: 'Moon phase text' });
+const bolt = e('sensor.kshchichka_lightning_distance', { unit_of_measurement: 'km', device_class: 'distance' });
+const boltAz = e('sensor.kshchichka_lightning_azimuth', { unit_of_measurement: '\u00b0' });
+const wxHourly = e('weather.forecast_varna', { supported_features: 3, uv_index: 1.2 });
+const wxDaily = e('weather.ivarna103', { supported_features: 1 });
+const HOUSE2 = [stamp, solar, rate, rain, uv, dist, visi, moon, moonNamed, bolt, boltAz, cpu, wxHourly, wxDaily];
+// A picker offers the domains that it was given (includeDomains); the filter narrows inside them. So each field is looked at in its own domains.
+const DOMAINS: Record<string, string[]> = { entity_update_time: ['sensor'], entity_solar_radiation: ['sensor'], entity_rain_rate: ['sensor'], entity_moon: ['sensor'], entity_lightning_distance: ['sensor'], entity_lightning_azimuth: ['sensor'],
+  entity_hourly: ['weather'], entity_rainfall: ['sensor'] };
+const offered2 = (el: Ed, key: string) => HOUSE2.filter((s) => (DOMAINS[key] ?? ['sensor', 'weather']).includes(s.entity_id.split('.')[0]) && el._pickerOffers(key, s)).map((s) => s.entity_id);
+
+describe('every picker of the second batch has its rule and its filter', () => {
+  it('in the editor, and as a rule', () => {
+    const src = readFileSync(join(__dirname, '..', 'src', 'editor.ts'), 'utf8');
+    const blocks = [...src.matchAll(/<ha-entity-picker\b(.*?)<\/ha-entity-picker>/gs)].map((m) => m[0]);
+    const el = house(HOUSE2);
+    for (const key of BATCH2) {
+      const mine = blocks.filter((b) => b.includes(`.configValue=\${'${key}'}`));
+      expect(mine.length, `a picker for ${key}`).toBeGreaterThan(0);
+      for (const b of mine) expect(b, key).toContain(`.entityFilter=\${this._filterFor('${key}')}`);
+      expect(el._filterFor(key), `a rule for ${key}`).toBeTypeOf('function');
+    }
+  });
+});
+
+describe('what the second batch offers', () => {
+  it('the update time: a sensor that is a timestamp, and not the rest of the house', () => {
+    const o = offered2(house(HOUSE2), 'entity_update_time');
+    expect(o).toEqual(['sensor.last_seen']);
+  });
+  it('the solar radiation, the rain rate and the rain: by class or unit, each its own', () => {
+    const el = house(HOUSE2);
+    expect(offered2(el, 'entity_solar_radiation')).toEqual(['sensor.gw_solar']);
+    expect(offered2(el, 'entity_rain_rate')).toEqual(['sensor.gw_rain_rate']);
+    for (const key of ['entity_rainfall', 'entity_pos', 'entity_pos_1', 'entity_possible_tomorrow']) {
+      const o = offered2(el, key);
+      expect(o, key).toContain('sensor.gw_rain_today');
+      expect(o, key).not.toContain('sensor.gw_rain_rate');
+      if (key !== 'entity_rainfall') expect(o, key).toContain('weather.forecast_varna');   // a forecast may give a possible rain; today's rain is a sensor
+    }
+  });
+  it('the UV index: a unit with UV in it, or a weather entity that has uv_index', () => {
+    const o = offered2(house(HOUSE2), 'entity_uv_index');
+    expect(o).toEqual(['sensor.gw_uv_index', 'weather.forecast_varna']);
+  });
+  it('the visibility: a distance, in a unit of distance, and the lightning is not one of them', () => {
+    const el = house(HOUSE2);
+    const o = offered2(el, 'entity_visibility');
+    expect(o).toEqual(expect.arrayContaining(['sensor.car_range', 'sensor.visibility_km', 'sensor.kshchichka_lightning_distance']));
+    expect(o).not.toContain('sensor.gw_solar');
+  });
+  it('the moon: an enum with moon phases, or a name that says moon', () => {
+    expect(offered2(house(HOUSE2), 'entity_moon')).toEqual(['sensor.moon_phase', 'sensor.luna_template']);
+  });
+  it('the lightning: a distance or a bearing that is named for lightning, and not every distance or every degree of the house', () => {
+    const el = house(HOUSE2);
+    expect(offered2(el, 'entity_lightning_distance')).toEqual(['sensor.kshchichka_lightning_distance']);
+    expect(offered2(el, 'entity_lightning_azimuth')).toEqual(['sensor.kshchichka_lightning_azimuth']);
+  });
+  it('the hourly weather entity: only one that gives an hourly forecast', () => {
+    expect(offered2(house(HOUSE2), 'entity_hourly')).toEqual(['weather.forecast_varna']);
+  });
+});
+
+describe('and nothing is hidden from a house that has nothing that fits', () => {
+  it('no timestamp, no irradiance: every sensor is offered for the field', () => {
+    const el = house([cpu, disk, wxDaily]);
+    expect([cpu, disk].filter((x) => el._pickerOffers('entity_update_time', x))).toHaveLength(2);
+    expect([cpu, disk].filter((x) => el._pickerOffers('entity_solar_radiation', x))).toHaveLength(2);
+  });
+  it('no lightning named in the house: every distance is offered for the lightning', () => {
+    const el = house([dist, visi, cpu]);
+    expect(el._pickerOffers('entity_lightning_distance', dist)).toBe(true);
+    expect(el._pickerOffers('entity_lightning_distance', cpu)).toBe(true);
+  });
+  it('no weather entity with an hourly forecast: every weather entity is offered for it', () => {
+    const el = house([wxDaily, cpu]);
+    expect(el._pickerOffers('entity_hourly', wxDaily)).toBe(true);
+  });
+  it('and the switch offers everything, for the second batch too', () => {
+    const el = house(HOUSE2, { option_editor_all_entities: true });
+    for (const key of BATCH2) expect(HOUSE2.filter((x) => el._pickerOffers(key, x)), key).toHaveLength(HOUSE2.length);
   });
 });
