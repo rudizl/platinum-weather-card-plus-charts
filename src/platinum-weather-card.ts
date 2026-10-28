@@ -4233,13 +4233,14 @@ export class PlatinumWeatherCard extends LitElement {
       'hail':                           'hail',
       'isolated-thunderstorms-day':     'lightning',
       'isolated-thunderstorms-night':   'lightning',
-      'unknown':                        'exceptional',
+      'unknown':                        'cloudy',
     };
     return map[iconName] ?? this._guessWcc(iconName);
   }
 
   // A name that is not in the table is a new variant of a family that is, and should look like its family; it did look
-  // like a tornado, for 'cloudy-3-day' and for 'rainy-2-day'. Only what is meant to be a tornado, or is not known, is one.
+  // like a tornado, for 'cloudy-3-day' and for 'rainy-2-day'. Only what is meant to be a tornado is one: a name that is not known at all
+  // is the plain cloud, which says nothing, and not the alarming picture.
   private _guessWcc(n: string): string {
     const night = /-night$/.test(n);
     if (/^clear/.test(n)) return night ? 'clear-night' : 'clear-day';
@@ -4251,7 +4252,8 @@ export class PlatinumWeatherCard extends LitElement {
     if (/^hail/.test(n)) return 'hail';
     if (/^wind/.test(n)) return 'wind';
     if (/thunder/.test(n)) return 'lightning-rain';
-    return 'exceptional';
+    if (/^(exceptional|tornado|hurricane)/.test(n)) return 'exceptional';
+    return 'cloudy';
   }
 
   // Maps our internal icon names to Home Assistant's own weather icons, which

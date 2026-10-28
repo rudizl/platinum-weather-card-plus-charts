@@ -66,6 +66,11 @@ describe('no name the card can produce is a tornado, unless it is meant to be', 
     const el = (await card({})) as Card & { _iconToWcc: (n: string) => string };
     for (const [n, want] of [['cloudy-4-day', 'cloudy'], ['rainy-9-night', 'rain'], ['snowy-7', 'snow'], ['clear-night', 'clear-night']] as const) expect(el._iconToWcc(n), n).toBe(want);
     expect(el._iconToWcc('tornado')).toBe('exceptional');
-    expect(el._iconToWcc('something-new')).toBe('exceptional');
+  });
+  // A tornado is for a tornado: a name that the card does not know, or that a provider calls 'unknown', is the cloud that says nothing, and not the alarming picture.
+  it('the tornado is for what is meant to be one, and not for a name that is not known', async () => {
+    const el = (await card({})) as Card & { _iconToWcc: (n: string) => string };
+    for (const n of ['exceptional', 'tornado', 'hurricane']) expect(el._iconToWcc(n), n).toBe('exceptional');
+    for (const n of ['unknown', 'something-new', 'xyz', '', 'qwerty-day']) expect(el._iconToWcc(n), JSON.stringify(n)).toBe('cloudy');
   });
 });
