@@ -10,6 +10,18 @@ import { tEditor } from './translations';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
+// What a picker offers (see _PICKER_RULES in the editor): a sensor by its device class, its unit or its name, a weather entity by the attribute that the field reads.
+type PickerRule = {
+  classes?: string[];      // device classes of a sensor that fit
+  units?: string[];        // units of a sensor that fit (with the name, when there is one)
+  unitMatch?: RegExp;      // a unit that is written in many ways (UV index, UV...)
+  options?: string;        // an enum sensor that has this option (a moon phase)
+  name?: RegExp;           // what the name or the identifier has to say when the unit or the class says too little
+  strictName?: boolean;    // the name is needed whatever the class or the unit says (a lightning distance is a distance, and so is a visibility)
+  weather?: string;        // the attribute of a weather entity that the field reads
+  hourly?: boolean;        // a weather entity that gives an hourly forecast
+};
+
 @customElement('platinum-weather-card-plus-charts-editor')
 export class WeatherCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
@@ -893,7 +905,7 @@ get _forecast_type(): string {
 
     const entity_visibility = entities.has("entity_visibility") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_visibility'} .value=${this._entity_visibility} .includeDomains=${['sensor', 'weather']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_visibility'} .value=${this._entity_visibility} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_visibility')}
           name="entity_visibility" label=${this._t("entity_visibility")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : '';
@@ -907,7 +919,7 @@ get _forecast_type(): string {
 
     const entity_solar_radiation = entities.has("entity_solar_radiation") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_solar_radiation')}
           name="entity_solar_radiation" label=${this._t("entity_solar_radiation")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
         <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
@@ -937,14 +949,14 @@ get _forecast_type(): string {
 
     const entity_uv_index = entities.has("entity_uv_index") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_uv_index'} .value=${this._config?.entity_uv_index || ''} .includeDomains=${['sensor', 'weather']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_uv_index'} .value=${this._config?.entity_uv_index || ''} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_uv_index')}
           name="entity_uv_index" label=${this._t("entity_uv_index")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : '';
 
     const entity_moon = entities.has("entity_moon") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_moon'} .value=${this._entity_moon} .includeDomains=${['sensor']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_moon'} .value=${this._entity_moon} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_moon')}
           name="entity_moon" label=${this._t("entity_moon")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : '';
@@ -958,14 +970,14 @@ get _forecast_type(): string {
 
     const entity_pos = entities.has("entity_pos") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pos'} .value=${this._entity_pos} .includeDomains=${['sensor', 'weather']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pos'} .value=${this._entity_pos} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_pos')}
           name="entity_pos" label=${this._t("entity_pos")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : '';
 
     const entity_possible_tomorrow = entities.has("entity_possible_tomorrow") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_possible_tomorrow'} .value=${this._entity_possible_tomorrow} .includeDomains=${['sensor', 'weather']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_possible_tomorrow'} .value=${this._entity_possible_tomorrow} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_possible_tomorrow')}
           name="entity_possible_tomorrow" label=${this._t("entity_2day_pos")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : '';
@@ -1004,7 +1016,7 @@ get _forecast_type(): string {
 
     const entity_rainfall = entities.has("entity_rainfall") ?
       html`
-        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_rainfall'} .value=${this._entity_rainfall} .includeDomains=${['sensor']}
+        <ha-entity-picker .hass=${this.hass} .configValue=${'entity_rainfall'} .value=${this._entity_rainfall} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_rainfall')}
           name="entity_rainfall" label=${this._t("entity_rainfall")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
         </ha-entity-picker>
       ` : '';
@@ -1130,7 +1142,7 @@ get _forecast_type(): string {
   private _sectionOverviewEditor(): TemplateResult {
     //tjl added weather as an included domain for Apparent Temp
     return html`
-      <ha-entity-picker .hass=${this.hass} .configValue=${'entity_update_time'} .value=${this._entity_update_time} .includeDomains=${['sensor']}
+      <ha-entity-picker .hass=${this.hass} .configValue=${'entity_update_time'} .value=${this._entity_update_time} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_update_time')}
         name="entity_update_time" label=${this._t("entity_update_time")} allow-custom-entity
         @value-changed=${this._valueChangedPicker}>
       </ha-entity-picker>
@@ -1277,7 +1289,7 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_hourly || ''}
           .configValue=${'entity_hourly'} @value-changed=${this._valueChangedPicker}
-          .includeDomains=${['weather']}
+          .includeDomains=${['weather']} .entityFilter=${this._filterFor('entity_hourly')}
           name="entity_hourly" label=${this._t("entity_hourly")} allow-custom-entity>
         </ha-entity-picker>
       </div>
@@ -1358,14 +1370,14 @@ get _forecast_type(): string {
         <div>
           <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_lightning_distance || ''}
             .configValue=${'entity_lightning_distance'} @value-changed=${this._valueChangedPicker}
-            .includeDomains=${['sensor']}
+            .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_lightning_distance')}
             name="entity_lightning_distance" label=${this._t("entity_lightning_distance")} allow-custom-entity>
           </ha-entity-picker>
         </div>
         <div>
           <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_lightning_azimuth || ''}
             .configValue=${'entity_lightning_azimuth'} @value-changed=${this._valueChangedPicker}
-            .includeDomains=${['sensor']}
+            .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_lightning_azimuth')}
             name="entity_lightning_azimuth" label=${this._t("entity_lightning_azimuth")} allow-custom-entity>
           </ha-entity-picker>
         </div>
@@ -1756,7 +1768,7 @@ get _forecast_type(): string {
       <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pop_1'} .value=${this._entity_pop_1}  .includeDomains=${['sensor', 'weather']}
         name="entity_pop_1" label=${this._t("entity_pop_1")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
       </ha-entity-picker>
-      <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pos_1'} .value=${this._entity_pos_1}  .includeDomains=${['sensor', 'weather']}
+      <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pos_1'} .value=${this._entity_pos_1}  .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_pos_1')}
         name="entity_pos_1" label=${this._t("entity_pos_1")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
       </ha-entity-picker>
       ${this._daily_forecast_layout === 'vertical' ? html`
@@ -1927,7 +1939,7 @@ get _forecast_type(): string {
       </div>
       <div class="side-by-side">
         <div>
-          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']}
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_solar_radiation')}
             name="entity_solar_radiation" label=${this._t("entity_solar_radiation")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
           </ha-entity-picker>
           <div class="help-text">${this._t("entity_solar_radiation_hint")}</div>
@@ -1940,7 +1952,7 @@ get _forecast_type(): string {
       </div>
       <div class="side-by-side">
         <div>
-          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_rain_rate'} .value=${this._config?.entity_rain_rate || ''} .includeDomains=${['sensor']}
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_rain_rate'} .value=${this._config?.entity_rain_rate || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_rain_rate')}
             name="entity_rain_rate" label=${this._t("entity_rain_rate")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
           </ha-entity-picker>
           <div class="help-text">${this._t("entity_rain_rate_hint")}</div>
@@ -2188,11 +2200,12 @@ get _forecast_type(): string {
   private static readonly _TEMPERATURE_UNITS = ['\u00b0C', '\u00b0F', 'K'];
   private static readonly _PRESSURE_UNITS = ['hPa', 'mbar', 'kPa', 'Pa', 'bar', 'cbar', 'mmHg', 'inHg', 'psi'];
   private static readonly _SPEED_UNITS = ['km/h', 'm/s', 'mph', 'kn', 'ft/s', 'Beaufort', 'bft'];
+  private static readonly _LIGHTNING_NAME = /lightning|blitz|strike|thunder|мълни|светкав|гроза|foudre|orage|rayo|fulmin|bliksem|piorun|blesk|blixt|lyn/i;
   private static readonly _HUMIDITY_NAME = /humid|влаж|feuchte|humedad|umidit|vochtig|wilgot|vlhk|fugt|вологість|vla[zž]n/i;
-  private static readonly _PICKER_RULES: Record<string, { classes?: string[]; units?: string[]; name?: RegExp; weather?: string }> = (() => {
+  private static readonly _PICKER_RULES: Record<string, PickerRule> = (() => {
     const temperature = { classes: ['temperature'], units: WeatherCardEditor._TEMPERATURE_UNITS };
     const speed = { classes: ['wind_speed'], units: WeatherCardEditor._SPEED_UNITS };
-    const rules: Record<string, { classes?: string[]; units?: string[]; name?: RegExp; weather?: string }> = {
+    const rules: Record<string, PickerRule> = {
       entity_temperature: { ...temperature, weather: 'temperature' },
       entity_apparent_temp: { ...temperature, weather: 'apparent_temperature' },
       entity_dew_point: { ...temperature, weather: 'dew_point' },
@@ -2212,6 +2225,20 @@ get _forecast_type(): string {
       entity_wind_gust_kt: { ...speed },
       entity_wind_bearing: { classes: ['wind_direction'], units: ['\u00b0'], weather: 'wind_bearing' },
       entity_wind_bearing_6h: { classes: ['wind_direction'], units: ['\u00b0'] },
+      // the second batch
+      entity_update_time: { classes: ['timestamp'] },
+      entity_solar_radiation: { classes: ['irradiance'], units: ['W/m\u00b2', 'W/m2'] },
+      entity_rain_rate: { classes: ['precipitation_intensity'], units: ['mm/h', 'in/h', 'mm/d', 'mm/min'] },
+      entity_rainfall: { classes: ['precipitation'], units: ['mm', 'in'] },
+      entity_pos: { classes: ['precipitation'], units: ['mm', 'in'] },
+      entity_pos_1: { classes: ['precipitation'], units: ['mm', 'in'] },
+      entity_possible_tomorrow: { classes: ['precipitation'], units: ['mm', 'in'] },
+      entity_uv_index: { unitMatch: /uv/i, weather: 'uv_index' },
+      entity_visibility: { classes: ['distance'], units: ['km', 'mi', 'm'], weather: 'visibility' },
+      entity_moon: { options: 'full_moon', name: /moon|луна|lune|mond|luna|maan|księż|měsíc|måne|місяц/i },
+      entity_lightning_distance: { classes: ['distance'], units: ['km', 'mi', 'm'], name: WeatherCardEditor._LIGHTNING_NAME, strictName: true },
+      entity_lightning_azimuth: { units: ['\u00b0'], name: WeatherCardEditor._LIGHTNING_NAME, strictName: true },
+      entity_hourly: { hourly: true },
     };
     return rules;
   })();
@@ -2224,21 +2251,37 @@ get _forecast_type(): string {
     return (this._pickerFilters[key] ??= (entity) => this._pickerOffers(key, entity));
   }
 
-  private static _sensorFits(rule: { classes?: string[]; units?: string[]; name?: RegExp }, entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean {
+  private static _sensorFits(rule: PickerRule, entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean {
     const attrs = entity.attributes ?? {};
+    const text = `${entity.entity_id} ${String(attrs.friendly_name ?? '')}`.replace(/[._]/g, ' ');
+    const nameOk = !rule.name || rule.name.test(text);
+    if (rule.strictName && !nameOk) return false;
     if (rule.classes?.includes(String(attrs.device_class ?? ''))) return true;
-    if (!rule.units?.includes(String(attrs.unit_of_measurement ?? ''))) return false;
+    if (rule.options && Array.isArray(attrs.options) && attrs.options.includes(rule.options)) return true;
+    const unit = String(attrs.unit_of_measurement ?? '');
     // a unit that says too little (per cent is a humidity, a battery, a load...) needs the name to say the rest
-    return !rule.name || rule.name.test(`${entity.entity_id} ${String(attrs.friendly_name ?? '')}`.replace(/[._]/g, ' '));
+    if (rule.units?.includes(unit) || (rule.unitMatch && rule.unitMatch.test(unit))) return nameOk;
+    // a rule that is only a name (a moon has no class and no unit)
+    if (!rule.classes && !rule.units && !rule.unitMatch) return !!rule.name && nameOk;
+    return false;
   }
 
-  private _houseHasSensorFor(key: string): boolean {
+  private static _weatherFits(rule: PickerRule, entity: { entity_id: string; attributes?: Record<string, unknown> }): boolean {
+    if (rule.hourly) return (Number(entity.attributes?.supported_features ?? 0) & 2) === 2;   // WeatherEntityFeature.FORECAST_HOURLY
+    if (!rule.weather) return true;
+    const value = entity.attributes?.[rule.weather];
+    return value !== undefined && value !== null && value !== '';
+  }
+
+  private _houseHas(key: string, domain: 'sensor' | 'weather'): boolean {
     const states = this.hass?.states as Record<string, { entity_id: string; attributes?: Record<string, unknown> }> | undefined;
-    const memo = this._houseMemo[key];
+    const id = `${key}:${domain}`;
+    const memo = this._houseMemo[id];
     if (memo && memo.states === states) return memo.any;
     const rule = WeatherCardEditor._PICKER_RULES[key];
-    const any = !!states && Object.values(states).some((e) => e.entity_id.startsWith('sensor.') && WeatherCardEditor._sensorFits(rule, e));
-    this._houseMemo[key] = { states, any };
+    const fits = domain === 'sensor' ? WeatherCardEditor._sensorFits : WeatherCardEditor._weatherFits;
+    const any = !!states && Object.values(states).some((e) => e.entity_id.startsWith(`${domain}.`) && fits(rule, e));
+    this._houseMemo[id] = { states, any };
     return any;
   }
 
@@ -2247,12 +2290,11 @@ get _forecast_type(): string {
     const rule = WeatherCardEditor._PICKER_RULES[key];
     if (!rule) return true;
     if (entity.entity_id.startsWith('weather.')) {
-      if (!rule.weather) return true;
-      const value = entity.attributes?.[rule.weather];
-      return value !== undefined && value !== null && value !== '';
+      // a house with no weather entity that gives an hourly forecast is offered every one, so that nothing is hidden from it
+      return WeatherCardEditor._weatherFits(rule, entity) || (!!rule.hourly && !this._houseHas(key, 'weather'));
     }
     if (!entity.entity_id.startsWith('sensor.')) return true;
-    return WeatherCardEditor._sensorFits(rule, entity) || !this._houseHasSensorFor(key);
+    return WeatherCardEditor._sensorFits(rule, entity) || !this._houseHas(key, 'sensor');
   }
 
   private _goBack(): void {

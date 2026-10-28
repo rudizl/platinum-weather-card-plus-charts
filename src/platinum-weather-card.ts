@@ -754,25 +754,27 @@ export class PlatinumWeatherCard extends LitElement {
 
 
 
+  // The state (or the attribute) of the update time entity as a date and time, or null. A browser reads a bare number as a date (1 is the first of January 2001, 2 the first of February: #36),
+  // and anything else that is not a date as "Invalid Date", and neither is a time. A date and time has a year of four digits and something between its parts, and is one that the browser can read.
+  private static _parseUpdateTime(value: unknown): Date | null {
+    if (typeof value !== 'string') return null;
+    const text = value.trim();
+    if (!/\d{4}/.test(text) || !/[-/:\s]/.test(text)) return null;
+    const d = new Date(text);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   private _renderUpdateTime(): TemplateResult {
-    if ((this._config.entity_update_time) && (this.hass.states[this._config.entity_update_time]) && (this.hass.states[this._config.entity_update_time].state !== undefined)) {
+    const entity = this._config.entity_update_time ? this.hass.states[this._config.entity_update_time] : undefined;
+    if (entity && entity.state !== undefined) {
+      let raw: unknown = entity.state;
       if (this._config.update_time_use_attr === true) {
-        if (this._config.update_time_name_attr !== undefined) {
-          const attribute = this._config.update_time_name_attr.toLowerCase().split(".").reduce((retval, value) => retval !== undefined ? retval[value] : undefined, this.hass.states[this._config.entity_update_time].attributes);
-          if (attribute !== undefined) {
-            const d = new Date(`${attribute}`);
-            switch (this.timeFormat) {
-              case '12hour':
-                return html`${d.toLocaleString(this.locale || navigator.language, { hour: 'numeric', minute: '2-digit', hour12: true }).replace(" ", "") + ", " + this._formatDate(d)}`;
-              case '24hour':
-                return html`${d.toLocaleString(this.locale || navigator.language, { hour: '2-digit', minute: '2-digit', hour12: false }) + ", " + this._formatDate(d)}`;
-              case 'system':
-                return html`${d.toLocaleTimeString(this.locale || navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" ", "") + ", " + this._formatDate(d)}`;
-            }
-          }
-        }
-      } else {
-        const d = new Date(this.hass.states[this._config.entity_update_time].state);
+        raw = this._config.update_time_name_attr !== undefined
+          ? this._config.update_time_name_attr.toLowerCase().split(".").reduce((retval: any, value: string) => retval !== undefined ? retval[value] : undefined, entity.attributes)
+          : undefined;
+      }
+      const d = PlatinumWeatherCard._parseUpdateTime(raw);
+      if (d) {
         switch (this.timeFormat) {
           case '12hour':
             return html`${d.toLocaleString(this.locale || navigator.language, { hour: 'numeric', minute: '2-digit', hour12: true }).replace(" ", "") + ", " + this._formatDate(d)}`;
