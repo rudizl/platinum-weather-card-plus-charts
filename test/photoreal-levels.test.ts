@@ -39,6 +39,25 @@ describe('the cloud cover decides the icon, in four bands', () => {
     });
 });
 
+describe('and the provider is not the sensors: a partly cloudy that the provider reports is the sun with a cloud, whatever the measured sky', () => {
+  it('with the sensors off, the provider\'s partly cloudy is the partly cloudy picture', async () => {
+    const hass = makeHass({ 'weather.home': { state: 'partlycloudy' }, 'sun.sun': { state: 'above_horizon', attributes: { elevation: ELEVATION, azimuth: 150 } } });
+    const el = (await renderCard(baseConfig({ weather_entity: 'weather.home', entity_sun: 'sun.sun', icon_pack: 'photoreal' } as never), hass)) as unknown as Card;
+    expect(el._getIconUrl(el._weatherIcon('partlycloudy')).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.png');
+  });
+  it('the measured sky does not leak into the icons that come after it: a forecast beside the current conditions is the provider\'s', async () => {
+    const el = await card({ cloud: 0.7 });
+    expect(picture(el)).toBe('p-brokenclouds-day');
+    expect(el._getIconUrl('cloudy-2-day', true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.png');
+    expect(el._getIconUrl('cloudy-2-day', true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.png');
+    expect(picture(el)).toBe('p-brokenclouds-day');
+  });
+  it('and when the sensors measure 55 to 85 per cent, the sky is the broken clouds, whatever the provider says', async () => {
+    expect(picture(await card({ cloud: 0.62 }))).toBe('p-brokenclouds-day');
+    expect(picture(await card({ cloud: 0.80 }))).toBe('p-brokenclouds-day');
+  });
+});
+
 describe('the rain gauge decides the icon, in three levels', () => {
   it.each([[0.8, 'p-lightrain'], [5, 'p-rain'], [12, 'p-rain']])('%s mm/h is %s in the photoreal pack', async (rain, want) => {
     expect(picture(await card({ rain }))).toBe(want);

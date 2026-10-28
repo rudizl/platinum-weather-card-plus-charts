@@ -17,7 +17,7 @@ const NAMES = ['clear-day', 'clear-night', 'partlycloudy-day', 'partlycloudy-nig
   'mostlysunny-day', 'mostlysunny-night', 'mostlycloudy-day', 'mostlycloudy-night', 'lightrain',
   'tropical-storm', 'dust', 'unknown', 'brokenclouds-day', 'brokenclouds-night'];
 
-type Card = HTMLElement & { _getIconUrl: (n: string, f?: boolean) => string; _weatherIcon: (c: string) => string; _iconToWcc: (n: string) => string };
+type Card = HTMLElement & { _getIconUrl: (n: string, f?: boolean) => string; _weatherIcon: (c: string) => string; _iconToWcc: (n: string) => string; _iconToPhotoreal?: (n: string, m?: boolean) => string };
 
 async function card(config: Record<string, unknown> = {}) {
   return (await renderCard(baseConfig({ icon_pack: 'photoreal', ...config } as never), makeHass({ 'weather.home': { state: 'cloudy' } }))) as unknown as Card;
@@ -55,7 +55,7 @@ describe('the pack in the card', () => {
     expect(el._getIconUrl('clear-day')).toMatch(/\/p-clear-day\.png\?r=\d+$/);
     expect(el._getIconUrl('rainy-3-day')).toMatch(/\/p-rain\.png\?r=\d+$/);
     expect(el._getIconUrl('rainy-3')).toMatch(/\/p-pouring\.png\?r=\d+$/);
-    expect(el._getIconUrl('cloudy-2-night')).toMatch(/\/p-brokenclouds-night\.png\?r=\d+$/);
+    expect(el._getIconUrl('cloudy-2-night')).toMatch(/\/p-partlycloudy-night\.png\?r=\d+$/);
   });
   it('and is the same place as the card itself, not the Internet and not a path the user has to make', async () => {
     const url = (await card())._getIconUrl('snowy-3');
@@ -101,7 +101,7 @@ describe('the levels of the sky and of the rain look different', () => {
       expect(new Set(f).size, `${t}: ${f.join(', ')}`).toBe(4);
     }
     expect(file(el, 'cloudy-1-day')).toBe('p-mostlysunny-day.png');
-    expect(file(el, 'cloudy-2-day')).toBe('p-brokenclouds-day.png');
+    expect(file(el, 'cloudy-2-day')).toBe('p-partlycloudy-day.png');
     expect(file(el, 'cloudy-3-day')).toBe('p-mostlycloudy-day.png');
     expect(file(el, 'cloudy-3-night')).toBe('p-mostlycloudy-night.png');
   });
@@ -128,27 +128,32 @@ describe('the levels of the sky and of the rain look different', () => {
   });
 });
 
-describe('broken clouds: a sun or a moon with torn streaks of cloud, for the level of 55 to 85 per cent', () => {
-  const file = (el: Card, n: string) => el._getIconUrl(n).split('/').pop()!.split('?')[0];
-  it('the second level of the sky is the broken clouds, by day and by night', async () => {
-    const el = await card();
-    expect(file(el, 'cloudy-2-day')).toBe('p-brokenclouds-day.png');
-    expect(file(el, 'cloudy-2-night')).toBe('p-brokenclouds-night.png');
-  });
-  it('and so is the condition that a provider calls partly cloudy: the card names both cloudy-2, and they are the same sky', async () => {
+describe('broken clouds: a sun or a moon with torn streaks of cloud, for the sky that the sensors measure at 55 to 85 per cent', () => {
+  const file = (el: Card, n: string, forecast = false) => el._getIconUrl(n, forecast).split('/').pop()!.split('?')[0];
+  it('what a provider calls partly cloudy is the partly cloudy picture, a sun with a cloud, and so is a forecast of it', async () => {
     const el = await card();
     expect(el._weatherIcon('partlycloudy')).toBe('cloudy-2-day');
-    expect(file(el, el._weatherIcon('partlycloudy'))).toBe('p-brokenclouds-day.png');
+    expect(file(el, el._weatherIcon('partlycloudy'))).toBe('p-partlycloudy-day.png');
+    expect(file(el, 'cloudy-2-day', true)).toBe('p-partlycloudy-day.png');
+    expect(el._getIconUrl('cloudy-2-night', true, true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-night.png');   // an hour that is night, in a forecast
   });
   it('the levels on each side of it are what they were', async () => {
     const el = await card();
     expect(file(el, 'cloudy-1-day')).toBe('p-mostlysunny-day.png');
     expect(file(el, 'cloudy-3-night')).toBe('p-mostlycloudy-night.png');
   });
-  it('the custom pack has no such picture, and keeps its fifteen names: the second level is still partly cloudy there', async () => {
+  it('the custom pack has no such picture, and keeps its fifteen names: the second level is partly cloudy there', async () => {
     const el = await card();
     expect(el._iconToWcc('cloudy-2-day')).toBe('partlycloudy-day');
     expect(el._iconToWcc('cloudy-2-night')).toBe('partlycloudy-night');
+  });
+  it('the table of the pack has the broken clouds under their own names, for the sky that was measured', async () => {
+    const c = (await card()) as Card & { _iconToPhotoreal: (n: string, measured?: boolean) => string };
+    expect(c._iconToPhotoreal('cloudy-2-day', true)).toBe('brokenclouds-day');
+    expect(c._iconToPhotoreal('cloudy-2-night', true)).toBe('brokenclouds-night');
+    expect(c._iconToPhotoreal('cloudy-2-day', false)).toBe('partlycloudy-day');
+    expect(c._iconToPhotoreal('cloudy-1-day', true)).toBe('mostlysunny-day');
+    expect(c._iconToPhotoreal('cloudy-3-day', true)).toBe('mostlycloudy-day');
   });
 });
 

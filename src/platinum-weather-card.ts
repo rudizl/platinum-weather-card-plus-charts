@@ -4208,7 +4208,12 @@ export class PlatinumWeatherCard extends LitElement {
   // The name the card settles on for the icon: the provider's, then the sun's word on day
   // and night, then what the sensors can see. Everything that draws the weather from the
   // state of the sky (the icon, and the effects behind it) asks here, so they cannot disagree.
+  // Whether the icon that _effectiveIconName gave was decided by the sensors (the measured sky), and not by the provider. The photoreal pack draws the two differently
+  // for the second level: broken clouds for a sky of 55 to 85 per cent that was measured, and the sun with a cloud for what a provider calls partly cloudy.
+  private _skyMeasured = false;
+
   private _effectiveIconName(iconName: string, forForecast = false, night = false): string {
+    this._skyMeasured = false;
     // A forecast icon is a day icon: a day's icon is the day's. An hour that is night is the exception, and says so.
     let adjusted = forForecast ? iconName.replace('-night', '-day') : iconName;
     if (forForecast && night) adjusted = adjusted.replace('-day', '-night');
@@ -4297,6 +4302,7 @@ export class PlatinumWeatherCard extends LitElement {
           // Every band has a day and a night file; a bare name matches nothing
           // and the card renders N/A.
           adjusted = `${['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target]}-${this.dayOrNight}`;
+          this._skyMeasured = true;
         }
       }
     }
@@ -4307,6 +4313,7 @@ export class PlatinumWeatherCard extends LitElement {
   private _getIconUrl(iconName: string, forForecast = false, night = false): string {
     const pack = this._config?.icon_pack ?? 'default';
     const adjusted = this._effectiveIconName(iconName, forForecast, night);
+    const measured = this._skyMeasured;
 
     if (pack === 'default') {
       const prefix = this._config?.option_static_icons ? 's-' : 'a-';
@@ -4324,7 +4331,7 @@ export class PlatinumWeatherCard extends LitElement {
     // The photoreal pack is twenty PNGs beside the card (p-<name>.png): the names of the custom pack, and five more for the levels
     // The revision is in the address: Home Assistant serves the pictures with a cache of 31 days, so a picture that is
     // redrawn under the same name would not reach a phone that has the old one. Raise it when a picture changes.
-    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + this._iconToPhotoreal(adjusted) + '.png?r=' + PHOTOREAL_REVISION;
+    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + this._iconToPhotoreal(adjusted, measured) + '.png?r=' + PHOTOREAL_REVISION;
     if (pack === 'custom' && this._config?.icon_pack_path)
       return this._config.icon_pack_path.replace('{condition}', wccName);
 
@@ -4410,14 +4417,14 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   // The photoreal pack has more pictures than the names of the custom pack, so that the levels of the sky and of the rain
-  // can be told apart: a small cloud, broken clouds (a sun or a moon with torn streaks of cloud, for the level of 55 to 85 per cent), and a sun nearly hidden; a light rain beside the rain.
-  // The partly cloudy picture, a sun with a cloud, stays for the condition that a provider calls partly cloudy.
+  // can be told apart: a small cloud, a partly cloudy sky, and a sun nearly hidden; a light rain beside the rain. For the second level there are two pictures, because it has two sources:
+  // a sky that the sensors measured at 55 to 85 per cent is broken clouds (a sun or a moon with torn streaks of cloud in front), and what a provider calls partly cloudy, or a forecast of it, is the sun with a cloud.
   // The custom pack keeps to its fifteen names.
   // It has a picture of its own for what the custom pack draws as a tornado, and it was not one: a tropical storm, dust, and a name that the card does not know at all.
-  private _iconToPhotoreal(iconName: string): string {
+  private _iconToPhotoreal(iconName: string, measured = false): string {
     if (iconName === 'tropical-storm' || iconName === 'dust' || iconName === 'unknown') return iconName;
     const sky = /^cloudy-([123])-(day|night)$/.exec(iconName);
-    if (sky) return `${['mostlysunny', 'brokenclouds', 'mostlycloudy'][Number(sky[1]) - 1]}-${sky[2]}`;
+    if (sky) return `${['mostlysunny', measured ? 'brokenclouds' : 'partlycloudy', 'mostlycloudy'][Number(sky[1]) - 1]}-${sky[2]}`;
     if (/^rainy-1(-|$)/.test(iconName)) return 'lightrain';
     return this._wccOrNull(iconName) ?? 'unknown';
   }
