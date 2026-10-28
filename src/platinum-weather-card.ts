@@ -4342,6 +4342,12 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   private _iconToWcc(iconName: string): string {
+    return this._wccOrNull(iconName) ?? 'cloudy';
+  }
+
+  // The WCC filename of an internal icon name, or null for a name that the card does not know at all (a pack that has a picture for that, and
+  // the photoreal one has, can say so; the others give the plain cloud).
+  private _wccOrNull(iconName: string): string | null {
     // Maps the OUTPUT of _weatherIcon() (internal icon names) to WCC filenames
     const map: { [key: string]: string } = {
       'clear-day':                      'clear-day',
@@ -4380,14 +4386,15 @@ export class PlatinumWeatherCard extends LitElement {
       'hail':                           'hail',
       'isolated-thunderstorms-day':     'lightning',
       'isolated-thunderstorms-night':   'lightning',
-      'unknown':                        'exceptional',
+      'unknown':                        'cloudy',
     };
     return map[iconName] ?? this._guessWcc(iconName);
   }
 
   // A name that is not in the table is a new variant of a family that is, and should look like its family; it did look
-  // like a tornado, for 'cloudy-3-day' and for 'rainy-2-day'. Only what is meant to be a tornado, or is not known, is one.
-  private _guessWcc(n: string): string {
+  // like a tornado, for 'cloudy-3-day' and for 'rainy-2-day'. Only what is meant to be a tornado is one: a name that is not known at all
+  // is the plain cloud, which says nothing, and not the alarming picture.
+  private _guessWcc(n: string): string | null {
     const night = /-night$/.test(n);
     if (/^clear/.test(n)) return night ? 'clear-night' : 'clear-day';
     if (/^(cloudy|overcast)/.test(n)) return 'cloudy';
@@ -4398,7 +4405,8 @@ export class PlatinumWeatherCard extends LitElement {
     if (/^hail/.test(n)) return 'hail';
     if (/^wind/.test(n)) return 'wind';
     if (/thunder/.test(n)) return 'lightning-rain';
-    return 'exceptional';
+    if (/^(exceptional|tornado|hurricane)/.test(n)) return 'exceptional';
+    return null;
   }
 
   // The photoreal pack has more pictures than the names of the custom pack, so that the levels of the sky and of the rain
