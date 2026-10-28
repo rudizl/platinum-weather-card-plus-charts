@@ -1148,24 +1148,8 @@ export class PlatinumWeatherCard extends LitElement {
     var sectionHeight = 0;
     if (this._config.show_section_slots !== false) {
       // Calculate the max number of slots in both left and right
-      var slotsLeft =
-        (this._config.slot_l1 !== 'remove' ? 1 : 0) +
-        (this._config.slot_l2 !== 'remove' ? 1 : 0) +
-        (this._config.slot_l3 !== 'remove' ? 1 : 0) +
-        (this._config.slot_l4 !== 'remove' ? 1 : 0) +
-        (this._config.slot_l5 !== 'remove' ? 1 : 0) +
-        ((this._config.slot_l6 !== undefined) && (this._config.slot_l6 !== 'remove') ? 1 : 0) +
-        ((this._config.slot_l7 !== undefined) && (this._config.slot_l7 !== 'remove') ? 1 : 0) +
-        ((this._config.slot_l8 !== undefined) && (this._config.slot_l8 !== 'remove') ? 1 : 0);
-      var slotsRight =
-        (this._config.slot_r1 !== 'remove' ? 1 : 0) +
-        (this._config.slot_r2 !== 'remove' ? 1 : 0) +
-        (this._config.slot_r3 !== 'remove' ? 1 : 0) +
-        (this._config.slot_r4 !== 'remove' ? 1 : 0) +
-        (this._config.slot_r5 !== 'remove' ? 1 : 0) +
-        ((this._config.slot_r6 !== undefined) && (this._config.slot_r6 !== 'remove') ? 1 : 0) +
-        ((this._config.slot_r7 !== undefined) && (this._config.slot_r7 !== 'remove') ? 1 : 0) +
-        ((this._config.slot_r8 !== undefined) && (this._config.slot_r8 !== 'remove') ? 1 : 0);
+      var slotsLeft = ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8'].filter((p) => this._slotCounted(p)).length;
+      var slotsRight = ['r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8'].filter((p) => this._slotCounted(p)).length;
       sectionHeight += 16 + Math.max(slotsLeft, slotsRight) * 24;
     }
     return sectionHeight;
@@ -2362,6 +2346,52 @@ export class PlatinumWeatherCard extends LitElement {
     return this.slotValue('r8', this._config.slot_r8);
   }
 
+  // What a slot shows when it is not chosen (README: Default slot values).
+  private static readonly _DEFAULT_SLOTS: Record<string, string> = {
+    l1: 'forecast_max', l2: 'forecast_min', l3: 'wind', l4: 'pressure', l5: 'sun_next', l6: 'remove', l7: 'remove', l8: 'remove',
+    r1: 'popforecast', r2: 'humidity', r3: 'uv_summary', r4: 'moon', r5: 'sun_following', r6: 'remove', r7: 'remove', r8: 'remove',
+  };
+
+  // Whether the entity of a setting is a source for a slot. An entity that the user set is one whatever it gives now (it may be unavailable for a minute, and a slot that comes and goes is worse than
+  // a `---`). One that the card supplied from the weather entity, or a weather entity itself, is one if the attribute that the slot reads is there.
+  private _hasEntitySource(key: string, attr: string): boolean {
+    const entity = (this._config as any)[key] as string | undefined;
+    if (!entity) return false;
+    if (!this._impliedKeys.has(key) && !entity.startsWith('weather.')) return true;
+    const value = this.hass?.states?.[entity]?.attributes?.[attr];
+    return value !== undefined && value !== null && value !== '';
+  }
+
+  // Whether a default slot has anything to read. The sun and the moon hide themselves; the others are the ones that were drawn as `---`.
+  private _defaultSlotHasSource(type: string): boolean {
+    switch (type) {
+      case 'forecast_max': return !!(this._config.entity_forecast_max || this._config.weather_entity);
+      case 'forecast_min': return !!(this._config.entity_forecast_min || this._config.weather_entity);
+      case 'wind': return this._hasEntitySource('entity_wind_speed', 'wind_speed') || this._hasEntitySource('entity_wind_bearing', 'wind_bearing');
+      case 'pressure': return this._hasEntitySource('entity_pressure', 'pressure');
+      case 'humidity': return this._hasEntitySource('entity_humidity', 'humidity');
+      case 'uv_summary': return !!this._config.entity_uv_alert_summary;
+      case 'popforecast': {
+        const sensor = (e?: string) => !!e && !e.startsWith('weather.');
+        if (sensor(this._config.entity_pop) || sensor(this._config.entity_pos)) return true;
+        if (!this._config.entity_pop && !this._config.entity_pos && !this._config.weather_entity) return false;
+        // the forecast comes a moment after the card: until it is here the slot is not taken away, and when it is here and gives neither a chance nor an amount it is
+        if (this.forecast1 === undefined || this.forecast1.length === 0) return true;
+        return this._firstDayProp('precipitation_probability') != null || this._firstDayProp('precipitation') != null;
+      }
+      default: return true;
+    }
+  }
+
+  // Whether the slot at a position is drawn, for the size of the card.
+  private _slotCounted(position: string): boolean {
+    const value = (this._config as any)[`slot_${position}`] as string | undefined;
+    if (value === 'remove') return false;
+    if (value !== undefined) return true;
+    const standing = PlatinumWeatherCard._DEFAULT_SLOTS[position];
+    return standing !== undefined && standing !== 'remove' && this._defaultSlotHasSource(standing);
+  }
+
   // slots - calculates the specific slot value
   slotValue(slot: string, value: string | undefined): TemplateResult {
     switch (value) {
@@ -2400,24 +2430,12 @@ export class PlatinumWeatherCard extends LitElement {
       case 'remove': return this.slotRemove;
     }
 
-    // If no value can be matched pass back a default for the slot
-    switch (slot) {
-      case 'l1': return this.slotForecastMax;
-      case 'l2': return this.slotForecastMin;
-      case 'l3': return this.slotWind;
-      case 'l4': return this.slotPressure;
-      case 'l5': return this.slotSunNext;
-      case 'l6': return this.slotRemove;
-      case 'l7': return this.slotRemove;
-      case 'l8': return this.slotRemove;
-      case 'r1': return this.slotPopForecast;
-      case 'r2': return this.slotHumidity;
-      case 'r3': return this.slotUvSummary;
-      case 'r4': return this.slotMoon;
-      case 'r5': return this.slotSunFollowing;
-      case 'r6': return this.slotRemove;
-      case 'r7': return this.slotRemove;
-      case 'r8': return this.slotRemove;
+    // If no value can be matched pass back a default for the slot, unless the card has nothing to read for it: a slot that nobody chose and that has no source is not drawn,
+    // as the moon was not, and not a row of `---` that was never asked for. A slot that was chosen is drawn whatever it finds (the branch above).
+    const standing = PlatinumWeatherCard._DEFAULT_SLOTS[slot];
+    if (standing !== undefined) {
+      if (standing !== 'remove' && !this._defaultSlotHasSource(standing)) return this.slotRemove;
+      return this.slotValue(slot, standing);
     }
     return this.slotEmpty;
   }
