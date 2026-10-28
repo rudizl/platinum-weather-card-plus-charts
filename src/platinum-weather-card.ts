@@ -30,7 +30,7 @@ import { sagerForecast } from './sager';
 // the revision of the photoreal pictures (dist/p-*.png): 1 was the first release, 2 the partly cloudy, the fog and the alignment,
 // 3 the fog as three bands of mist and nothing else, 4 the sun drawn as the example (yellow, orange at the heart),
 // 5 the fog as one soft mass of mist
-const PHOTOREAL_REVISION = 5;
+const PHOTOREAL_REVISION = 6;
 // What the overview and the slots read their figures from: today's condition, the
 // measurements, and today's high and low. A card that has a weather_entity and
 // none of these takes them all from that entity, which the card can already read
@@ -4412,11 +4412,13 @@ export class PlatinumWeatherCard extends LitElement {
   // The photoreal pack has more pictures than the names of the custom pack, so that the levels of the sky and of the rain
   // can be told apart: a small cloud, a partly cloudy sky, and a sun nearly hidden; a light rain beside the rain.
   // The custom pack keeps to its fifteen names.
+  // It has a picture of its own for what the custom pack draws as a tornado, and it was not one: a tropical storm, dust, and a name that the card does not know at all.
   private _iconToPhotoreal(iconName: string): string {
+    if (iconName === 'tropical-storm' || iconName === 'dust' || iconName === 'unknown') return iconName;
     const sky = /^cloudy-([123])-(day|night)$/.exec(iconName);
     if (sky) return `${['mostlysunny', 'partlycloudy', 'mostlycloudy'][Number(sky[1]) - 1]}-${sky[2]}`;
     if (/^rainy-1(-|$)/.test(iconName)) return 'lightrain';
-    return this._iconToWcc(iconName);
+    return this._wccOrNull(iconName) ?? 'unknown';
   }
 
   // Maps our internal icon names to Home Assistant's own weather icons, which
