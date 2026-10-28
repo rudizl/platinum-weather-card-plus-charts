@@ -4410,13 +4410,14 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   // The photoreal pack has more pictures than the names of the custom pack, so that the levels of the sky and of the rain
-  // can be told apart: a small cloud, a partly cloudy sky, and a sun nearly hidden; a light rain beside the rain.
+  // can be told apart: a small cloud, broken clouds (a sun or a moon with torn streaks of cloud, for the level of 55 to 85 per cent), and a sun nearly hidden; a light rain beside the rain.
+  // The partly cloudy picture, a sun with a cloud, stays for the condition that a provider calls partly cloudy.
   // The custom pack keeps to its fifteen names.
   // It has a picture of its own for what the custom pack draws as a tornado, and it was not one: a tropical storm, dust, and a name that the card does not know at all.
   private _iconToPhotoreal(iconName: string): string {
     if (iconName === 'tropical-storm' || iconName === 'dust' || iconName === 'unknown') return iconName;
     const sky = /^cloudy-([123])-(day|night)$/.exec(iconName);
-    if (sky) return `${['mostlysunny', 'partlycloudy', 'mostlycloudy'][Number(sky[1]) - 1]}-${sky[2]}`;
+    if (sky) return `${['mostlysunny', 'brokenclouds', 'mostlycloudy'][Number(sky[1]) - 1]}-${sky[2]}`;
     if (/^rainy-1(-|$)/.test(iconName)) return 'lightrain';
     return this._wccOrNull(iconName) ?? 'unknown';
   }

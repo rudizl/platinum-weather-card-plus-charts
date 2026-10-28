@@ -33,7 +33,7 @@ async function card(opts: { cloud?: number; rain?: number; pack?: Record<string,
 const picture = (el: Card) => el._getIconUrl(el._weatherIcon('cloudy')).split('/').pop()!.split('?')[0].replace(/\.(svg|png)$/, '');
 
 describe('the cloud cover decides the icon, in four bands', () => {
-  it.each([[0.10, 'p-clear-day'], [0.40, 'p-mostlysunny-day'], [0.70, 'p-partlycloudy-day'], [0.93, 'p-mostlycloudy-day']])(
+  it.each([[0.10, 'p-clear-day'], [0.40, 'p-mostlysunny-day'], [0.70, 'p-brokenclouds-day'], [0.93, 'p-mostlycloudy-day']])(
     'a cloud cover of %s is %s in the photoreal pack', async (cloud, want) => {
       expect(picture(await card({ cloud }))).toBe(want);
     });
