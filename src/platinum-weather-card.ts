@@ -30,7 +30,7 @@ import { sagerForecast } from './sager';
 // the revision of the photoreal pictures (dist/p-*.png): 1 was the first release, 2 the partly cloudy, the fog and the alignment,
 // 3 the fog as three bands of mist and nothing else, 4 the sun drawn as the example (yellow, orange at the heart),
 // 5 the fog as one soft mass of mist
-const PHOTOREAL_REVISION = 6;
+const PHOTOREAL_REVISION = 7;
 // What the overview and the slots read their figures from: today's condition, the
 // measurements, and today's high and low. A card that has a weather_entity and
 // none of these takes them all from that entity, which the card can already read

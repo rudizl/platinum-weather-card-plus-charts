@@ -166,9 +166,9 @@ describe('the strange conditions each have a picture of their own, and only the 
     expect(file(el, 'dust')).toBe('p-dust.png');
     expect(file(el, 'unknown')).toBe('p-unknown.png');
   });
-  it('the revision of the pack was raised when the exceptional picture was changed, so that a phone does not keep the vortex for a month', async () => {
+  it('the revision of the pack was raised when the exceptional picture was changed, so that a phone does not keep the vortex, or the small cloud like a wart, for a month (6: the exceptional picture; 7: the 25 to 55 per cent pictures)', async () => {
     const el = await card();
-    expect(Number(/\?r=(\d+)$/.exec(el._getIconUrl('exceptional'))![1])).toBeGreaterThanOrEqual(6);
+    expect(Number(/\?r=(\d+)$/.exec(el._getIconUrl('exceptional'))![1])).toBeGreaterThanOrEqual(7);
   });
   it('a tornado, a hurricane and an exceptional condition are the exceptional picture', async () => {
     const el = await card();
