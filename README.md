@@ -113,6 +113,8 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **The tooltips of the forecast say the wind in the unit of the weather entity.** They read the unit from a setting the card no longer has, and fell back to the unit system: a forecast in m/s was labelled km/h in a metric house.
 
+**Ukrainian is chosen when Home Assistant is in Ukrainian.** Home Assistant names the language `uk`, and the card keeps its Ukrainian as `ua`, so a house in Ukrainian had the card and its editor in English.
+
 **Naming the cloud cover entity no longer empties a card of a weather entity.** `entity_cloud_cover`, the provider's sky for the night that Sager reads, was one of the measurement settings, and setting any of those means that nothing is filled in from the weather entity: a card that named it, as this README recommends, lost its temperature, its icon and its slots, with no warning, even when it named the weather entity itself. It is a fallback now and not a choice, and a measurement setting pointed at the weather entity itself is no choice either.
 
 Two hundred and eighty-nine new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
