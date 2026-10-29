@@ -788,6 +788,12 @@ export class PlatinumWeatherCard extends LitElement {
     return html`---`;
   }
 
+  // The Meteocons packs draw their icons in a 64 by 64 frame, and the drawing of the usual ones (a cloud, rain, snow, wind) lies between 17 and 47 of it, so that a quarter of the frame is empty above
+  // and as much below: beside the temperature the icon looked small and low (#37). Their big icon has a class of its own, which enlarges it and moves it up (see the styles).
+  private get _bigIconClass(): string {
+    return (this._config?.icon_pack ?? '').startsWith('meteocons') ? 'big-icon meteocons' : 'big-icon';
+  }
+
   private _renderCompleteOverviewSection(): TemplateResult {
     if (this._config?.show_section_overview === false) return html``;
 
@@ -795,7 +801,7 @@ export class PlatinumWeatherCard extends LitElement {
     const url = { href: this._getIconUrl(weatherIcon) };
     const hoverText = weatherIcon !== 'unknown' ? '' : `Unknown condition\n${this.forecastIcon}`;
     const unknownDiv = weatherIcon !== 'unknown' ? html`` : html`<div class="unknown-forecast">${this.forecastIcon}</div>`;
-    const biggerIcon = html`<div class="big-icon"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
+    const biggerIcon = html`<div class="${this._bigIconClass}"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
 
     const currentTemp = html`
       <div class="current-temp${this._overviewTapEntity('temperature') ? ' overview-tappable' : ''}"
@@ -902,7 +908,7 @@ export class PlatinumWeatherCard extends LitElement {
     const url = { href: this._getIconUrl(weatherIcon) };
     const hoverText = weatherIcon !== 'unknown' ? '' : `Unknown condition\n${this.forecastIcon}`;
     const unknownDiv = weatherIcon !== 'unknown' ? html`` : html`<div class="unknown-forecast">${this.forecastIcon}</div>`;
-    const biggerIcon = html`<div class="big-icon"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
+    const biggerIcon = html`<div class="${this._bigIconClass}"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
 
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
@@ -4761,6 +4767,10 @@ export class PlatinumWeatherCard extends LitElement {
       .big-icon img {
         object-fit: contain;
         object-position: center;
+      }
+      /* Meteocons: the drawing fills about the half of its frame; enlarged and moved up, the top of a cloud is about level with the digits of the temperature (#37). */
+      .big-icon.meteocons img {
+        transform: scale(1.3) translateY(-10px);
       }
       .unknown-forecast {
         position: relative;

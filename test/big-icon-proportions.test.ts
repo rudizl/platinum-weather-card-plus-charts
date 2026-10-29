@@ -22,7 +22,8 @@ describe('the big icon keeps the proportions of its picture', () => {
     expect(box).toMatch(/width:\s*140px/);
   });
   it('both places that draw the big icon draw the same picture element', () => {
-    const uses = card.match(/<div class="big-icon"><img src="\$\{url\.href\}" width="100%" height="100%"/g) ?? [];
+    // the class of the div is `big-icon`, and `big-icon meteocons` for the Meteocons packs (#37): one getter, the same in both places
+    const uses = card.match(/<div class="\$\{this\._bigIconClass\}"><img src="\$\{url\.href\}" width="100%" height="100%"/g) ?? [];
     expect(uses).toHaveLength(2);
   });
 });
