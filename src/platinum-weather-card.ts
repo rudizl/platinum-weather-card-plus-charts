@@ -755,14 +755,54 @@ export class PlatinumWeatherCard extends LitElement {
 
 
 
-  // The state (or the attribute) of the update time entity as a date and time, or null. A browser reads a bare number as a date (1 is the first of January 2001, 2 the first of February: #36),
-  // and anything else that is not a date as "Invalid Date", and neither is a time. A date and time has a year of four digits and something between its parts, and is one that the browser can read.
+  // The state (or the attribute) of the update time entity as a date and time, or null. The card reads it itself and does not hand it to
+  // new Date(string), which is up to the browser: a bare number is a date there (1 is the first of January 2001: #36), V8 reads
+  // 05.10.2026 10:00 month first (the 10th of May) and 2026-02-31 as the 3rd of March. The forms read are ISO 8601 (a T or a space,
+  // seconds, fractions and an offset optional; a date alone is midnight UTC, as ISO has it), the European DD.MM.YYYY HH:MM[:SS],
+  // YYYY/MM/DD HH:MM[:SS], and what Date.toString() writes. Without an offset the time is the browser's local time. Anything else, and any
+  // date or time that cannot be, is null.
   private static _parseUpdateTime(value: unknown): Date | null {
     if (typeof value !== 'string') return null;
     const text = value.trim();
-    if (!/\d{4}/.test(text) || !/[-/:\s]/.test(text)) return null;
-    const d = new Date(text);
-    return isNaN(d.getTime()) ? null : d;
+    const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    let y: number, mo: number, d: number, h = 0, mi = 0, sec = 0, ms = 0;
+    let offsetMin: number | null = null;
+    let m: RegExpMatchArray | null;
+    const time = '(\\d{2}):(\\d{2})(?::(\\d{2})(?:[.,](\\d+))?)?';
+    if ((m = text.match(new RegExp(`^(\\d{4})-(\\d{2})-(\\d{2})(?:[T ]${time}\\s?(Z|[+-]\\d{2}(?::?\\d{2})?)?)?$`, 'i')))) {
+      [y, mo, d] = [+m[1], +m[2], +m[3]];
+      if (m[4] === undefined) offsetMin = 0;   // a date alone: midnight UTC
+      else {
+        [h, mi, sec] = [+m[4], +m[5], m[6] === undefined ? 0 : +m[6]];
+        ms = m[7] === undefined ? 0 : Math.floor(Number(`0.${m[7]}`) * 1000);
+        if (m[8] !== undefined) {
+          if (/^z$/i.test(m[8])) offsetMin = 0;
+          else {
+            const o = m[8].match(/^([+-])(\d{2}):?(\d{2})?$/)!;
+            const oh = +o[2], om = o[3] === undefined ? 0 : +o[3];
+            if (oh > 14 || om > 59) return null;
+            offsetMin = (o[1] === '-' ? -1 : 1) * (oh * 60 + om);
+          }
+        }
+      }
+    } else if ((m = text.match(new RegExp(`^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4}),?\\s+${time}$`)))) {
+      [d, mo, y, h, mi] = [+m[1], +m[2], +m[3], +m[4], +m[5]];
+      sec = m[6] === undefined ? 0 : +m[6];
+    } else if ((m = text.match(new RegExp(`^(\\d{4})/(\\d{1,2})/(\\d{1,2})\\s+${time}$`)))) {
+      [y, mo, d, h, mi] = [+m[1], +m[2], +m[3], +m[4], +m[5]];
+      sec = m[6] === undefined ? 0 : +m[6];
+    } else if ((m = text.match(/^(?:mon|tue|wed|thu|fri|sat|sun) ([a-z]{3}) (\d{1,2}) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT([+-])(\d{2})(\d{2})(?: \(.*\))?$/i))) {
+      mo = MONTHS.indexOf(m[1].toLowerCase()) + 1;
+      if (mo === 0) return null;
+      [d, y, h, mi, sec] = [+m[2], +m[3], +m[4], +m[5], +m[6]];
+      offsetMin = (m[7] === '-' ? -1 : 1) * (+m[8] * 60 + +m[9]);
+    } else return null;
+    const daysInMonth = mo >= 1 && mo <= 12 ? new Date(Date.UTC(y, mo, 0)).getUTCDate() : 0;
+    if (d < 1 || d > daysInMonth || h > 23 || mi > 59 || sec > 59) return null;
+    const t = offsetMin === null
+      ? new Date(y, mo - 1, d, h, mi, sec, ms).getTime()
+      : Date.UTC(y, mo - 1, d, h, mi, sec, ms) - offsetMin * 60000;
+    return isNaN(t) ? null : new Date(t);
   }
 
   private _renderUpdateTime(): TemplateResult {
