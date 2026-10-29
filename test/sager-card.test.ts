@@ -13,7 +13,7 @@ import '../src/platinum-weather-card';
 import { sagerForecast } from '../src/sager';
 import { tidalTrendHpaPerHour } from '../src/zambretti';
 import { tSager } from '../src/translations';
-import { makeHass, baseConfig, renderCard } from './helpers';
+import { makeHass, baseConfig, renderCard, forgetSharedState } from './helpers';
 
 const spy = vi.mocked(sagerForecast);
 type St = { state: string; attributes?: Record<string, unknown> };
@@ -64,8 +64,7 @@ const run = (el: Card) => { spy.mockClear(); const text = el.sagerForecastText; 
 // The cloud and rain memories live on the class, shared by every card on a page: that is
 // the point of them, and it means two cards in one test must be told to forget.
 function forget() {
-  const cls = customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown>;
-  cls._cloudSamples = []; cls._cloudBand = null; cls._lastDaylightCloud = null; cls._lastRain = null;
+  forgetSharedState();
 }
 beforeEach(forget);
 afterEach(() => vi.useRealTimers());

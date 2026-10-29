@@ -182,25 +182,28 @@ export class PlatinumWeatherCard extends LitElement {
   private _zamCandidateKey: string | null = null;
   private _zamCandidateTs = 0;
   private _windSamples: { t: number; deg: number }[] = [];
-  // Static, not per-instance: the sky is the same for every card on the page.
-  // Per-instance buffers meant two cards averaged different sample sets from
-  // different start times and settled into different hysteresis bands, so one
-  // showed sun while the other showed cloud.
-  private static _cloudSamples: { t: number; f: number }[] = [];
-  private static _cloudBand: number | null = null;
+  // Static, not per-instance: the sky is the same for every card of the same
+  // pyranometer. Per-instance buffers meant two cards averaged different sample
+  // sets from different start times and settled into different hysteresis
+  // bands, so one showed sun while the other showed cloud. Kept per sensor (by
+  // entity_solar_radiation, entity_rain_rate, the gauge, the weather entity):
+  // once for the whole page, a card that measures no sky showed another
+  // station's, and a dry gauge gave Sager another gauge's shower.
+  private static _cloudSamples = new Map<string, { t: number; f: number }[]>();
+  private static _cloudBand = new Map<string, number>();
   // The last cloud reading taken while the sun was high enough to trust it.
   // Static for the same reason the buffer is: it describes the sky, not a card.
-  private static _lastDaylightCloud: { t: number; f: number } | null = null;
+  private static _lastDaylightCloud = new Map<string, { t: number; f: number }>();
   // When it last rained, so a gap between showers does not read as fine weather.
-  private static _lastRain: { t: number; rate: number } | null = null;
+  private static _lastRain = new Map<string, { t: number; rate: number }>();
   // The keys supplied from weather_entity rather than set by the user.
   private _impliedKeys = new Set<string>();
   // The last real gauge reading, for the icon: see _gaugeRateForIcon().
-  private static _gaugeSeen: { entity: string; t: number; rate: number } | null = null;
+  private static _gaugeSeen = new Map<string, { t: number; rate: number }>();
   // The last time the gauge read above zero, and what it read; see _gaugeRateForIcon().
-  private static _gaugeRain: { entity: string; t: number; rate: number } | null = null;
+  private static _gaugeRain = new Map<string, { t: number; rate: number }>();
   // The last real condition of the weather entity behind the icon; see forecastIcon.
-  private static _lastCondition: { entity: string; t: number; state: string } | null = null;
+  private static _lastCondition = new Map<string, { t: number; state: string }>();
 
   private _error: string[] = [];
 
@@ -3440,17 +3443,17 @@ export class PlatinumWeatherCard extends LitElement {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = Date.now();
     if (live !== null && entity) {
-      cls._gaugeSeen = { entity, t: now, rate: live };
+      cls._gaugeSeen.set(entity, { t: now, rate: live });
       if (live > 0) {
-        cls._gaugeRain = { entity, t: now, rate: live };
+        cls._gaugeRain.set(entity, { t: now, rate: live });
         return live;
       }
-      const rain = cls._gaugeRain;
-      if (rain && rain.entity === entity && now - rain.t <= 900000) return rain.rate;
+      const rain = cls._gaugeRain.get(entity);
+      if (rain && now - rain.t <= 900000) return rain.rate;
       return live;
     }
-    const seen = cls._gaugeSeen;
-    if (entity && seen && seen.entity === entity && now - seen.t <= 60000) return seen.rate;
+    const seen = entity ? cls._gaugeSeen.get(entity) : undefined;
+    if (seen && now - seen.t <= 60000) return seen.rate;
     return null;
   }
 
@@ -3478,11 +3481,13 @@ export class PlatinumWeatherCard extends LitElement {
   get forecastRainRate(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = this.measuredRainRate;
+    const gauge = this._config.entity_rain_rate;
+    if (!gauge) return now;   // no gauge: nothing measured, nothing to remember
     if (now !== null && now > 0) {
-      cls._lastRain = { t: Date.now(), rate: now };
+      cls._lastRain.set(gauge, { t: Date.now(), rate: now });
       return now;
     }
-    const last = cls._lastRain;
+    const last = cls._lastRain.get(gauge) ?? null;
     if (last === null) return now;
     if (Date.now() - last.t > 5400000) return now;
     // Report it as showery rather than at full strength: it is not raining this
@@ -3493,11 +3498,12 @@ export class PlatinumWeatherCard extends LitElement {
   get forecastCloudFraction(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = this.measuredCloudFraction;
-    if (now !== null) {
-      cls._lastDaylightCloud = { t: Date.now(), f: now };
+    const sensor = this._config.entity_solar_radiation;
+    if (now !== null && sensor) {
+      cls._lastDaylightCloud.set(sensor, { t: Date.now(), f: now });
       return now;
     }
-    const last = cls._lastDaylightCloud;
+    const last = (sensor ? cls._lastDaylightCloud.get(sensor) : undefined) ?? null;
     // Six hours, not a day. Checked against a real frontal event: the sky was
     // last measured at 38% on a Saturday afternoon, that figure was still being
     // reported through the night, and by the time rain arrived at six the next
@@ -3538,19 +3544,23 @@ export class PlatinumWeatherCard extends LitElement {
   get measuredCloudFraction(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const instant = this._instantCloudFraction;
+    const sensor = this._config.entity_solar_radiation;
+    if (!sensor) return instant;
     const now = Date.now();
+    let samples = cls._cloudSamples.get(sensor) ?? [];
     if (instant !== null) {
-      // one sample per reading, however many cards are asking
-      const last = cls._cloudSamples[cls._cloudSamples.length - 1];
-      if (!last || now - last.t > 5000) cls._cloudSamples.push({ t: now, f: instant });
+      // one sample per reading, however many cards of this sensor are asking
+      const last = samples[samples.length - 1];
+      if (!last || now - last.t > 5000) samples.push({ t: now, f: instant });
     }
-    cls._cloudSamples = cls._cloudSamples.filter((s) => now - s.t <= 300000);
-    if (cls._cloudSamples.length === 0) return instant;
+    samples = samples.filter((s) => now - s.t <= 300000);
+    cls._cloudSamples.set(sensor, samples);
+    if (samples.length === 0) return instant;
     // Median, not mean: a five-minute window of broken cloud is a handful of
     // readings under cloud and one or two through a gap, and the mean lets those
     // few bright readings drag the answer toward 'clear' long after the gap has
     // closed. The median describes what the sky mostly is.
-    const sorted = cls._cloudSamples.map((s) => s.f).sort((a, b) => a - b);
+    const sorted = samples.map((s) => s.f).sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   }
@@ -3731,10 +3741,10 @@ export class PlatinumWeatherCard extends LitElement {
     // condition is held for ten seconds, so the icon does not flash N/A; a provider
     // that has really gone is shown as gone after that.
     if (state === 'unavailable' || state === 'unknown') {
-      const last = cls._lastCondition;
-      return last && last.entity === entity && now - last.t <= 10000 ? last.state : state;
+      const last = cls._lastCondition.get(entity);
+      return last && now - last.t <= 10000 ? last.state : state;
     }
-    cls._lastCondition = { entity, t: now, state };
+    cls._lastCondition.set(entity, { t: now, state });
     return state;
   }
 
@@ -4216,12 +4226,14 @@ export class PlatinumWeatherCard extends LitElement {
           const EDGES = [0.25, 0.55, 0.85];
           const MARGIN = 0.05;
           const cls = this.constructor as typeof PlatinumWeatherCard;
+          const sensor = this._config.entity_solar_radiation ?? '';
+          const band = cls._cloudBand.get(sensor) ?? null;
           let target = EDGES.filter((e) => cloud >= e).length;
-          if (cls._cloudBand !== null && target !== cls._cloudBand) {
-            const edge = EDGES[Math.min(cls._cloudBand, target)];
-            if (Math.abs(cloud - edge) < MARGIN) target = cls._cloudBand;
+          if (band !== null && target !== band) {
+            const edge = EDGES[Math.min(band, target)];
+            if (Math.abs(cloud - edge) < MARGIN) target = band;
           }
-          cls._cloudBand = target;
+          cls._cloudBand.set(sensor, target);
           // Every band has a day and a night file; a bare name matches nothing
           // and the card renders N/A.
           adjusted = `${['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target]}-${this.dayOrNight}`;
