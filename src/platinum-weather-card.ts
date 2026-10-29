@@ -523,6 +523,7 @@ export class PlatinumWeatherCard extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._unsubscribeForecastEvents();
+    this._unsubscribeHourly();
     this.removeEventListener('pointerdown', this._boundPointerDown);
     this.removeEventListener('pointercancel', this._boundPointerCancel);
     this.removeEventListener('click', this._boundCardClick);
