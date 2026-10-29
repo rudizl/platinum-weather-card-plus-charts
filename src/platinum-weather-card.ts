@@ -2745,19 +2745,51 @@ export class PlatinumWeatherCard extends LitElement {
 
   // Sea-level pressure in hPa, with the station-altitude correction applied when
   // configured. Shared so both forecast algorithms judge the same barometer.
-  private get _forecastPressureHpa(): number | null {
+  // A number from a state or an attribute, or null. Number(null) and Number('') are 0, which is not "not a number": a weather entity that
+  // gives its pressure as null (Home Assistant writes None so) was a pressure of 0 hPa.
+  private static _number(raw: unknown): number | null {
+    if (raw === null || raw === undefined || (typeof raw === 'string' && raw.trim() === '')) return null;
+    const value = Number(raw);
+    return isFinite(value) ? value : null;
+  }
+
+  // The pressure of entity_pressure in hPa, as the station reads it (no correction for the altitude), or null.
+  private get _stationPressureHpa(): number | null {
     const entity = this._config.entity_pressure;
     if (!entity || !this.hass.states[entity]) return null;
     const stateObj = this.hass.states[entity];
-    const raw = entity.match('^weather.') === null ? stateObj.state : stateObj.attributes.pressure;
-    const value = Number(raw);
-    if (isNaN(value)) return null;
+    const fromWeather = entity.match('^weather.') !== null;
+    const value = PlatinumWeatherCard._number(fromWeather ? stateObj.attributes.pressure : stateObj.state);
+    if (value === null) return null;
     const uom = this._config.pressure_units
       ? this._config.pressure_units
-      : entity.match('^weather.') === null
-        ? stateObj.attributes.unit_of_measurement
-        : stateObj.attributes.pressure_unit;
-    let pressure = pressureToHpa(value, uom);
+      : fromWeather ? stateObj.attributes.pressure_unit : stateObj.attributes.unit_of_measurement;
+    return pressureToHpa(value, uom);
+  }
+
+  // The pressure that Zambretti reads: the station's, at sea level when an altitude is set.
+  private get _zambrettiPressureHpa(): number | null {
+    let pressure = this._stationPressureHpa;
+    if (pressure === null) return null;
+    // Optional station → sea-level correction (skip when the sensor already reports relative pressure)
+    const altitude = Number(this._config.option_forecast_altitude);
+    if (!isNaN(altitude) && altitude > 0) {
+      const tempEntity = this._config.entity_temperature;
+      const tempRaw = tempEntity && this.hass.states[tempEntity]
+        ? (tempEntity.match('^weather.') === null
+          ? this.hass.states[tempEntity].state
+          : this.hass.states[tempEntity].attributes.temperature)
+        : undefined;
+      const tempC = Number(tempRaw);
+      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
+    }
+    return pressure;
+  }
+
+  private get _forecastPressureHpa(): number | null {
+    const entity = this._config.entity_pressure;
+    let pressure = this._stationPressureHpa;
+    if (pressure === null) return null;
     const altitude = Number(this._config.option_forecast_altitude);
     if (isFinite(altitude) && altitude > 0) {
       const tempEntity = this._config.entity_temperature;
@@ -2864,28 +2896,8 @@ export class PlatinumWeatherCard extends LitElement {
   get localForecastText(): string | null {
     const entity = this._config.entity_pressure;
     if (this._config.option_local_forecast !== true || !entity || !this.hass.states[entity]) return null;
-    const stateObj = this.hass.states[entity];
-    const raw = entity.match('^weather.') === null ? stateObj.state : stateObj.attributes.pressure;
-    const value = Number(raw);
-    if (isNaN(value)) return null;
-    const uom = this._config.pressure_units
-      ? this._config.pressure_units
-      : entity.match('^weather.') === null
-        ? stateObj.attributes.unit_of_measurement
-        : stateObj.attributes.pressure_unit;
-    let pressure = pressureToHpa(value, uom);
-    // Optional station → sea-level correction (skip when the sensor already reports relative pressure)
-    const altitude = Number(this._config.option_forecast_altitude);
-    if (!isNaN(altitude) && altitude > 0) {
-      const tempEntity = this._config.entity_temperature;
-      const tempRaw = tempEntity && this.hass.states[tempEntity]
-        ? (tempEntity.match('^weather.') === null
-          ? this.hass.states[tempEntity].state
-          : this.hass.states[tempEntity].attributes.temperature)
-        : undefined;
-      const tempC = Number(tempRaw);
-      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
-    }
+    const pressure = this._zambrettiPressureHpa;
+    if (pressure === null) return null;
     // Trend in hPa/h: numeric derivative sensor preferred, categorical mapped to ±0.2
     let trend = 0.0;
     const trendEntity = this._config.entity_pressure_trend;
@@ -3786,15 +3798,13 @@ export class PlatinumWeatherCard extends LitElement {
   get currentPressure(): string {
     const entity = this._config.entity_pressure;
     var places = this._config.option_pressure_decimals ? Math.max(Math.min(this._config.option_pressure_decimals, 3), 0) : 0;
-    return entity && this.hass.states[entity]
-      ? entity.match('^weather.') === null
-        ? (this.hass.states[entity].state === 'unknown' || this.hass.states[entity].state === 'unavailable')
-          ? '---'
-          : (Number(this.hass.states[entity].state)).toLocaleString(this.locale, { minimumFractionDigits: places, maximumFractionDigits: places })
-        : this.hass.states[entity].attributes.pressure !== undefined
-          ? (Number(this.hass.states[entity].attributes.pressure)).toLocaleString(this.locale)
-          : '---'
-      : '---';
+    if (!entity || !this.hass.states[entity]) return '---';
+    const fromWeather = entity.match('^weather.') !== null;
+    const value = PlatinumWeatherCard._number(fromWeather ? this.hass.states[entity].attributes.pressure : this.hass.states[entity].state);
+    if (value === null) return '---';   // unknown, unavailable, null, empty
+    return fromWeather
+      ? value.toLocaleString(this.locale)
+      : value.toLocaleString(this.locale, { minimumFractionDigits: places, maximumFractionDigits: places });
   }
 
   get currentVisibility(): string {
