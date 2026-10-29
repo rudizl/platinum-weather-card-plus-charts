@@ -1,0 +1,20 @@
+name: 'Validate'
+
+# The HACS validation, also every night: some of what it checks does not depend on our code (the description, the topics and the issues of the repository,
+# the latest release, and the action itself, which is not pinned), and a push is not the only time that it can break. build.yml runs it on a push and a pull request.
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  validate-hacs:
+    name: HACS Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: HACS Action
+        uses: hacs/action@main
+        with:
+          category: plugin
