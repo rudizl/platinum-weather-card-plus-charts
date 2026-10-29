@@ -2762,8 +2762,6 @@ export class PlatinumWeatherCard extends LitElement {
     return null;
   }
 
-  // Sea-level pressure in hPa, with the station-altitude correction applied when
-  // configured. Shared so both forecast algorithms judge the same barometer.
   // A number from a state or an attribute, or null. Number(null) and Number('') are 0, which is not "not a number": a weather entity that
   // gives its pressure as null (Home Assistant writes None so) was a pressure of 0 hPa.
   private static _number(raw: unknown): number | null {
@@ -2805,6 +2803,8 @@ export class PlatinumWeatherCard extends LitElement {
     return pressure;
   }
 
+  // Sea-level pressure in hPa, with the station-altitude correction applied when
+  // configured. Shared so both forecast algorithms judge the same barometer.
   private get _forecastPressureHpa(): number | null {
     const entity = this._config.entity_pressure;
     let pressure = this._stationPressureHpa;
