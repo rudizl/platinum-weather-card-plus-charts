@@ -154,6 +154,8 @@ export class PlatinumWeatherCard extends LitElement {
   //tjl copied from HA front-end.  Supports subscribing to weather forecast events.
   //  https://github/homeassistant/frontend/src/panels/lovelace/cards/hui-weather-forecast-card.ts
   @state() private _subscribed?: Promise<() => void>;
+  // The state of the weather entity when Home Assistant refused its forecast; not reactive, see _subscribeForecastEvents.
+  private _refusedFor?: unknown;
   @state() private _forecastEvent?: ForecastEvent;
   // A second, independent subscription. The hourly section reads its own weather
   // entity rather than a second forecast type from the same one: most people
@@ -370,7 +372,8 @@ export class PlatinumWeatherCard extends LitElement {
   //tjl copy from bramkragten's weather-card
   _unsubscribeForecastEvents() {
     if (this._subscribed) {
-      this._subscribed.then((unsub) => unsub());
+      // a refused subscription has nothing to end, and its refusal was handled where it was made
+      this._subscribed.then((unsub) => unsub(), () => undefined);
       this._subscribed = undefined;
     }
   }
@@ -409,16 +412,29 @@ export class PlatinumWeatherCard extends LitElement {
     // twice_daily), so hourly data — up to 24 entries a day — leaves it empty (#24).
     // 'hourly' is still accepted in a stored configuration, and read as daily; the
     // hours have a view and a subscription of their own, to entity_hourly.
+    //
+    // Home Assistant refuses a subscription to an entity it does not have (an
+    // integration not loaded yet, or failed): ask when it is there, and after a
+    // refusal ask again only when the entity has changed. Asking on every update
+    // would be a loop, since the refusal clears _subscribed, which updates the
+    // card (#23 was that loop, for the hourly one).
+    const entity = this._config.weather_entity;
+    const stateObj = this.hass.states[entity];
+    if (!stateObj || stateObj === this._refusedFor) return;
     const type = this._stripForecastType;
-    this._subscribed = subscribeForecast(
+    const subscribed = subscribeForecast(
       this.hass,
-    //this._config.entity,
-      this._config.weather_entity,
+      entity,
       type as "daily" | "twice_daily",
       (event) => {
         this._forecastEvent = event;
       }
     );
+    this._subscribed = subscribed;
+    subscribed.catch(() => {
+      this._refusedFor = stateObj;
+      if (this._subscribed === subscribed) this._subscribed = undefined;
+    });
   }
 
 
