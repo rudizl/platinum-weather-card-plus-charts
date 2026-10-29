@@ -1711,9 +1711,8 @@ export class PlatinumWeatherCard extends LitElement {
 
   /** Returns wind speed unit from entity attribute, with robust fallback (never returns m/s for metric) */
   private _getWindUnit(): string {
-    const fromEnt = this._config.entity
-      ? (this.hass.states[this._config.entity]?.attributes?.wind_speed_unit as string | undefined)
-      : undefined;
+    // the forecast is the weather entity's, in its units (HA converts it to them)
+    const fromEnt = this._entityUnit(this._config.weather_entity, 'wind_speed_unit');
     if (fromEnt) return fromEnt;
     // HA unit_system.wind_speed can be 'm/s' for metric — weather entities typically use km/h
     const sys = this.hass.config?.unit_system?.wind_speed;
