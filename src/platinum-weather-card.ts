@@ -32,9 +32,13 @@ import { sagerForecast } from './sager';
 const MEASUREMENT_KEYS = [
   'entity_forecast_icon', 'entity_temperature', 'entity_apparent_temp', 'entity_humidity',
   'entity_pressure', 'entity_visibility', 'entity_wind_bearing', 'entity_wind_speed',
-  'entity_wind_gust', 'entity_uv_index', 'entity_dew_point', 'entity_cloud_cover',
+  'entity_wind_gust', 'entity_uv_index', 'entity_dew_point',
   'entity_forecast_min', 'entity_forecast_max', 'entity_pop', 'entity_pos',
 ] as const;
+
+// The provider's sky for the night, when the pyranometer cannot help: a fallback, not a measurement of the station. It is filled in with the
+// measurements, but naming it is no choice about them.
+const FALLBACK_KEYS = ['entity_cloud_cover'] as const;
 
 // From the mildest weather to the worst, for choosing the one that stands for a
 // group of hours: a three-hour column that had rain in it should not show the
@@ -314,16 +318,20 @@ export class PlatinumWeatherCard extends LitElement {
     // weather entity, each is that entity's temperature, humidity and so on, and
     // that is all a card with no sensors to read can mean. Here too any one of them
     // set by the user is a choice (a station beside a forecast), and nothing is
-    // filled in around it.
+    // filled in around it. One pointed at the weather entity itself is no choice of
+    // anything else: the rest of the measurements are still that entity.
     this._impliedKeys = new Set<string>();
     const cfg = this._config as unknown as Record<string, unknown>;
-    for (const family of [FORECAST_DAY_KEYS, MEASUREMENT_KEYS] as readonly (readonly string[])[]) {
-      if (cfg.weather_entity && !family.some((k) => cfg[k])) {
-        for (const k of family) {
-          cfg[k] = cfg.weather_entity;
-          this._impliedKeys.add(k);
-        }
-      }
+    const fill = (k: string) => {
+      if (cfg[k]) return;
+      cfg[k] = cfg.weather_entity;
+      this._impliedKeys.add(k);
+    };
+    if (cfg.weather_entity) {
+      if (!FORECAST_DAY_KEYS.some((k) => cfg[k])) FORECAST_DAY_KEYS.forEach(fill);
+      // the fallback goes with the measurements, as it did when it was one of them: where they are a station's, the provider's sky is the
+      // hourly entity's first (see providerCloudFraction), and that order is kept
+      if (!MEASUREMENT_KEYS.some((k) => cfg[k] && cfg[k] !== cfg.weather_entity)) [...MEASUREMENT_KEYS, ...FALLBACK_KEYS].forEach(fill);
     }
 
     // sun.sun is the only sun entity Home Assistant has, so a card that names none
