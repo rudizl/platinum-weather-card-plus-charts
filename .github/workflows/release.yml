@@ -41,3 +41,21 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
+
+      # The notes of every release begin with the line that asks for a star or a beer. The notes are written when the release is made;
+      # this puts the line there if it is not (and does nothing if it is), so that no release goes out without it. A failure here
+      # must not fail the release: the files are uploaded already.
+      - name: Put the support line at the top of the release notes
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          LINE='> ⭐ Enjoying the card? [Star the repository](https://github.com/${{ github.repository }}) and/or [buy me a beer 🍺](https://www.buymeacoffee.com/rudizl). Thank you!'
+          BODY="$(gh release view "$TAG" --json body --jq .body)"
+          case "$BODY" in
+            "> ⭐ Enjoying the card?"*) echo "The support line is already at the top." ;;
+            *) printf '%s\n\n%s\n' "$LINE" "$BODY" > "$RUNNER_TEMP/notes.md"
+               gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
+               echo "The support line was added." ;;
+          esac
