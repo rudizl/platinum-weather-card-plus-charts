@@ -2801,39 +2801,38 @@ export class PlatinumWeatherCard extends LitElement {
     return pressureToHpa(value, uom);
   }
 
-  // The pressure that Zambretti reads: the station's, at sea level when an altitude is set.
+  // The pressure that Zambretti reads: the station's, at sea level when an altitude is set (skip the altitude when the sensor already
+  // reports relative pressure). The same as Sager's: both judge the same barometer at the same temperature.
   private get _zambrettiPressureHpa(): number | null {
-    let pressure = this._stationPressureHpa;
-    if (pressure === null) return null;
-    // Optional station → sea-level correction (skip when the sensor already reports relative pressure)
-    const altitude = Number(this._config.option_forecast_altitude);
-    if (!isNaN(altitude) && altitude > 0) {
-      const tempEntity = this._config.entity_temperature;
-      const tempRaw = tempEntity && this.hass.states[tempEntity]
-        ? (tempEntity.match('^weather.') === null
-          ? this.hass.states[tempEntity].state
-          : this.hass.states[tempEntity].attributes.temperature)
-        : undefined;
-      const tempC = Number(tempRaw);
-      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
-    }
-    return pressure;
+    return this._forecastPressureHpa;
   }
 
   // Sea-level pressure in hPa, with the station-altitude correction applied when
   // configured. Shared so both forecast algorithms judge the same barometer.
   private get _forecastPressureHpa(): number | null {
-    const entity = this._config.entity_pressure;
     let pressure = this._stationPressureHpa;
     if (pressure === null) return null;
     const altitude = Number(this._config.option_forecast_altitude);
     if (isFinite(altitude) && altitude > 0) {
-      const tempEntity = this._config.entity_temperature;
-      const tempC = tempEntity && this.hass.states[tempEntity]
-        ? Number(this.hass.states[tempEntity].state) : NaN;
-      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
+      pressure = seaLevelPressure(pressure, altitude, this._temperatureC ?? 15);
     }
     return pressure;
+  }
+
+  // The temperature of entity_temperature in °C, for the sea-level correction: the state of a sensor in its unit_of_measurement, or the
+  // temperature attribute of a weather entity in its temperature_unit (°F and K converted; no unit is °C), or null. Sager read 68 °F as
+  // 68 °C and the state of a weather entity ('sunny') as nothing.
+  private get _temperatureC(): number | null {
+    const entity = this._config.entity_temperature;
+    if (!entity || !this.hass.states[entity]) return null;
+    const st = this.hass.states[entity];
+    const fromWeather = entity.match('^weather.') !== null;
+    const value = PlatinumWeatherCard._number(fromWeather ? st.attributes?.temperature : st.state);
+    if (value === null) return null;
+    const unit = String((fromWeather ? st.attributes?.temperature_unit : st.attributes?.unit_of_measurement) ?? '').replace(/[\s°º]/g, '').toUpperCase();
+    if (unit === 'F') return (value - 32) * 5 / 9;
+    if (unit === 'K') return value - 273.15;
+    return value;
   }
 
   // Pressure change in hPa per hour, with the atmospheric tide removed.
