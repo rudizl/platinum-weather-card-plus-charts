@@ -863,9 +863,12 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   // The Meteocons packs draw their icons in a 64 by 64 frame, and the drawing of the usual ones (a cloud, rain, snow, wind) lies between 17 and 47 of it, so that a quarter of the frame is empty above
-  // and as much below: beside the temperature the icon looked small and low (#37). Their big icon has a class of its own, which enlarges it and moves it up (see the styles).
+  // and as much below: beside the temperature the icon looked small and low (#37). Their big icon has classes of its own, `meteocons` and the pack's, which enlarge it and move it up (see the styles).
   private get _bigIconClass(): string {
-    return (this._config?.icon_pack ?? '').startsWith('meteocons') ? 'big-icon meteocons' : 'big-icon';
+    const pack = this._config?.icon_pack ?? '';
+    if (pack === 'meteocons-fill') return 'big-icon meteocons meteocons-fill';
+    if (pack === 'meteocons-line') return 'big-icon meteocons meteocons-line';
+    return pack.startsWith('meteocons') ? 'big-icon meteocons' : 'big-icon';
   }
 
   private _renderCompleteOverviewSection(): TemplateResult {
@@ -4882,10 +4885,24 @@ export class PlatinumWeatherCard extends LitElement {
         object-fit: contain;
         object-position: center;
       }
-      /* Meteocons: the drawing fills about the half of its frame; enlarged and moved up, the top of a cloud is about level with the digits of the temperature (#37). */
-      .big-icon.meteocons img {
-        transform: scale(1.3) translateY(-10px);
+      /* Meteocons (#37): the drawing fills about the half of its frame, and starts at a different height in each icon: a cloud, rain, snow or wind at about 17 of the 64 (a little lower
+         in the fill style), a sun higher. The icon is enlarged by 1.3 and moved so that the top of its drawing is level with the top of the digits of the temperature: with the frame
+         of 120 px the shift is 24.4 px less 2.4375 px (1.875 px a unit, times 1.3) for each unit of the top. --pwcc-meteocons-top is that top, by the pack and the name of the file.
+         The sun, the moon and the partly cloudy icons are animated (rays that turn, a sun that moves), so their tops are those seen in a browser, the mean of frames over eight seconds,
+         and not those of the still drawing (8, 11.5 and 12.5). */
+      .big-icon.meteocons-line img, .big-icon.meteocons-fill img {
+        transform: scale(1.3) translateY(calc(24.4px - 2.4375px * var(--pwcc-meteocons-top)));
       }
+      .big-icon.meteocons-line img { --pwcc-meteocons-top: 17; }
+      .big-icon.meteocons-line img[src*="/clear-day"] { --pwcc-meteocons-top: 10.1; }
+      .big-icon.meteocons-line img[src*="/partly-cloudy-day"], .big-icon.meteocons-line img[src*="/overcast-day"] { --pwcc-meteocons-top: 12.8; }
+      .big-icon.meteocons-line img[src*="/partly-cloudy-night"], .big-icon.meteocons-line img[src*="/overcast-night"] { --pwcc-meteocons-top: 13.4; }
+      .big-icon.meteocons-line img[src*="/clear-night"] { --pwcc-meteocons-top: 14.5; }
+      .big-icon.meteocons-fill img { --pwcc-meteocons-top: 18.1; }
+      .big-icon.meteocons-fill img[src*="/clear-day"] { --pwcc-meteocons-top: 10.1; }
+      .big-icon.meteocons-fill img[src*="/partly-cloudy-day"], .big-icon.meteocons-fill img[src*="/overcast-day"] { --pwcc-meteocons-top: 12.8; }
+      .big-icon.meteocons-fill img[src*="/partly-cloudy-night"], .big-icon.meteocons-fill img[src*="/overcast-night"] { --pwcc-meteocons-top: 14; }
+      .big-icon.meteocons-fill img[src*="/clear-night"] { --pwcc-meteocons-top: 15.5; }
       .unknown-forecast {
         position: relative;
         top: -30px;
