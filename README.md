@@ -115,7 +115,7 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **Ukrainian is chosen when Home Assistant is in Ukrainian.** Home Assistant names the language `uk`, and the card keeps its Ukrainian as `ua`, so a house in Ukrainian had the card and its editor in English.
 
-**The update time is read by the card, not by the browser.** A date with dots was read month first: `05.10.2026 10:00` was the 10th of May, and `27.10.2026 10:00` nothing at all; and `2026-02-31` was the 3rd of March. The card now reads ISO 8601 (with a `T` or a space, with or without an offset), `DD.MM.YYYY HH:MM`, `YYYY/MM/DD HH:MM` and the form that a browser writes; a date or time that cannot be is `---`, and so is a date with slashes in another order (`10/27/2026`), which cannot be told from a day first.
+**The update time is read by the card, not by the browser.** A date with dots was read month first: `05.10.2026 10:00` was the 10th of May, and `27.10.2026 10:00` nothing at all; and `2026-02-31` was the 3rd of March. The card now reads ISO 8601 (with a `T` or a space, with or without an offset), `DD.MM.YYYY HH:MM`, `YYYY/MM/DD HH:MM` and the form that a browser writes; a date or time that cannot be is `---`, and US-style dates with slashes (`10/27/2026`) are `---`, not guessed.
 
 **A pressure of null is no pressure.** A weather entity that gives its pressure as `null` showed a pressure of 0 in the slot, and gave the forecasts 0 hPa; it is `---` now, and the forecasts have no pressure to read, as with an empty value.
 
