@@ -4657,13 +4657,21 @@ export class PlatinumWeatherCard extends LitElement {
     return this._config?.option_compact_slots === true;
   }
 
+  // The language for Intl and toLocale*, and for the translations (which read uk as their ua: see resolveLang).
   get locale(): string | undefined {
     try {
       Intl.NumberFormat(this._config.option_locale);
-      return this._config.option_locale ?? this.hass?.locale?.language;
+      return PlatinumWeatherCard._intlLanguage(this._config.option_locale ?? this.hass?.locale?.language);
     } catch (e) {
-      return this.hass?.locale?.language;
+      return PlatinumWeatherCard._intlLanguage(this.hass?.locale?.language);
     }
+  }
+
+  // The editor offers Ukrainian as `ua`, the card's own code for it; its language code is `uk`, and Intl, not knowing `ua`, fell back
+  // to English: the days and the numbers of a card set to Ukrainian were English.
+  private static _intlLanguage(code: string | undefined): string | undefined {
+    if (code === undefined) return undefined;
+    return /^ua(-|$)/i.test(code) ? 'uk' : code;
   }
 
   get localeTextFeelsLike(): string { return tCard(this.locale, 'feels_like'); }
