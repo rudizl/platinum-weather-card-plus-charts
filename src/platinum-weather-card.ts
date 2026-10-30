@@ -156,6 +156,8 @@ export class PlatinumWeatherCard extends LitElement {
   @state() private _subscribed?: Promise<() => void>;
   // The state of the weather entity when Home Assistant refused its forecast; not reactive, see _subscribeForecastEvents.
   private _refusedFor?: unknown;
+  // The same for the hourly forecast: the state of the hourly entity when Home Assistant refused its forecast; not reactive, see _subscribeHourly.
+  private _hourlyRefusedFor?: unknown;
   @state() private _forecastEvent?: ForecastEvent;
   // A second, independent subscription. The hourly section reads its own weather
   // entity rather than a second forecast type from the same one: most people
@@ -440,7 +442,8 @@ export class PlatinumWeatherCard extends LitElement {
 
   _unsubscribeHourly() {
     if (this._hourlySubscribed) {
-      this._hourlySubscribed.then((unsub) => unsub());
+      // a refused subscription has nothing to end, and its refusal was handled where it was made
+      this._hourlySubscribed.then((unsub) => unsub(), () => undefined);
       this._hourlySubscribed = undefined;
     }
   }
@@ -449,10 +452,20 @@ export class PlatinumWeatherCard extends LitElement {
     this._unsubscribeHourly();
     const entity = this._config?.entity_hourly;
     if (!this.isConnected || !this.hass || !this._config || !entity) return;
-    if (!this.hass.states[entity]) return;
-    this._hourlySubscribed = subscribeForecast(
+    // Home Assistant refuses a subscription to an entity that is not provided (an integration that is off or has not loaded yet: its entity is
+    // then in the states as unavailable). Ask when the entity is there, and after a refusal ask again only when the entity has changed: a
+    // refusal kept as the subscription was never asked for again (the hours stayed empty until the page was reloaded), and asking on every
+    // update would be a loop, since the refusal clears _hourlySubscribed, which updates the card (#23).
+    const stateObj = this.hass.states[entity];
+    if (!stateObj || stateObj === this._hourlyRefusedFor) return;
+    const subscribed = subscribeForecast(
       this.hass, entity, 'hourly', (event) => { this._hourlyEvent = event; },
     );
+    this._hourlySubscribed = subscribed;
+    subscribed.catch(() => {
+      this._hourlyRefusedFor = stateObj;
+      if (this._hourlySubscribed === subscribed) this._hourlySubscribed = undefined;
+    });
   }
 
   // The hours the section will draw, trimmed to the configured span. Unlike the
