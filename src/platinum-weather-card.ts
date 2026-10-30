@@ -797,7 +797,8 @@ export class PlatinumWeatherCard extends LitElement {
         if (m[8] !== undefined) {
           if (/^z$/i.test(m[8])) offsetMin = 0;
           else {
-            const o = m[8].match(/^([+-])(\d{2}):?(\d{2})?$/)!;
+            const o = m[8].match(/^([+-])(\d{2}):?(\d{2})?$/);
+            if (!o) return null;
             const oh = +o[2], om = o[3] === undefined ? 0 : +o[3];
             if (oh > 14 || om > 59) return null;
             offsetMin = (o[1] === '-' ? -1 : 1) * (oh * 60 + om);
