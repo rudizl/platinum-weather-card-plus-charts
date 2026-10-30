@@ -2745,11 +2745,28 @@ export class PlatinumWeatherCard extends LitElement {
   // Pressure trend from an optional derivative/trend sensor:
   // numeric state → sign decides rising/steady/falling (|x| <= 0.05 ≈ steady);
   // text states 'rising'/'steady'/'falling' (and up/down) also accepted
+  // The numeric state of entity_pressure_trend in hPa per hour, in whatever unit its sensor gives (hPa/h, inHg/h, mmHg/h, Pa/min,
+  // hPa/3h...; no unit is hPa/h, as before), or null when it is no number (a trend in words, unknown). Read as hPa/h whatever its unit,
+  // -0.06 inHg/h (about -2 hPa/h, falling fast) was steady.
+  private get _trendHpaPerHourRaw(): number | null {
+    const entity = this._config.entity_pressure_trend;
+    if (!entity || !this.hass.states[entity]) return null;
+    const value = PlatinumWeatherCard._number(this.hass.states[entity].state);
+    if (value === null) return null;
+    const unit = String(this.hass.states[entity].attributes?.unit_of_measurement ?? '').replace(/\s/g, '');
+    const m = unit.match(/^(.*)\/(\d*(?:\.\d+)?)(h|hr|hour|min|s)$/i);
+    if (!m) return value;
+    const per = m[2] === '' ? 1 : Number(m[2]);
+    const hours = (/^min$/i.test(m[3]) ? per / 60 : /^s$/i.test(m[3]) ? per / 3600 : per);
+    if (!(hours > 0)) return value;
+    return pressureToHpa(value, m[1]) / hours;
+  }
+
   get pressureTrend(): 'rising' | 'steady' | 'falling' | null {
     const entity = this._config.entity_pressure_trend;
     if (!entity || !this.hass.states[entity]) return null;
     const raw = this.hass.states[entity].state;
-    const n = Number(raw);
+    const n = this._trendHpaPerHourRaw ?? NaN;
     if (!isNaN(n)) {
       if (n > 0.05) return 'rising';
       if (n < -0.05) return 'falling';
@@ -2821,10 +2838,8 @@ export class PlatinumWeatherCard extends LitElement {
 
   // Pressure change in hPa per hour, with the atmospheric tide removed.
   private get pressureTrendHpaPerHour(): number | null {
-    const trendEntity = this._config.entity_pressure_trend;
-    if (!trendEntity || !this.hass.states[trendEntity]) return null;
-    const raw = Number(this.hass.states[trendEntity].state);
-    if (!isFinite(raw)) return null;
+    const raw = this._trendHpaPerHourRaw;
+    if (raw === null) return null;
     const lat = this.hass.config?.latitude;
     const lon = this.hass.config?.longitude;
     if (lat === undefined || lon === undefined) return raw;
@@ -2921,7 +2936,7 @@ export class PlatinumWeatherCard extends LitElement {
     let trend = 0.0;
     const trendEntity = this._config.entity_pressure_trend;
     if (trendEntity && this.hass.states[trendEntity]) {
-      const n = Number(this.hass.states[trendEntity].state);
+      const n = this._trendHpaPerHourRaw ?? NaN;
       if (!isNaN(n)) {
         trend = n;
       } else {
