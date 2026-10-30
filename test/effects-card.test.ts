@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import '../src/platinum-weather-card';
-import { makeHass, baseConfig, renderCard } from './helpers';
+import { makeHass, baseConfig, renderCard, forgetSharedState } from './helpers';
 
 // The effects behind the card, as the card draws them. The decision is tested on its own in
 // effects.test.ts; here it is the wiring: when the layer is there, where it sits, and that it
@@ -9,8 +9,7 @@ import { makeHass, baseConfig, renderCard } from './helpers';
 // The gauge, the sky and the provider are remembered on the class for a while, shared by every
 // card on a page; two tests must not remember each other's rain.
 beforeEach(() => {
-  const cls = customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown>;
-  cls._gaugeSeen = null; cls._gaugeRain = null; cls._lastCondition = null; cls._cloudSamples = []; cls._cloudBand = null; cls._lastDaylightCloud = null; cls._lastRain = null;
+  forgetSharedState();
 });
 afterEach(() => vi.useRealTimers());
 

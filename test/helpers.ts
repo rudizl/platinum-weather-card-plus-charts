@@ -133,3 +133,13 @@ export function warnings(el: HTMLElement): string[] {
     .map((d) => d.textContent ?? '')
     .filter((t) => t && t !== 'Weather Card');
 }
+
+// What the card remembers between readings lives on the class, per sensor (see the static fields of the card): a test that needs a clean
+// slate forgets all of it.
+export function forgetSharedState(): void {
+  const C = customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown> | undefined;
+  if (!C) return;
+  for (const f of ['_cloudSamples', '_cloudBand', '_lastDaylightCloud', '_lastRain', '_gaugeSeen', '_gaugeRain', '_lastCondition']) {
+    (C[f] as Map<string, unknown>).clear();
+  }
+}

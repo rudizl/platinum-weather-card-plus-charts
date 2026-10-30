@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import '../src/platinum-weather-card';
-import { makeHass, baseConfig, renderCard } from './helpers';
+import { makeHass, baseConfig, renderCard, forgetSharedState } from './helpers';
 
 // What the main icon shows when the sensors and the provider disagree, run
 // through the card rather than read out of its source: the correction has two
@@ -66,12 +66,7 @@ async function swapStates(el: Card, s: Scene) {
 
 beforeEach(() => {
   // the held gauge reading and the cloud band live on the class
-  const cls = customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown>;
-  cls._gaugeSeen = null;
-  cls._cloudBand = null;
-  cls._cloudSamples = [];
-  cls._gaugeRain = null;
-  cls._lastCondition = null;
+  forgetSharedState();
 });
 afterEach(() => vi.useRealTimers());
 

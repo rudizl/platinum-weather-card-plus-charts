@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import '../src/platinum-weather-card';
-import { makeHass, baseConfig, renderCard } from './helpers';
+import { makeHass, baseConfig, renderCard, forgetSharedState } from './helpers';
 import { clearSkyIrradiance } from '../src/zambretti';
 
 // The levels that the sensors give: the cloud cover from the pyranometer (four bands), and the rain from the gauge (three).
@@ -8,12 +8,11 @@ import { clearSkyIrradiance } from '../src/zambretti';
 // rain, 2.5 to 10 mm/h, did the same. This goes through the real choice of the icon, with the sensors, and not through a list of names.
 
 type Card = HTMLElement & { _getIconUrl: (n: string, f?: boolean) => string; _weatherIcon: (c: string) => string };
-const statics = () => customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown>;
 const ELEVATION = 35;
 
 beforeEach(() => {
   // the card remembers the sky and the rain for minutes, in the class, and a test must not inherit what another saw
-  Object.assign(statics(), { _cloudSamples: [], _cloudBand: null, _gaugeSeen: null, _gaugeRain: null, _lastRain: null, _lastDaylightCloud: null });
+  forgetSharedState();
 });
 
 async function card(opts: { cloud?: number; rain?: number; pack?: Record<string, unknown> }) {

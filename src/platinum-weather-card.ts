@@ -38,9 +38,13 @@ const PHOTOREAL_REVISION = 8;
 const MEASUREMENT_KEYS = [
   'entity_forecast_icon', 'entity_temperature', 'entity_apparent_temp', 'entity_humidity',
   'entity_pressure', 'entity_visibility', 'entity_wind_bearing', 'entity_wind_speed',
-  'entity_wind_gust', 'entity_uv_index', 'entity_dew_point', 'entity_cloud_cover',
+  'entity_wind_gust', 'entity_uv_index', 'entity_dew_point',
   'entity_forecast_min', 'entity_forecast_max', 'entity_pop', 'entity_pos',
 ] as const;
+
+// The provider's sky for the night, when the pyranometer cannot help: a fallback, not a measurement of the station. It is filled in with the
+// measurements, but naming it is no choice about them.
+const FALLBACK_KEYS = ['entity_cloud_cover'] as const;
 
 // From the mildest weather to the worst, for choosing the one that stands for a
 // group of hours: a three-hour column that had rain in it should not show the
@@ -156,6 +160,8 @@ export class PlatinumWeatherCard extends LitElement {
   //tjl copied from HA front-end.  Supports subscribing to weather forecast events.
   //  https://github/homeassistant/frontend/src/panels/lovelace/cards/hui-weather-forecast-card.ts
   @state() private _subscribed?: Promise<() => void>;
+  // The state of the weather entity when Home Assistant refused its forecast; not reactive, see _subscribeForecastEvents.
+  private _refusedFor?: unknown;
   @state() private _forecastEvent?: ForecastEvent;
   // A second, independent subscription. The hourly section reads its own weather
   // entity rather than a second forecast type from the same one: most people
@@ -184,25 +190,28 @@ export class PlatinumWeatherCard extends LitElement {
   private _zamCandidateKey: string | null = null;
   private _zamCandidateTs = 0;
   private _windSamples: { t: number; deg: number }[] = [];
-  // Static, not per-instance: the sky is the same for every card on the page.
-  // Per-instance buffers meant two cards averaged different sample sets from
-  // different start times and settled into different hysteresis bands, so one
-  // showed sun while the other showed cloud.
-  private static _cloudSamples: { t: number; f: number }[] = [];
-  private static _cloudBand: number | null = null;
+  // Static, not per-instance: the sky is the same for every card of the same
+  // pyranometer. Per-instance buffers meant two cards averaged different sample
+  // sets from different start times and settled into different hysteresis
+  // bands, so one showed sun while the other showed cloud. Kept per sensor (by
+  // entity_solar_radiation, entity_rain_rate, the gauge, the weather entity):
+  // once for the whole page, a card that measures no sky showed another
+  // station's, and a dry gauge gave Sager another gauge's shower.
+  private static _cloudSamples = new Map<string, { t: number; f: number }[]>();
+  private static _cloudBand = new Map<string, number>();
   // The last cloud reading taken while the sun was high enough to trust it.
   // Static for the same reason the buffer is: it describes the sky, not a card.
-  private static _lastDaylightCloud: { t: number; f: number } | null = null;
+  private static _lastDaylightCloud = new Map<string, { t: number; f: number }>();
   // When it last rained, so a gap between showers does not read as fine weather.
-  private static _lastRain: { t: number; rate: number } | null = null;
+  private static _lastRain = new Map<string, { t: number; rate: number }>();
   // The keys supplied from weather_entity rather than set by the user.
   private _impliedKeys = new Set<string>();
   // The last real gauge reading, for the icon: see _gaugeRateForIcon().
-  private static _gaugeSeen: { entity: string; t: number; rate: number } | null = null;
+  private static _gaugeSeen = new Map<string, { t: number; rate: number }>();
   // The last time the gauge read above zero, and what it read; see _gaugeRateForIcon().
-  private static _gaugeRain: { entity: string; t: number; rate: number } | null = null;
+  private static _gaugeRain = new Map<string, { t: number; rate: number }>();
   // The last real condition of the weather entity behind the icon; see forecastIcon.
-  private static _lastCondition: { entity: string; t: number; state: string } | null = null;
+  private static _lastCondition = new Map<string, { t: number; state: string }>();
 
   private _error: string[] = [];
 
@@ -320,16 +329,20 @@ export class PlatinumWeatherCard extends LitElement {
     // weather entity, each is that entity's temperature, humidity and so on, and
     // that is all a card with no sensors to read can mean. Here too any one of them
     // set by the user is a choice (a station beside a forecast), and nothing is
-    // filled in around it.
+    // filled in around it. One pointed at the weather entity itself is no choice of
+    // anything else: the rest of the measurements are still that entity.
     this._impliedKeys = new Set<string>();
     const cfg = this._config as unknown as Record<string, unknown>;
-    for (const family of [FORECAST_DAY_KEYS, MEASUREMENT_KEYS] as readonly (readonly string[])[]) {
-      if (cfg.weather_entity && !family.some((k) => cfg[k])) {
-        for (const k of family) {
-          cfg[k] = cfg.weather_entity;
-          this._impliedKeys.add(k);
-        }
-      }
+    const fill = (k: string) => {
+      if (cfg[k]) return;
+      cfg[k] = cfg.weather_entity;
+      this._impliedKeys.add(k);
+    };
+    if (cfg.weather_entity) {
+      if (!FORECAST_DAY_KEYS.some((k) => cfg[k])) FORECAST_DAY_KEYS.forEach(fill);
+      // the fallback goes with the measurements, as it did when it was one of them: where they are a station's, the provider's sky is the
+      // hourly entity's first (see providerCloudFraction), and that order is kept
+      if (!MEASUREMENT_KEYS.some((k) => cfg[k] && cfg[k] !== cfg.weather_entity)) [...MEASUREMENT_KEYS, ...FALLBACK_KEYS].forEach(fill);
     }
 
     // sun.sun is the only sun entity Home Assistant has, so a card that names none
@@ -365,7 +378,8 @@ export class PlatinumWeatherCard extends LitElement {
   //tjl copy from bramkragten's weather-card
   _unsubscribeForecastEvents() {
     if (this._subscribed) {
-      this._subscribed.then((unsub) => unsub());
+      // a refused subscription has nothing to end, and its refusal was handled where it was made
+      this._subscribed.then((unsub) => unsub(), () => undefined);
       this._subscribed = undefined;
     }
   }
@@ -404,16 +418,29 @@ export class PlatinumWeatherCard extends LitElement {
     // twice_daily), so hourly data — up to 24 entries a day — leaves it empty (#24).
     // 'hourly' is still accepted in a stored configuration, and read as daily; the
     // hours have a view and a subscription of their own, to entity_hourly.
+    //
+    // Home Assistant refuses a subscription to an entity it does not have (an
+    // integration not loaded yet, or failed): ask when it is there, and after a
+    // refusal ask again only when the entity has changed. Asking on every update
+    // would be a loop, since the refusal clears _subscribed, which updates the
+    // card (#23 was that loop, for the hourly one).
+    const entity = this._config.weather_entity;
+    const stateObj = this.hass.states[entity];
+    if (!stateObj || stateObj === this._refusedFor) return;
     const type = this._stripForecastType;
-    this._subscribed = subscribeForecast(
+    const subscribed = subscribeForecast(
       this.hass,
-    //this._config.entity,
-      this._config.weather_entity,
+      entity,
       type as "daily" | "twice_daily",
       (event) => {
         this._forecastEvent = event;
       }
     );
+    this._subscribed = subscribed;
+    subscribed.catch(() => {
+      this._refusedFor = stateObj;
+      if (this._subscribed === subscribed) this._subscribed = undefined;
+    });
   }
 
 
@@ -521,6 +548,7 @@ export class PlatinumWeatherCard extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._unsubscribeForecastEvents();
+    this._unsubscribeHourly();
     this.removeEventListener('pointerdown', this._boundPointerDown);
     this.removeEventListener('pointercancel', this._boundPointerCancel);
     this.removeEventListener('click', this._boundCardClick);
@@ -754,14 +782,55 @@ export class PlatinumWeatherCard extends LitElement {
 
 
 
-  // The state (or the attribute) of the update time entity as a date and time, or null. A browser reads a bare number as a date (1 is the first of January 2001, 2 the first of February: #36),
-  // and anything else that is not a date as "Invalid Date", and neither is a time. A date and time has a year of four digits and something between its parts, and is one that the browser can read.
+  // The state (or the attribute) of the update time entity as a date and time, or null. The card reads it itself and does not hand it to
+  // new Date(string), which is up to the browser: a bare number is a date there (1 is the first of January 2001: #36), V8 reads
+  // 05.10.2026 10:00 month first (the 10th of May) and 2026-02-31 as the 3rd of March. The forms read are ISO 8601 (a T or a space,
+  // seconds, fractions and an offset optional; a date alone is midnight UTC, as ISO has it), the European DD.MM.YYYY HH:MM[:SS],
+  // YYYY/MM/DD HH:MM[:SS], and what Date.toString() writes. Without an offset the time is the browser's local time. Anything else, and any
+  // date or time that cannot be, is null.
   private static _parseUpdateTime(value: unknown): Date | null {
     if (typeof value !== 'string') return null;
     const text = value.trim();
-    if (!/\d{4}/.test(text) || !/[-/:\s]/.test(text)) return null;
-    const d = new Date(text);
-    return isNaN(d.getTime()) ? null : d;
+    const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    let y: number, mo: number, d: number, h = 0, mi = 0, sec = 0, ms = 0;
+    let offsetMin: number | null = null;
+    let m: RegExpMatchArray | null;
+    const time = '(\\d{2}):(\\d{2})(?::(\\d{2})(?:[.,](\\d+))?)?';
+    if ((m = text.match(new RegExp(`^(\\d{4})-(\\d{2})-(\\d{2})(?:[T ]${time}\\s?(Z|[+-]\\d{2}(?::?\\d{2})?)?)?$`, 'i')))) {
+      [y, mo, d] = [+m[1], +m[2], +m[3]];
+      if (m[4] === undefined) offsetMin = 0;   // a date alone: midnight UTC
+      else {
+        [h, mi, sec] = [+m[4], +m[5], m[6] === undefined ? 0 : +m[6]];
+        ms = m[7] === undefined ? 0 : Math.floor(Number(`0.${m[7]}`) * 1000);
+        if (m[8] !== undefined) {
+          if (/^z$/i.test(m[8])) offsetMin = 0;
+          else {
+            const o = m[8].match(/^([+-])(\d{2}):?(\d{2})?$/);
+            if (!o) return null;
+            const oh = +o[2], om = o[3] === undefined ? 0 : +o[3];
+            if (oh > 14 || om > 59) return null;
+            offsetMin = (o[1] === '-' ? -1 : 1) * (oh * 60 + om);
+          }
+        }
+      }
+    } else if ((m = text.match(new RegExp(`^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4}),?\\s+${time}$`)))) {
+      [d, mo, y, h, mi] = [+m[1], +m[2], +m[3], +m[4], +m[5]];
+      sec = m[6] === undefined ? 0 : +m[6];
+    } else if ((m = text.match(new RegExp(`^(\\d{4})/(\\d{1,2})/(\\d{1,2})\\s+${time}$`)))) {
+      [y, mo, d, h, mi] = [+m[1], +m[2], +m[3], +m[4], +m[5]];
+      sec = m[6] === undefined ? 0 : +m[6];
+    } else if ((m = text.match(/^(?:mon|tue|wed|thu|fri|sat|sun) ([a-z]{3}) (\d{1,2}) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT([+-])(\d{2})(\d{2})(?: \(.*\))?$/i))) {
+      mo = MONTHS.indexOf(m[1].toLowerCase()) + 1;
+      if (mo === 0) return null;
+      [d, y, h, mi, sec] = [+m[2], +m[3], +m[4], +m[5], +m[6]];
+      offsetMin = (m[7] === '-' ? -1 : 1) * (+m[8] * 60 + +m[9]);
+    } else return null;
+    const daysInMonth = mo >= 1 && mo <= 12 ? new Date(Date.UTC(y, mo, 0)).getUTCDate() : 0;
+    if (d < 1 || d > daysInMonth || h > 23 || mi > 59 || sec > 59) return null;
+    const t = offsetMin === null
+      ? new Date(y, mo - 1, d, h, mi, sec, ms).getTime()
+      : Date.UTC(y, mo - 1, d, h, mi, sec, ms) - offsetMin * 60000;
+    return isNaN(t) ? null : new Date(t);
   }
 
   private _renderUpdateTime(): TemplateResult {
@@ -1751,9 +1820,8 @@ export class PlatinumWeatherCard extends LitElement {
 
   /** Returns wind speed unit from entity attribute, with robust fallback (never returns m/s for metric) */
   private _getWindUnit(): string {
-    const fromEnt = this._config.entity
-      ? (this.hass.states[this._config.entity]?.attributes?.wind_speed_unit as string | undefined)
-      : undefined;
+    // the forecast is the weather entity's, in its units (HA converts it to them)
+    const fromEnt = this._entityUnit(this._config.weather_entity, 'wind_speed_unit');
     if (fromEnt) return fromEnt;
     // HA unit_system.wind_speed can be 'm/s' for metric — weather entities typically use km/h
     const sys = this.hass.config?.unit_system?.wind_speed;
@@ -2730,11 +2798,28 @@ export class PlatinumWeatherCard extends LitElement {
   // Pressure trend from an optional derivative/trend sensor:
   // numeric state → sign decides rising/steady/falling (|x| <= 0.05 ≈ steady);
   // text states 'rising'/'steady'/'falling' (and up/down) also accepted
+  // The numeric state of entity_pressure_trend in hPa per hour, in whatever unit its sensor gives (hPa/h, inHg/h, mmHg/h, Pa/min,
+  // hPa/3h...; no unit is hPa/h, as before), or null when it is no number (a trend in words, unknown). Read as hPa/h whatever its unit,
+  // -0.06 inHg/h (about -2 hPa/h, falling fast) was steady.
+  private get _trendHpaPerHourRaw(): number | null {
+    const entity = this._config.entity_pressure_trend;
+    if (!entity || !this.hass.states[entity]) return null;
+    const value = PlatinumWeatherCard._number(this.hass.states[entity].state);
+    if (value === null) return null;
+    const unit = String(this.hass.states[entity].attributes?.unit_of_measurement ?? '').replace(/\s/g, '');
+    const m = unit.match(/^(.*)\/(\d*(?:\.\d+)?)(h|hr|hour|min|s)$/i);
+    if (!m) return value;
+    const per = m[2] === '' ? 1 : Number(m[2]);
+    const hours = (/^min$/i.test(m[3]) ? per / 60 : /^s$/i.test(m[3]) ? per / 3600 : per);
+    if (!(hours > 0)) return value;
+    return pressureToHpa(value, m[1]) / hours;
+  }
+
   get pressureTrend(): 'rising' | 'steady' | 'falling' | null {
     const entity = this._config.entity_pressure_trend;
     if (!entity || !this.hass.states[entity]) return null;
     const raw = this.hass.states[entity].state;
-    const n = Number(raw);
+    const n = this._trendHpaPerHourRaw ?? NaN;
     if (!isNaN(n)) {
       if (n > 0.05) return 'rising';
       if (n < -0.05) return 'falling';
@@ -2747,37 +2832,50 @@ export class PlatinumWeatherCard extends LitElement {
     return null;
   }
 
-  // Sea-level pressure in hPa, with the station-altitude correction applied when
-  // configured. Shared so both forecast algorithms judge the same barometer.
-  private get _forecastPressureHpa(): number | null {
+  // A number from a state or an attribute, or null. Number(null) and Number('') are 0, which is not "not a number": a weather entity that
+  // gives its pressure as null (Home Assistant writes None so) was a pressure of 0 hPa.
+  private static _number(raw: unknown): number | null {
+    if (raw === null || raw === undefined || (typeof raw === 'string' && raw.trim() === '')) return null;
+    const value = Number(raw);
+    return isFinite(value) ? value : null;
+  }
+
+  // The pressure of entity_pressure in hPa, as the station reads it (no correction for the altitude), or null.
+  private get _stationPressureHpa(): number | null {
     const entity = this._config.entity_pressure;
     if (!entity || !this.hass.states[entity]) return null;
     const stateObj = this.hass.states[entity];
-    const raw = entity.match('^weather.') === null ? stateObj.state : stateObj.attributes.pressure;
-    const value = Number(raw);
-    if (isNaN(value)) return null;
+    const fromWeather = entity.match('^weather.') !== null;
+    const value = PlatinumWeatherCard._number(fromWeather ? stateObj.attributes.pressure : stateObj.state);
+    if (value === null) return null;
     const uom = this._config.pressure_units
       ? this._config.pressure_units
-      : entity.match('^weather.') === null
-        ? stateObj.attributes.unit_of_measurement
-        : stateObj.attributes.pressure_unit;
-    let pressure = pressureToHpa(value, uom);
+      : fromWeather ? stateObj.attributes.pressure_unit : stateObj.attributes.unit_of_measurement;
+    return pressureToHpa(value, uom);
+  }
+
+  // The pressure that Zambretti reads: the station's, at sea level when an altitude is set (skip the altitude when the sensor already
+  // reports relative pressure). The same as Sager's: both judge the same barometer at the same temperature.
+  private get _zambrettiPressureHpa(): number | null {
+    return this._forecastPressureHpa;
+  }
+
+  // Sea-level pressure in hPa, with the station-altitude correction applied when
+  // configured. Shared so both forecast algorithms judge the same barometer.
+  private get _forecastPressureHpa(): number | null {
+    let pressure = this._stationPressureHpa;
+    if (pressure === null) return null;
     const altitude = Number(this._config.option_forecast_altitude);
     if (isFinite(altitude) && altitude > 0) {
-      const tempEntity = this._config.entity_temperature;
-      const tempC = tempEntity && this.hass.states[tempEntity]
-        ? Number(this.hass.states[tempEntity].state) : NaN;
-      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
+      pressure = seaLevelPressure(pressure, altitude, this._temperatureC ?? 15);
     }
     return pressure;
   }
 
   // Pressure change in hPa per hour, with the atmospheric tide removed.
   private get pressureTrendHpaPerHour(): number | null {
-    const trendEntity = this._config.entity_pressure_trend;
-    if (!trendEntity || !this.hass.states[trendEntity]) return null;
-    const raw = Number(this.hass.states[trendEntity].state);
-    if (!isFinite(raw)) return null;
+    const raw = this._trendHpaPerHourRaw;
+    if (raw === null) return null;
     const lat = this.hass.config?.latitude;
     const lon = this.hass.config?.longitude;
     if (lat === undefined || lon === undefined) return raw;
@@ -2868,33 +2966,13 @@ export class PlatinumWeatherCard extends LitElement {
   get localForecastText(): string | null {
     const entity = this._config.entity_pressure;
     if (this._config.option_local_forecast !== true || !entity || !this.hass.states[entity]) return null;
-    const stateObj = this.hass.states[entity];
-    const raw = entity.match('^weather.') === null ? stateObj.state : stateObj.attributes.pressure;
-    const value = Number(raw);
-    if (isNaN(value)) return null;
-    const uom = this._config.pressure_units
-      ? this._config.pressure_units
-      : entity.match('^weather.') === null
-        ? stateObj.attributes.unit_of_measurement
-        : stateObj.attributes.pressure_unit;
-    let pressure = pressureToHpa(value, uom);
-    // Optional station → sea-level correction (skip when the sensor already reports relative pressure)
-    const altitude = Number(this._config.option_forecast_altitude);
-    if (!isNaN(altitude) && altitude > 0) {
-      const tempEntity = this._config.entity_temperature;
-      const tempRaw = tempEntity && this.hass.states[tempEntity]
-        ? (tempEntity.match('^weather.') === null
-          ? this.hass.states[tempEntity].state
-          : this.hass.states[tempEntity].attributes.temperature)
-        : undefined;
-      const tempC = Number(tempRaw);
-      pressure = seaLevelPressure(pressure, altitude, isNaN(tempC) ? 15 : tempC);
-    }
+    const pressure = this._zambrettiPressureHpa;
+    if (pressure === null) return null;
     // Trend in hPa/h: numeric derivative sensor preferred, categorical mapped to ±0.2
     let trend = 0.0;
     const trendEntity = this._config.entity_pressure_trend;
     if (trendEntity && this.hass.states[trendEntity]) {
-      const n = Number(this.hass.states[trendEntity].state);
+      const n = this._trendHpaPerHourRaw ?? NaN;
       if (!isNaN(n)) {
         trend = n;
       } else {
@@ -3432,17 +3510,17 @@ export class PlatinumWeatherCard extends LitElement {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = Date.now();
     if (live !== null && entity) {
-      cls._gaugeSeen = { entity, t: now, rate: live };
+      cls._gaugeSeen.set(entity, { t: now, rate: live });
       if (live > 0) {
-        cls._gaugeRain = { entity, t: now, rate: live };
+        cls._gaugeRain.set(entity, { t: now, rate: live });
         return live;
       }
-      const rain = cls._gaugeRain;
-      if (rain && rain.entity === entity && now - rain.t <= 900000) return rain.rate;
+      const rain = cls._gaugeRain.get(entity);
+      if (rain && now - rain.t <= 900000) return rain.rate;
       return live;
     }
-    const seen = cls._gaugeSeen;
-    if (entity && seen && seen.entity === entity && now - seen.t <= 60000) return seen.rate;
+    const seen = entity ? cls._gaugeSeen.get(entity) : undefined;
+    if (seen && now - seen.t <= 60000) return seen.rate;
     return null;
   }
 
@@ -3470,11 +3548,13 @@ export class PlatinumWeatherCard extends LitElement {
   get forecastRainRate(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = this.measuredRainRate;
+    const gauge = this._config.entity_rain_rate;
+    if (!gauge) return now;   // no gauge: nothing measured, nothing to remember
     if (now !== null && now > 0) {
-      cls._lastRain = { t: Date.now(), rate: now };
+      cls._lastRain.set(gauge, { t: Date.now(), rate: now });
       return now;
     }
-    const last = cls._lastRain;
+    const last = cls._lastRain.get(gauge) ?? null;
     if (last === null) return now;
     if (Date.now() - last.t > 5400000) return now;
     // Report it as showery rather than at full strength: it is not raining this
@@ -3485,11 +3565,12 @@ export class PlatinumWeatherCard extends LitElement {
   get forecastCloudFraction(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = this.measuredCloudFraction;
-    if (now !== null) {
-      cls._lastDaylightCloud = { t: Date.now(), f: now };
+    const sensor = this._config.entity_solar_radiation;
+    if (now !== null && sensor) {
+      cls._lastDaylightCloud.set(sensor, { t: Date.now(), f: now });
       return now;
     }
-    const last = cls._lastDaylightCloud;
+    const last = (sensor ? cls._lastDaylightCloud.get(sensor) : undefined) ?? null;
     // Six hours, not a day. Checked against a real frontal event: the sky was
     // last measured at 38% on a Saturday afternoon, that figure was still being
     // reported through the night, and by the time rain arrived at six the next
@@ -3530,19 +3611,23 @@ export class PlatinumWeatherCard extends LitElement {
   get measuredCloudFraction(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const instant = this._instantCloudFraction;
+    const sensor = this._config.entity_solar_radiation;
+    if (!sensor) return instant;
     const now = Date.now();
+    let samples = cls._cloudSamples.get(sensor) ?? [];
     if (instant !== null) {
-      // one sample per reading, however many cards are asking
-      const last = cls._cloudSamples[cls._cloudSamples.length - 1];
-      if (!last || now - last.t > 5000) cls._cloudSamples.push({ t: now, f: instant });
+      // one sample per reading, however many cards of this sensor are asking
+      const last = samples[samples.length - 1];
+      if (!last || now - last.t > 5000) samples.push({ t: now, f: instant });
     }
-    cls._cloudSamples = cls._cloudSamples.filter((s) => now - s.t <= 300000);
-    if (cls._cloudSamples.length === 0) return instant;
+    samples = samples.filter((s) => now - s.t <= 300000);
+    cls._cloudSamples.set(sensor, samples);
+    if (samples.length === 0) return instant;
     // Median, not mean: a five-minute window of broken cloud is a handful of
     // readings under cloud and one or two through a gap, and the mean lets those
     // few bright readings drag the answer toward 'clear' long after the gap has
     // closed. The median describes what the sky mostly is.
-    const sorted = cls._cloudSamples.map((s) => s.f).sort((a, b) => a - b);
+    const sorted = samples.map((s) => s.f).sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   }
@@ -3723,10 +3808,10 @@ export class PlatinumWeatherCard extends LitElement {
     // condition is held for ten seconds, so the icon does not flash N/A; a provider
     // that has really gone is shown as gone after that.
     if (state === 'unavailable' || state === 'unknown') {
-      const last = cls._lastCondition;
-      return last && last.entity === entity && now - last.t <= 10000 ? last.state : state;
+      const last = cls._lastCondition.get(entity);
+      return last && now - last.t <= 10000 ? last.state : state;
     }
-    cls._lastCondition = { entity, t: now, state };
+    cls._lastCondition.set(entity, { t: now, state });
     return state;
   }
 
@@ -3790,15 +3875,13 @@ export class PlatinumWeatherCard extends LitElement {
   get currentPressure(): string {
     const entity = this._config.entity_pressure;
     var places = this._config.option_pressure_decimals ? Math.max(Math.min(this._config.option_pressure_decimals, 3), 0) : 0;
-    return entity && this.hass.states[entity]
-      ? entity.match('^weather.') === null
-        ? (this.hass.states[entity].state === 'unknown' || this.hass.states[entity].state === 'unavailable')
-          ? '---'
-          : (Number(this.hass.states[entity].state)).toLocaleString(this.locale, { minimumFractionDigits: places, maximumFractionDigits: places })
-        : this.hass.states[entity].attributes.pressure !== undefined
-          ? (Number(this.hass.states[entity].attributes.pressure)).toLocaleString(this.locale)
-          : '---'
-      : '---';
+    if (!entity || !this.hass.states[entity]) return '---';
+    const fromWeather = entity.match('^weather.') !== null;
+    const value = PlatinumWeatherCard._number(fromWeather ? this.hass.states[entity].attributes.pressure : this.hass.states[entity].state);
+    if (value === null) return '---';   // unknown, unavailable, null, empty
+    return fromWeather
+      ? value.toLocaleString(this.locale)
+      : value.toLocaleString(this.locale, { minimumFractionDigits: places, maximumFractionDigits: places });
   }
 
   get currentVisibility(): string {
@@ -4165,11 +4248,16 @@ export class PlatinumWeatherCard extends LitElement {
     return { value, unit: String(st.attributes?.[fromWeather ? unitAttribute : 'unit_of_measurement'] ?? '') };
   }
 
+  // The temperature of entity_temperature in °C: the state of a sensor in its unit_of_measurement, or the temperature attribute of a weather entity
+  // in its temperature_unit (°F and K converted); with no unit, the one of the unit system of Home Assistant. For the effects and for the
+  // sea-level correction of Sager and Zambretti (Sager read 68 °F as 68 °C, and the state of a weather entity as nothing).
   private get _temperatureC(): number | null {
     const r = this._reading(this._config?.entity_temperature, 'temperature', 'temperature_unit');
     if (!r) return null;
-    const unit = r.unit || this.getUOM('temperature');
-    return /F/i.test(unit) ? (r.value - 32) * 5 / 9 : r.value;
+    const unit = (r.unit || this.getUOM('temperature')).replace(/[\s°º]/g, '').toUpperCase();
+    if (unit === 'F') return (r.value - 32) * 5 / 9;
+    if (unit === 'K') return r.value - 273.15;
+    return r.value;
   }
 
   private get _visibilityKm(): number | null {
@@ -4187,8 +4275,9 @@ export class PlatinumWeatherCard extends LitElement {
   private _minutesSinceRain(): number | null {
     const live = this.measuredRainRate;
     if (live === null || live > 0) return null;
-    const last = (this.constructor as typeof PlatinumWeatherCard)._gaugeRain;
-    if (!last || last.entity !== this._config.entity_rain_rate) return null;
+    const gauge = this._config.entity_rain_rate;
+    const last = gauge ? (this.constructor as typeof PlatinumWeatherCard)._gaugeRain.get(gauge) : undefined;
+    if (!last) return null;
     return (Date.now() - last.t) / 60000;
   }
 
@@ -4299,12 +4388,14 @@ export class PlatinumWeatherCard extends LitElement {
           const EDGES = [0.25, 0.55, 0.85];
           const MARGIN = 0.05;
           const cls = this.constructor as typeof PlatinumWeatherCard;
+          const sensor = this._config.entity_solar_radiation ?? '';
+          const band = cls._cloudBand.get(sensor) ?? null;
           let target = EDGES.filter((e) => cloud >= e).length;
-          if (cls._cloudBand !== null && target !== cls._cloudBand) {
-            const edge = EDGES[Math.min(cls._cloudBand, target)];
-            if (Math.abs(cloud - edge) < MARGIN) target = cls._cloudBand;
+          if (band !== null && target !== band) {
+            const edge = EDGES[Math.min(band, target)];
+            if (Math.abs(cloud - edge) < MARGIN) target = band;
           }
-          cls._cloudBand = target;
+          cls._cloudBand.set(sensor, target);
           // Every band has a day and a night file; a bare name matches nothing
           // and the card renders N/A.
           adjusted = `${['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target]}-${this.dayOrNight}`;
@@ -4724,13 +4815,21 @@ export class PlatinumWeatherCard extends LitElement {
     return this._config?.option_compact_slots === true;
   }
 
+  // The language for Intl and toLocale*, and for the translations (which read uk as their ua: see resolveLang).
   get locale(): string | undefined {
     try {
       Intl.NumberFormat(this._config.option_locale);
-      return this._config.option_locale ?? this.hass?.locale?.language;
+      return PlatinumWeatherCard._intlLanguage(this._config.option_locale ?? this.hass?.locale?.language);
     } catch (e) {
-      return this.hass?.locale?.language;
+      return PlatinumWeatherCard._intlLanguage(this.hass?.locale?.language);
     }
+  }
+
+  // The editor offers Ukrainian as `ua`, the card's own code for it; its language code is `uk`, and Intl, not knowing `ua`, fell back
+  // to English: the days and the numbers of a card set to Ukrainian were English.
+  private static _intlLanguage(code: string | undefined): string | undefined {
+    if (code === undefined) return undefined;
+    return /^ua(-|$)/i.test(code) ? 'uk' : code;
   }
 
   get localeTextFeelsLike(): string { return tCard(this.locale, 'feels_like'); }
