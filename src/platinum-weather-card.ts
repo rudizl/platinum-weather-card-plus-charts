@@ -24,6 +24,7 @@ import { CARD_VERSION } from './const';
 import { sectionNames } from './types';
 import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
+import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
 
 
@@ -1173,19 +1174,22 @@ export class PlatinumWeatherCard extends LitElement {
     const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum] ?? '0.16';
     const levelClass = levelNum === '4' ? 'warning-row level-red'
       : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
-    const icon = ({
-      '1': 'mdi:weather-windy', '2': 'mdi:snowflake', '3': 'mdi:weather-lightning',
-      '4': 'mdi:weather-fog', '5': 'mdi:thermometer-high', '6': 'mdi:thermometer-low',
-      '7': 'mdi:waves', '8': 'mdi:fire', '9': 'mdi:image-filter-hdr',
-      '10': 'mdi:weather-pouring', '11': 'mdi:home-flood', '12': 'mdi:home-flood',
-      '13': 'mdi:home-flood', '14': 'mdi:sail-boat', '15': 'mdi:water-off',
-    })[typeNum] ?? 'mdi:alert';
+    const icon = WARNING_ICONS[typeNum] ?? 'mdi:alert';
 
     // Fall back to the provider's own wording when the type is unknown to us
-    const hazard = tWarning(this.locale, `type_${typeNum}`)
-      || String(a.event ?? a.headline ?? stateObj.state);
+    const typeName = tWarning(this.locale, `type_${typeNum}`);
+    const hazard = typeName || String(a.event ?? a.headline ?? stateObj.state);
     const level = tWarning(this.locale, `level_${levelNum}`) || levelParts[1] || '';
-    const headline = level ? `${level}: ${hazard}` : hazard;
+
+    // A service can put two hazards in one warning ("Heavy precipitation and strong wind!", of type rain): the type has one, the title names more. The ones that the
+    // type does not already say follow it, with their own icons, at most two; a title in a language that is not known names nothing (see warning_hazards.ts).
+    const extras = typeName
+      ? hazardsNamedIn(`${a.event ?? ''} ${a.headline ?? ''}`).filter((t) => !typeCovers(Number(typeNum), t)).slice(0, 2)
+      : [];
+    const hazards = [hazard, ...extras.map((t) => tWarning(this.locale, `type_${t}`))].join(' + ');
+    const headline = level ? `${level}: ${hazards}` : hazards;
+    // with two hazards the text does not fit beside the time of the end on a phone: the row says so, and its text takes a second line instead of being cut
+    const multi = extras.length > 0 ? ' multi' : '';
 
     let expiry = '';
     if (this._config.option_warning_show_expiry !== false && a.expires) {
@@ -1199,17 +1203,19 @@ export class PlatinumWeatherCard extends LitElement {
 
     if (this._warningStyle === 'soft') {
       return html`
-        <div class="${levelClass} soft" style="--sev: ${colour};" title="${String(a.description ?? a.instruction ?? '')}">
+        <div class="${levelClass}${multi} soft" style="--sev: ${colour};" title="${String(a.description ?? a.instruction ?? '')}">
           <ha-icon class="warning-icon" icon="${icon}"></ha-icon>
+          ${extras.map((t) => html`<ha-icon class="warning-icon" icon="${WARNING_ICONS[String(t)] ?? 'mdi:alert'}"></ha-icon>`)}
           <div class="warning-text">${headline}</div>
           ${expiry ? html`<div class="warning-expiry">${expiry}</div>` : html``}
         </div>
       `;
     }
     return html`
-      <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});"
+      <div class="${levelClass}${multi}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});"
            title="${String(a.description ?? a.instruction ?? '')}">
         <ha-icon class="warning-icon" style="color: ${colour};" icon="${icon}"></ha-icon>
+        ${extras.map((t) => html`<ha-icon class="warning-icon" style="color: ${colour};" icon="${WARNING_ICONS[String(t)] ?? 'mdi:alert'}"></ha-icon>`)}
         <div class="warning-text">${headline}</div>
         ${expiry ? html`<div class="warning-expiry">${expiry}</div>` : html``}
       </div>
@@ -5366,6 +5372,12 @@ export class PlatinumWeatherCard extends LitElement {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+      .warning-row.multi .warning-text {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.25;
       }
       .warning-expiry {
         flex: 0 0 auto;
