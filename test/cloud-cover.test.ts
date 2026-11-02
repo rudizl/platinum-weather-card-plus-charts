@@ -160,7 +160,7 @@ describe('the icon correction follows ordinary cloud bands', () => {
   // half covered — and a sensor reading badly enough to matter is one to clean,
   // not a reason to distrust it while still showing its number in a slot.
   const band = (cloud: number) =>
-    cloud < 0.25 ? 'clear' : cloud < 0.55 ? 'cloudy-1' : cloud < 0.85 ? 'cloudy-2' : 'cloudy-3';
+    cloud < 0.25 ? 'clear' : cloud < 0.50 ? 'cloudy-1' : cloud < 0.75 ? 'cloudy-2' : 'cloudy-3';
 
   it('calls a nearly clear sky clear', () => {
     expect(band(0)).toBe('clear');
@@ -216,7 +216,7 @@ describe('the icon does not flicker in broken cloud', () => {
   const CLEAR_SKY = 387; // sun at about 30° of elevation
 
   function countSwitches(average: boolean, hysteresis: boolean): number {
-    const EDGES = [0.25, 0.55, 0.85];
+    const EDGES = [0.25, 0.50, 0.75];
     const MARGIN = 0.05;
     const window: number[] = [];
     let band: number | null = null;

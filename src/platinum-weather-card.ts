@@ -4267,10 +4267,14 @@ export class PlatinumWeatherCard extends LitElement {
           // showing it: provider 'rainy', gauge 0.0 mm/h, 14 and 17 October.
           adjusted = 'cloudy';
         } else if (cloud !== null) {
-          // Ordinary meteorological bands, with hysteresis so a value sitting on
-          // a boundary does not alternate: an icon that changes every few
-          // minutes is worse than one that lags by a few.
-          const EDGES = [0.25, 0.55, 0.85];
+          // Bands, with hysteresis so a value sitting on a boundary does not
+          // alternate: an icon that changes every few minutes is worse than one
+          // that lags by a few. The cover is 1 - (measured / clear sky), and that
+          // underrates a thick overcast, which lets through 10 to 25% of a clear
+          // sky's light and so reads as 75 to 90%: with the edges at 55 and 85 a
+          // sky of 84% (44 W/m2, the sun 23 degrees up) was drawn with the sun and
+          // two thin streaks. The upper two edges are 50 and 75.
+          const EDGES = [0.25, 0.50, 0.75];
           const MARGIN = 0.05;
           const cls = this.constructor as typeof PlatinumWeatherCard;
           const sensor = this._config.entity_solar_radiation ?? '';
