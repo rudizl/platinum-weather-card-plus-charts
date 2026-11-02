@@ -1148,6 +1148,8 @@ export class PlatinumWeatherCard extends LitElement {
       : [];
     const hazards = [hazard, ...extras.map((t) => tWarning(this.locale, `type_${t}`))].join(' + ');
     const headline = level ? `${level}: ${hazards}` : hazards;
+    // with two hazards the text does not fit beside the time of the end on a phone: the row says so, and its text takes a second line instead of being cut
+    const multi = extras.length > 0 ? ' multi' : '';
 
     let expiry = '';
     if (this._config.option_warning_show_expiry !== false && a.expires) {
@@ -1160,7 +1162,7 @@ export class PlatinumWeatherCard extends LitElement {
     }
 
     return html`
-      <div class="${levelClass}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});"
+      <div class="${levelClass}${multi}" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});"
            title="${String(a.description ?? a.instruction ?? '')}">
         <ha-icon class="warning-icon" style="color: ${colour};" icon="${icon}"></ha-icon>
         ${extras.map((t) => html`<ha-icon class="warning-icon" style="color: ${colour};" icon="${WARNING_ICONS[String(t)] ?? 'mdi:alert'}"></ha-icon>`)}
@@ -5162,6 +5164,12 @@ export class PlatinumWeatherCard extends LitElement {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+      .warning-row.multi .warning-text {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.25;
       }
       .warning-expiry {
         flex: 0 0 auto;

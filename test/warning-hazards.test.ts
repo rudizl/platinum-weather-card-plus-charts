@@ -43,22 +43,43 @@ describe('the hazards that the title of a warning names', () => {
   });
 });
 
-async function bar(attrs: Record<string, unknown>) {
+async function bar(attrs: Record<string, unknown>, style?: string) {
   const hass = makeHass({
     'weather.w': { state: 'cloudy', attributes: { temperature: 13 } },
     'binary_sensor.alarm': { state: 'on', attributes: { awareness_level: '4; red; Extreme', awareness_type: '10; Rain', expires: '2026-11-04T00:00:00+02:00', ...attrs } },
   });
-  const el = (await renderCard(baseConfig({ weather_entity: 'weather.w', entity_warning: 'binary_sensor.alarm', section_order: ['warnings', 'overview'] } as never), hass)) as HTMLElement;
+  const el = (await renderCard(baseConfig({ weather_entity: 'weather.w', entity_warning: 'binary_sensor.alarm', section_order: ['warnings', 'overview'], ...(style ? { option_warning_style: style } : {}) } as never), hass)) as HTMLElement;
   const row = el.shadowRoot!.querySelector('.warning-row') as HTMLElement;
-  return { text: row.querySelector('.warning-text')!.textContent!.trim(), icons: [...row.querySelectorAll('.warning-icon')].map((i) => i.getAttribute('icon')) };
+  return { text: row.querySelector('.warning-text')!.textContent!.trim(), icons: [...row.querySelectorAll('.warning-icon')].map((i) => i.getAttribute('icon')), multi: row.classList.contains('multi'), el };
 }
 
 describe('the bar of a warning that names a second hazard', () => {
+  // On a phone the text of a bar with two hazards does not fit beside the time that the warning ends ("Red code: Rain + Str..."): it goes on to a second line there instead of being cut.
+  it.each(['soft', 'classic'])('the row of two hazards is marked, so that its text may take a second line (%s)', async (style) => {
+    const two = await bar({ event: 'Heavy precipitation and strong wind!' }, style);
+    expect(two.multi).toBe(true);
+    const one = await bar({ event: 'Heavy precipitation' }, style);
+    expect(one.multi).toBe(false);
+  });
+  it('the marked row lets its text wrap, and the other rows keep the cut that they had', async () => {
+    const { el } = await bar({ event: 'Heavy precipitation and strong wind!' });
+    const css = String((el as unknown as { styles: { cssText: string } }).styles.cssText).replace(/\s+/g, ' ');
+    expect(css).toMatch(/\.warning-row\.multi \.warning-text \{ white-space: normal; overflow: visible; text-overflow: clip; line-height: 1\.25; \}/);
+    const plain = (css.match(/(?:^|\})\s*\.warning-text \{([^}]*)\}/) ?? [])[1] ?? '';   // the rule of the text itself, not the ones of a level
+    expect(plain).toContain('white-space: nowrap');
+    expect(plain).toContain('text-overflow: ellipsis');
+  });
+
   const level = tWarning('en', 'level_4'), rain = tWarning('en', 'type_10'), wind = tWarning('en', 'type_1');
   it('shows both hazards, with the icon of each (the case of 2 November)', async () => {
     const b = await bar({ event: 'Heavy precipitation and strong wind!', headline: 'Heavy precipitation and strong wind!' });
     expect(b.text).toBe(`${level}: ${rain} + ${wind}`);
     expect(b.icons).toEqual(['mdi:weather-pouring', 'mdi:weather-windy']);
+  });
+  it.each(['soft', 'classic'])('draws the second icon in the %s style of the bar (the soft one is the default where there is one)', async (style) => {
+    const b = await bar({ event: 'Heavy precipitation and strong wind!' }, style);
+    expect(b.icons).toEqual(['mdi:weather-pouring', 'mdi:weather-windy']);
+    expect(b.text).toBe(`${level}: ${rain} + ${wind}`);
   });
   it('is as it was when the title names only the type', async () => {
     const b = await bar({ event: 'Heavy precipitation', headline: 'Heavy precipitation' });
