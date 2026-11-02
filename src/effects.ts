@@ -374,6 +374,13 @@ export const EFFECTS_CSS = `
   -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
 }
+/* That reach is for a host that is the first section. When another section is above it (a warning, say), the layer must not go up over it: it
+   began in the middle of the warning's bar and cut it. It starts at the host then, and fades in at the top instead of starting at an edge. */
+.fx-host:not(:first-child) > .fx-overview {
+  inset-block-start: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 55%, transparent 100%);
+}
 
 .fx-sky { inset: 0; }
 .fx[data-night] .fx-sky { background: linear-gradient(180deg, color-mix(in srgb, var(--fx-dim) 45%, transparent), transparent 88%); }
