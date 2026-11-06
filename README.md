@@ -658,10 +658,12 @@ It needs one thing the card cannot supply itself. Sager compares the wind now wi
 ```yaml
 # Settings → Devices & Services → Helpers → Statistics
 # Source: your wind direction sensor
-# Characteristic: average
+# Characteristic: circular mean (mean_circular)
 # Sampling size: enough to cover six hours
 # Max age: 6 hours
 ```
+
+Choose the **circular mean**, the one made for a direction. An ordinary mean of 350° and 10° is 180°, a south wind made of two northerly ones, where the circular mean says 0°; around north that turns the whole branch the wrong way. And a mean over six hours lies about three hours back, so the turn it shows is about half the turn of the full six hours: for telling a backing wind from a veering one, that is enough.
 
 Point **Wind bearing six hours ago** at that helper. It is not required: without it the other five inputs still stand, and the sky measurement — the reason to choose Sager at all — is worth more than the one branch the bearing sharpens.
 
