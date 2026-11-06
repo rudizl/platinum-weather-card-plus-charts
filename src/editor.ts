@@ -7,6 +7,7 @@ import { keys } from 'ts-transformer-keys';
 import { mdiPencil, mdiArrowDown, mdiArrowUp, mdiApplicationEditOutline } from '@mdi/js';
 
 import { tEditor } from './translations';
+import { kmPer } from './distance';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
@@ -1105,6 +1106,13 @@ get _forecast_type(): string {
       ${entity_custom4}`;
   }
 
+  // the unit of the chosen lightning detector, which its range is written in (#38); kilometres without one
+  get _lightningUnit(): string {
+    const entity = this._config?.entity_lightning_distance;
+    const unit = entity ? this.hass?.states?.[entity]?.attributes?.unit_of_measurement : undefined;
+    return typeof unit === 'string' && unit.trim() ? unit : 'km';
+  }
+
   get _show_warning(): boolean {
     return this._config?.show_warning || false;
   }
@@ -1371,11 +1379,11 @@ get _forecast_type(): string {
       ${this._config?.entity_lightning_distance ? html`
       <div class="side-by-side">
         <div>
-          <ha-input type="number" label=${this._t("lightning_max_distance")}
+          <ha-input type="number" label=${this._t("lightning_max_distance").replace('{unit}', this._lightningUnit)}
             .value=${this._config?.option_lightning_max_distance ?? ''}
             .configValue=${'option_lightning_max_distance'} @change=${this._valueChangedNumber}>
           </ha-input>
-          <div class="help-text">${this._t("lightning_max_distance_hint")}</div>
+          <div class="help-text">${this._t("lightning_max_distance_hint").replace('{default}', `${Math.round(50 / kmPer(this._lightningUnit))} ${this._lightningUnit}`)}</div>
         </div>
         <div></div>
       </div>` : html``}

@@ -25,6 +25,7 @@ import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
 import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
+import { kmPer } from './distance';
 
 // What the overview and the slots read their figures from: today's condition, the
 // measurements, and today's high and low. A card that has a weather_entity and
@@ -1078,20 +1079,25 @@ export class PlatinumWeatherCard extends LitElement {
     const distance = Number(distState.state);
     if (!isFinite(distance)) return html``;
 
+    // The distance is in the unit of its entity (#38): a detector in miles was compared with limits written for kilometres. The
+    // colours work in kilometres whatever the unit. The range stays in the unit of the entity, as it has always been compared, so a
+    // value someone set keeps meaning what it meant; left unset, it is 50 km in that unit.
+    const unit = distState.attributes?.unit_of_measurement ?? 'km';
+    const perUnit = kmPer(unit);
+    const km = distance * perUnit;
     const threshold = Number(this._config.option_lightning_max_distance);
-    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50;
+    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50 / perUnit;
     if (distance > limit) return html``;
 
     // Red within fifteen kilometres — near enough that the next strike could be
     // overhead; amber to thirty; yellow beyond.
-    const levelNum = distance <= 15 ? '4' : distance <= 30 ? '3' : '2';
+    const levelNum = km <= 15 ? '4' : km <= 30 ? '3' : '2';
     const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum]!;
     const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum]!;
     const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum]!;
     const levelClass = levelNum === '4' ? 'warning-row level-red'
       : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
 
-    const unit = distState.attributes?.unit_of_measurement ?? 'km';
     let headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)} ${unit}`;
 
     const bearingEntity = this._config.entity_lightning_azimuth;
