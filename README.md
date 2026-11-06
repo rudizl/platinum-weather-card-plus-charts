@@ -114,9 +114,9 @@ The two cards register under different names, so you can try this one beside the
 - **Hourly Forecast** — a column per hour, as a tab beside the days or on its own
 - **Charts** — temperature lines and precipitation bars
 
-Each row has a switch to hide the section entirely and arrows to reorder it. The pencil opens the entities the section reads from; the second icon, where present, opens its display options. **Hourly Forecast** is the exception: it is a view of the daily forecast rather than a section, so it has a switch and one settings button, holding both its entity and its options, and no arrows.
+Each row has a switch to hide the section entirely, arrows to reorder it, and a pencil for its page: where the section takes its data from. The pencil of **Warnings** opens the page of the warnings, below. **Hourly forecast** is the exception among the rows: it is a view of the daily forecast rather than a section, so it has a switch and its pencil, and no arrows.
 
-**Global Options** and **Appearance** at the top are not sections of the card. Global Options holds the settings that several sections draw on, such as the locale and the station sensors; Appearance holds how the card looks: the icon pack, the static icons, how close the slots sit, and the weather effects.
+Under the sections, **Settings by topic** holds everything else, on five pages: **Appearance**, **Warnings**, **Sky and rain from sensors**, **Local forecast** and **Card and language** (see [Settings by topic](#settings-by-topic)). **Interactions**, at the bottom, holds what a tap, a hold and a double tap on the card do.
 
 ## Overview Section
 
@@ -157,7 +157,7 @@ Tapping a slot value (humidity, pressure, wind, ...) — or the big current temp
 
 The card can compute a short local forecast entirely from your own weather station — no internet, no forecast provider. It implements the classic **Zambretti forecaster** (Negretti & Zambra, 1915), which reads barometric pressure, its trend, wind direction and season. It is reported to be right around 90% of the time for the next 12 hours — but that figure comes from the frontal weather it was designed for, and there are conditions it cannot see at all (see *What it can and cannot do* below).
 
-Enable it in the editor: **Overview Section → Options → Local forecast (Zambretti)**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
+Enable it in the editor: **Local forecast → Local forecast**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
 
 A **Verbose forecast text** toggle expands the short phrase into a full sentence with a pressure-tendency clause, e.g. *"Unsettled weather, with rain expected later. The pressure is falling."*
 
@@ -389,7 +389,7 @@ sensor:
     round: 2
 ```
 
-Then select it in the editor: Slots Section → *Entity Pressure Trend* (the picker appears once a pressure entity is set).
+Then select it in the editor, on the page **Local forecast** (*Entity Pressure Trend*), or on the page of the slots once a pressure entity is set.
 
 ## Warnings Section
 
@@ -453,7 +453,7 @@ entity_warning: binary_sensor.meteoalarm_varna
 
 ### How the air feels
 
-Under the apparent temperature the card can show a single word — *dry*, *comfortable*, *muggy* — worked out from the dew point. Point **Dew point entity** at your sensor in the overview options and switch on **Show how the air feels**.
+Under the apparent temperature the card can show a single word — *dry*, *comfortable*, *muggy* — worked out from the dew point. Point **Dew point entity** at your sensor on the page of the overview and switch on **Show how the air feels**.
 
 Dew point rather than relative humidity, because relative humidity on its own says very little about comfort: 60% at 15°C is pleasant and 60% at 30°C is unbearable, since warm air holds far more water at the same percentage. Dew point is the actual moisture content, so its bands hold whatever the temperature is — a dew point of 21°C feels muggy at 24°C and at 35°C alike, because the moisture your sweat has to compete with is the same either way. That is why forecasters quote it and why it is the more useful number on a humid coast, where the temperature can look modest while the air does not.
 
@@ -475,7 +475,7 @@ The Fahrenheit boundaries are the original ones, this being an American scale wh
 
 If your station measures solar radiation, the card can work out the cloud cover from it. How much sunlight *would* arrive under a clear sky depends only on the sun's elevation, the day of year and your altitude — pure geometry, no external data — so the ratio between that and what the sensor actually reports is the cloud cover.
 
-Point **Solar radiation entity** in Global Options at your pyranometer (W/m²); a sun entity is needed too, since the calculation turns on the sun's elevation. The slot reads as a percentage by default; **Show oktas instead of percent** switches it to eighths of the sky, which is how observers and aviation reports state it. From there the measurement is available to two independent things: add the **Cloud cover** slot to show it as a reading, and switch on **Measurement corrects the icon** to let it correct the condition icon. Either without the other is fine.
+Point **Solar radiation entity**, on the page **Sky and rain from sensors**, at your pyranometer (W/m²); a sun entity is needed too, since the calculation turns on the sun's elevation. The slot reads as a percentage by default; **Show oktas instead of percent** switches it to eighths of the sky, which is how observers and aviation reports state it. From there the measurement is available to two independent things: add the **Cloud cover** slot to show it as a reading, and switch on **Measurement corrects the icon** to let it correct the condition icon. Either without the other is fine.
 
 Worth knowing about its limits:
 
@@ -743,11 +743,17 @@ The boxes of the values on the chart follow the mode of Home Assistant, so the c
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-light-theme.png" alt="The card in the light theme of Home Assistant" width="400">
 </p>
 
-## Global Options
+## Settings by topic
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/global-options.png" alt="Global options in the editor" width="720">
-</p>
+What is not about where a section takes its data from is on five pages, under **Settings by topic** on the first screen of the editor:
+
+- **Appearance:** the icons, the weather effects, the layout of the overview, the numbers (the decimals), and how the readings look.
+- **Warnings:** the warning entity, the lightning detector and its range, the expiry, the style of the rows, and the colour of the fire danger. The two switches for the colour wait, greyed, until a fire danger entity is chosen, since without one there is nothing to colour.
+- **Sky and rain from sensors:** the pyranometer, the cloud cover at night and the rain gauge, which the icon, the cloud slot, the weather effects and Sager all read.
+- **Local forecast:** Zambretti or Sager, the barometer and its trend, the altitude, and the wind six hours ago.
+- **Card and language:** the titles, the time format and the language, and whether the lists offer every entity.
+
+The settings keep their keys. A configuration written for 2.6, in the editor or in YAML, works as it is: only where the editor shows a setting has changed.
 
 The lists of the pickers offer what each field can read: the solar radiation field offers the sensors in W/m², the temperatures the temperature sensors, and so on. **Offer every entity in the lists** turns that off.
 
@@ -796,7 +802,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 
 ## Actions
 
-The card supports all standard [HA actions](https://www.home-assistant.io/dashboards/actions/), configurable from **Global Options → Actions** in the editor:
+The card supports all standard [HA actions](https://www.home-assistant.io/dashboards/actions/), configurable from **Interactions**, at the bottom of the first screen of the editor:
 
 <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-actions.png" alt="Editor actions" width="506">
 
