@@ -426,7 +426,7 @@ The card shows the warnings that would otherwise need cards of their own: a seve
 
 When the title of a warning names a second hazard (`Heavy precipitation and strong wind!`, of the type rain), the row shows both, with an icon for each: see the note below.
 
-**Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown.
+**Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown. The distance is read in the unit of its entity, which Blitzortung takes from the unit system of Home Assistant: in miles the row is red within 9 mi, orange to 19 mi, and the range is written in miles too (31 mi unless you set it).
 
 [![Open your Home Assistant instance and show Blitzortung in the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=mrk-its&repository=homeassistant-blitzortung&category=integration)
 
@@ -879,7 +879,7 @@ double_tap_action:
 | `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
 | `entity_lightning_distance` | String | none | Strike detector distance sensor — adds its own warning row |
 | `entity_lightning_azimuth` | String | none | Strike detector bearing sensor, for the direction |
-| `option_lightning_max_distance` | Number | `50` | Storms further away than this are ignored |
+| `option_lightning_max_distance` | Number | 50 km | Storms further away than this are ignored. In the unit of the distance entity (31 when it is in miles) |
 | `show_section_warnings` | Boolean | `true` | Show the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |

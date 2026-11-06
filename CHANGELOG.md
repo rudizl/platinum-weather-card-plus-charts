@@ -2,6 +2,12 @@
 
 All notable changes to Platinum Weather Card Plus Charts. The newest version is at the top. Each version lists what was **added**, what **changed** and what was **fixed**; the notes of every release, with the same text, are on the [releases page](https://github.com/rudizl/platinum-weather-card-plus-charts/releases).
 
+## 2.6.1 (unreleased)
+
+### Fixed
+
+- **A lightning detector in miles is read in miles** (#38). The distance was compared, as it came, with limits written for kilometres, so with a detector in miles (Blitzortung follows the unit system of Home Assistant) the default range of 50 was 50 miles, the row turned red within 15 miles and amber within 30, and the editor said *Warn within (km)*. The colours work in kilometres whatever the unit: red within 15 km (9 mi), amber to 30 km (19 mi). The range stays in the unit of the entity, as it has always been compared, so a value someone set keeps meaning what it meant; left unset, it is 50 km in that unit (31 mi). The editor names the unit of the chosen detector, and the default in it, in the 15 languages. A distance without a unit is read in kilometres, as before. Ten tests, four breakages caught.
+
 ## 2.6.0 (2026-11-06)
 
 **In short:** one weather entity is enough for a whole card, and the card offers itself under *Add to dashboard → By entity*; the lists of the editor offer what each field can read; a twice-daily forecast fills the strip and the charts; the hourly strip has the chance of rain and a moon at night; Sager has a sky at night; a warning that names two hazards shows both; a sky that is wholly covered is drawn as one; and the fixes below.
