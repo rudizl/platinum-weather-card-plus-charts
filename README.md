@@ -116,7 +116,7 @@ The two cards register under different names, so you can try this one beside the
 
 Each row has a switch to hide the section entirely, arrows to reorder it, and a pencil for its page: where the section takes its data from. The pencil of **Warnings** opens the page of the warnings, below. **Hourly forecast** is the exception among the rows: it is a view of the daily forecast rather than a section, so it has a switch and its pencil, and no arrows.
 
-Under the sections, **Settings by topic** holds everything else, on five pages: **Appearance**, **Warnings**, **Sky and rain from sensors**, **Local forecast** and **Card and language** (see [Settings by topic](#settings-by-topic)). **Interactions**, at the bottom, holds what a tap, a hold and a double tap on the card do.
+Each row says, in a line under its title, what it is set to. Under the sections, **Settings by topic** holds everything else, on five pages: **Appearance**, **Warnings**, **Sky and rain from sensors**, **Local forecast** and **Card and language** (see [Settings by topic](#settings-by-topic)). **Interactions**, at the bottom, holds what a tap, a hold and a double tap on the card do.
 
 ## Overview Section
 
