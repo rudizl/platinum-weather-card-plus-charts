@@ -1532,7 +1532,7 @@ get _forecast_type(): string {
       </ha-entity-picker>
       <label class='mdc-label'>${this._t('forecast_type')}</label>
       <select class='ha-select-compat' .configValue=${'forecast_type'} .value=${this._forecast_type} @change=${this._valueChanged}>
-        <option value=""></option>
+        <option value="">${this._t("opt_default")}</option>
         <option value="daily">${this._t("opt_daily")}</option>
         <option value="twice_daily">${this._t("opt_twice_daily")}</option>
       </select>
@@ -1645,7 +1645,7 @@ get _forecast_type(): string {
         <div class="full-width">
           <label class='mdc-label'>${this._t('condition_alignment')}</label>
           <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._forecast_text_alignment} @change=${this._valueChanged}>
-            <option value=""></option>
+            <option value="">${this._t("opt_default")}</option>
             <option value="left">${this._t("align_left")}</option>
             <option value="center">${this._t("align_center")}</option>
             <option value="right">${this._t("align_right")}</option>
@@ -1654,7 +1654,7 @@ get _forecast_type(): string {
         <div>
           <label class='mdc-label'>${this._t('overview_layout')}</label>
           <select class='ha-select-compat' .configValue=${'overview_layout'} .value=${this._overview_layout} @change=${this._valueChanged}>
-            <option value=""></option>
+            <option value="">${this._t("opt_default")}</option>
             <option value="complete">${this._t("opt_complete")}</option>
             <option value="observations">${this._t("opt_observations")}</option>
             <option value="forecast">${this._t("opt_forecast")}</option>
@@ -1751,7 +1751,7 @@ get _forecast_type(): string {
         <div>
           <label class='mdc-label'>${this._t('pressure_decimals')}</label>
           <select class='ha-select-compat' .configValue=${'option_pressure_decimals'} .value=${this._option_pressure_decimals !== null ? String(this._option_pressure_decimals) : ''} @change=${this._valueChanged}>
-            <option value=""></option>
+            <option value="">${this._t("opt_default")}</option>
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -1768,7 +1768,7 @@ get _forecast_type(): string {
         <div>
           <label class='mdc-label'>${this._t('wind_decimals')}</label>
           <select class='ha-select-compat' .configValue=${'option_wind_decimals'} .value=${this._option_wind_decimals !== null ? String(this._option_wind_decimals) : ''} @change=${this._valueChanged}>
-            <option value=""></option>
+            <option value="">${this._t("opt_default")}</option>
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -1865,7 +1865,7 @@ get _forecast_type(): string {
         <div>
           <label class='mdc-label'>${this._t('daily_forecast_layout')}</label>
           <select class='ha-select-compat' .configValue=${'daily_forecast_layout'} .value=${this._daily_forecast_layout} @change=${this._valueChanged}>
-            <option value=""></option>
+            <option value="">${this._t("opt_default")}</option>
             <option value="horizontal">${this._t("opt_horizontal")}</option>
             <option value="vertical">${this._t("opt_vertical")}</option>
           </select>
@@ -1873,7 +1873,7 @@ get _forecast_type(): string {
         <div>
           <label class='mdc-label'>${this._t('daily_forecast_days')}</label>
         <select class='ha-select-compat' .configValue=${'daily_forecast_days'} .value=${this._daily_forecast_days !== null ? String(this._daily_forecast_days) : ''} @change=${this._valueChanged}>
-          <option value=""></option>
+          <option value="">${this._t("opt_default")}</option>
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
@@ -1895,7 +1895,7 @@ get _forecast_type(): string {
         <div>
           <label class='mdc-label'>${this._t('daily_extended_days')}</label>
           <select class='ha-select-compat' .configValue=${'daily_extended_forecast_days'} @change=${this._valueChangedNumber}>
-          <option value=""></option>
+          <option value="">${this._t("opt_default")}</option>
           <option value="0">0</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -2007,7 +2007,7 @@ get _forecast_type(): string {
         <div>
           <label class='mdc-label'>${this._t('time_format')}</label>
           <select class='ha-select-compat' .configValue=${'option_time_format'} .value=${this._option_time_format ?? ''} @change=${this._valueChanged}>
-            <option value=""></option>
+            <option value="">${this._t("opt_default")}</option>
             <option value="system">${this._t("opt_system")}</option>
             <option value="12hour">${this._t("opt_12hour")}</option>
             <option value="24hour">${this._t("opt_24hour")}</option>
@@ -2523,7 +2523,10 @@ get _forecast_type(): string {
         <div class="section-label">
           <span class=${on ? "pwc-switch active" : "pwc-switch"} .value=${showKey} @click=${this._toggleVisibility}></span>
           <ha-icon class="section-icon" icon=${icon}></ha-icon>
-          <span class="section-title">${this._t(titleKey)}</span>
+          <div class="title-stack">
+            <span class="section-title">${this._t(titleKey)}</span>
+            ${this._summary(block) ? html`<span class="row-summary">${this._summary(block)}</span>` : html``}
+          </div>
         </div>
         <div>
           ${movable ? html`
@@ -2572,10 +2575,105 @@ get _forecast_type(): string {
       ${WeatherCardEditor._TOPICS.map(([id, icon]) => html`
         <button class="topic-row" .value=${id} data-topic=${id} @click=${this._editSubmenu}>
           <ha-icon class="section-icon" icon=${icon}></ha-icon>
-          <span class="section-title topic-title">${this._t(id)}</span>
+          <div class="title-stack topic-title">
+            <span class="section-title">${this._t(id)}</span>
+            <span class="row-summary">${this._summary(id)}</span>
+          </div>
           <ha-icon class="topic-chevron" icon="mdi:chevron-right"></ha-icon>
         </button>`)}
     `;
+  }
+
+  // What a row is set to, in a line under its title, so that a setting can be seen without opening its page.
+  private static readonly _PACK_NAMES: Record<string, string> = {
+    photoreal: 'Photoreal', 'meteocons-fill': 'Meteocons (fill)', 'meteocons-line': 'Meteocons (line)', 'ha-official': 'Home Assistant', 'wcc-2': 'amCharts', custom: 'Custom',
+  };
+  private static readonly _LOCALE_NAMES: Record<string, string> = {
+    bg: 'Български', cs: 'Čeština', da: 'Dansk', de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', he: 'עברית', it: 'Italiano', nl: 'Nederlands',
+    pl: 'Polski', sr: 'Српски', 'sr-Latn': 'Srpski', ru: 'Русский', ua: 'Українська',
+  };
+
+  private _nameOf(entity: unknown): string {
+    if (typeof entity !== 'string' || !entity) return '';
+    const name = this.hass?.states?.[entity]?.attributes?.friendly_name;
+    return typeof name === 'string' && name ? name : entity;
+  }
+
+  private _fmt(key: string, values: Record<string, string | number>): string {
+    return this._t(key).replace(/\{(\w+)\}/g, (_m: string, k: string) => String(values[k] ?? ''));
+  }
+
+  private _summary(id: string): string {
+    const c = (this._config ?? {}) as Record<string, unknown>;
+    const parts: string[] = [];
+    switch (id) {
+      case 'topic_appearance': {
+        const pack = typeof c.icon_pack === 'string' && c.icon_pack ? c.icon_pack : 'default';
+        parts.push(`${this._t('icon_pack')}: ${pack === 'default' ? this._t('opt_default') : (WeatherCardEditor._PACK_NAMES[pack] ?? pack)}`);
+        if (c.option_effects === 'subtle' || c.option_effects === 'full') parts.push(`${this._t('group_effects')}: ${this._t('effects_' + c.option_effects)}`);
+        break;
+      }
+      case 'topic_warnings': {
+        parts.push(c.entity_warning ? this._nameOf(c.entity_warning) : this._t('summary_no_entity'));
+        if (c.entity_lightning_distance) {
+          const limit = Number(c.option_lightning_max_distance);
+          const unit = this.hass?.states?.[c.entity_lightning_distance as string]?.attributes?.unit_of_measurement ?? 'km';
+          parts.push(this._fmt('summary_lightning', { n: `${isFinite(limit) && limit > 0 ? limit : 50} ${unit}` }));
+        }
+        parts.push(this._t(c.option_warning_style === 'classic' ? 'warning_style_classic' : 'warning_style_soft'));
+        break;
+      }
+      case 'topic_sky': {
+        if (c.entity_solar_radiation) parts.push(this._t('summary_pyranometer') + (c.option_cloud_overrides_icon === true ? `, ${this._t('summary_corrects_icon')}` : ''));
+        if (c.entity_rain_rate) parts.push(this._t('summary_rain_gauge'));
+        if (c.entity_cloud_cover) parts.push(this._nameOf(c.entity_cloud_cover));
+        if (!parts.length) parts.push(this._t('summary_no_sensors'));
+        break;
+      }
+      case 'topic_local_forecast': {
+        if (c.option_local_forecast !== true) { parts.push(this._t('summary_off')); break; }
+        parts.push(c.option_forecast_algorithm === 'sager' ? 'Sager' : 'Zambretti');
+        if (c.option_local_forecast_verbose === true) parts.push(this._t('local_forecast_verbose'));
+        break;
+      }
+      case 'topic_card': {
+        if (typeof c.text_card_title === 'string' && c.text_card_title) parts.push(`“${c.text_card_title}”`);
+        const lang = typeof c.option_locale === 'string' ? c.option_locale : '';
+        parts.push(lang ? (WeatherCardEditor._LOCALE_NAMES[lang] ?? lang) : this._t('summary_language_ha'));
+        break;
+      }
+      case 'overview': {
+        const layouts: Record<string, string> = { complete: 'opt_complete', observations: 'opt_observations', forecast: 'opt_forecast', 'title only': 'opt_title_only' };
+        parts.push(this._t(layouts[String(c.overview_layout ?? 'complete')] ?? 'opt_complete'));
+        break;
+      }
+      case 'slots': {
+        let n = 0;
+        for (let i = 1; i <= 8; i++) n += (c[`slot_l${i}`] ? 1 : 0) + (c[`slot_r${i}`] ? 1 : 0);
+        if (n) parts.push(this._fmt('summary_slots', { n }));
+        break;
+      }
+      case 'daily_forecast': {
+        const days = Number(c.daily_forecast_days);
+        parts.push(this._fmt('summary_days', { n: isFinite(days) && days > 0 ? days : 5 }));
+        parts.push(this._t(c.daily_forecast_layout === 'vertical' ? 'opt_vertical' : 'opt_horizontal'));
+        break;
+      }
+      case 'hourly_forecast': {
+        if (!c.entity_hourly) { parts.push(this._t('summary_no_entity')); break; }
+        const hours = Number(c.hourly_forecast_hours);
+        const step = Math.round(Number(c.hourly_forecast_step));
+        let line = this._fmt('summary_hours', { n: isFinite(hours) && hours > 0 ? Math.min(hours, 48) : 12 });
+        if (isFinite(step) && step > 1) line += `, ${this._fmt('summary_every', { m: step })}`;
+        parts.push(line, this._nameOf(c.entity_hourly));
+        break;
+      }
+      case 'extended': {
+        if (c.entity_extended) parts.push(this._nameOf(c.entity_extended));
+        break;
+      }
+    }
+    return parts.filter(Boolean).join(' · ');
   }
 
   protected render(): TemplateResult | void {
@@ -2792,6 +2890,18 @@ get _forecast_type(): string {
     }
     .topic-title {
       flex: 1;
+    }
+    .title-stack {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .row-summary {
+      font-size: 12px;
+      color: var(--secondary-text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .topic-chevron {
       color: var(--secondary-text-color);

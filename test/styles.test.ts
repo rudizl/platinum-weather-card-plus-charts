@@ -215,12 +215,14 @@ describe('every section row is the same width', () => {
       expect(m![1], `${row} is drawn by _sectionRow`).toContain('this._sectionRow(');
     }
     const draw = /private _sectionRow\([\s\S]*?\n  \}\n/.exec(editor)![0];
-    const [moves, still] = draw.split(' : html`');
+    // the two branches of the arrows: from the test of movable to the end of the one that does not move
+    const arrows = draw.slice(draw.indexOf('${movable ? html`'));
+    const [moves, still] = [arrows.slice(0, arrows.indexOf('` : html`')), arrows.slice(arrows.indexOf('` : html`') + 9)];
     const count = (s: string) => (s.match(/<ha-icon-button/g) ?? []).length + (s.match(/<div class="no-icon"><\/div>/g) ?? []).length;
     // the pencil is after both branches, so it counts once for each
-    const pencil = (draw.slice(draw.lastIndexOf('`}')).match(/<ha-icon-button/g) ?? []).length;
+    const pencil = (arrows.slice(arrows.indexOf('`}')).match(/<ha-icon-button/g) ?? []).length;
     expect(pencil, 'the pencil').toBe(1);
-    expect(count(moves.slice(moves.indexOf('${movable ? html`'))), 'a row that moves: two arrows').toBe(2);
+    expect(count(moves), 'a row that moves: two arrows').toBe(2);
     expect(count(still.slice(0, still.indexOf('`}'))), 'a row that does not: two spacers').toBe(2);
   });
 });
