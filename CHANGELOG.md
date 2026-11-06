@@ -2,6 +2,12 @@
 
 All notable changes to Platinum Weather Card Plus Charts. The newest version is at the top. Each version lists what was **added**, what **changed** and what was **fixed**; the notes of every release, with the same text, are on the [releases page](https://github.com/rudizl/platinum-weather-card-plus-charts/releases).
 
+## 2.6.1 (unreleased)
+
+### Fixed
+
+- **The big icon of the default pack starts at the top of the figures for every condition** (#40). The drawings leave the place of the sun empty when there is none, so a plain cloud, the wind, fog, snow, rain without a sun, a storm and the moon by night sat lower than the figures of the temperature: the wind by 22 px, fog by 40, the moon by 5. Each of those 77 icons (animated and static) has a viewBox now that raises the drawing by exactly that and keeps its size; measured in the card, the top of the drawing is 0 to 2 px from the top of the figures for every condition. The animated hurricane is left as it is: it spins, and at some moment fills the box. The days and the hours use the same files, so their icons line up at the top as well. Five tests; the measurement is in `scripts/measure-icon-tops.py`.
+
 ## 2.6.0 (2026-11-06)
 
 **In short:** one weather entity is enough for a whole card, and the card offers itself under *Add to dashboard → By entity*; the lists of the editor offer what each field can read; a twice-daily forecast fills the strip and the charts; the hourly strip has the chance of rain and a moon at night; Sager has a sky at night; a warning that names two hazards shows both; a sky that is wholly covered is drawn as one; and the fixes below.
