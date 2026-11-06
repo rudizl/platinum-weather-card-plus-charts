@@ -206,13 +206,15 @@ describe('the hourly settings', () => {
     // and says a great deal more.
     const getter = /get hourlyForecast\(\)[\s\S]*?\n  \}/.exec(card)![0];
     expect(getter).toContain('hourly_forecast_step');
-    expect(getter).toMatch(/i % Math\.round\(step\) === 0/);
+    expect(getter).toMatch(/const n = Math\.round\(step\)/);
+    expect(getter).toMatch(/i % n === 0/);
   });
 
   it('always keeps the first hour when stepping', () => {
     // It is the hour you are standing in; dropping it would be odd.
     const getter = /get hourlyForecast\(\)[\s\S]*?\n  \}/.exec(card)![0];
-    expect(getter).toMatch(/i % Math\.round\(step\) === 0/);
+    expect(getter).toMatch(/const n = Math\.round\(step\)/);
+    expect(getter).toMatch(/i % n === 0/);
     expect([0, 3, 6].every((i) => i % 3 === 0)).toBe(true);
   });
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import '../src/platinum-weather-card';
-import { makeHass, baseConfig, renderCard } from './helpers';
+import { makeHass, baseConfig, renderCard, forgetSharedState } from './helpers';
 
 // What the main icon shows when the sensors and the provider disagree, run
 // through the card rather than read out of its source: the correction has two
@@ -66,10 +66,7 @@ async function swapStates(el: Card, s: Scene) {
 
 beforeEach(() => {
   // the held gauge reading and the cloud band live on the class
-  const cls = customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown>;
-  cls._gaugeSeen = null;
-  cls._cloudBand = null;
-  cls._cloudSamples = [];
+  forgetSharedState();
 });
 afterEach(() => vi.useRealTimers());
 
@@ -212,5 +209,94 @@ describe('the icon packs and the names the card can produce', () => {
       const el = await mount({ condition: 'rainy', rain: '0.0', solar: '0', sunState: 'below_horizon', elevation: -22, config: { icon_pack: pack } });
       expect(iconSrc(el), pack).not.toMatch(/not-available/);
     }
+  });
+});
+
+describe('a gauge that only ticks', () => {
+  // The piezo gauge reports in steps of 0.6 mm/h: in a light shower it shows 0.6 for ten minutes
+  // and 0.0 between the ticks. On 19 October, 20:33 to 23:48, it made five bursts with gaps of
+  // two and five minutes and a lull of a hundred. Read as it stands, each gap handed the icon
+  // back to the provider's rain and the next tick took it away again: ten changes in three hours.
+  const night: Scene = { condition: 'rainy', solar: '0', sunState: 'below_horizon', elevation: -22 };
+  const minutes = (n: number) => n * 60000;
+  const T0 = new Date('2026-10-19T17:33:00Z').getTime();
+
+  it('counts a tick as raining for fifteen minutes, so a gap between ticks is not a dry spell', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(T0);
+    const el = await mount({ ...night, rain: '0.6' });
+    expect(iconSrc(el)).toMatch(/rainy/);
+    vi.setSystemTime(T0 + minutes(5));
+    await swapStates(el, { ...night, rain: '0.0' });
+    expect(iconSrc(el), 'the icon changed in a five-minute gap').toMatch(/rainy/);
+    vi.setSystemTime(T0 + minutes(14));
+    await swapStates(el, { ...night, rain: '0.0' });
+    expect(iconSrc(el)).toMatch(/rainy/);
+  });
+
+  it('and lets go after that: a lull of an hour is a dry spell', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(T0);
+    const el = await mount({ ...night, rain: '0.6' });
+    vi.setSystemTime(T0 + minutes(16));
+    await swapStates(el, { ...night, rain: '0.0' });
+    expect(iconSrc(el), 'sixteen minutes after the tick').not.toMatch(/rainy/);
+  });
+
+  it('starts the fifteen minutes again at every tick', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(T0);
+    const el = await mount({ ...night, rain: '0.6' });
+    vi.setSystemTime(T0 + minutes(12));
+    await swapStates(el, { ...night, rain: '0.6' });
+    vi.setSystemTime(T0 + minutes(25));
+    await swapStates(el, { ...night, rain: '0.0' });
+    expect(iconSrc(el), 'thirteen minutes after the second tick').toMatch(/rainy/);
+  });
+
+  it('keeps a shower the provider missed for as long, too', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(T0);
+    const el = await mount({ ...night, condition: 'cloudy', rain: '0.6' });
+    expect(iconSrc(el)).toMatch(/rainy/);
+    vi.setSystemTime(T0 + minutes(8));
+    await swapStates(el, { ...night, condition: 'cloudy', rain: '0.0' });
+    expect(iconSrc(el)).toMatch(/rainy/);
+  });
+
+  it('invents no hold for rain it never saw: a gauge that has read 0.0 all along is dry at once', async () => {
+    const el = await mount({ ...night, rain: '0.0' });
+    expect(iconSrc(el)).not.toMatch(/rainy/);
+  });
+});
+
+describe('a provider that drops out for a moment', () => {
+  // weather.ivarna103 goes 'unavailable' for 0.2 to 0.5 seconds at the top of every hour,
+  // and the card drew the unknown icon, N/A, for as long as it lasted.
+  const day: Scene = { condition: 'cloudy', rain: null, solar: '300', sunState: 'above_horizon', elevation: 30 };
+
+  it('keeps showing the last weather through it', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-19T09:00:00Z'));
+    const el = await mount(day);
+    const before = iconSrc(el);
+    expect(before).not.toMatch(/unknown/);
+    vi.setSystemTime(new Date('2026-10-19T09:00:03Z'));
+    await swapStates(el, { ...day, condition: 'unavailable' });
+    expect(iconSrc(el), 'the icon changed while the provider was out').toBe(before);
+  });
+
+  it('lets go after ten seconds: a provider that has gone has gone', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-19T09:00:00Z'));
+    const el = await mount(day);
+    vi.setSystemTime(new Date('2026-10-19T09:00:11Z'));
+    await swapStates(el, { ...day, condition: 'unavailable' });
+    expect(iconSrc(el)).toMatch(/unknown/);
+  });
+
+  it('invents no weather it never had', async () => {
+    const el = await mount({ ...day, condition: 'unavailable' });
+    expect(iconSrc(el)).toMatch(/unknown/);
   });
 });

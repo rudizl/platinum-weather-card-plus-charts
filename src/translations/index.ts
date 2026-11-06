@@ -23,7 +23,9 @@ export const TRANSLATIONS: Record<string, Translation> = { en, bg, da, de, es, f
 function resolveLang(input: string | undefined): string {
   const raw = (input || 'en').toLowerCase();
   if (raw.startsWith('sr')) return raw.includes('latn') ? 'sr-Latn' : 'sr';
-  return raw.split('-')[0];
+  const base = raw.split('-')[0];
+  // Home Assistant names Ukrainian `uk` (ISO 639-1); the card's Ukrainian is `ua`
+  return base === 'uk' ? 'ua' : base;
 }
 
 // Editor string: keyed by HA UI language, falls back to English, then the key itself

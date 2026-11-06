@@ -40,6 +40,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   show_section_extended?: boolean;
   show_section_slots?: boolean;
   show_section_daily_forecast?: boolean;
+  show_section_charts?: boolean;
   overview_layout?: layoutOverview;
   text_card_title?: string;
   text_card_title_2?: string;
@@ -147,8 +148,11 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   hourly_forecast_step?: number;
   show_section_hourly_forecast?: boolean;
   option_hourly_precipitation?: boolean;
+  option_hourly_pop?: boolean;
+  option_editor_all_entities?: boolean;
   option_hourly_wind?: boolean;
   option_hourly_shade_night?: boolean;
+  option_hourly_group?: boolean;
   entity_lightning_distance?: string;
   entity_lightning_azimuth?: string;
   option_lightning_max_distance?: number;
@@ -167,6 +171,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_show_forecast_wind?: boolean;
   option_show_forecast_pop?: boolean;
   option_pressure_decimals?: pressureDecimals;
+  pressure_units?: string;
   option_wind_decimals?: windDecimals;
   option_extended_separator?: boolean;
   forecast_text_alignment?: 'left' | 'center' | 'right';
@@ -183,6 +188,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_cloud_min_elevation_am?: number;
   option_cloud_min_elevation_pm?: number;
   option_color_fire_danger?: boolean;
+  option_daily_color_fire_danger?: boolean;
 
   option_locale?: string;
   option_static_icons?: boolean;
@@ -193,6 +199,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
 
   //tjl added.  This is where the subscribe entity/events go to
   weather_entity: string;
+  forecast_type?: 'daily' | 'twice_daily' | 'hourly' | 'legacy';
 
  //tjl used in code but missing here, so added
   tempformat?: string;

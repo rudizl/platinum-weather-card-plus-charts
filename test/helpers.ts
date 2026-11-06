@@ -128,8 +128,19 @@ export function makeForecast(days: number, startOffset = 0) {
   return out;
 }
 
+// The lines of the warning row that the card draws at its top for an entity that is missing.
 export function warnings(el: HTMLElement): string[] {
-  return Array.from(el.shadowRoot?.querySelectorAll('hui-warning div') ?? [])
-    .map((d) => d.textContent ?? '')
-    .filter((t) => t && t !== 'Weather Card');
+  return Array.from(el.shadowRoot?.querySelectorAll('.config-warning .config-warning-text') ?? [])
+    .map((d) => (d.textContent ?? '').trim())
+    .filter((t) => t);
+}
+
+// What the card remembers between readings lives on the class, per sensor (see the static fields of the card): a test that needs a clean
+// slate forgets all of it.
+export function forgetSharedState(): void {
+  const C = customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown> | undefined;
+  if (!C) return;
+  for (const f of ['_cloudSamples', '_cloudBand', '_lastDaylightCloud', '_lastRain', '_gaugeSeen', '_gaugeRain', '_lastCondition']) {
+    (C[f] as Map<string, unknown>).clear();
+  }
 }
