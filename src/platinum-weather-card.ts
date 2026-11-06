@@ -27,6 +27,7 @@ import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidal
 import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
 import { iconData } from './icon-packs';
+import { kmPer } from './distance';
 
 
 // What the overview and the slots read their figures from: today's condition, the
@@ -1075,19 +1076,22 @@ export class PlatinumWeatherCard extends LitElement {
   // MeteoAlarm row is, so it belongs in the same section rather than in a slot
   // that would sit empty almost always. The severity comes from the distance,
   // which is the only thing a strike detector can tell you about urgency.
-  // How far away the storm is, in the unit the sensor gives, or null: no sensor, no reading, or beyond
-  // the range (option_lightning_max_distance, fifty by default). The bar and the weather behind the
-  // card both ask here, so they speak of the same storm.
-  private _lightningDistance(): number | null {
+  // How far away the storm is, or null: no sensor, no reading, or beyond the range. The bar and the weather behind the card both ask
+  // here, so they speak of the same storm. The distance is in the unit of its entity (#38), and in kilometres for what is reckoned in
+  // them: the colours of the bar and the flashes of the effects. The range stays in the unit of the entity, as it has always been
+  // compared, so a value someone set keeps meaning what it meant; left unset, it is 50 km in that unit (option_lightning_max_distance).
+  private _lightningDistance(): { distance: number; km: number; unit: string } | null {
     const distEntity = this._config?.entity_lightning_distance;
     if (!distEntity) return null;
     const distState = this.hass?.states?.[distEntity];
     if (!distState || distState.state === 'unknown' || distState.state === 'unavailable') return null;
     const distance = Number(distState.state);
     if (!isFinite(distance)) return null;
+    const unit = distState.attributes?.unit_of_measurement ?? 'km';
+    const perUnit = kmPer(unit);
     const threshold = Number(this._config.option_lightning_max_distance);
-    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50;
-    return distance > limit ? null : distance;
+    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50 / perUnit;
+    return distance > limit ? null : { distance, km: distance * perUnit, unit };
   }
 
   // soft (the default) or classic: a word it does not know is the default
@@ -1096,20 +1100,19 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   private _renderLightningWarning(): TemplateResult {
-    const distance = this._lightningDistance();
-    if (distance === null) return html``;
-    const distState = this.hass.states[this._config.entity_lightning_distance as string];
+    const storm = this._lightningDistance();
+    if (storm === null) return html``;
+    const { distance, km, unit } = storm;
 
     // Red within fifteen kilometres — near enough that the next strike could be
     // overhead; amber to thirty; yellow beyond.
-    const levelNum = distance <= 15 ? '4' : distance <= 30 ? '3' : '2';
+    const levelNum = km <= 15 ? '4' : km <= 30 ? '3' : '2';
     const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum]!;
     const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum]!;
     const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum]!;
     const levelClass = levelNum === '4' ? 'warning-row level-red'
       : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
 
-    const unit = distState.attributes?.unit_of_measurement ?? 'km';
     let direction = '';
     const bearingEntity = this._config.entity_lightning_azimuth;
     const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
@@ -4258,7 +4261,7 @@ export class PlatinumWeatherCard extends LitElement {
       rainRateMmH: this._gaugeRateForIcon(),
       cloudFraction: this.measuredCloudFraction,
       beaufort: Number.isFinite(force) ? force : null,
-      lightningKm: this._lightningDistance(),
+      lightningKm: this._lightningDistance()?.km ?? null,
       temperatureC: this._temperatureC,
       visibilityKm: this._visibilityKm,
       sunElevation: this._sunAttribute('elevation'),
