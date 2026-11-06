@@ -2274,7 +2274,9 @@ export class PlatinumWeatherCard extends LitElement {
           : forecastData.forecast.slice(0, firstDay + forecastDays))
         : undefined;
   
-    if (this._checkForErrors()) htmlCode.push(this._showConfigWarning(this._error));
+    // An entity that is missing (deleted, renamed, not loaded yet) is a row at the top of the card, inside it: a box of Home Assistant's above the card
+    // pushed the card out of its cell in the sections view, and one missing optional sensor left only the warning to be seen.
+    const configWarning = this._checkForErrors() ? this._showConfigWarning(this._error) : html``;
 
     const sections: TemplateResult[] = [];
     if (this._config.section_order !== undefined) {
@@ -2318,7 +2320,7 @@ export class PlatinumWeatherCard extends LitElement {
           hasAction(this._config.tap_action) ? "0" : undefined
         )}
         ><div class="content">
-          ${sections}
+          ${configWarning}${sections}
         </div>
       </ha-card>
     `);
@@ -4813,10 +4815,10 @@ export class PlatinumWeatherCard extends LitElement {
     // const errorCard = <LovelaceCard>document.createElement('hui-error-card');
     // eslint-disable-next-line no-console
     return html`
-      <hui-warning>
-        <div>Weather Card</div>
-        ${warnings.map(warning => html`<div>${warning}</div>`)}
-      </hui-warning>
+      <div class="config-warning" role="status">
+        <ha-icon class="config-warning-icon" icon="mdi:alert-outline"></ha-icon>
+        <div class="config-warning-lines">${warnings.map(warning => html`<div class="config-warning-text">${warning}</div>`)}</div>
+      </div>
     `;
   }
 
@@ -5171,6 +5173,31 @@ export class PlatinumWeatherCard extends LitElement {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+      .config-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin: 8px 0 4px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: rgba(255, 166, 0, 0.12);
+        color: var(--primary-text-color);
+        font-size: 12px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+      .config-warning-icon {
+        color: var(--warning-color, #ffa600);
+        --mdc-icon-size: 18px;
+        flex: 0 0 auto;
+      }
+      .config-warning-lines {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .config-warning-text {
+        white-space: normal;
       }
       .warning-row.multi .warning-text {
         white-space: normal;

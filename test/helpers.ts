@@ -128,10 +128,11 @@ export function makeForecast(days: number, startOffset = 0) {
   return out;
 }
 
+// The lines of the warning row that the card draws at its top for an entity that is missing.
 export function warnings(el: HTMLElement): string[] {
-  return Array.from(el.shadowRoot?.querySelectorAll('hui-warning div') ?? [])
-    .map((d) => d.textContent ?? '')
-    .filter((t) => t && t !== 'Weather Card');
+  return Array.from(el.shadowRoot?.querySelectorAll('.config-warning .config-warning-text') ?? [])
+    .map((d) => (d.textContent ?? '').trim())
+    .filter((t) => t);
 }
 
 // What the card remembers between readings lives on the class, per sensor (see the static fields of the card): a test that needs a clean
