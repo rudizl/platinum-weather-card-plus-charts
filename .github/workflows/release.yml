@@ -54,7 +54,8 @@ jobs:
           LINE='> ⭐ Enjoying the card? [Star the repository](https://github.com/${{ github.repository }}) and/or [buy me a beer 🍺](https://www.buymeacoffee.com/rudizl). Thank you!'
           BODY="$(gh release view "$TAG" --json body --jq .body)"
           case "$BODY" in
-            "> ⭐ Enjoying the card?"*) echo "The support line is already at the top." ;;
+            # the notes may ask for a star and a beer in their own words (the notes of a stable release do): then they need no second line
+            "> ⭐ Enjoying the card?"*|*"buymeacoffee.com/rudizl"*) echo "The support line, or a link to the beer, is already in the notes." ;;
             *) printf '%s\n\n%s\n' "$LINE" "$BODY" > "$RUNNER_TEMP/notes.md"
                gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
                echo "The support line was added." ;;
