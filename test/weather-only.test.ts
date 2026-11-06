@@ -61,7 +61,7 @@ describe('a weather_entity and nothing else to read from', () => {
   });
   it('draws the condition icon from the entity\'s state', async () => {
     const rainy = await mount(only, states({}, {}, 'rainy'));
-    expect(rainy.shadowRoot?.querySelector('.big-icon img')?.getAttribute('src')).toMatch(/rainy/);
+    expect(rainy.shadowRoot?.querySelector('.big-icon img')?.getAttribute('data-icon')).toMatch(/rainy/);
   });
   it('uses the dew point for the comfort word', async () => {
     const el = await mount({ ...only, option_show_comfort: true });

@@ -43,7 +43,8 @@ async function card(forecast: Entry[], extra: Record<string, unknown> = {}) {
 const dayColumns = (el: HTMLElement) => el.shadowRoot?.querySelectorAll('.dayname').length ?? 0;
 const columns = (el: HTMLElement) => [...(el.shadowRoot?.querySelectorAll('ul.f-slot-horiz') ?? [])];
 const text = (col: Element, sel: string) => (col.querySelector(sel)?.textContent ?? '').replace(/\s+/g, ' ').trim();
-const icon = (col: Element) => col.querySelector('.icon')?.getAttribute('style') ?? '';
+// the icon is named in data-icon (#41): src and the style hold the picture itself, from the module of its pack
+const icon = (col: Element) => col.querySelector('.icon')?.getAttribute('data-icon') ?? '';
 const chartPoints = (el: HTMLElement) => {
   const pts = el.shadowRoot?.querySelector('svg polyline')?.getAttribute('points') ?? '';
   return pts.trim() ? pts.trim().split(/\s+/).length : 0;

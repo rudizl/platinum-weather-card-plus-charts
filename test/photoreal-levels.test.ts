@@ -29,7 +29,7 @@ async function card(opts: { cloud?: number; rain?: number; pack?: Record<string,
     ...(opts.pack ?? { icon_pack: 'photoreal' }),
   } as never), hass)) as unknown as Card;
 }
-const picture = (el: Card) => el._getIconUrl(el._weatherIcon('cloudy')).split('/').pop()!.split('?')[0].replace(/\.(svg|png)$/, '');
+const picture = (el: Card) => el._getIconUrl(el._weatherIcon('cloudy')).split('/').pop()!.split('?')[0].replace(/\.(svg|webp)$/, '');
 
 describe('the cloud cover decides the icon, in four bands', () => {
   it.each([[0.10, 'p-clear-day'], [0.40, 'p-mostlysunny-day'], [0.70, 'p-brokenclouds-day'], [0.93, 'p-mostlycloudy-day']])(
@@ -42,13 +42,13 @@ describe('and the provider is not the sensors: a partly cloudy that the provider
   it('with the sensors off, the provider\'s partly cloudy is the partly cloudy picture', async () => {
     const hass = makeHass({ 'weather.home': { state: 'partlycloudy' }, 'sun.sun': { state: 'above_horizon', attributes: { elevation: ELEVATION, azimuth: 150 } } });
     const el = (await renderCard(baseConfig({ weather_entity: 'weather.home', entity_sun: 'sun.sun', icon_pack: 'photoreal' } as never), hass)) as unknown as Card;
-    expect(el._getIconUrl(el._weatherIcon('partlycloudy')).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.png');
+    expect(el._getIconUrl(el._weatherIcon('partlycloudy')).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.webp');
   });
   it('the measured sky does not leak into the icons that come after it: a forecast beside the current conditions is the provider\'s', async () => {
     const el = await card({ cloud: 0.7 });
     expect(picture(el)).toBe('p-brokenclouds-day');
-    expect(el._getIconUrl('cloudy-2-day', true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.png');
-    expect(el._getIconUrl('cloudy-2-day', true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.png');
+    expect(el._getIconUrl('cloudy-2-day', true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.webp');
+    expect(el._getIconUrl('cloudy-2-day', true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-day.webp');
     expect(picture(el)).toBe('p-brokenclouds-day');
   });
   it('and when the sensors measure 55 to 85 per cent, the sky is the broken clouds, whatever the provider says', async () => {

@@ -43,7 +43,8 @@ async function mount(extra: Record<string, unknown>, data: Entry[]) {
 }
 const cols = (el: HTMLElement) => [...(el.shadowRoot?.querySelectorAll('.hourly-col') ?? [])];
 const part = (col: Element, cls: string) => (col.querySelector(`.${cls}`)?.textContent ?? '').replace(/\s+/g, ' ').trim();
-const icon = (col: Element) => col.querySelector('.hourly-icon')?.getAttribute('style') ?? '';
+// the icon is named in data-icon (#41): src and the style hold the picture itself, from the module of its pack
+const icon = (col: Element) => col.querySelector('.hourly-icon')?.getAttribute('data-icon') ?? '';
 
 describe('the hours in a step, with the choice made', () => {
   it('can be added up: the rain of every hour in the group, under the time it starts', async () => {

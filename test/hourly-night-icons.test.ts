@@ -47,7 +47,8 @@ async function mount(data: Entry[], extra: Record<string, unknown> = {}, config:
   } as never), hass)) as HTMLElement & { _getIconUrl: (n: string, f?: boolean) => string };
 }
 const cols = (el: HTMLElement) => [...(el.shadowRoot?.querySelectorAll('.hourly-col') ?? [])];
-const icon = (col: Element) => col.querySelector('.hourly-icon')?.getAttribute('style') ?? '';
+// the icon is named in data-icon (#41): src and the style hold the picture itself, from the module of its pack
+const icon = (col: Element) => col.querySelector('.hourly-icon')?.getAttribute('data-icon') ?? '';
 
 describe('the icon of an hour is the icon of its sky', () => {
   it('a clear sky at night is the moon, and by day the sun', async () => {
@@ -69,8 +70,8 @@ describe('the icon of an hour is the icon of its sky', () => {
   });
   it('the same in the photoreal pack: the moon and the sun of its own', async () => {
     const c = cols(await mount(entries(), { icon_pack: 'photoreal' }));
-    expect(icon(c[0])).toMatch(/p-clear-night\.png/);
-    expect(icon(c[5])).toMatch(/p-clear-day\.png/);
+    expect(icon(c[0])).toMatch(/p-clear-night\.webp/);
+    expect(icon(c[5])).toMatch(/p-clear-day\.webp/);
   });
   it('and for the other skies that have a night: partly cloudy is a moon behind a cloud', async () => {
     const c = cols(await mount(entries(() => ({ condition: 'partlycloudy' }))));

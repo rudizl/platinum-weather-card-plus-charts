@@ -26,12 +26,9 @@ import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
 import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
+import { iconData } from './icon-packs';
 
 
-// the revision of the photoreal pictures (dist/p-*.png): 1 was the first release, 2 the partly cloudy, the fog and the alignment,
-// 3 the fog as three bands of mist and nothing else, 4 the sun drawn as the example (yellow, orange at the heart),
-// 5 the fog as one soft mass of mist
-const PHOTOREAL_REVISION = 8;
 // What the overview and the slots read their figures from: today's condition, the
 // measurements, and today's high and low. A card that has a weather_entity and
 // none of these takes them all from that entity, which the card can already read
@@ -887,7 +884,7 @@ export class PlatinumWeatherCard extends LitElement {
     const url = { href: this._getIconUrl(weatherIcon) };
     const hoverText = weatherIcon !== 'unknown' ? '' : `Unknown condition\n${this.forecastIcon}`;
     const unknownDiv = weatherIcon !== 'unknown' ? html`` : html`<div class="unknown-forecast">${this.forecastIcon}</div>`;
-    const biggerIcon = html`<div class="${this._bigIconClass}"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
+    const biggerIcon = html`<div class="${this._bigIconClass}"><img src="${this._iconSrc(url.href)}" data-icon="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
 
     const currentTemp = html`
       <div class="current-temp${this._overviewTapEntity('temperature') ? ' overview-tappable' : ''}"
@@ -994,7 +991,7 @@ export class PlatinumWeatherCard extends LitElement {
     const url = { href: this._getIconUrl(weatherIcon) };
     const hoverText = weatherIcon !== 'unknown' ? '' : `Unknown condition\n${this.forecastIcon}`;
     const unknownDiv = weatherIcon !== 'unknown' ? html`` : html`<div class="unknown-forecast">${this.forecastIcon}</div>`;
-    const biggerIcon = html`<div class="${this._bigIconClass}"><img src="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
+    const biggerIcon = html`<div class="${this._bigIconClass}"><img src="${this._iconSrc(url.href)}" data-icon="${url.href}" width="100%" height="100%" title="${hoverText}"></div>`;
 
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
@@ -1364,7 +1361,7 @@ export class PlatinumWeatherCard extends LitElement {
         }
 
         const url = { href: this._getIconUrl(iconEntity && condition ? this._weatherIcon(condition) : 'unknown', true) };
-        htmlIcon = html`<li class="f-slot-horiz-icon"><i class="icon" style="background: none, url(${url.href}) no-repeat; background-size: contain;"></i></li>`;
+        htmlIcon = html`<li class="f-slot-horiz-icon"><i class="icon" data-icon="${url.href}" style="background: none, url(&quot;${this._iconSrc(url.href)}&quot;) no-repeat; background-size: contain;"></i></li>`;
       } else {
         // using sensor domain entities
         var start = this._config.entity_forecast_icon_1 ? this._config.entity_forecast_icon_1.match(/(\d+)(?!.*\d)/g) : false;
@@ -1373,7 +1370,7 @@ export class PlatinumWeatherCard extends LitElement {
           break;
         }
         const url = { href: this._getIconUrl(iconEntity && this.hass.states[iconEntity] ? this._weatherIcon(this.hass.states[iconEntity].state) : 'unknown', true) };
-        htmlIcon = html`<i class="icon" style="background: none, url(${url.href}) no-repeat; background-size: contain;"></i>`;
+        htmlIcon = html`<i class="icon" data-icon="${url.href}" style="background: none, url(&quot;${this._iconSrc(url.href)}&quot;) no-repeat; background-size: contain;"></i>`;
       }
       if (this._config.entity_forecast_max_1?.match('^weather.')) {
 
@@ -1583,7 +1580,7 @@ export class PlatinumWeatherCard extends LitElement {
         }
 
         const url = { href: this._getIconUrl(iconEntity && condition ? this._weatherIcon(condition) : 'unknown', true) };
-        htmlIcon = html`<i class="icon" style="background: none, url(${url.href}) no-repeat; background-size: contain;"></i><br>`;
+        htmlIcon = html`<i class="icon" data-icon="${url.href}" style="background: none, url(&quot;${this._iconSrc(url.href)}&quot;) no-repeat; background-size: contain;"></i><br>`;
       } else {
         // using sensor domain entities
         var start = this._config.entity_forecast_icon_1 ? this._config.entity_forecast_icon_1.match(/(\d+)(?!.*\d)/g) : false;
@@ -1592,7 +1589,7 @@ export class PlatinumWeatherCard extends LitElement {
           break;
         }
         const url = { href: this._getIconUrl(this.hass.states[iconEntity] !== undefined ? this._weatherIcon(this.hass.states[iconEntity].state) : 'unknown', true) };
-        htmlIcon = html`<i class="icon" style="background: none, url(${url.href}) no-repeat; background-size: contain;"></i><br>`;
+        htmlIcon = html`<i class="icon" data-icon="${url.href}" style="background: none, url(&quot;${this._iconSrc(url.href)}&quot;) no-repeat; background-size: contain;"></i><br>`;
       }
 
       //tjl Feature add for entity_summary_1.  Add support for weather entity using the forecast attribute 'condition'. 
@@ -1996,7 +1993,7 @@ export class PlatinumWeatherCard extends LitElement {
       return html`
         <div class="hourly-col${night ? ' hourly-night' : ''}">
           <div class="hourly-time">${time}</div>
-          <i class="icon hourly-icon" style="background: none, url(${url}) no-repeat; background-size: contain;"></i>
+          <i class="icon hourly-icon" data-icon="${url}" style="background: none, url(&quot;${this._iconSrc(url)}&quot;) no-repeat; background-size: contain;"></i>
           <div class="hourly-temp">${temp}</div>
           ${pop}
           ${rain}
@@ -4460,16 +4457,24 @@ export class PlatinumWeatherCard extends LitElement {
     const metName = this._iconToMeteocons(adjusted);
     if (pack === 'meteocons-fill') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/${metName}.svg`;
     if (pack === 'meteocons-line') return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/${metName}.svg`;
-    // The photoreal pack is twenty PNGs beside the card (p-<name>.png): the names of the custom pack, and five more for the levels
-    // The revision is in the address: Home Assistant serves the pictures with a cache of 31 days, so a picture that is
-    // redrawn under the same name would not reach a phone that has the old one. Raise it when a picture changes.
-    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + this._iconToPhotoreal(adjusted, measured) + '.png?r=' + PHOTOREAL_REVISION;
+    // The photoreal pack is WebPs in one module beside the card (p-<name>.webp, #41): the names of the custom pack, and more for the levels.
+    // The pack is asked for with the version of the card in its address, which is what keeps a phone from showing an older picture.
+    if (pack === 'photoreal') return this._iconBaseUrl() + 'p-' + this._iconToPhotoreal(adjusted, measured) + '.webp';
     if (pack === 'custom' && this._config?.icon_pack_path)
       return this._config.icon_pack_path.replace('{condition}', wccName);
 
     // fallback to default
     const prefix = this._config?.option_static_icons ? 's-' : 'a-';
     return this._iconBaseUrl() + prefix + adjusted + '.svg';
+  }
+
+  // The picture for an icon address: a file of the card's own packs is taken from the module of its pack (#41), and any other address
+  // (a CDN, a custom path) is the address. _getIconUrl keeps naming the file, which says which picture it is.
+  private _iconSrc(url: string): string {
+    const base = this._iconBaseUrl();
+    if (!url.startsWith(base)) return url;
+    const file = url.slice(base.length).split('?')[0];
+    return iconData(base, file, CARD_VERSION, () => this.requestUpdate()) ?? url;
   }
 
   // Base directory of the card JS — strips filename AND query string

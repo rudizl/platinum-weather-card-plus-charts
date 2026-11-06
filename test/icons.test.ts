@@ -7,7 +7,9 @@ import { makeHass, baseConfig, renderCard } from './helpers';
 // Icons are the one part of the card a user notices instantly when it is wrong:
 // a moon at midday, or a missing file leaving an empty square.
 
-const DIST = join(__dirname, '..', 'dist');
+// the icons that the release carries, in the modules made from icons/animated and icons/static (#41)
+const ICONS = [join(__dirname, '..', 'icons', 'animated'), join(__dirname, '..', 'icons', 'static')];
+const shippedFiles = () => ICONS.flatMap((d) => readdirSync(d));
 const cardSource = join(__dirname, '..', 'src', 'platinum-weather-card.ts');
 
 async function cardWithCondition(
@@ -38,7 +40,7 @@ async function cardWithCondition(
 function iconSrc(el: HTMLElement): string {
   const img = el.shadowRoot?.querySelector('.icon, img, .conditions');
   return (
-    img?.getAttribute('src') ??
+    img?.getAttribute('data-icon') ??
     (img as HTMLElement | null)?.style?.backgroundImage ??
     el.shadowRoot?.innerHTML.match(/[\w-]+\.svg/)?.[0] ??
     ''
@@ -114,9 +116,8 @@ describe('every condition resolves to an icon', () => {
 
 describe('the icon files exist', () => {
   it('ships every icon the card can ask for', () => {
-    if (!existsSync(DIST)) return; // nothing built yet
-    const shipped = new Set(readdirSync(DIST).filter((f) => f.endsWith('.svg')));
-    expect(shipped.size, 'no icons in dist').toBeGreaterThan(50);
+    const shipped = new Set(shippedFiles().filter((f) => f.endsWith('.svg')));
+    expect(shipped.size, 'no icons in icons/').toBeGreaterThan(50);
 
     // Both variants must exist for anything with a day/night form: a missing
     // night file leaves an empty square after sunset.
@@ -131,8 +132,7 @@ describe('the icon files exist', () => {
   });
 
   it('ships both icon sets', () => {
-    if (!existsSync(DIST)) return;
-    const files = readdirSync(DIST).filter((f) => f.endsWith('.svg'));
+    const files = shippedFiles().filter((f) => f.endsWith('.svg'));
     // 'a-' animated and 's-' static
     expect(files.some((f) => f.startsWith('a-')), 'no animated icons').toBe(true);
     expect(files.some((f) => f.startsWith('s-')), 'no static icons').toBe(true);

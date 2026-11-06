@@ -68,7 +68,7 @@ describe('the vertical layout, from a weather entity', () => {
   it('shows an icon for the condition of each day', async () => {
     const f = makeForecast(8, 0).map((d, i) => ({ ...d, condition: i === 1 ? 'rainy' : 'sunny' }));
     const el = await mount(cfg, weather(), f);
-    const icons = all(el, '.day-vert-dayicon .icon').map((n) => n.getAttribute('style') ?? '');
+    const icons = all(el, '.day-vert-dayicon .icon').map((n) => n.getAttribute('data-icon') ?? '');
     expect(icons[1]).toMatch(/rainy/);
     expect(icons[0]).not.toMatch(/rainy/);
   });

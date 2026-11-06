@@ -6,12 +6,12 @@ import '../src/editor';
 import { render } from 'lit';
 import { makeHass, baseConfig, renderCard } from './helpers';
 
-// The photoreal pack: twenty PNG pictures with a transparent background, a flat file each beside the card's own
-// (the release uploads dist/* flat), named p-<name>.png: the fifteen names the custom pack asks for, and five more for
+// The photoreal pack: WebP pictures with a transparent background, kept in icons/photoreal and shipped in one module beside the
+// card (dist/icons-photoreal.js, #41; they were PNGs, a flat file each, until 2.7), named p-<name>.webp: the fifteen names the custom pack asks for, and five more for
 // the levels of the sky and of the rain, which the custom pack does not ask for, and three for what is not a tornado and was drawn as one (a tropical storm, dust, a name
 // that is not known).
 
-const DIST = resolve(__dirname, '../dist');
+const DIST = resolve(__dirname, '../icons/photoreal');
 const NAMES = ['clear-day', 'clear-night', 'partlycloudy-day', 'partlycloudy-night', 'cloudy', 'fog', 'rain', 'pouring',
   'snow', 'sleet', 'hail', 'lightning', 'lightning-rain', 'wind', 'exceptional',
   'mostlysunny-day', 'mostlysunny-night', 'mostlycloudy-day', 'mostlycloudy-night', 'lightrain',
@@ -23,44 +23,53 @@ async function card(config: Record<string, unknown> = {}) {
   return (await renderCard(baseConfig({ icon_pack: 'photoreal', ...config } as never), makeHass({ 'weather.home': { state: 'cloudy' } }))) as unknown as Card;
 }
 
+// A WebP of a picture with a transparent background is RIFF....WEBP with a VP8X chunk, whose flags carry the alpha bit
+// and whose canvas is 24 bits of width less one and 24 of height less one.
+function webp(n: string) {
+  const b = readFileSync(resolve(DIST, `p-${n}.webp`));
+  return { b, riff: b.subarray(0, 4).toString('latin1'), kind: b.subarray(8, 12).toString('latin1'), chunk: b.subarray(12, 16).toString('latin1'),
+    alpha: (b[20] & 0x10) !== 0, w: 1 + b.readUIntLE(24, 3), h: 1 + b.readUIntLE(27, 3) };
+}
+
 describe('the files', () => {
-  it('there are twenty-five, each p-<name>.png, in dist, where the release takes them from', () => {
-    for (const n of NAMES) expect(existsSync(resolve(DIST, `p-${n}.png`)), `p-${n}.png`).toBe(true);
-    expect(readdirSync(DIST).filter((f) => /^p-.*\.png$/.test(f)).sort()).toEqual(NAMES.map((n) => `p-${n}.png`).sort());
+  it('there are twenty-five, each p-<name>.webp, in icons/photoreal, which the build puts in the module of the pack', () => {
+    for (const n of NAMES) expect(existsSync(resolve(DIST, `p-${n}.webp`)), `p-${n}.webp`).toBe(true);
+    expect(readdirSync(DIST).filter((f) => /^p-.*\.webp$/.test(f)).sort()).toEqual(NAMES.map((n) => `p-${n}.webp`).sort());
   });
-  it('each is a real PNG with an alpha channel: a picture that has a background of its own is not an icon', () => {
+  it('each is a real WebP with an alpha channel: a picture that has a background of its own is not an icon', () => {
     for (const n of NAMES) {
-      const b = readFileSync(resolve(DIST, `p-${n}.png`));
-      expect(b.subarray(0, 8).toString('hex'), n).toBe('89504e470d0a1a0a');
-      expect(b[25], `${n}: colour type (6 is RGBA)`).toBe(6);
+      const f = webp(n);
+      expect([f.riff, f.kind], n).toEqual(['RIFF', 'WEBP']);
+      expect(f.chunk, `${n}: an extended WebP, which is the one that can carry an alpha channel`).toBe('VP8X');
+      expect(f.alpha, `${n}: the alpha bit`).toBe(true);
     }
   });
   it('each is square, and not so large that the card is slow to start', () => {
     for (const n of NAMES) {
-      const b = readFileSync(resolve(DIST, `p-${n}.png`));
-      const w = b.readUInt32BE(16), h = b.readUInt32BE(20);
-      expect(w, n).toBe(h);
-      expect(w, n).toBeGreaterThanOrEqual(256);
-      expect(w, n).toBeLessThanOrEqual(512);
-      expect(statSync(resolve(DIST, `p-${n}.png`)).size / 1024, `${n} in KB`).toBeLessThan(180);
+      const f = webp(n);
+      expect(f.w, n).toBe(f.h);
+      expect(f.w, n).toBeGreaterThanOrEqual(256);
+      expect(f.w, n).toBeLessThanOrEqual(512);
+      expect(statSync(resolve(DIST, `p-${n}.webp`)).size / 1024, `${n} in KB`).toBeLessThan(60);
     }
-    const total = NAMES.reduce((s, n) => s + statSync(resolve(DIST, `p-${n}.png`)).size, 0) / 1024 / 1024;
-    expect(total, 'all of them, in MB').toBeLessThan(2.6);
+    const total = NAMES.reduce((s, n) => s + statSync(resolve(DIST, `p-${n}.webp`)).size, 0) / 1024 / 1024;
+    // they were 2.3 MB as PNGs
+    expect(total, 'all of them, in MB').toBeLessThan(0.75);
   });
 });
 
 describe('the pack in the card', () => {
   it('is a picture beside the card, named after the condition', async () => {
     const el = await card();
-    expect(el._getIconUrl('clear-day')).toMatch(/\/p-clear-day\.png\?r=\d+$/);
-    expect(el._getIconUrl('rainy-3-day')).toMatch(/\/p-rain\.png\?r=\d+$/);
-    expect(el._getIconUrl('rainy-3')).toMatch(/\/p-pouring\.png\?r=\d+$/);
-    expect(el._getIconUrl('cloudy-2-night')).toMatch(/\/p-partlycloudy-night\.png\?r=\d+$/);
+    expect(el._getIconUrl('clear-day')).toMatch(/\/p-clear-day\.webp$/);
+    expect(el._getIconUrl('rainy-3-day')).toMatch(/\/p-rain\.webp$/);
+    expect(el._getIconUrl('rainy-3')).toMatch(/\/p-pouring\.webp$/);
+    expect(el._getIconUrl('cloudy-2-night')).toMatch(/\/p-partlycloudy-night\.webp$/);
   });
   it('and is the same place as the card itself, not the Internet and not a path the user has to make', async () => {
     const url = (await card())._getIconUrl('snowy-3');
     expect(url).not.toMatch(/^https?:\/\/(cdn|raw)/);
-    expect(url).toMatch(/p-snow\.png\?r=\d+$/);
+    expect(url).toMatch(/p-snow\.webp$/);
   });
   it('has a picture for every name the card can produce, and the picture is in dist', async () => {
     const el = await card();
@@ -77,14 +86,14 @@ describe('the pack in the card', () => {
     for (const n of names) {
       const url = el._getIconUrl(n);
       const file = url.split('/').pop()!.split('?')[0];
-      if (!/^p-.*\.png$/.test(file) || !existsSync(resolve(DIST, file))) missing.push(`${n} -> ${file}`);
-      if (file === 'p-exceptional.png' && !ON_PURPOSE.has(n)) tornado.push(n);
+      if (!/^p-.*\.webp$/.test(file) || !existsSync(resolve(DIST, file))) missing.push(`${n} -> ${file}`);
+      if (file === 'p-exceptional.webp' && !ON_PURPOSE.has(n)) tornado.push(n);
     }
     expect(missing, 'names that land on a picture that is not there').toEqual([]);
     expect(tornado, 'names that land on the tornado without meaning to').toEqual([]);
   });
   it('the forecast strips use it too', async () => {
-    expect((await card())._getIconUrl('rainy-3-day', true)).toMatch(/p-rain\.png\?r=\d+$/);
+    expect((await card())._getIconUrl('rainy-3-day', true)).toMatch(/p-rain\.webp$/);
   });
   it('another pack is not changed by it', async () => {
     const el = await card({ icon_pack: 'default' });
@@ -100,20 +109,20 @@ describe('the levels of the sky and of the rain look different', () => {
       const f = ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'].map((b) => file(el, `${b}-${t}`));
       expect(new Set(f).size, `${t}: ${f.join(', ')}`).toBe(4);
     }
-    expect(file(el, 'cloudy-1-day')).toBe('p-mostlysunny-day.png');
-    expect(file(el, 'cloudy-2-day')).toBe('p-partlycloudy-day.png');
-    expect(file(el, 'cloudy-3-day')).toBe('p-mostlycloudy-day.png');
-    expect(file(el, 'cloudy-3-night')).toBe('p-mostlycloudy-night.png');
+    expect(file(el, 'cloudy-1-day')).toBe('p-mostlysunny-day.webp');
+    expect(file(el, 'cloudy-2-day')).toBe('p-partlycloudy-day.webp');
+    expect(file(el, 'cloudy-3-day')).toBe('p-mostlycloudy-day.webp');
+    expect(file(el, 'cloudy-3-night')).toBe('p-mostlycloudy-night.webp');
   });
   it('three levels of rain, three pictures: light, rain, pouring', async () => {
     const el = await card();
     const f = [file(el, 'rainy-1-day'), file(el, 'rainy-2-day'), file(el, 'rainy-3')];
-    expect(f).toEqual(['p-lightrain.png', 'p-rain.png', 'p-pouring.png']);
+    expect(f).toEqual(['p-lightrain.webp', 'p-rain.webp', 'p-pouring.webp']);
   });
   it('and the pictures are not the same picture under other names', () => {
     const sums = new Map<string, string>();
     for (const n of NAMES) {
-      const key = readFileSync(resolve(DIST, `p-${n}.png`)).toString('base64');
+      const key = readFileSync(resolve(DIST, `p-${n}.webp`)).toString('base64');
       expect(sums.has(key), `${n} is the same file as ${sums.get(key)}`).toBe(false);
       sums.set(key, n);
     }
@@ -133,14 +142,14 @@ describe('broken clouds: a sun or a moon with torn streaks of cloud, for the sky
   it('what a provider calls partly cloudy is the partly cloudy picture, a sun with a cloud, and so is a forecast of it', async () => {
     const el = await card();
     expect(el._weatherIcon('partlycloudy')).toBe('cloudy-2-day');
-    expect(file(el, el._weatherIcon('partlycloudy'))).toBe('p-partlycloudy-day.png');
-    expect(file(el, 'cloudy-2-day', true)).toBe('p-partlycloudy-day.png');
-    expect(el._getIconUrl('cloudy-2-night', true, true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-night.png');   // an hour that is night, in a forecast
+    expect(file(el, el._weatherIcon('partlycloudy'))).toBe('p-partlycloudy-day.webp');
+    expect(file(el, 'cloudy-2-day', true)).toBe('p-partlycloudy-day.webp');
+    expect(el._getIconUrl('cloudy-2-night', true, true).split('/').pop()!.split('?')[0]).toBe('p-partlycloudy-night.webp');   // an hour that is night, in a forecast
   });
   it('the levels on each side of it are what they were', async () => {
     const el = await card();
-    expect(file(el, 'cloudy-1-day')).toBe('p-mostlysunny-day.png');
-    expect(file(el, 'cloudy-3-night')).toBe('p-mostlycloudy-night.png');
+    expect(file(el, 'cloudy-1-day')).toBe('p-mostlysunny-day.webp');
+    expect(file(el, 'cloudy-3-night')).toBe('p-mostlycloudy-night.webp');
   });
   it('the custom pack has no such picture, and keeps its fifteen names: the second level is partly cloudy there', async () => {
     const el = await card();
@@ -161,40 +170,39 @@ describe('the strange conditions each have a picture of their own, and only the 
   const file = (el: Card, n: string) => el._getIconUrl(n).split('/').pop()!.split('?')[0];
   it('exceptional, a tropical storm, dust and a name that is not known are four different pictures', async () => {
     const el = await card();
-    expect(file(el, 'exceptional')).toBe('p-exceptional.png');
-    expect(file(el, 'tropical-storm')).toBe('p-tropical-storm.png');
-    expect(file(el, 'dust')).toBe('p-dust.png');
-    expect(file(el, 'unknown')).toBe('p-unknown.png');
-  });
-  it('the revision of the pack was raised when the exceptional picture was changed, so that a phone does not keep the vortex, or the small cloud like a wart, for a month (6: the exceptional picture; 7: the 25 to 55 per cent pictures; 8: the broken clouds)', async () => {
-    const el = await card();
-    expect(Number(/\?r=(\d+)$/.exec(el._getIconUrl('exceptional'))![1])).toBeGreaterThanOrEqual(8);
+    expect(file(el, 'exceptional')).toBe('p-exceptional.webp');
+    expect(file(el, 'tropical-storm')).toBe('p-tropical-storm.webp');
+    expect(file(el, 'dust')).toBe('p-dust.webp');
+    expect(file(el, 'unknown')).toBe('p-unknown.webp');
   });
   it('a tornado, a hurricane and an exceptional condition are the exceptional picture', async () => {
     const el = await card();
-    for (const n of ['exceptional', 'tornado', 'hurricane']) expect(file(el, n), n).toBe('p-exceptional.png');
+    for (const n of ['exceptional', 'tornado', 'hurricane']) expect(file(el, n), n).toBe('p-exceptional.webp');
   });
   it('a name that nobody has heard of is the picture of the unknown, and not the exceptional one', async () => {
     const el = await card();
-    for (const n of ['something-new', 'qwerty-day', 'xyz', '']) expect(file(el, n), JSON.stringify(n)).toBe('p-unknown.png');
+    for (const n of ['something-new', 'qwerty-day', 'xyz', '']) expect(file(el, n), JSON.stringify(n)).toBe('p-unknown.webp');
   });
   it('and a name that is new in a family that the card knows is still that family', async () => {
     const el = await card();
-    expect(file(el, 'cloudy-4-day')).toBe('p-cloudy.png');
-    expect(file(el, 'rainy-9-night')).toBe('p-rain.png');
-    expect(file(el, 'snowy-7')).toBe('p-snow.png');
+    expect(file(el, 'cloudy-4-day')).toBe('p-cloudy.webp');
+    expect(file(el, 'rainy-9-night')).toBe('p-rain.webp');
+    expect(file(el, 'snowy-7')).toBe('p-snow.webp');
   });
 });
 
 describe('pictures that change without changing their names', () => {
-  // Home Assistant serves them with a cache of 31 days (max-age=2678400, seen on 23 October), so a phone that has
-  // the old p-rain.png keeps it for a month unless the address changes. The revision is in the address, and
-  // Home Assistant does not mind it.
-  it('the address carries the revision of the pack, the same for every picture', async () => {
+  // Home Assistant serves the files beside a card with a cache of 31 days (max-age=2678400, seen on 23 October), so a phone that has
+  // an old picture keeps it for a month unless the address changes. Until 2.7 a revision of the pack was in the address of each
+  // picture; now the pack is one module, and the version of the card is in its address (#41): a new version is a new address.
+  it('the pack is asked for with the version of the card in its address', async () => {
+    const { packUrl } = await import('../src/icon-packs');
+    const { CARD_VERSION } = await import('../src/const');
+    expect(packUrl('/local/community/x/', 'photoreal', CARD_VERSION)).toBe(`/local/community/x/icons-photoreal.js?v=${encodeURIComponent(CARD_VERSION)}`);
+  });
+  it('and the address of a picture names the file and nothing else, the same way for every picture', async () => {
     const el = await card();
-    const revs = new Set(NAMES.map((n) => /\?r=(\d+)$/.exec(el._getIconUrl(n === 'partlycloudy-day' ? 'cloudy-1-day' : n === 'clear-night' ? 'clear-night' : 'clear-day'))![1]));
-    expect(revs.size).toBe(1);
-    expect(+[...revs][0]).toBeGreaterThanOrEqual(2);
+    for (const n of ['clear-day', 'clear-night', 'cloudy-1-day']) expect(el._getIconUrl(n), n).toMatch(/\/p-[a-z-]+\.webp$/);
   });
 });
 

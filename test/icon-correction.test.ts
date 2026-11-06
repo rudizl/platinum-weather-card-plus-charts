@@ -51,7 +51,7 @@ async function mount(s: Scene = {}): Promise<Card> {
 function iconSrc(el: HTMLElement): string {
   const img = el.shadowRoot?.querySelector('.icon, img, .conditions');
   return (
-    img?.getAttribute('src') ??
+    img?.getAttribute('data-icon') ??
     (img as HTMLElement | null)?.style?.backgroundImage ??
     el.shadowRoot?.innerHTML.match(/[\w-]+\.svg/)?.[0] ??
     ''

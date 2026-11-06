@@ -352,9 +352,8 @@ describe('the corrected icon names a file that exists', () => {
 
 describe('every icon the correction can produce is shipped', () => {
   it('finds a file for each band in both day and night', () => {
-    const dist = join(__dirname, '..', 'dist');
-    if (!existsSync(dist)) return;
-    const files = new Set(readdirSync(dist));
+    // the sets the release carries, as modules made from icons/animated and icons/static (#41)
+    const files = new Set(['animated', 'static'].flatMap((d) => readdirSync(join(__dirname, '..', 'icons', d))));
     for (const band of ['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3']) {
       for (const when of ['day', 'night']) {
         for (const prefix of ['a-', 's-']) {
