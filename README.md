@@ -1,6 +1,8 @@
 <h1 align="center">Platinum Weather Card Plus Charts</h1>
 
-A mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) and [Weather Chart Card](https://github.com/mlamberts78/weather-chart-card) — two of the best weather cards for Home Assistant, neither of which has seen active development for a while. I used to run Weather Chart Card on my main dashboard and Platinum on a dedicated weather view. At some point it felt pointless to maintain two separate cards with overlapping functionality, so I merged them as far as makes sense.
+**One card for the weather now, by day and by hour, with charts, severe-weather and lightning warnings, and a local Sager or Zambretti forecast.** One weather entity is enough to start; add your own station's sensors where you have them. In fifteen languages.
+
+It started as a mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) and [Weather Chart Card](https://github.com/mlamberts78/weather-chart-card) — two of the best weather cards for Home Assistant, neither of which has seen active development for a while. I used to run Weather Chart Card on my main dashboard and Platinum on a dedicated weather view. At some point it felt pointless to maintain two separate cards with overlapping functionality, so I merged them as far as makes sense.
 
 Based on the original Platinum Weather Card by [@makin-things](https://www.github.com/makin-things), extended by [@tommyjlong](https://github.com/tommyjlong). Weather Chart Card by [@mlamberts78](https://github.com/mlamberts78). Maintained and further developed here by me, [@rudizl](https://github.com/rudizl). If you like my work, you can <a href="https://buymeacoffee.com/rudizl"><img src="https://img.shields.io/badge/-Buy%20me%20a%20beer-FFDD00?style=flat&amp;logo=buymeacoffee&amp;logoColor=black" alt="Buy me a beer" align="absmiddle"></a> and/or [drop a ⭐ on GitHub](https://github.com/rudizl/platinum-weather-card-plus-charts).
 
@@ -13,17 +15,36 @@ Based on the original Platinum Weather Card by [@makin-things](https://www.githu
 [![CI](https://img.shields.io/github/actions/workflow/status/rudizl/platinum-weather-card-plus-charts/build.yml?branch=master&style=flat&label=CI)](https://github.com/rudizl/platinum-weather-card-plus-charts/actions/workflows/build.yml)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-daily.png" alt="The card with the Daily tab open, and its Charts section" width="371">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-daily.png" alt="The card with the Daily tab open, and its Charts section" width="400">
   &nbsp;&nbsp;
-  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-hourly.png" alt="The same card with the Hourly tab open" width="436">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-hourly.png" alt="The same card with the Hourly tab open" width="400">
+</p>
+
+## What the card shows
+
+- **The weather now**: the temperature, how it feels and a word for the air, and up to sixteen slots: wind and gusts, pressure and its trend, humidity, rain today and the rain rate, UV, cloud cover, the moon, the sun. From a weather entity, from your own station, or both.
+- **Days and hours**: a daily forecast (in columns or in rows) and an hourly one, in tabs, with temperature and rain charts and a tooltip for each day. The hours show the chance of rain and the wind, with the night shaded and a moon after dark. A twice-daily forecast (the US National Weather Service) fills both.
+- **Warnings, without another card**: severe-weather warnings from MeteoAlarm or any feed with the same CAP attributes, in fifteen kinds, yellow, orange or red, with the time they end, in the card's language, and both hazards when one warning names two. And a row for **lightning** from Blitzortung (no hardware needed) or a strike detector, with its distance and direction.
+- **A forecast from your barometer**: Sager, which reads the wind and the sky as well, or Zambretti, short or in full.
+- **The sky from a pyranometer**: a measured cloud cover corrects the provider's icon by day.
+- **Icon packs**: the built-in animated set, Meteocons (line or fill), the icons of Home Assistant, or your own pictures.
+- **Fifteen languages**, light and dark themes, the sections view, *Add to dashboard → By entity*, and an editor whose lists offer only the sensors that fit each field.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/warning-levels.png" alt="Yellow, orange and red warnings, the red one for two hazards" width="460">
+</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/languages.png" alt="The same card in German, French and Bulgarian" width="820">
 </p>
 
 ## Installation
 
-The card is in the HACS default store. From Home Assistant 2026.11 HACS is built in and called the **Marketplace** (Settings → Marketplace); the steps are the same in both, and the card stays where it is when you upgrade:
+The card is in the default catalogue of HACS, which from Home Assistant 2026.11 is built in and called the **Marketplace**. A card installed through HACS stays installed when you upgrade.
 
-1. HACS or the Marketplace → search for **Platinum Weather Card Plus Charts**
-2. Download (or Install)
+[![Open your Home Assistant instance and show the card in the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=rudizl&repository=platinum-weather-card-plus-charts&category=plugin)
+
+1. **Settings → Marketplace** (on Home Assistant 2026.10 and older, HACS) → search for **Platinum Weather Card Plus Charts**, or use the button above
+2. **Download**. The card is added to your dashboard resources for you
 3. Hard-refresh your browser
 4. Add the card to a dashboard. In *Add to dashboard*, pick a weather entity under *By entity* and the card is offered under *Community*, already set up for it (Home Assistant 2026.6 or later); under *By card* it has a preview, filled in with one of your weather entities. Or in YAML:
 
@@ -36,9 +57,19 @@ The card is in the HACS default store. From Home Assistant 2026.11 HACS is built
    option_show_precipitation_chart: true
    ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/add-by-entity.png" alt="Add to dashboard, By entity: the card offered for a weather entity, in two forms" width="640">
+</p>
+
+**Betas.** On the card's page in the Marketplace, the ⋮ menu has **Include pre-releases**, after which the update offers the newest beta, and **Install another version**, to install a beta or to go back to the stable one. **Reinstall** downloads the installed version again. In HACS the same is ⋮ → **Redownload**, where you choose the version.
+
 ### With just a weather entity
 
 A card with a `weather_entity` and nothing else to read works. The overview, the slots, the days and the charts all take their figures from it: temperature, feels-like, humidity, pressure, wind and gusts, visibility, UV index, cloud cover, today's high and low, and today's chance of rain and rain amount from its attributes and forecast, the dew point for the comfort word (with the comfort option on), the condition icon from its state, and the days from its forecast. What a provider does not give shows as `---`, and the feels-like line is left out.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/weather-entity-only.png" alt="A card with nothing but a weather entity" width="400">
+</p>
 
 Add sensors and they are your choice, one group at a time. Set any one of the measurement settings (`entity_temperature`, `entity_humidity` and the rest, listed on the `weather_entity` row of the YAML reference) and none of the others is filled in for you; the same goes for the six per-day settings (`entity_forecast_icon_1` and its siblings). So a weather station beside a forecast stays exactly what you made it. None of this is written to your configuration.
 
@@ -46,7 +77,7 @@ Add sensors and they are your choice, one group at a time. Set any one of the me
 
 If you used [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card), your configuration carries over: every option and slot name from its documentation is supported here, including the per-day `entity_forecast_*_1` sensors, so the card works without a weather entity, charts included: they are drawn from those sensors.
 
-1. Install this card from HACS or the Marketplace, as above.
+1. Install this card from the Marketplace (or HACS), as above.
 2. In your card's YAML, change `type: custom:platinum-weather-card` to `type: custom:platinum-weather-card-plus-charts`.
 3. Hard-refresh. The charts and the hourly forecast are extra sections you can switch on in the editor.
 
@@ -58,6 +89,8 @@ The two cards register under different names, so you can try this one beside the
 <summary><strong>Changelog</strong></summary>
 
 **v2.6.0**
+
+**In short:** one weather entity is enough for a whole card, and the card offers itself under *Add to dashboard → By entity*; the lists of the editor offer what each field can read; a twice-daily forecast fills the strip and the charts; the hourly strip has the chance of rain and a moon at night; Sager has a sky at night; a warning that names two hazards shows both; a sky that is wholly covered is drawn as one; and the fixes below.
 
 **A weather entity is all the card needs.** A card with a `weather_entity` and no sensors showed the daily strip (since 2.5.2) and `---` everywhere else, although the card could already read each figure from a weather entity when each setting was pointed at it by hand. Now, when you have set none of the measurement settings (`entity_forecast_icon`, `entity_temperature`, `entity_apparent_temp`, `entity_humidity`, `entity_pressure`, `entity_visibility`, `entity_wind_bearing`, `entity_wind_speed`, `entity_wind_gust`, `entity_uv_index`, `entity_dew_point`, `entity_forecast_min`, `entity_forecast_max`, `entity_pop` and `entity_pos`), the card treats them as the weather entity, in its own copy of the configuration and never written back to yours. Set any one of them to a sensor, and nothing is filled in around it, so a weather station beside a forecast stays exactly what you made it; one set to the weather entity itself changes nothing. The provider's cloud cover for the night (`entity_cloud_cover`) is filled in with them, and naming it changes nothing else. A provider that does not give a figure shows `---`; the feels-like line, and the gusts beside the wind, are left out rather than printed as dashes.
 
@@ -89,9 +122,11 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **A warning that names two hazards shows both.** MeteoAlarm warns of one hazard in a warning, but a service can put two in one: the red warning of 2 November 2026 for Varna, from the national institute, was "Heavy precipitation and strong wind!", of the type `10; Rain`, and the card drew *Red code: Rain*: the wind was in the description, which is only the tooltip. The card names now the hazards that the title of a warning says besides its type, with an icon for each, at most two: *Red code: Rain + Wind*. It reads the title (`event` and `headline`) and not the description, and knows English and Bulgarian words (precipitation says rain only when it is not said of snow); a title in another language, or a type that the card does not know, is drawn as it was. On a phone the text of such a bar does not fit beside the time that the warning ends, and it takes a second line instead of being cut. Twenty-eight new tests.
 
+**Three small things found while the pictures of this README were taken.** The lightning row puts a space between the distance and its unit (`8 km`, not `8km`). A time format that the card does not know (`option_time_format: 24`, say, where it takes `12hour` or `24hour`) means the one of Home Assistant, where the times of the sun were drawn as `undefined`. And the boxes of the values on the chart follow the mode of Home Assistant: in a light theme they were dark patches, and now they are light, with the text colour of the theme; dark mode is as it was, and `--pwcc-chart-label-background` and `--pwcc-chart-label-color` set them by hand. Ten new tests.
+
 **A sky that is wholly covered is no longer drawn as broken clouds.** The card reads a cloud cover from the pyranometer as 1 less the radiation that it measures over what a clear sky would give, and that is not the cover of the sky: a thick overcast lets through only 10 to 25% of a clear sky's light, so a sky that is wholly covered measures as 75 to 90%. With the edges of the bands at 25, 55 and 85%, a morning in November with 44 W/m² under a sun 23 degrees up (84%, an overcast and rain) was drawn as the sun with two thin streaks of cloud. The edges of the measured sky are 25, 50 and 75% now, with the same hysteresis, for every icon pack and for the effects behind the icon; the number in the cloud cover slot is the same as before. The older tests of the bands copied the formula into the test, and so could not see the card's own edges: twenty new tests ask the card.
 
-**An overcast sky and a moderate rain no longer draw a tornado with a custom pack.** The card names the icon for a cloud cover of 75% and over `cloudy-3` (it was 85% before beta.16: see the paragraph on the bands of the measured sky), and for a rain of 2.5 to 10 mm/h (measured by the rain gauge) `rainy-2`, with a day or a night, and the table of picture names that the `custom` and `wcc-2` packs use did not have those two: they fell to `exceptional`. Anyone who lets the sensors choose the icon had a tornado under an overcast sky or in a moderate rain. (It is in 2.5.2 too.) Both are in the table now, and a name that the table does not have takes the picture of its family; only what is meant to be exceptional (`dust`, `tropical-storm`, a condition that is not known) still does. Nine new tests go through the real choice, with a solar sensor and a rain gauge, and the four that matter fail on the old table.
+**An overcast sky and a moderate rain no longer draw a tornado with a custom pack.** The card names the icon for a cloud cover of 75% and over `cloudy-3` (it was 85% in 2.5.2: see the paragraph on the bands of the measured sky), and for a rain of 2.5 to 10 mm/h (measured by the rain gauge) `rainy-2`, with a day or a night, and the table of picture names that the `custom` and `wcc-2` packs use did not have those two: they fell to `exceptional`. Anyone who lets the sensors choose the icon had a tornado under an overcast sky or in a moderate rain. (It is in 2.5.2 too.) Both are in the table now, and a name that the table does not have takes the picture of its family; only what is meant to be exceptional (`dust`, `tropical-storm`, a condition that is not known) still does. Nine new tests go through the real choice, with a solar sensor and a rain gauge, and the four that matter fail on the old table.
 
 **The cloud cover entity can be a weather entity.** The card reads it from the attribute `cloud_coverage` of a weather entity, or from the state of a sensor, but the picker in the editor offered sensors only, so that met.no's weather entity, which gives the number, could not be chosen for the cloud cover shown at night. Both pickers offer weather entities now, and only the ones that can be a sky: a weather entity that gives a cloud cover, and the sensors in per cent that are named for a sky (cloud, overcast, sky, облачност, bewölkung...), or every sensor in per cent when the house has none: not the thousand sensors of a house (anything else can still be typed in). Fourteen new tests.
 
@@ -99,7 +134,7 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **The big icon of the Meteocons packs is enlarged and moved up** (#37). The Meteocons icons (`meteocons-line` and `meteocons-fill`, from a CDN) are drawn in a 64 by 64 frame, and the drawing of the usual ones (a cloud, rain, snow, wind) lies between 17 and 47 of it: a quarter of the frame is empty above and as much below. In the card the big icon looked small and low, a good thirty pixels under the top of the temperature. Their big icon is enlarged by 1.3 and moved up now, so that the top of its drawing is level with the top of the digits of the temperature: each icon by its own amount, since the drawing of a sun starts higher in the frame than that of a cloud, and the fill style sits a little lower than the line style (measured on the icons of both styles and checked in a browser, frames over eight seconds for the icons that move); the other packs are cut tight and are not touched. Nine new tests.
 
-**A name that the card does not know is a cloud, and not a tornado.** With a custom pack (and the wcc-2 one) a condition that the table of picture names did not have, or that a provider called `unknown`, fell to the picture of the tornado: it was what an overcast sky and a moderate rain looked like before beta.8, and it was what any new name looked like after. A tornado is for what is meant to be one (`exceptional`, `tornado`, `hurricane`); a name that is not known is the plain cloud, which says nothing. One new test.
+**A name that the card does not know is a cloud, and not a tornado.** With a custom pack (and the wcc-2 one) a condition that the table of picture names did not have, or that a provider called `unknown`, fell to the picture of the tornado: it was what an overcast sky and a moderate rain looked like (see the paragraph above), and what any new name still looked like. A tornado is for what is meant to be one (`exceptional`, `tornado`, `hurricane`); a name that is not known is the plain cloud, which says nothing. One new test.
 
 **Slots that nobody chose are not drawn when they have nothing to read.** A card of a weather entity alone drew the ten slots of the defaults, and with a provider that gives no humidity, no pressure or no wind, or in a house with no UV warning, that was rows of `---` that nobody had asked for. A default slot that has no source is not drawn now: the wind, the pressure and the humidity (read from the weather entity, or from the entities that are set), the UV summary (it needs its own entity), and the chance of rain (when the forecast has arrived and gives neither a chance nor an amount). What you chose yourself keeps its `---`, and an entity that you set is a source even while it is unavailable, so that a slot does not come and go. The height that the card reports follows the slots that are drawn. Ten new tests.
 
@@ -137,7 +172,7 @@ Three readings the card could not take from a weather entity now work: the **UV 
 
 **Naming the cloud cover entity no longer empties a card of a weather entity.** `entity_cloud_cover`, the provider's sky for the night that Sager reads, was one of the measurement settings, and setting any of those means that nothing is filled in from the weather entity: a card that named it, as this README recommends, lost its temperature, its icon and its slots, with no warning, even when it named the weather entity itself. It is a fallback now and not a choice, and a measurement setting pointed at the weather entity itself is no choice either.
 
-Four hundred and sixty-two new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
+Four hundred and seventy-two new tests run the card itself, seven of them from @johnnyh1975's pull requests. They cover the card's side of the Sager forecast, the rain rate slot, the Beaufort tables, the vertical layout and the tap, double tap and hold actions, as well as each way the picker finds the card. They guard what must not change too: a user's own sensors, a weather entity that is not there, a provider without a feels-like or gusts, an entity that does not say what it can do, the hours as they were when the switch is off, and a gauge that has read 0.0 all along, which is dry at once.
 
 ---
 
@@ -244,7 +279,7 @@ Measured against a real station: of four summer convective events, three were wa
 
 **v2.3.1**
 - Cloud cover is the median of the last five minutes, with hysteresis on the band boundaries, and shared across every card on the page rather than measured per card — two cards were showing different icons for the same sky. Broken cloud swings the raw reading across the whole icon range within minutes; on real data from one such morning this cuts the icon changing from eight times in twenty-five minutes to once
-- The icon correction follows the ordinary cloud bands — clear below 25%, lightly cloudy to 50%, cloudy to 75%, overcast above (they were 25, 55 and 85 until beta.15). Correcting only at the extremes left the common case wrong: a provider claiming full sun while the pyranometer saw 59% cloud kept its sun icon
+- The icon correction follows the ordinary cloud bands — clear below 25%, lightly cloudy to 50%, cloudy to 75%, overcast above (they were 25, 55 and 85 in 2.5.2). Correcting only at the extremes left the common case wrong: a provider claiming full sun while the pyranometer saw 59% cloud kept its sun icon
 - The pyranometer settings moved to Global Options. They were behind the cloud cover slot, which meant the icon correction could not be used without also displaying a reading nobody had asked for — the two are independent and are now configured independently
 
 ---
@@ -556,10 +591,10 @@ Four layout options are available:
 
 | Layout | Preview |
 |--------|---------| 
-| **Complete** | ![](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-complete.png) |
-| **Observations** | ![](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-observations.png) |
-| **Forecast** | ![](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-forecast.png) |
-| **Title Only** | ![](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-title-only.png) |
+| **Complete** | <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-complete.png" alt="The overview, complete" width="456"> |
+| **Observations** | <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-observations.png" alt="The overview, observations" width="456"> |
+| **Forecast** | <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-forecast.png" alt="The overview, forecast" width="456"> |
+| **Title Only** | <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-title-only.png" alt="The overview, title only" width="456"> |
 
 | Option | Type | Description |
 | ------ | ---- | ----------- |
@@ -595,7 +630,7 @@ A **Verbose forecast text** toggle expands the short phrase into a full sentence
 
 | Short | Verbose |
 |-------|---------|
-| ![Editor options and short forecast](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-options-zambretti.png) | ![Verbose forecast](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/local-forecast-zambretti.png) |
+| <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-options-zambretti.png" alt="Editor options and short forecast" width="480"> | <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/local-forecast-zambretti.png" alt="Verbose forecast" width="380"> |
 
 Inputs used:
 
@@ -755,6 +790,10 @@ Each column holds up to eight slots, chosen from the list below and configured h
 
 Up to 8 rows of data in 2 columns. The required entities update dynamically based on which slots are selected.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/slots-section.png" alt="The overview and the slots of a card" width="400">
+</p>
+
 | Slot Value | Description | Example |
 | ---------- | ----------- | ------- |
 | `humidity` | Current humidity | 36% |
@@ -815,19 +854,41 @@ Then select it in the editor: Slots Section → *Entity Pressure Trend* (the pic
 
 ## Warnings Section
 
-Shows an active severe-weather warning as a coloured row. Point it at a [MeteoAlarm](https://www.home-assistant.io/integrations/meteoalarm/) binary sensor (or any integration exposing the same CAP attributes) and the row appears only while a warning is in force — the rest of the time the section takes no space at all.
+The card shows the warnings that would otherwise need cards of their own: a severe-weather warning from your national weather service, and a storm that is coming. The section is there while there is something to show, and gone the rest of the time.
 
-The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers. So a Bulgarian card reads *"Жълт код: Високи температури · до сб 00:00"* even though the feed itself is in English. All fifteen hazard types are translated in every language the card supports; unknown types fall back to the provider's own `event` text.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/warnings-lightning.png" alt="A lightning row and a red warning for rain and wind above the overview" width="460">
+</p>
 
-The colour of the row follows the warning level — yellow, orange or red.
+**Severe-weather warnings.** Point **Warning entity** at a [MeteoAlarm](https://www.home-assistant.io/integrations/meteoalarm/) binary sensor, or at any integration exposing the same CAP attributes. The wording is the card's own, in the card's language, rather than the provider's: MeteoAlarm reports the hazard as numbered strings following the EUMETNET CAP profile (`awareness_type: "5; high-temperature"`, `awareness_level: "2; yellow; Moderate"`), and the card keys off those numbers, so a warning reads the same in each of its fifteen languages. The colour of the row follows the level, yellow, orange or red, and the time the warning ends follows, in the card's locale.
 
-A **lightning detector** can add a row of its own. Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row alongside any provider warning, coloured by how close it is: red within 15 km, amber to 30, yellow beyond. Add the bearing entity and the row says which way it lies. **Warn within** sets the range, 50 km by default.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/warning-levels.png" alt="Yellow, orange and red warnings" width="460">
+</p>
+
+| Type | Hazard | Icon |
+| --- | --- | --- |
+| 1 | Wind | `mdi:weather-windy` |
+| 2 | Snow and ice | `mdi:snowflake` |
+| 3 | Thunderstorms | `mdi:weather-lightning` |
+| 4 | Fog | `mdi:weather-fog` |
+| 5 | High temperatures | `mdi:thermometer-high` |
+| 6 | Low temperatures | `mdi:thermometer-low` |
+| 7 | Coastal event | `mdi:waves` |
+| 8 | Forest fire | `mdi:fire` |
+| 9 | Avalanches | `mdi:image-filter-hdr` |
+| 10 | Rain | `mdi:weather-pouring` |
+| 11 | Flooding | `mdi:home-flood` |
+| 12 | Flooding | `mdi:home-flood` |
+| 13 | Rain and flooding | `mdi:home-flood` |
+| 14 | Marine hazard | `mdi:sail-boat` |
+| 15 | Drought | `mdi:water-off` |
+
+When the title of a warning names a second hazard (`Heavy precipitation and strong wind!`, of the type rain), the row shows both, with an icon for each: see the note below.
+
+**Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown.
 
 This is deliberately part of the warnings section rather than a slot. An approaching storm is a warning in the same sense a rain alert is, and the section already appears and vanishes on its own, where a slot would sit empty most of the time — six weeks of readings at the station this was built against recorded no strikes at all. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
-
-![Warnings section](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/warnings-section.png)
-
-Two hazard types from the same feed, on a Bulgarian card: high temperature and rain. The icon follows the hazard, the bar follows the level, and the expiry time is formatted in the card's locale.
 
 | Option | Type | Description |
 | ------ | ---- | ----------- |
@@ -913,6 +974,10 @@ The two are independent: the sun override only changes day to night and back, ne
 ## Icon Packs
 
 <p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/icon-packs.png" alt="The default, Meteocons line and Meteocons fill packs" width="760">
+</p>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-icon-pack.png" alt="Choosing an icon pack" width="720">
 </p>
 
@@ -951,6 +1016,10 @@ Hovering a column shows the full forecast for that day, including the precipitat
 
 Two layout options: **Horizontal** (default, up to 5 days) and **Vertical** (up to 7 days).
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/daily-forecast-vertical.png" alt="The daily forecast in the vertical layout" width="400">
+</p>
+
 **Where the days come from.** Either a weather entity or per-day sensors:
 
 - **A weather entity.** Set `weather_entity` and that is all there is to it. The six per-day settings in the table below (icon, summary, minimum, maximum, chance of rain, possible rain) are that entity, unless you set any of them yourself. Set one, to a sensor or to the weather entity, and the card fills in none of the others.
@@ -980,7 +1049,7 @@ Hovering over any forecast day column shows a tooltip with date, weather descrip
 
 With **Show date next to day** enabled, the date follows the day name and the label shrinks to fit:
 
-![Daily forecast with dates](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/daily-forecast-dates.png)
+<img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/daily-forecast-dates.png" alt="Daily forecast with dates" width="456">
 
 ## Hourly Forecast Section
 
@@ -1028,7 +1097,7 @@ Opened with the settings button on the **Hourly forecast** row:
 ### What it shows
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-hourly.png" alt="The card with the Daily and Hourly tabs, Hourly open" width="436">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-hourly.png" alt="The card with the Daily and Hourly tabs, Hourly open" width="400">
 </p>
 
 A column per hour — time in the card's locale, icon, temperature — starting at the hour in progress. Temperatures follow the same decimals setting as the overview (`option_today_temperature_decimals`). The columns scroll sideways, each keeping a minimum width, so the span stays readable rather than being squeezed across a phone.
@@ -1066,11 +1135,11 @@ Hovering over any chart column shows the same tooltip as hovering over the corre
 
 When the **Charts section is disabled**, max/min temperature and precipitation are shown as text directly in each forecast column:
 
-![Forecast columns without charts](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/forecast-columns-no-charts.png)
+<img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/forecast-columns-no-charts.png" alt="Forecast columns without charts" width="456">
 
 When the **Charts section is enabled**, the same data is rendered visually as temperature lines (max in orange, min in blue) and precipitation bars in the chart strip below the forecast. The text values are automatically hidden to avoid duplication — the chart already tells the full story.
 
-![Forecast columns with charts](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/daily-forecast-dates.png)
+<img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/daily-forecast-dates.png" alt="Forecast columns with charts" width="456">
 
 The same five days either way. The whole card in each mode:
 
@@ -1087,10 +1156,22 @@ The two charts are independent, and each hides only its own row:
 
 So a card with the precipitation chart on and the temperature chart off shows the temperatures as text and the rainfall as bars. If you would rather have the figures as well as the chart, switch off the chart you want the text for — there is no separate control for the text itself, since the pair are two views of one number.
 
+The boxes of the values on the chart follow the mode of Home Assistant, so the card reads as well in a light theme as in a dark one:
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/card-light-theme.png" alt="The card in the light theme of Home Assistant" width="400">
+</p>
+
 ## Global Options
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/global-options.png" alt="Global options in the editor" width="720">
+</p>
+
+The lists of the pickers offer what each field can read: the solar radiation field offers the sensors in W/m², the temperatures the temperature sensors, and so on. **Offer every entity in the lists** turns that off.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-picker-narrowed.png" alt="The list of the solar radiation field offers only the two sensors that fit" width="720">
 </p>
 
 | Option | Type | Description |
@@ -1133,7 +1214,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 
 The card supports all standard [HA actions](https://www.home-assistant.io/dashboards/actions/), configurable from **Global Options → Actions** in the editor:
 
-![Editor actions](https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-actions.png)
+<img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-actions.png" alt="Editor actions" width="506">
 
 Some YAML examples:
 
