@@ -1092,7 +1092,7 @@ export class PlatinumWeatherCard extends LitElement {
       : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
 
     const unit = distState.attributes?.unit_of_measurement ?? 'km';
-    let headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)}${unit}`;
+    let headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)} ${unit}`;
 
     const bearingEntity = this._config.entity_lightning_azimuth;
     const bearingState = bearingEntity ? this.hass.states[bearingEntity] : undefined;
@@ -2005,6 +2005,13 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   private _renderChartSection(): TemplateResult {
+    // The boxes of the values follow the mode of Home Assistant: dark with white text as they always were in dark mode (and when the mode is not
+    // known), light with the text colour of the theme in light mode, where the dark boxes were patches. --pwcc-chart-label-background and
+    // --pwcc-chart-label-color set them by hand.
+    const lightMode = (this.hass as unknown as { themes?: { darkMode?: boolean } } | undefined)?.themes?.darkMode === false;
+    const labelBg = lightMode ? 'rgba(255,255,255,0.9)' : 'rgba(10,14,24,0.85)';
+    const labelBgRain = lightMode ? 'rgba(255,255,255,0.9)' : 'rgba(10,14,24,0.9)';
+    const labelFg = lightMode ? 'var(--primary-text-color, #212121)' : '#fff';
     if (this._config.show_section_charts === false) return html``;
     // A forecast array comes from a weather entity. A card configured the way the
     // original Platinum card was — per-day sensors, entity_forecast_*_1 with a
@@ -2115,8 +2122,8 @@ export class PlatinumWeatherCard extends LitElement {
       if (showTemp && isFinite(tempYs[i].maxY) && isFinite(tempYs[i].minY)) {
         const maxTop = tempYs[i].maxY - BH / 2;
         const minTop = tempYs[i].minY - BH / 2;
-        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:rgba(10,14,24,0.85);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
-        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:rgba(10,14,24,0.85);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${Math.round(d.minT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
       }
       if (showPrecip) {
         const pMax  = Math.max(...data.map(x => x.precip), 0.1);
@@ -2128,7 +2135,7 @@ export class PlatinumWeatherCard extends LitElement {
           // Bar behind everything (z-index 0), rising from bottom of temp area
           colHtml = `<div style="position:absolute;top:${bTop}px;left:0;right:0;height:${bH}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>` + colHtml;
           // Label centered ON the baseline
-          colHtml += `<div style="position:absolute;top:${tempH - 6}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:rgba(10,14,24,0.9);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${label}</div>`;
+          colHtml += `<div style="position:absolute;top:${tempH - 6}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBgRain});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${label}</div>`;
         } else {
           // 0mm: subtle dash at baseline
           colHtml += `<div style="position:absolute;top:${tempH - 1}px;left:0;right:0;height:2px;background:rgba(151,230,255,0.15);border-radius:1px;"></div>`;
@@ -4170,9 +4177,9 @@ export class PlatinumWeatherCard extends LitElement {
 
   // is12Hour - returns true if 12 hour clock or false if 24
   get timeFormat(): timeFormat {
-    if (this._config.option_time_format && this._config.option_time_format !== 'system') {
-      return this._config.option_time_format;
-    }
+    // Only the two that the card knows are taken as they are: anything else (`24`, a typo) means `system`, as it is not drawn otherwise.
+    const own = this._config.option_time_format as string | undefined;
+    if (own === '12hour' || own === '24hour') return own;
     // Read from HA system settings (Settings → Profile → Time format)
     const haTimeFormat = this.hass?.locale?.time_format;
     if (haTimeFormat === '12') return '12hour';
