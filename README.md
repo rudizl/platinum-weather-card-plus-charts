@@ -73,6 +73,10 @@ A card with a `weather_entity` and nothing else to read works. The overview, the
 
 Add sensors and they are your choice, one group at a time. Set any one of the measurement settings (`entity_temperature`, `entity_humidity` and the rest, listed on the `weather_entity` row of the YAML reference) and none of the others is filled in for you; the same goes for the six per-day settings (`entity_forecast_icon_1` and its siblings). So a weather station beside a forecast stays exactly what you made it. None of this is written to your configuration.
 
+No weather entity yet? [Met.no](https://www.home-assistant.io/integrations/met/) is built into Home Assistant and gives one for your home, with daily and hourly forecasts:
+
+[![Open your Home Assistant instance and start setting up Met.no.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=met)
+
 ### Coming from the original Platinum Weather Card?
 
 If you used [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card), your configuration carries over: every option and slot name from its documentation is supported here, including the per-day `entity_forecast_*_1` sensors, so the card works without a weather entity, charts included: they are drawn from those sensors.
@@ -649,6 +653,8 @@ The difference shows in the case that prompted this: a morning at 1020 hPa with 
 
 It needs one thing the card cannot supply itself. Sager compares the wind now with the wind six hours ago, and a dashboard forgets everything when the page reloads — so the history has to come from a helper you create:
 
+[![Open your Home Assistant instance and start setting up a Statistics helper.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=statistics)
+
 ```yaml
 # Settings → Devices & Services → Helpers → Statistics
 # Source: your wind direction sensor
@@ -834,6 +840,8 @@ If you point `entity_pressure_trend` at a trend sensor, the pressure slot shows 
 
 The easiest source is a **Derivative helper** (Settings → Devices & Services → Helpers → Create helper → Derivative):
 
+[![Open your Home Assistant instance and start setting up a Derivative helper.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=derivative)
+
 - **Source:** your barometric pressure sensor
 - **Time window:** 3 hours (the meteorological standard for pressure tendency)
 - **Time unit:** hours (output becomes hPa/h)
@@ -887,6 +895,8 @@ The card shows the warnings that would otherwise need cards of their own: a seve
 When the title of a warning names a second hazard (`Heavy precipitation and strong wind!`, of the type rain), the row shows both, with an icon for each: see the note below.
 
 **Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown.
+
+[![Open your Home Assistant instance and show Blitzortung in the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=mrk-its&repository=homeassistant-blitzortung&category=integration)
 
 This is deliberately part of the warnings section rather than a slot. An approaching storm is a warning in the same sense a rain alert is, and the section already appears and vanishes on its own, where a slot would sit empty most of the time — six weeks of readings at the station this was built against recorded no strikes at all. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
 
@@ -1179,7 +1189,7 @@ The lists of the pickers offer what each field can read: the solar radiation fie
 | Icon Pack | String | `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, or `custom` |
 | Icon Pack Path | String | Path template for `custom` icon pack (e.g. `/local/icons/{condition}.svg`) |
 | Show Static Icons | Boolean | Disable animated icons |
-| Time Format | String | `system` (follows HA Settings → Profile), `12hour`, or `24hour` |
+| Time Format | String | `system` (follows [Settings → Profile](https://my.home-assistant.io/redirect/profile/) in HA), `12hour`, or `24hour` |
 | Locale | String | Locale for timestamp and moon phase formatting. Supported: `bg`, `cs`, `da`, `de`, `en`, `es`, `fr`, `he`, `it`, `nl`, `pl`, `ru`, `sr` (Cyrillic), `sr-Latn` (Latin), `ua` — when empty, the card follows the Home Assistant interface language |
 | Compact slot labels | Boolean | Shorter slot label wording (`option_compact_slots`) |
 | Show Gust in Wind Slot | Boolean | Append the gust value to the wind slot |
@@ -1237,7 +1247,7 @@ double_tap_action:
     entity_id: light.living_room
 ```
 
-| `option_time_format` | String | `system` | `system` (follows HA Settings → Profile), `12hour` or `24hour` |
+| `option_time_format` | String | `system` | `system` (follows [Settings → Profile](https://my.home-assistant.io/redirect/profile/) in HA), `12hour` or `24hour` |
 | `option_locale` | String | none | Locale for timestamp and moon phase: `bg`, `cs`, `da`, `de`, `en`, `es`, `fr`, `he`, `it`, `nl`, `pl`, `ru`, `sr`, `sr-Latn`, `ua` |
 | `text_update_time_prefix` | String | none | Prefix for the update time display |
 
