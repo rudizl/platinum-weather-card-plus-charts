@@ -2,6 +2,12 @@
 
 All notable changes to Platinum Weather Card Plus Charts. The newest version is at the top. Each version lists what was **added**, what **changed** and what was **fixed**; the notes of every release, with the same text, are on the [releases page](https://github.com/rudizl/platinum-weather-card-plus-charts/releases).
 
+## 2.6.1 (unreleased)
+
+### Fixed
+
+- **"Use attribute" for the summary of the days is read by the tooltip of the charts too** (#39). With the switch on, the text of each day comes from an attribute of its sensor instead of its state; the tooltip of the days across and the text of the days down read it, and the tooltip of the days drawn with the charts read the state alone. All three read it now. Eight tests: the three places with and without the switch, and the switch in the editor.
+
 ## 2.6.0 (2026-11-06)
 
 **In short:** one weather entity is enough for a whole card, and the card offers itself under *Add to dashboard → By entity*; the lists of the editor offer what each field can read; a twice-daily forecast fills the strip and the charts; the hourly strip has the chance of rain and a moon at night; Sager has a sky at night; a warning that names two hazards shows both; a sky that is wholly covered is drawn as one; and the fixes below.
