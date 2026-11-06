@@ -3615,17 +3615,22 @@ export class PlatinumWeatherCard extends LitElement {
   // the entity of the hourly forecast and the card's own weather entity, by the same attribute (met.no gives it). On 26 October at 21:11 Sager
   // said "fair and cooler" under a sky that met.no gave as 99% covered, for want of a sky to read. Null when nothing gives a number.
   get providerCloudFraction(): number | null {
-    const named = this._config.entity_cloud_cover;
-    if (named && this.hass.states[named]) {
-      const st = this.hass.states[named];
-      const f = PlatinumWeatherCard._percentToFraction(named.startsWith('weather.') ? st.attributes?.cloud_coverage : st.state);
-      if (f !== null) return f;
-    }
+    const f = this.namedCloudFraction;
+    if (f !== null) return f;
     for (const entity of [this._config.entity_hourly, this._config.weather_entity]) {
       const f = PlatinumWeatherCard._percentToFraction(entity ? this.hass.states[entity]?.attributes?.cloud_coverage : undefined);
       if (f !== null) return f;
     }
     return null;
+  }
+
+  // The sky of the entity named for the night, entity_cloud_cover, as the slot reads it: the attribute cloud_coverage of a weather entity, or the
+  // state of a sensor, in per cent. Null when none is named or it gives no number; nothing is guessed from other entities here.
+  get namedCloudFraction(): number | null {
+    const named = this._config?.entity_cloud_cover;
+    const st = named ? this.hass?.states?.[named] : undefined;
+    if (!named || !st) return null;
+    return PlatinumWeatherCard._percentToFraction(named.startsWith('weather.') ? st.attributes?.cloud_coverage : st.state);
   }
 
   // A percentage, 0 to 100, as a fraction; null for anything that is not one (unknown, unavailable, empty, text, out of range).
@@ -4400,7 +4405,12 @@ export class PlatinumWeatherCard extends LitElement {
             : 'rainy-3';
         adjusted = `${name}-${this.dayOrNight}`;
       } else if (isPlainSky) {
-        const cloud = this.measuredCloudFraction;
+        const measured = this.measuredCloudFraction;
+        // When the pyranometer has nothing to say (after dark, or the sun under its cut-off), the sky of the entity named for the night, which
+        // the cloud slot shows and Sager reads: the icon read the provider alone, and on 6 November at 20:14 a partly cloudy night (a station of
+        // Weather Underground, which measures no cloud) stood beside a cloud cover of 1% and "the sky is clear" (met.no). A plain sky only:
+        // a forecast of cloud does not overrule a claim of rain, snow or a storm, so sunlitAndDry above stays the pyranometer's.
+        const cloud = measured ?? this.namedCloudFraction;
         if (cloud === null && rainDenied) {
           // The gauge has ruled the rain out, and the sky cannot be measured —
           // after dark, or with the sun under the cut-off — so there is nothing
@@ -4420,7 +4430,8 @@ export class PlatinumWeatherCard extends LitElement {
           const EDGES = [0.25, 0.50, 0.75];
           const MARGIN = 0.05;
           const cls = this.constructor as typeof PlatinumWeatherCard;
-          const sensor = this._config.entity_solar_radiation ?? '';
+          // the band remembered for each source, so that the night sky does not hold the day's band, nor the day the night's
+          const sensor = measured !== null ? (this._config.entity_solar_radiation ?? '') : `night:${this._config.entity_cloud_cover ?? ''}`;
           const band = cls._cloudBand.get(sensor) ?? null;
           let target = EDGES.filter((e) => cloud >= e).length;
           if (band !== null && target !== band) {
@@ -4431,7 +4442,8 @@ export class PlatinumWeatherCard extends LitElement {
           // Every band has a day and a night file; a bare name matches nothing
           // and the card renders N/A.
           adjusted = `${['clear', 'cloudy-1', 'cloudy-2', 'cloudy-3'][target]}-${this.dayOrNight}`;
-          this._skyMeasured = true;
+          // measured only when the pyranometer gave it: the photoreal pack draws a measured sky of 55 to 85 per cent as broken clouds
+          this._skyMeasured = measured !== null;
         }
       }
     }

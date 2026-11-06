@@ -488,7 +488,7 @@ If your station has a rain gauge, point **Rain rate entity** at it too (mm/h). A
 
 A weather entity that drops out for a moment, as some providers do at a fixed time every hour, keeps its last condition for ten seconds, so the icon does not flash.
 
-The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess.
+The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 50%, cloudy to 75%, overcast above — rather than the provider's guess. After dark, when the pyranometer has nothing to say, the icon follows the **Cloud cover entity (night fallback)** if one is named, as the cloud slot does; for a plain sky only, since a forecast of cloud does not overrule a claim of rain, snow or a storm.
 
 Only the plain sky icons are normally touched: rain, snow and fog are things a provider knows about and the sensors cannot see, so those are left alone. There are two exceptions, and they are not the same.
 
@@ -918,7 +918,7 @@ double_tap_action:
 | `option_sun_overrides_icon` | Boolean | `true` | Force the day/night variant of the current condition icon from the sun entity's state (its elevation as a fallback), overriding the provider |
 | `option_moon_icon_only` | Boolean | `false` | Show only the moon phase icon, without the text |
 | `entity_solar_radiation` | String | none | Pyranometer in W/m², for the cloud cover slot |
-| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help: by the cloud cover slot and by the Sager forecast. A sensor in per cent, or a weather entity that gives `cloud_coverage` (met.no does); the picker offers only those: a weather entity that gives a cloud cover, and the sensors in per cent that are named for a sky (cloud, overcast, sky, облачност, bewölkung...), or every sensor in per cent when the house has none; anything else can be typed in |
+| `entity_cloud_cover` | String | none | Provider cloud cover, used at night when the pyranometer cannot help: by the cloud cover slot, by the Sager forecast, and by the icon when **Measurement corrects the icon** is on. A sensor in per cent, or a weather entity that gives `cloud_coverage` (met.no does); the picker offers only those: a weather entity that gives a cloud cover, and the sensors in per cent that are named for a sky (cloud, overcast, sky, облачност, bewölkung...), or every sensor in per cent when the house has none; anything else can be typed in |
 | `entity_rain_rate` | String | none | Rain gauge in mm/h — measured rain overrides a provider reporting clear sky, and drives the rain rate slot. Intensity follows the standard bands: light below 2.5 mm/h, moderate to 10, heavy to 50, violent above |
 | `entity_dew_point` | String | none | Dew point sensor, for the comfort line under the apparent temperature |
 | `option_show_comfort` | Boolean | `false` | Show how the air feels, in a word |
