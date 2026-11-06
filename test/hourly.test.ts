@@ -152,17 +152,21 @@ describe('the two views share one section', () => {
     // after the daily forecast rather than at the end of the list.
     expect(editor).toMatch(/case 'hourly_forecast':/);
     expect(editor).toMatch(/if \(slot === 'daily_forecast'\) \{\s*\n\s*htmlConfig\.push\(this\.getConfigBlock\('hourly_forecast'/);
-    expect(editor).toMatch(/case 'option_hourly_forecast':/);
+    // and a page of its own, as every section has (2.7)
+    expect(editor).toMatch(/section_hourly_forecast: \['hourly_heading'/);
   });
 
   it('carries a switch but no reorder arrows', () => {
     // The switch is what decides whether the hours show; there is nothing to
     // reorder, because they sit with the forecast they are a view of.
-    const row = /case 'hourly_forecast':[\s\S]*?\n        `;/.exec(editor)![0];
-    expect(row).toContain('pwc-switch');
+    // Every row is drawn by _sectionRow (2.7); the hours ask it for a row that does not move.
+    const row = /case 'hourly_forecast':[\s\S]*?;\n/.exec(editor)![0];
     expect(row).toContain('show_section_hourly_forecast');
-    expect(row).not.toContain('down-icon');
-    expect(row).not.toContain('up-icon');
+    expect(row).toMatch(/, false\);\n$/);
+    const draw = /private _sectionRow\([\s\S]*?\n  \}\n/.exec(editor)![0];
+    expect(draw).toContain('pwc-switch');
+    // the arrows are drawn only for a row that moves
+    expect(draw).toMatch(/\$\{movable \? html`[\s\S]*?down-icon[\s\S]*?up-icon[\s\S]*?` : html`<div class="no-icon"><\/div><div class="no-icon"><\/div>`\}/);
   });
 
   it('offers only weather entities for the source', () => {

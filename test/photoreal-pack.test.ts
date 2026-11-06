@@ -199,14 +199,14 @@ describe('pictures that change without changing their names', () => {
 });
 
 describe('the choice in the editor', () => {
-  type Editor = HTMLElement & { setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown>; _optionAppearanceEditor: () => unknown };
+  type Editor = HTMLElement & { setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown>; _topicAppearance: () => unknown };
   it('is offered in Appearance, among the packs', async () => {
     const el = document.createElement('platinum-weather-card-plus-charts-editor') as Editor;
     el.setConfig({ card_config_version: 8, weather_entity: 'weather.home', icon_pack: 'photoreal' });
     el.hass = makeHass({ 'weather.home': { state: 'cloudy' } });
     document.body.appendChild(el);
     await el.updateComplete;
-    const box = document.createElement('div'); render(el._optionAppearanceEditor() as never, box);
+    const box = document.createElement('div'); render(el._topicAppearance() as never, box);
     const sel = [...box.querySelectorAll('select')].find((s) => (s as unknown as { configValue: string }).configValue === 'icon_pack') as HTMLSelectElement;
     const values = [...sel.querySelectorAll('option')].map((o) => o.getAttribute('value'));
     expect(values).toContain('photoreal');

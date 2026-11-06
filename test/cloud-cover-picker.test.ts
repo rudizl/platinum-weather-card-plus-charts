@@ -25,7 +25,7 @@ const st = (entity_id: string, attributes: Record<string, unknown>) => ({ entity
 describe('the cloud cover pickers, as the elements are given them', () => {
   it('in the global options: a picker with the filter, offering sensors and weather entities', async () => {
     const el = await editor();
-    const p = pickers(draw((el as unknown as { _optionGlobalOptionsEditor: () => unknown })._optionGlobalOptionsEditor()));
+    const p = pickers(draw((el as unknown as { _topicSky: () => unknown })._topicSky()));
     expect(p).toHaveLength(1);
     expect(typeof p[0].entityFilter, 'entityFilter on the element').toBe('function');
     expect(p[0].includeDomains).toEqual(['sensor', 'weather']);
@@ -38,7 +38,7 @@ describe('the cloud cover pickers, as the elements are given them', () => {
   });
   it('and what the filter lets through is what it should', async () => {
     const el = await editor();
-    const f = pickers(draw((el as unknown as { _optionGlobalOptionsEditor: () => unknown })._optionGlobalOptionsEditor()))[0].entityFilter!;
+    const f = pickers(draw((el as unknown as { _topicSky: () => unknown })._topicSky()))[0].entityFilter!;
     const house = [
       st('weather.forecast_varna', { cloud_coverage: 99.2 }), st('weather.ivarna103', { temperature: 13 }),
       st('sensor.cloud', { unit_of_measurement: '%' }), st('sensor.battery', { unit_of_measurement: '%', device_class: 'battery' }),

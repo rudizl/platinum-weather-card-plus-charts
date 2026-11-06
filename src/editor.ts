@@ -4,7 +4,7 @@ import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helper
 
 import { keys } from 'ts-transformer-keys';
 
-import { mdiPencil, mdiArrowDown, mdiArrowUp, mdiApplicationEditOutline } from '@mdi/js';
+import { mdiPencil, mdiArrowDown, mdiArrowUp } from '@mdi/js';
 
 import { tEditor } from './translations';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
@@ -1183,109 +1183,10 @@ get _forecast_type(): string {
     `;
   }
 
-  private _optionOverviewEditor(): TemplateResult {
-    return html`
-      <div class="side-by-side">
-        <div>
-          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_dew_point'} .value=${this._config?.entity_dew_point || ''} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_dew_point')}
-            name="entity_dew_point" label=${this._t("entity_dew_point")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
-          </ha-entity-picker>
-        </div>
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_show_comfort ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_comfort'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("show_comfort")}</span>
-            </div>
-          <div class="help-text">${this._t("show_comfort_hint")}</div>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div class="full-width">
-          <label class='mdc-label'>${this._t('condition_alignment')}</label>
-          <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._forecast_text_alignment} @change=${this._valueChanged}>
-            <option value=""></option>
-            <option value="left">${this._t("align_left")}</option>
-            <option value="center">${this._t("align_center")}</option>
-            <option value="right">${this._t("align_right")}</option>
-          </select>
-        </div>
-        <div>
-          <label class='mdc-label'>${this._t('overview_layout')}</label>
-          <select class='ha-select-compat' .configValue=${'overview_layout'} .value=${this._overview_layout} @change=${this._valueChanged}>
-            <option value=""></option>
-            <option value="complete">${this._t("opt_complete")}</option>
-            <option value="observations">${this._t("opt_observations")}</option>
-            <option value="forecast">${this._t("opt_forecast")}</option>
-            <option value="title only">${this._t("opt_title_only")}</option>
-          </select>
-        </div>
-        </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_show_overview_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_overview_decimals'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("show_temp_decimals")}</span>
-            </div>
-        </div>
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_show_overview_separator !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_overview_separator'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("show_separator")}</span>
-            </div>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_local_forecast ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("local_forecast")}</span>
-            </div>
-        </div>
-        ${this._config?.option_local_forecast === true ? html`
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_local_forecast_verbose ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast_verbose'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("local_forecast_verbose")}</span>
-            </div>
-        </div>` : html`<div></div>`}
-      </div>
-      ${this._config?.option_local_forecast === true ? html`
-      <div class="side-by-side">
-        <div>
-          <label class='mdc-label'>${this._t('forecast_algorithm')}</label>
-          <select class='ha-select-compat' .configValue=${'option_forecast_algorithm'} .value=${this._option_forecast_algorithm} @change=${this._valueChanged}>
-            <option value="zambretti">Zambretti (1915)</option>
-            <option value="sager">Sager Weathercaster (1942)</option>
-          </select>
-          <div class="help-text">${this._t('forecast_algorithm_hint')}</div>
-        </div>
-        <div>
-          ${this._config?.option_forecast_algorithm === 'sager' ? html`
-          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_wind_bearing_6h'} .value=${this._config?.entity_wind_bearing_6h || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_wind_bearing_6h')}
-            name="entity_wind_bearing_6h" label=${this._t("entity_wind_bearing_6h")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
-          </ha-entity-picker>
-          <div class="help-text">${this._t("entity_wind_bearing_6h_hint")}</div>` : html``}
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
-          </ha-input>
-          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
-        </div>
-        <div>
-          <ha-input type="number" label=${this._t("trend_window")} .value=${this._config?.option_trend_window_hours ?? ''} .configValue=${'option_trend_window_hours'} @input=${this._valueChangedNumber}>
-          </ha-input>
-          <div class="help-text">${this._t("trend_window_hint")}</div>
-        </div>
-      </div>` : html``}
-    `;
-  }
 
   private _hourlyForecastOptions(): TemplateResult {
     const hasEntity = !!this._config?.entity_hourly;
     return html`
-      <label class="label">${this._t("hourly_heading")}</label>
       <div class="side-by-side">
         <ha-entity-picker .hass=${this.hass} .value=${this._config?.entity_hourly || ''}
           .configValue=${'entity_hourly'} @value-changed=${this._valueChangedPicker}
@@ -1614,107 +1515,6 @@ get _forecast_type(): string {
     `;
   }
 
-  private _optionSlotsEditor(): TemplateResult {
-    return html`
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_today_temperature_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_temperature_decimals'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("today_temp_decimals")}</span>
-            </div>
-        </div>
-        <div>
-          <label class='mdc-label'>${this._t('pressure_decimals')}</label>
-          <select class='ha-select-compat' .configValue=${'option_pressure_decimals'} .value=${this._option_pressure_decimals !== null ? String(this._option_pressure_decimals) : ''} @change=${this._valueChanged}>
-            <option value=""></option>
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <label class='mdc-label'>${this._t('wind_decimals')}</label>
-          <select class='ha-select-compat' .configValue=${'option_wind_decimals'} .value=${this._option_wind_decimals !== null ? String(this._option_wind_decimals) : ''} @change=${this._valueChanged}>
-            <option value=""></option>
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-          </select>
-          <div class="help-text">${this._t('wind_decimals_hint')}</div>
-        </div>
-        <div></div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_today_rainfall_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_rainfall_decimals'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("today_rain_decimals")}</span>
-            </div>
-        </div>
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_forecast_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_forecast_decimals'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("forecast_temp_decimals")}</span>
-            </div>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_show_forecast_pop !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_forecast_pop'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("show_forecast_pop")}</span>
-            </div>
-        </div>
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_show_forecast_wind === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_forecast_wind'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("show_forecast_wind")}</span>
-            </div>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_show_gust_in_wind !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_gust_in_wind'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("show_gust_in_wind")}</span>
-            </div>
-        </div>
-        <div>
-          <div class="toggle-row">
-              <span class=${this._option_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_color_fire_danger'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("colour_fire_danger")}</span>
-            </div>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_wind_bearing_icon ? "pwc-switch active" : "pwc-switch"} .value=${'option_wind_bearing_icon'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("wind_bearing_icon")}</span>
-            </div>
-        </div>
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_moon_icon_only ? "pwc-switch active" : "pwc-switch"} .value=${'option_moon_icon_only'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("moon_icon_only")}</span>
-            </div>
-        </div>
-      </div>
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-              <span class=${this._config?.option_slot_tap_more_info !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_slot_tap_more_info'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("slot_tap_more_info")}</span>
-            </div>
-        </div>
-        </div>
-        </div>
-      </div>
-    `;
-  }
 
   private _sectionDailyForecastEditor(): TemplateResult {
     const attr_names: TemplateResult[] = [];
@@ -1815,7 +1615,251 @@ get _forecast_type(): string {
     `;
   }
 
-  private _optionDailyForecastEditor(): TemplateResult {
+
+
+
+  // The parts of the pages of the editor, by topic (2.7). Each is the controls of a setting as they were in 2.6, moved and not rewritten; the keys do not change.
+
+  private _ovComfort(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_dew_point'} .value=${this._config?.entity_dew_point || ''} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_dew_point')}
+            name="entity_dew_point" label=${this._t("entity_dew_point")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_show_comfort ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_comfort'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_comfort")}</span>
+            </div>
+          <div class="help-text">${this._t("show_comfort_hint")}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  private _ovLayout(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div class="full-width">
+          <label class='mdc-label'>${this._t('condition_alignment')}</label>
+          <select class='ha-select-compat' .configValue=${'forecast_text_alignment'} .value=${this._forecast_text_alignment} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="left">${this._t("align_left")}</option>
+            <option value="center">${this._t("align_center")}</option>
+            <option value="right">${this._t("align_right")}</option>
+          </select>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('overview_layout')}</label>
+          <select class='ha-select-compat' .configValue=${'overview_layout'} .value=${this._overview_layout} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="complete">${this._t("opt_complete")}</option>
+            <option value="observations">${this._t("opt_observations")}</option>
+            <option value="forecast">${this._t("opt_forecast")}</option>
+            <option value="title only">${this._t("opt_title_only")}</option>
+          </select>
+        </div>
+        </div>
+    `;
+  }
+
+  private _ovDecimals(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_show_overview_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_overview_decimals'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_temp_decimals")}</span>
+            </div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_show_overview_separator !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_overview_separator'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_separator")}</span>
+            </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private _lfSwitch(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_local_forecast ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("local_forecast")}</span>
+            </div>
+        </div>
+        ${this._config?.option_local_forecast === true ? html`
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_local_forecast_verbose ? "pwc-switch active" : "pwc-switch"} .value=${'option_local_forecast_verbose'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("local_forecast_verbose")}</span>
+            </div>
+        </div>` : html`<div></div>`}
+      </div>
+    `;
+  }
+
+  private _lfDetails(): TemplateResult {
+    return html`
+      ${this._config?.option_local_forecast === true ? html`
+      <div class="side-by-side">
+        <div>
+          <label class='mdc-label'>${this._t('forecast_algorithm')}</label>
+          <select class='ha-select-compat' .configValue=${'option_forecast_algorithm'} .value=${this._option_forecast_algorithm} @change=${this._valueChanged}>
+            <option value="zambretti">Zambretti (1915)</option>
+            <option value="sager">Sager Weathercaster (1942)</option>
+          </select>
+          <div class="help-text">${this._t('forecast_algorithm_hint')}</div>
+        </div>
+        <div>
+          ${this._config?.option_forecast_algorithm === 'sager' ? html`
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_wind_bearing_6h'} .value=${this._config?.entity_wind_bearing_6h || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_wind_bearing_6h')}
+            name="entity_wind_bearing_6h" label=${this._t("entity_wind_bearing_6h")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+          <div class="help-text">${this._t("entity_wind_bearing_6h_hint")}</div>` : html``}
+        </div>
+      </div>
+      <div class="side-by-side">
+        <div>
+          <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
+        </div>
+        <div>
+          <ha-input type="number" label=${this._t("trend_window")} .value=${this._config?.option_trend_window_hours ?? ''} .configValue=${'option_trend_window_hours'} @input=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("trend_window_hint")}</div>
+        </div>
+      </div>` : html``}
+    `;
+  }
+
+  private _numTempPressure(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_today_temperature_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_temperature_decimals'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("today_temp_decimals")}</span>
+            </div>
+        </div>
+        <div>
+          <label class='mdc-label'>${this._t('pressure_decimals')}</label>
+          <select class='ha-select-compat' .configValue=${'option_pressure_decimals'} .value=${this._option_pressure_decimals !== null ? String(this._option_pressure_decimals) : ''} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+      </div>
+    `;
+  }
+
+  private _numWind(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <label class='mdc-label'>${this._t('wind_decimals')}</label>
+          <select class='ha-select-compat' .configValue=${'option_wind_decimals'} .value=${this._option_wind_decimals !== null ? String(this._option_wind_decimals) : ''} @change=${this._valueChanged}>
+            <option value=""></option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          <div class="help-text">${this._t('wind_decimals_hint')}</div>
+        </div>
+        <div></div>
+      </div>
+    `;
+  }
+
+  private _numRainForecast(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_today_rainfall_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_today_rainfall_decimals'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("today_rain_decimals")}</span>
+            </div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_forecast_decimals !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_forecast_decimals'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("forecast_temp_decimals")}</span>
+            </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private _dailyPopWind(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_show_forecast_pop !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_forecast_pop'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_forecast_pop")}</span>
+            </div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_show_forecast_wind === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_forecast_wind'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_forecast_wind")}</span>
+            </div>
+        </div>
+      </div>
+    `;
+  }
+
+
+
+  private _readArrowMoon(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_wind_bearing_icon ? "pwc-switch active" : "pwc-switch"} .value=${'option_wind_bearing_icon'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("wind_bearing_icon")}</span>
+            </div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_moon_icon_only ? "pwc-switch active" : "pwc-switch"} .value=${'option_moon_icon_only'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("moon_icon_only")}</span>
+            </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private _readGustTap(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+              <span class=${this._option_show_gust_in_wind !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_show_gust_in_wind'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("show_gust_in_wind")}</span>
+            </div>
+        </div>
+        <div>
+          <div class="toggle-row">
+              <span class=${this._config?.option_slot_tap_more_info !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_slot_tap_more_info'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("slot_tap_more_info")}</span>
+            </div>
+        </div>
+      </div>
+    `;
+  }
+
+
+  private _dailyLayoutDays(): TemplateResult {
     return html`
       <div class="side-by-side">
         <div>
@@ -1841,6 +1885,11 @@ get _forecast_type(): string {
         </select>
         </div>
       </div>
+    `;
+  }
+
+  private _dailyExtendedDays(): TemplateResult {
+    return html`
       ${this._daily_forecast_layout === 'vertical' ? html`
       <div class="side-by-side">
         <div>
@@ -1859,7 +1908,11 @@ get _forecast_type(): string {
         </div>
         <div></div>
       </div>` : html``}
+    `;
+  }
 
+  private _dailyTooltipsToday(): TemplateResult {
+    return html`
         <div class="side-by-side">
           <div>
             ${this._daily_forecast_layout !== 'vertical' ? html`
@@ -1875,6 +1928,11 @@ get _forecast_type(): string {
             </div>
           </div>
         </div>
+    `;
+  }
+
+  private _dailyDate(): TemplateResult {
+    return html`
         <div class="side-by-side">
           <div>
             <div class="toggle-row">
@@ -1883,21 +1941,56 @@ get _forecast_type(): string {
             </div>
           </div>
           </div>
+    `;
+  }
 
-        <div class="side-by-side">
-        ${this._daily_forecast_layout === 'vertical' ? html`<div>
-          <div class="toggle-row">
-              <span class=${this._option_daily_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_daily_color_fire_danger'} @click=${this._toggleVisibility}></span>
-              <span class="toggle-label">${this._t("colour_fire_danger")}</span>
-            </div>
-        </div>` : html``}
+  private _fireColourSlots(): TemplateResult {
+    return html`
+      <div class="side-by-side">
         <div>
+          ${this._config?.entity_fire_danger ? html`
+          <div class="toggle-row">
+              <span class=${this._option_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_color_fire_danger'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("colour_fire_danger_slots")}</span>
+            </div>` : html`
+          <div class="toggle-row disabled">
+              <span class=${this._option_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_color_fire_danger'}></span>
+              <span class="toggle-label">${this._t("colour_fire_danger_slots")}</span>
+            </div>
+          <div class="help-text">${this._t("choose_fire_danger_first")}</div>`}
         </div>
+        <div></div>
       </div>
     `;
   }
 
-  private _optionGlobalOptionsEditor(): TemplateResult {
+  private _fireColourDaily(): TemplateResult {
+    return html`
+        ${this._daily_forecast_layout === 'vertical' ? this._fireColourDailyRow() : html``}
+    `;
+  }
+
+  private _fireColourDailyRow(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          ${this._config?.entity_fire_danger_1 ? html`
+          <div class="toggle-row">
+              <span class=${this._option_daily_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_daily_color_fire_danger'} @click=${this._toggleVisibility}></span>
+              <span class="toggle-label">${this._t("colour_fire_danger_daily")}</span>
+            </div>` : html`
+          <div class="toggle-row disabled">
+              <span class=${this._option_daily_color_fire_danger !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_daily_color_fire_danger'}></span>
+              <span class="toggle-label">${this._t("colour_fire_danger_daily")}</span>
+            </div>
+          <div class="help-text">${this._t("choose_fire_danger_first")}</div>`}
+        </div>
+        <div></div>
+      </div>
+    `;
+  }
+
+  private _cardTitles(): TemplateResult {
     return html`
       <ha-input label=${this._t("card_title_1")} .value=${this._text_card_title} .configValue=${'text_card_title'}
         @input=${this._valueChanged}>
@@ -1905,6 +1998,11 @@ get _forecast_type(): string {
       <ha-input label=${this._t("card_title_2")} .value=${this._text_card_title_2} .configValue=${'text_card_title_2'}
         @input=${this._valueChanged}>
       </ha-input>
+    `;
+  }
+
+  private _cardTimeLocale(): TemplateResult {
+    return html`
       <div class="side-by-side">
         <div>
           <label class='mdc-label'>${this._t('time_format')}</label>
@@ -1937,6 +2035,25 @@ get _forecast_type(): string {
         </select>
         </div>
       </div>
+    `;
+  }
+
+  private _editorAllEntities(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <div class="toggle-row">
+            <span class=${this._config?.option_editor_all_entities ? "pwc-switch active" : "pwc-switch"} .value=${'option_editor_all_entities'} @click=${this._toggleVisibility}></span>
+            <span class="toggle-label">${this._t("all_entities")}</span>
+          </div>
+          <div class="help-text">${this._t("all_entities_hint")}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  private _skyPyranometer(): TemplateResult {
+    return html`
       <div class="side-by-side">
         <div>
           <ha-entity-picker .hass=${this.hass} .configValue=${'entity_solar_radiation'} .value=${this._config?.entity_solar_radiation || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_solar_radiation')}
@@ -1950,6 +2067,11 @@ get _forecast_type(): string {
           </ha-entity-picker>
         </div>
       </div>
+    `;
+  }
+
+  private _skyRain(): TemplateResult {
+    return html`
       <div class="side-by-side">
         <div>
           <ha-entity-picker .hass=${this.hass} .configValue=${'entity_rain_rate'} .value=${this._config?.entity_rain_rate || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_rain_rate')}
@@ -1959,6 +2081,11 @@ get _forecast_type(): string {
         </div>
         <div></div>
       </div>
+    `;
+  }
+
+  private _skyElevations(): TemplateResult {
+    return html`
       ${this._config?.entity_solar_radiation ? html`
       <div class="side-by-side">
         <div>
@@ -1992,31 +2119,26 @@ get _forecast_type(): string {
             </div>
         </div>
       </div>` : html``}
-      <div class="side-by-side">
-        <div>
-          <div class="toggle-row">
-            <span class=${this._config?.option_editor_all_entities ? "pwc-switch active" : "pwc-switch"} .value=${'option_editor_all_entities'} @click=${this._toggleVisibility}></span>
-            <span class="toggle-label">${this._t("all_entities")}</span>
-          </div>
-          <div class="help-text">${this._t("all_entities_hint")}</div>
-        </div>
-      </div>
-      <div style="padding: 8px 0 4px; font-weight: 500;">${this._t("actions")}</div>
-      <hui-action-editor
+    `;
+  }
+
+  private _interactions(): TemplateResult {
+    return html`
+      <hui-action-editor data-key="tap_action"
         .label=${this._t("tap_action")}
         .hass=${this.hass}
         .config=${this._tap_action}
         .actions=${["more-info","toggle","navigate","url","call-service","assist","none"]}
         @value-changed=${(ev) => this._valueChangedAction('tap_action', ev)}>
       </hui-action-editor>
-      <hui-action-editor
+      <hui-action-editor data-key="hold_action"
         .label=${this._t("hold_action")}
         .hass=${this.hass}
         .config=${this._hold_action}
         .actions=${["more-info","toggle","navigate","url","call-service","assist","none"]}
         @value-changed=${(ev) => this._valueChangedAction('hold_action', ev)}>
       </hui-action-editor>
-      <hui-action-editor
+      <hui-action-editor data-key="double_tap_action"
         .label=${this._t("double_tap_action")}
         .hass=${this.hass}
         .config=${this._double_tap_action}
@@ -2026,9 +2148,7 @@ get _forecast_type(): string {
     `;
   }
 
-  // How the card looks, as distinct from what it reads: the icons, how close the slots sit, and
-  // the weather that moves behind the card. The settings keep the keys they always had.
-  private _optionAppearanceEditor(): TemplateResult {
+  private _apIconPack(): TemplateResult {
     return html`
       <div class="side-by-side">
         <div class="full-width">
@@ -2051,6 +2171,11 @@ get _forecast_type(): string {
           <div class="help-text">Use {condition} as placeholder — e.g. /local/icons/{condition}.svg</div>
         </div>` : html``}
       </div>
+    `;
+  }
+
+  private _apStaticCompact(): TemplateResult {
+    return html`
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
@@ -2065,6 +2190,11 @@ get _forecast_type(): string {
             </div>
         </div>
       </div>
+    `;
+  }
+
+  private _apSunIcon(): TemplateResult {
+    return html`
       <div class="side-by-side">
         <div>
           <div class="toggle-row">
@@ -2074,6 +2204,11 @@ get _forecast_type(): string {
         </div>
         <div></div>
       </div>
+    `;
+  }
+
+  private _apEffects(): TemplateResult {
+    return html`
       <div class="side-by-side">
         <div>
           <label class="label">${this._t("effects")}</label>
@@ -2094,6 +2229,11 @@ get _forecast_type(): string {
       <div class="side-by-side full-width">
         <div class="full-width"><div class="help-text">${this._t("effects_hint")}</div></div>
       </div>
+    `;
+  }
+
+  private _warnStyle(): TemplateResult {
+    return html`
       <div class="side-by-side">
         <div class="full-width">
           <label class="label">${this._t("warning_style")}</label>
@@ -2106,56 +2246,111 @@ get _forecast_type(): string {
     `;
   }
 
-  private _renderSubElementEditor(): TemplateResult {
-    const subel: TemplateResult[] = [
-      html`
-        <div class="header">
-          <div class="back-title">
-            <mwc-icon-button @click=${this._goBack}>
-              <ha-icon icon="mdi:arrow-left"></ha-icon>
-            </mwc-icon-button>
-          </div>
+  private _lfPressure(): TemplateResult {
+    return html`
+      <div class="side-by-side">
+        <div>
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pressure'} .value=${this._entity_pressure} .includeDomains=${['sensor', 'weather']} .entityFilter=${this._filterFor('entity_pressure')}
+            name="entity_pressure" label=${this._t("entity_pressure")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
         </div>
-      `,
-    ];
-    switch (this._subElementEditor) {
-      case 'section_overview':
-        subel.push(this._sectionOverviewEditor());
-        break;
-      case 'option_overview':
-        subel.push(this._optionOverviewEditor());
-        break;
-      case 'section_warnings':
-        subel.push(this._sectionWarningsEditor());
-        break;
-      case 'section_extended':
-        subel.push(this._sectionExtendedEditor());
-        break;
-      case 'section_slots':
-        subel.push(this._sectionSlotsEditor());
-        break;
-      case 'option_slots':
-        subel.push(this._optionSlotsEditor());
-        break;
-      case 'section_daily_forecast':
-        subel.push(this._sectionDailyForecastEditor());
-        break;
-      case 'option_daily_forecast':
-        subel.push(this._optionDailyForecastEditor());
-        break;
-      case 'option_charts':
-        subel.push(this._optionChartsEditor());
-        break;
-      case 'option_hourly_forecast':
-        return this._hourlyForecastOptions();
-      case 'option_global_options':
-        subel.push(this._optionGlobalOptionsEditor());
-        break;
-      case 'option_appearance':
-        subel.push(this._optionAppearanceEditor());
-        break;
-    }
-    return html`${subel}`;
+        <div>
+          <ha-entity-picker .hass=${this.hass} .configValue=${'entity_pressure_trend'} .value=${this._entity_pressure_trend} .includeDomains=${['sensor', 'binary_sensor']}
+            name="entity_pressure_trend" label=${this._t("entity_pressure_trend")} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+          </ha-entity-picker>
+        </div>
+      </div>
+    `;
+  }
+
+
+  // The pages. A section has one page, for where its data come from; everything else is on five pages by topic.
+  private _pageOverview(): TemplateResult {
+    return html`${this._sectionOverviewEditor()}${this._ovComfort()}`;
+  }
+
+  private _pageDailyForecast(): TemplateResult {
+    return html`
+      ${this._sectionDailyForecastEditor()}
+      <div class="group-heading">${this._t("group_days")}</div>
+      ${this._dailyLayoutDays()}${this._dailyExtendedDays()}${this._dailyTooltipsToday()}${this._dailyDate()}${this._dailyPopWind()}
+    `;
+  }
+
+  private _topicAppearance(): TemplateResult {
+    return html`
+      <div class="group-heading">${this._t("group_icons")}</div>
+      ${this._apIconPack()}${this._apStaticCompact()}${this._apSunIcon()}
+      <div class="group-heading">${this._t("group_effects")}</div>
+      ${this._apEffects()}
+      <div class="group-heading">${this._t("group_overview")}</div>
+      ${this._ovLayout()}${this._ovDecimals()}
+      <div class="group-heading">${this._t("group_numbers")}</div>
+      ${this._numTempPressure()}${this._numWind()}${this._numRainForecast()}
+      <div class="group-heading">${this._t("group_readings")}</div>
+      ${this._readGustTap()}${this._readArrowMoon()}
+    `;
+  }
+
+  private _topicWarnings(): TemplateResult {
+    return html`
+      ${this._sectionWarningsEditor()}
+      ${this._warnStyle()}
+      <div class="group-heading">${this._t("group_fire_danger")}</div>
+      ${this._fireColourSlots()}${this._fireColourDaily()}
+    `;
+  }
+
+  private _topicSky(): TemplateResult {
+    return html`${this._skyPyranometer()}${this._skyElevations()}${this._skyRain()}`;
+  }
+
+  private _topicLocalForecast(): TemplateResult {
+    return html`
+      ${this._lfSwitch()}${this._lfDetails()}
+      <div class="group-heading">${this._t("group_barometer")}</div>
+      ${this._lfPressure()}
+    `;
+  }
+
+  private _topicCard(): TemplateResult {
+    return html`${this._cardTitles()}${this._cardTimeLocale()}${this._editorAllEntities()}`;
+  }
+
+  // The pages of the editor, each with its title. The names of 2.6 still lead somewhere, to where their settings went.
+  private static readonly _PAGE_ALIASES: Record<string, string> = {
+    option_overview: 'section_overview', section_warnings: 'topic_warnings', option_slots: 'topic_appearance', option_daily_forecast: 'section_daily_forecast',
+    option_charts: 'section_charts', option_hourly_forecast: 'section_hourly_forecast', option_global_options: 'topic_card', option_appearance: 'topic_appearance',
+  };
+
+  private _renderSubElementEditor(): TemplateResult {
+    const pages: Record<string, [string, () => TemplateResult]> = {
+      section_overview: ['overview_section', () => this._pageOverview()],
+      section_slots: ['slots_section', () => this._sectionSlotsEditor()],
+      section_daily_forecast: ['daily_forecast_section', () => this._pageDailyForecast()],
+      section_hourly_forecast: ['hourly_heading', () => this._hourlyForecastOptions()],
+      section_charts: ['charts_section', () => this._optionChartsEditor()],
+      section_extended: ['extended_section', () => this._sectionExtendedEditor()],
+      topic_appearance: ['topic_appearance', () => this._topicAppearance()],
+      topic_warnings: ['topic_warnings', () => this._topicWarnings()],
+      topic_sky: ['topic_sky', () => this._topicSky()],
+      topic_local_forecast: ['topic_local_forecast', () => this._topicLocalForecast()],
+      topic_card: ['topic_card', () => this._topicCard()],
+    };
+    const id = this._subElementEditor ?? '';
+    const page = pages[WeatherCardEditor._PAGE_ALIASES[id] ?? id];
+    if (!page) return html``;
+    return html`
+      <div class="header">
+        <div class="back-title">
+          <mwc-icon-button @click=${this._goBack}>
+            <ha-icon icon="mdi:arrow-left"></ha-icon>
+          </mwc-icon-button>
+          <span class="page-title">${this._t(page[0])}</span>
+        </div>
+      </div>
+      ${page[1]()}
+    `;
   }
 
   // What the picker of the cloud cover entity offers: a weather entity that gives a cloud cover, and a sensor in per cent. Not every sensor and every
@@ -2321,181 +2516,66 @@ get _forecast_type(): string {
     return this._config?.show_section_charts !== false; //default on
   }
 
+  // A section on the first screen: its switch, its place in the order, and one button for its page.
+  private _sectionRow(block: string, showKey: string, on: boolean, icon: string, titleKey: string, edit: string, first: boolean, last: boolean, movable = true): TemplateResult {
+    return html`
+      <div class="section-flex section-row edit-${block.replace(/_/g, '-')}-section">
+        <div class="section-label">
+          <span class=${on ? "pwc-switch active" : "pwc-switch"} .value=${showKey} @click=${this._toggleVisibility}></span>
+          <ha-icon class="section-icon" icon=${icon}></ha-icon>
+          <span class="section-title">${this._t(titleKey)}</span>
+        </div>
+        <div>
+          ${movable ? html`
+          <ha-icon-button class="down-icon" .value=${block} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
+          </ha-icon-button>
+          <ha-icon-button class="up-icon" .value=${block} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
+          </ha-icon-button>` : html`<div class="no-icon"></div><div class="no-icon"></div>`}
+          <ha-icon-button class="edit-icon" .value=${edit} .path=${mdiPencil} @click="${this._editSubmenu}">
+          </ha-icon-button>
+        </div>
+      </div>
+    `;
+  }
+
   private getConfigBlock(block: string, first: boolean, last: boolean): TemplateResult {
     switch (block) {
       case 'overview':
-        return html`
-          <div class="section-flex edit-overview-section">
-            <div class="section-label">
-              <span class=${this._show_section_overview !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_overview'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:eye-outline"></ha-icon>
-              <span class="section-title">${this._t("overview_section")}</span>
-            </div>
-            <div>
-              <ha-icon-button class="down-icon" .value=${'overview'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
-              </ha-icon-button>
-              <ha-icon-button class="up-icon" .value=${'overview'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
-              </ha-icon-button>
-              <ha-icon-button class="edit-icon" .value=${'section_overview'} .path=${mdiPencil} @click="${this._editSubmenu}">
-              </ha-icon-button>
-              <ha-icon-button class="option-icon" .value=${'option_overview'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
-              </ha-icon-button>
-            </div>
-          </div>
-        `;
+        return this._sectionRow(block, 'show_section_overview', this._show_section_overview !== false, 'mdi:eye-outline', 'overview_section', 'section_overview', first, last);
       case 'warnings':
-        return html`
-          <div class="section-flex edit-warnings-section">
-            <div class="section-label">
-              <span class=${this._config?.show_section_warnings !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_warnings'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:alert-outline"></ha-icon>
-              <span class="section-title">${this._t("warnings_section")}</span>
-            </div>
-            <div>
-              <ha-icon-button class="down-icon" .value=${'warnings'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
-              </ha-icon-button>
-              <ha-icon-button class="up-icon" .value=${'warnings'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
-              </ha-icon-button>
-              <ha-icon-button class="edit-icon" .value=${'section_warnings'} .path=${mdiPencil} @click="${this._editSubmenu}">
-              </ha-icon-button>
-              <div class="no-icon"></div>
-            </div>
-          </div>
-        `;
+        // the section shows the warnings; what it warns of is the topic Warnings
+        return this._sectionRow(block, 'show_section_warnings', this._config?.show_section_warnings !== false, 'mdi:alert-outline', 'warnings_section', 'topic_warnings', first, last);
       case 'extended':
-        return html`
-          <div class="section-flex edit-extended-section">
-            <div class="section-label">
-              <span class=${this._show_section_extended !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_extended'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:text-box-outline"></ha-icon>
-              <span class="section-title">${this._t("extended_section")}</span>
-            </div>
-            <div>
-              <ha-icon-button class="down-icon" .value=${'extended'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
-              </ha-icon-button>
-              <ha-icon-button class="up-icon" .value=${'extended'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
-              </ha-icon-button>
-              <ha-icon-button class="edit-icon" .value=${'section_extended'} .path=${mdiPencil} @click="${this._editSubmenu}">
-              </ha-icon-button>
-              <div class="no-icon"></div>
-            </div>
-          </div>
-        `;
+        return this._sectionRow(block, 'show_section_extended', this._show_section_extended !== false, 'mdi:text-box-outline', 'extended_section', 'section_extended', first, last);
       case 'slots':
-        return html`
-          <div class="section-flex edit-slots-section">
-            <div class="section-label">
-              <span class=${this._show_section_slots !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_slots'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:view-grid-outline"></ha-icon>
-              <span class="section-title">${this._t("slots_section")}</span>
-            </div>
-            <div>
-              <ha-icon-button class="down-icon" .value=${'slots'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
-              </ha-icon-button>
-              <ha-icon-button class="up-icon" .value=${'slots'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
-              </ha-icon-button>
-              <ha-icon-button class="edit-icon" .value=${'section_slots'} .path=${mdiPencil} @click="${this._editSubmenu}">
-              </ha-icon-button>
-              <ha-icon-button class="option-icon" .value=${'option_slots'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
-              </ha-icon-button>
-            </div>
-          </div>
-        `;
+        return this._sectionRow(block, 'show_section_slots', this._show_section_slots !== false, 'mdi:view-grid-outline', 'slots_section', 'section_slots', first, last);
       case 'daily_forecast':
-        return html`
-          <div class="section-flex edit-daily-forecast-section">
-            <div class="section-label">
-              <span class=${this._show_section_daily_forecast !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_daily_forecast'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:calendar-week"></ha-icon>
-              <span class="section-title">${this._t("daily_forecast_section")}</span>
-            </div>
-            <div>
-              <ha-icon-button class="down-icon" .value=${'daily_forecast'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
-              </ha-icon-button>
-              <ha-icon-button class="up-icon" .value=${'daily_forecast'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
-              </ha-icon-button>
-              <ha-icon-button class="edit-icon" .value=${'section_daily_forecast'} .path=${mdiPencil} @click="${this._editSubmenu}">
-              </ha-icon-button>
-              <ha-icon-button class="option-icon" .value=${'option_daily_forecast'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
-              </ha-icon-button>
-            </div>
-          </div>
-        `;
+        return this._sectionRow(block, 'show_section_daily_forecast', this._show_section_daily_forecast !== false, 'mdi:calendar-week', 'daily_forecast_section', 'section_daily_forecast', first, last);
       case 'charts':
-        return html`
-          <div class="section-flex edit-charts-section">
-            <div class="section-label">
-              <span class=${this._show_section_charts !== false ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_charts'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:chart-line"></ha-icon>
-              <span class="section-title">${this._t("charts_section")}</span>
-            </div>
-            <div>
-              <ha-icon-button class="down-icon" .value=${'charts'} .path=${mdiArrowDown} .disabled=${last} @click="${this._moveDown}">
-              </ha-icon-button>
-              <ha-icon-button class="up-icon" .value=${'charts'} .path=${mdiArrowUp} .disabled=${first} @click="${this._moveUp}">
-              </ha-icon-button>
-              <div class="no-icon"></div>
-              <ha-icon-button class="option-icon" .value=${'option_charts'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
-              </ha-icon-button>
-            </div>
-          </div>
-        `;
+        return this._sectionRow(block, 'show_section_charts', this._show_section_charts !== false, 'mdi:chart-line', 'charts_section', 'section_charts', first, last);
       case 'hourly_forecast':
-        // A row of its own, but not a section: the hours are a view of the
-        // forecast, so there is nothing to reorder. Its switch, together with
-        // the daily forecast's, decides which view shows.
-        return html`
-          <div class="section-flex">
-            <div class="section-label">
-              <span class=${this._config?.show_section_hourly_forecast === true ? "pwc-switch active" : "pwc-switch"} .value=${'show_section_hourly_forecast'} @click=${this._toggleVisibility}></span>
-              <ha-icon class="section-icon" icon="mdi:clock-outline"></ha-icon>
-              <span class="section-title">${this._t("hourly_heading")}</span>
-            </div>
-            <div>
-              <div class="no-icon"></div>
-              <div class="no-icon"></div>
-              <div class="no-icon"></div>
-              <ha-icon-button class="edit-icon" .value=${'option_hourly_forecast'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
-              </ha-icon-button>
-            </div>
-          </div>
-        `;
-      case 'appearance':
-        return html`
-          <div class="section-flex">
-            <div class="section-label">
-              <div class="visibility-spacer"></div>
-              <ha-icon class="section-icon" icon="mdi:palette-outline"></ha-icon>
-              <span class="section-title">${this._t("appearance")}</span>
-            </div>
-            <div>
-              <div class="no-icon"></div>
-              <div class="no-icon"></div>
-              <div class="no-icon"></div>
-              <ha-icon-button class="edit-icon" .value=${'option_appearance'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
-              </ha-icon-button>
-            </div>
-          </div>
-        `;
-      case 'global_options':
-        return html`
-          <div class="section-flex">
-            <div class="section-label">
-              <div class="visibility-spacer"></div>
-              <ha-icon class="section-icon" icon="mdi:cog"></ha-icon>
-              <span class="section-title">${this._t("global_options")}</span>
-            </div>
-            <div>
-              <div class="no-icon"></div>
-              <div class="no-icon"></div>
-              <div class="no-icon"></div>
-              <ha-icon-button class="edit-icon" .value=${'option_global_options'} .path=${mdiApplicationEditOutline} @click="${this._editSubmenu}">
-              </ha-icon-button>
-            </div>
-          </div>
-        `;
+        // A row of its own, but not a section: the hours are a view of the forecast, so there is nothing to reorder. Its switch, together with the daily
+        // forecast's, decides which view shows.
+        return this._sectionRow(block, 'show_section_hourly_forecast', this._config?.show_section_hourly_forecast === true, 'mdi:clock-outline', 'hourly_heading', 'section_hourly_forecast', first, last, false);
     }
     return html``;
+  }
+
+  private static readonly _TOPICS: [string, string][] = [
+    ['topic_appearance', 'mdi:palette-outline'], ['topic_warnings', 'mdi:alert-outline'], ['topic_sky', 'mdi:weather-partly-cloudy'],
+    ['topic_local_forecast', 'mdi:gauge'], ['topic_card', 'mdi:card-text-outline'],
+  ];
+
+  private _topicRows(): TemplateResult {
+    return html`
+      <div class="topics-heading">${this._t('topics_heading')}</div>
+      ${WeatherCardEditor._TOPICS.map(([id, icon]) => html`
+        <button class="topic-row" .value=${id} data-topic=${id} @click=${this._editSubmenu}>
+          <ha-icon class="section-icon" icon=${icon}></ha-icon>
+          <span class="section-title topic-title">${this._t(id)}</span>
+          <ha-icon class="topic-chevron" icon="mdi:chevron-right"></ha-icon>
+        </button>`)}
+    `;
   }
 
   protected render(): TemplateResult | void {
@@ -2508,16 +2588,21 @@ get _forecast_type(): string {
     const htmlConfig: TemplateResult[] = [];
     const slots = this._section_order || [];
 
-    htmlConfig.push(this.getConfigBlock('global_options', false, false));
-    htmlConfig.push(this.getConfigBlock('appearance', false, false));
+    htmlConfig.push(html`<div class="topics-heading">${this._t('sections_heading')}</div>`);
     slots.forEach((slot, index) => {
       htmlConfig.push(this.getConfigBlock(slot, index === 0, index + 1 === slots.length));
-      // Directly beneath the forecast it belongs to, rather than at the end of
-      // the list where nobody would look for it.
+      // Directly beneath the forecast it belongs to, rather than at the end of the list where nobody would look for it.
       if (slot === 'daily_forecast') {
         htmlConfig.push(this.getConfigBlock('hourly_forecast', false, false));
       }
     });
+    htmlConfig.push(this._topicRows());
+    // As in the cards of Home Assistant: what a tap does is not how the card looks, and comes last.
+    htmlConfig.push(html`
+      <ha-expansion-panel class="interactions" outlined .header=${this._t('interactions')}>
+        ${this._interactions()}
+      </ha-expansion-panel>
+    `);
 
     return html`${htmlConfig}`;
   }
@@ -2678,6 +2763,53 @@ get _forecast_type(): string {
   }
 
   static styles: CSSResultGroup = css`
+    /* the first screen and the pages by topic (2.7) */
+    .section-row {
+      min-height: 48px;
+    }
+    .topics-heading, .group-heading {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--secondary-text-color);
+      margin: 18px 0 6px;
+    }
+    .topic-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 48px;
+      padding: 4px 0;
+      border: 0;
+      border-bottom: 1px solid var(--divider-color);
+      background: none;
+      color: var(--primary-text-color);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .topic-title {
+      flex: 1;
+    }
+    .topic-chevron {
+      color: var(--secondary-text-color);
+    }
+    .page-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-left: 4px;
+    }
+    .interactions {
+      display: block;
+      margin-top: 18px;
+    }
+    .toggle-row.disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
     ha-input,
     ha-entity-picker,
     ha-icon-picker,

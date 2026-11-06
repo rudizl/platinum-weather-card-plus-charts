@@ -10,7 +10,7 @@ import { makeHass } from './helpers';
 
 type Editor = HTMLElement & {
   setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown>;
-  _optionAppearanceEditor: () => unknown; _valueChanged: (ev: unknown) => void;
+  _topicAppearance: () => unknown; _valueChanged: (ev: unknown) => void;
 };
 
 async function editor(config: Record<string, unknown> = {}) {
@@ -20,7 +20,7 @@ async function editor(config: Record<string, unknown> = {}) {
   document.body.appendChild(el);
   await el.updateComplete;
   const box = document.createElement('div');
-  render(el._optionAppearanceEditor() as never, box);
+  render(el._topicAppearance() as never, box);
   return { el, box };
 }
 const select = (box: HTMLElement, key: string) =>

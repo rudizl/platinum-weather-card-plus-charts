@@ -204,19 +204,24 @@ describe('selects can show their stored value', () => {
 });
 
 describe('every section row is the same width', () => {
-  it('gives each row four button slots', () => {
-    // Rows differ in which buttons they need — Extended has no submenu, Charts
-    // has no per-section editor — so without spacers their icons land in
-    // different columns and the list looks ragged.
-    const rows = ['overview', 'warnings', 'extended', 'slots', 'daily_forecast', 'charts', 'global_options'];
+  it('gives each row three button slots', () => {
+    // Without spacers the icons of rows that need fewer buttons land in different columns and the list looks ragged. Since 2.7 every
+    // section has one page, so a row has three slots, the two arrows and the pencil, and a row that does not move has two spacers for the arrows.
+    // Every row is drawn by one function, so they cannot drift apart.
+    const rows = ['overview', 'warnings', 'extended', 'slots', 'daily_forecast', 'charts', 'hourly_forecast'];
     for (const row of rows) {
-      const m = new RegExp(`case '${row}':([\\s\\S]*?)(?=\\n      case '|\\n    \\})`).exec(editor);
+      const m = new RegExp(`case '${row}':([\\s\\S]*?);\\n`).exec(editor);
       expect(m, `row ${row} not found`).not.toBeNull();
-      const body = m![1];
-      const buttons = (body.match(/<ha-icon-button/g) ?? []).length;
-      const spacers = (body.match(/<div class="no-icon"><\/div>/g) ?? []).length;
-      expect(buttons + spacers, `${row}: ${buttons} buttons + ${spacers} spacers`).toBe(4);
+      expect(m![1], `${row} is drawn by _sectionRow`).toContain('this._sectionRow(');
     }
+    const draw = /private _sectionRow\([\s\S]*?\n  \}\n/.exec(editor)![0];
+    const [moves, still] = draw.split(' : html`');
+    const count = (s: string) => (s.match(/<ha-icon-button/g) ?? []).length + (s.match(/<div class="no-icon"><\/div>/g) ?? []).length;
+    // the pencil is after both branches, so it counts once for each
+    const pencil = (draw.slice(draw.lastIndexOf('`}')).match(/<ha-icon-button/g) ?? []).length;
+    expect(pencil, 'the pencil').toBe(1);
+    expect(count(moves.slice(moves.indexOf('${movable ? html`'))), 'a row that moves: two arrows').toBe(2);
+    expect(count(still.slice(0, still.indexOf('`}'))), 'a row that does not: two spacers').toBe(2);
   });
 });
 

@@ -130,7 +130,7 @@ describe('the switch that turns it off', () => {
   it('is in the global options, with its words', () => {
     const el = house(HOUSE);
     const box = document.createElement('div');
-    render((el as unknown as { _optionGlobalOptionsEditor: () => unknown })._optionGlobalOptionsEditor() as never, box);
+    render((el as unknown as { _topicCard: () => unknown })._topicCard() as never, box);
     expect(box.querySelector('.pwc-switch') !== null && [...box.querySelectorAll('.pwc-switch')].some((s) => (s as unknown as { value?: string }).value === 'option_editor_all_entities')).toBe(true);
   });
 });

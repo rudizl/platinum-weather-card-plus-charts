@@ -117,7 +117,7 @@ describe('the provider\'s warnings follow the style too', () => {
 });
 
 describe('the editor offers the choice', () => {
-  type Editor = HTMLElement & { setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown>; _optionAppearanceEditor: () => unknown };
+  type Editor = HTMLElement & { setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown>; _topicWarnings: () => unknown };
   async function panel(config: Record<string, unknown> = {}) {
     const el = document.createElement('platinum-weather-card-plus-charts-editor') as Editor;
     el.setConfig({ card_config_version: 8, weather_entity: 'weather.home', ...config });
@@ -125,7 +125,7 @@ describe('the editor offers the choice', () => {
     document.body.appendChild(el);
     await el.updateComplete;
     const box = document.createElement('div');
-    render(el._optionAppearanceEditor() as never, box);
+    render(el._topicWarnings() as never, box);
     return box;
   }
   const sel = (box: HTMLElement) => [...box.querySelectorAll('select')].find((s) => (s as unknown as { configValue: string }).configValue === 'option_warning_style') as HTMLSelectElement | undefined;
