@@ -1121,7 +1121,7 @@ export class PlatinumWeatherCard extends LitElement {
       const points = tWindDirections(this.locale);
       direction = ` ${points[Math.round(((bearing % 360) + 360) % 360 / 22.5) % 16]}`;
     }
-    const headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)}${unit}${direction}`;
+    const headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)} ${unit}${direction}`;
 
     if (this._warningStyle === 'classic') {
       return html`
@@ -2055,6 +2055,13 @@ export class PlatinumWeatherCard extends LitElement {
   }
 
   private _renderChartSection(): TemplateResult {
+    // The boxes of the values follow the mode of Home Assistant: dark with white text as they always were in dark mode (and when the mode is not
+    // known), light with the text colour of the theme in light mode, where the dark boxes were patches. --pwcc-chart-label-background and
+    // --pwcc-chart-label-color set them by hand.
+    const lightMode = (this.hass as unknown as { themes?: { darkMode?: boolean } } | undefined)?.themes?.darkMode === false;
+    const labelBg = lightMode ? 'rgba(255,255,255,0.9)' : 'rgba(10,14,24,0.85)';
+    const labelBgRain = lightMode ? 'rgba(255,255,255,0.9)' : 'rgba(10,14,24,0.9)';
+    const labelFg = lightMode ? 'var(--primary-text-color, #212121)' : '#fff';
     if (this._config.show_section_charts === false) return html``;
     // A forecast array comes from a weather entity. A card configured the way the
     // original Platinum card was — per-day sensors, entity_forecast_*_1 with a
@@ -2165,8 +2172,8 @@ export class PlatinumWeatherCard extends LitElement {
       if (showTemp && isFinite(tempYs[i].maxY) && isFinite(tempYs[i].minY)) {
         const maxTop = tempYs[i].maxY - BH / 2;
         const minTop = tempYs[i].minY - BH / 2;
-        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:rgba(10,14,24,0.85);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
-        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:rgba(10,14,24,0.85);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${Math.round(d.minT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
       }
       if (showPrecip) {
         const pMax  = Math.max(...data.map(x => x.precip), 0.1);
@@ -2178,7 +2185,7 @@ export class PlatinumWeatherCard extends LitElement {
           // Bar behind everything (z-index 0), rising from bottom of temp area
           colHtml = `<div style="position:absolute;top:${bTop}px;left:0;right:0;height:${bH}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>` + colHtml;
           // Label centered ON the baseline
-          colHtml += `<div style="position:absolute;top:${tempH - 6}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:rgba(10,14,24,0.9);padding:1px 4px;font-size:8px;color:#fff;white-space:nowrap;">${label}</div>`;
+          colHtml += `<div style="position:absolute;top:${tempH - 6}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBgRain});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${label}</div>`;
         } else {
           // 0mm: subtle dash at baseline
           colHtml += `<div style="position:absolute;top:${tempH - 1}px;left:0;right:0;height:2px;background:rgba(151,230,255,0.15);border-radius:1px;"></div>`;
@@ -2320,7 +2327,9 @@ export class PlatinumWeatherCard extends LitElement {
           : forecastData.forecast.slice(0, firstDay + forecastDays))
         : undefined;
   
-    if (this._checkForErrors()) htmlCode.push(this._showConfigWarning(this._error));
+    // An entity that is missing (deleted, renamed, not loaded yet) is a row at the top of the card, inside it: a box of Home Assistant's above the card
+    // pushed the card out of its cell in the sections view, and one missing optional sensor left only the warning to be seen.
+    const configWarning = this._checkForErrors() ? this._showConfigWarning(this._error) : html``;
 
     const sections: TemplateResult[] = [];
     if (this._config.section_order !== undefined) {
@@ -2364,7 +2373,7 @@ export class PlatinumWeatherCard extends LitElement {
           hasAction(this._config.tap_action) ? "0" : undefined
         )}
         >${this._fxLayer('card')}<div class="content">
-          ${sections}
+          ${configWarning}${sections}
         </div>
       </ha-card>
     `);
@@ -4207,9 +4216,9 @@ export class PlatinumWeatherCard extends LitElement {
 
   // is12Hour - returns true if 12 hour clock or false if 24
   get timeFormat(): timeFormat {
-    if (this._config.option_time_format && this._config.option_time_format !== 'system') {
-      return this._config.option_time_format;
-    }
+    // Only the two that the card knows are taken as they are: anything else (`24`, a typo) means `system`, as it is not drawn otherwise.
+    const own = this._config.option_time_format as string | undefined;
+    if (own === '12hour' || own === '24hour') return own;
     // Read from HA system settings (Settings → Profile → Time format)
     const haTimeFormat = this.hass?.locale?.time_format;
     if (haTimeFormat === '12') return '12hour';
@@ -4964,10 +4973,10 @@ export class PlatinumWeatherCard extends LitElement {
     // const errorCard = <LovelaceCard>document.createElement('hui-error-card');
     // eslint-disable-next-line no-console
     return html`
-      <hui-warning>
-        <div>Weather Card</div>
-        ${warnings.map(warning => html`<div>${warning}</div>`)}
-      </hui-warning>
+      <div class="config-warning" role="status">
+        <ha-icon class="config-warning-icon" icon="mdi:alert-outline"></ha-icon>
+        <div class="config-warning-lines">${warnings.map(warning => html`<div class="config-warning-text">${warning}</div>`)}</div>
+      </div>
     `;
   }
 
@@ -5372,6 +5381,31 @@ export class PlatinumWeatherCard extends LitElement {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+      .config-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin: 8px 0 4px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: rgba(255, 166, 0, 0.12);
+        color: var(--primary-text-color);
+        font-size: 12px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+      .config-warning-icon {
+        color: var(--warning-color, #ffa600);
+        --mdc-icon-size: 18px;
+        flex: 0 0 auto;
+      }
+      .config-warning-lines {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .config-warning-text {
+        white-space: normal;
       }
       .warning-row.multi .warning-text {
         white-space: normal;
