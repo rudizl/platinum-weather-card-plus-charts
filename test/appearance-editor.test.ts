@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render } from 'lit';
 import '../src/platinum-weather-card';
 import '../src/editor';
-import { makeHass } from './helpers';
+import { makeHass, choice } from './helpers';
 
 // Global Options had become a drawer for everything that fitted nowhere else. What decides how the card looks, as distinct from what it reads, got a panel of its
 // own next to it in 2.6, and in 2.7 it is the first of the five pages by topic; Global Options is gone, and what it held is on the pages Card and language and Sky
@@ -97,7 +97,8 @@ describe('the settings do not move in the configuration', () => {
   it('a card configured before the move still reads and shows the same values', async () => {
     const el = await editor({ icon_pack: 'meteocons-fill', option_static_icons: true, option_compact_slots: true, option_effects: 'full', option_effects_area: 'card' });
     const box = draw(el._topicAppearance());
-    const sel = (k: string) => ([...box.querySelectorAll('select')].find((s) => (s as unknown as { configValue: string }).configValue === k) as unknown as { value: string }).value;
+    // the pack, the effects and their place are chosen by pressing since 2.7: the chosen one is pressed
+    const sel = (k: string) => choice(box, k)?.value;
     expect(sel('icon_pack')).toBe('meteocons-fill');
     expect(sel('option_effects')).toBe('full');
     expect(sel('option_effects_area')).toBe('card');

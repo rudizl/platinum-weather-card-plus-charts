@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import '../src/platinum-weather-card';
 import '../src/editor';
 import { render } from 'lit';
-import { makeHass, baseConfig, renderCard } from './helpers';
+import { makeHass, baseConfig, renderCard, choice } from './helpers';
 
 // The photoreal pack: WebP pictures with a transparent background, kept in icons/photoreal and shipped in one module beside the
 // card (dist/icons-photoreal.js, #41; they were PNGs, a flat file each, until 2.7), named p-<name>.webp: the fifteen names the custom pack asks for, and five more for
@@ -215,10 +215,11 @@ describe('the choice in the editor', () => {
     document.body.appendChild(el);
     await el.updateComplete;
     const box = document.createElement('div'); render(el._topicAppearance() as never, box);
-    const sel = [...box.querySelectorAll('select')].find((s) => (s as unknown as { configValue: string }).configValue === 'icon_pack') as HTMLSelectElement;
-    const values = [...sel.querySelectorAll('option')].map((o) => o.getAttribute('value'));
+    // a picture for each pack since 2.7, the chosen one pressed
+    const sel = choice(box, 'icon_pack')!;
+    const values = sel.values;
     expect(values).toContain('photoreal');
-    expect((sel as unknown as { value: string }).value).toBe('photoreal');
+    expect(sel.value).toBe('photoreal');
     expect(values.indexOf('photoreal')).toBeLessThan(values.indexOf('custom'));
   });
 });

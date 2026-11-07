@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
+import { LitElement, html, svg, TemplateResult, css, CSSResultGroup } from 'lit';
 import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helpers';
 
 import { keys } from 'ts-transformer-keys';
@@ -8,6 +8,8 @@ import { mdiPencil, mdiArrowDown, mdiArrowUp } from '@mdi/js';
 
 import { tEditor } from './translations';
 import { kmPer } from './distance';
+import { iconData } from './icon-packs';
+import { CARD_VERSION } from './const';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
@@ -2156,29 +2158,58 @@ get _forecast_type(): string {
     `;
   }
 
+  // A choice made by pressing a picture: the button carries configValue and value, as a select does, and the click may land on the picture in it.
+  private _pick(ev: Event): void {
+    this._valueChanged({ target: ev.currentTarget });
+  }
+
+  // The partly cloudy day of each pack, for its button: the built-in ones from their modules, the others from where the card takes them.
+  private _packPicture(pack: string): string | null {
+    const base = (() => { const u = import.meta.url.split('?')[0]; return u.substring(0, u.lastIndexOf('/') + 1); })();
+    const own = (file: string) => iconData(base, file, CARD_VERSION, () => this.requestUpdate()) ?? '';
+    switch (pack) {
+      case 'default': return own(this._option_static_icons === true ? 's-cloudy-2-day.svg' : 'a-cloudy-2-day.svg');
+      case 'photoreal': return own('p-partlycloudy-day.webp');
+      case 'meteocons-fill': return 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/partly-cloudy-day.svg';
+      case 'meteocons-line': return 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/partly-cloudy-day.svg';
+      case 'ha-official': return 'https://cdn.jsdelivr.net/gh/scinos/lovelace-weather-icons@main/svg/partlycloudy.svg';
+      case 'wcc-2': return '/hacsfiles/weather-chart-card/icons2/partlycloudy-day.svg';
+      default: return null;
+    }
+  }
+
+  private static readonly _PACKS: [string, string][] = [
+    ['default', ''], ['photoreal', 'Photoreal'], ['meteocons-fill', 'Meteocons Fill'], ['meteocons-line', 'Meteocons Line'],
+    ['ha-official', 'Home Assistant'], ['wcc-2', 'amCharts'], ['custom', ''],
+  ];
+
   private _apIconPack(): TemplateResult {
+    const chosen = this._icon_pack || 'default';
     return html`
+      <label class="label">${this._t("icon_pack")}</label>
+      <div class="picker picker-packs" role="group" aria-label=${this._t("icon_pack")}>
+        ${WeatherCardEditor._PACKS.map(([pack, name]) => {
+          const picture = this._packPicture(pack);
+          const label = pack === 'default' ? this._t('opt_default') : pack === 'custom' ? this._t('icon_path') : name;
+          return html`
+          <button class="pick${chosen === pack ? ' chosen' : ''}" aria-pressed=${chosen === pack ? 'true' : 'false'} title=${label}
+            .configValue=${'icon_pack'} .value=${pack} @click=${this._pick}>
+            ${picture !== null
+              ? html`<img src=${picture} alt="" @error=${(e: Event) => ((e.currentTarget as HTMLElement).style.visibility = 'hidden')}>`
+              : html`<ha-icon icon="mdi:folder-image"></ha-icon>`}
+            <span>${label}</span>
+          </button>`;
+        })}
+      </div>
+      ${this._icon_pack === 'custom' ? html`
       <div class="side-by-side">
-        <div class="full-width">
-          <label class="label">${this._t("icon_pack")}</label>
-          <select class='ha-select-compat' .configValue=${'icon_pack'} .value=${this._icon_pack} @change=${this._valueChanged}>
-            <option value='default'>Default (built-in animated)</option>
-            <option value='photoreal'>Photorealistic (built-in, experimental)</option>
-            <option value='meteocons-fill'>Meteocons — Fill (CDN, basmilius)</option>
-            <option value='meteocons-line'>Meteocons — Line (CDN, basmilius)</option>
-            <option value='ha-official'>Home Assistant official (CDN, scinos)</option>
-            <option value='wcc-2'>ammap Weather Icons (requires weather-chart-card)</option>
-            <option value='custom'>Custom path...</option>
-          </select>
-        </div>
-        ${this._icon_pack === 'custom' ? html`
         <div class="full-width">
           <ha-input .label=${this._t("icon_path")} .value=${this._icon_pack_path}
             .configValue=${'icon_pack_path'} @change=${this._valueChanged}>
           </ha-input>
           <div class="help-text">Use {condition} as placeholder — e.g. /local/icons/{condition}.svg</div>
-        </div>` : html``}
-      </div>
+        </div>
+      </div>` : html``}
     `;
   }
 
@@ -2186,8 +2217,11 @@ get _forecast_type(): string {
     return html`
       <div class="side-by-side">
         <div>
-          <div class="toggle-row">
-              <span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} @click=${this._toggleVisibility}></span>
+          <!-- the static icons are of the default pack: greyed, and no click, with any other, as the colours of the fire danger are without its entity -->
+          <div class="toggle-row${(this._icon_pack || 'default') === 'default' ? '' : ' disabled'}">
+              ${(this._icon_pack || 'default') === 'default'
+                ? html`<span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} @click=${this._toggleVisibility}></span>`
+                : html`<span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} aria-disabled="true"></span>`}
               <span class="toggle-label">${this._t("show_static_icons")}</span>
           </div>
         </div>
@@ -2215,41 +2249,59 @@ get _forecast_type(): string {
     `;
   }
 
+  // A small dark card for each setting of the effects: nothing, a little cloud, and cloud, rain and stars.
+  private static _effectsPicture(level: string): TemplateResult {
+    return html`<svg viewBox="0 0 140 86" aria-hidden="true">
+      <rect width="140" height="86" rx="8" fill="#151a22"></rect>
+      ${level === 'subtle' ? svg`<ellipse cx="62" cy="24" rx="26" ry="9" fill="#fff" opacity="0.1"></ellipse><ellipse cx="110" cy="62" rx="30" ry="9" fill="#fff" opacity="0.08"></ellipse>` : ''}
+      ${level === 'full' ? svg`<circle cx="60" cy="12" r="1" fill="#fff" opacity=".8"></circle><circle cx="92" cy="9" r="1.1" fill="#fff" opacity=".7"></circle><circle cx="128" cy="20" r="1" fill="#fff" opacity=".6"></circle>
+        <ellipse cx="58" cy="26" rx="30" ry="10" fill="#cfd8e6" opacity="0.22"></ellipse><ellipse cx="100" cy="58" rx="36" ry="11" fill="#cfd8e6" opacity="0.18"></ellipse>
+        <g stroke="#9fc4ff" stroke-width="1.4" stroke-linecap="round" opacity=".7"><path d="M40 50l-3 8M56 56l-3 8M72 48l-3 8M88 60l-3 8M118 46l-3 8"></path></g>` : ''}
+      <circle cx="26" cy="30" r="10" fill="#f6c453"></circle>
+    </svg>`;
+  }
+
   private _apEffects(): TemplateResult {
+    const level = this._option_effects;
+    const area = this._option_effects_area;
     return html`
-      <div class="side-by-side">
-        <div>
-          <label class="label">${this._t("effects")}</label>
-          <select class='ha-select-compat' .configValue=${'option_effects'} .value=${this._option_effects} @change=${this._valueChanged}>
-            <option value='off'>${this._t("effects_off")}</option>
-            <option value='subtle'>${this._t("effects_subtle")}</option>
-            <option value='full'>${this._t("effects_full")}</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">${this._t("effects_area")}</label>
-          <select class='ha-select-compat' .configValue=${'option_effects_area'} .value=${this._option_effects_area} @change=${this._valueChanged}>
-            <option value='overview'>${this._t("effects_area_overview")}</option>
-            <option value='card'>${this._t("effects_area_card")}</option>
-          </select>
-        </div>
+      <label class="label">${this._t("effects")}</label>
+      <div class="picker picker-effects" role="group" aria-label=${this._t("effects")}>
+        ${['off', 'subtle', 'full'].map((v) => html`
+          <button class="pick${level === v ? ' chosen' : ''}" aria-pressed=${level === v ? 'true' : 'false'}
+            .configValue=${'option_effects'} .value=${v} @click=${this._pick}>
+            ${WeatherCardEditor._effectsPicture(v)}<span>${this._t(`effects_${v}`)}</span>
+          </button>`)}
       </div>
-      <div class="side-by-side full-width">
-        <div class="full-width"><div class="help-text">${this._t("effects_hint")}</div></div>
+      <label class="label">${this._t("effects_area")}</label>
+      <div class="segmented" role="group" aria-label=${this._t("effects_area")}>
+        ${['overview', 'card'].map((v) => html`
+          <button class="seg${area === v ? ' chosen' : ''}" aria-pressed=${area === v ? 'true' : 'false'}
+            .configValue=${'option_effects_area'} .value=${v} @click=${this._pick}>${this._t(`effects_area_${v}`)}</button>`)}
       </div>
+      <div class="help-text">${this._t("effects_hint")}</div>
     `;
   }
 
   private _warnStyle(): TemplateResult {
+    const style = this._option_warning_style;
+    const bolt = svg`<path d="M13 2 4 14h6l-1 8 9-12h-6z"></path>`;
+    const icon = (c: string) => html`<svg viewBox="0 0 24 24" fill="none" stroke=${c} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${bolt}</svg>`;
     return html`
-      <div class="side-by-side">
-        <div class="full-width">
-          <label class="label">${this._t("warning_style")}</label>
-          <select class='ha-select-compat' .configValue=${'option_warning_style'} .value=${this._option_warning_style} @change=${this._valueChanged}>
-            <option value='soft'>${this._t("warning_style_soft")}</option>
-            <option value='classic'>${this._t("warning_style_classic")}</option>
-          </select>
-        </div>
+      <label class="label">${this._t("warning_style")}</label>
+      <div class="picker picker-warnings" role="group" aria-label=${this._t("warning_style")}>
+        <button class="pick${style === 'soft' ? ' chosen' : ''}" aria-pressed=${style === 'soft' ? 'true' : 'false'}
+          .configValue=${'option_warning_style'} .value=${'soft'} @click=${this._pick}>
+          <span class="ws soft-bar">${icon('#ffb74d')}22 km</span>
+          <span class="ws soft-pill">${icon('#ffd54f')}41 km</span>
+          <span>${this._t("warning_style_soft")}</span>
+        </button>
+        <button class="pick${style === 'classic' ? ' chosen' : ''}" aria-pressed=${style === 'classic' ? 'true' : 'false'}
+          .configValue=${'option_warning_style'} .value=${'classic'} @click=${this._pick}>
+          <span class="ws classic-bar orange">${icon('#ff9800')}22 km</span>
+          <span class="ws classic-bar yellow">${icon('#ffc107')}41 km</span>
+          <span>${this._t("warning_style_classic")}</span>
+        </button>
       </div>
     `;
   }
@@ -2527,13 +2579,13 @@ get _forecast_type(): string {
   // A section on the first screen: its switch, its place in the order, and one button for its page.
   private _sectionRow(block: string, showKey: string, on: boolean, icon: string, titleKey: string, edit: string, first: boolean, last: boolean, movable = true): TemplateResult {
     return html`
-      <div class="section-flex section-row edit-${block.replace(/_/g, '-')}-section">
+      <div class="section-flex section-row edit-${block.replace(/_/g, '-')}-section${on ? '' : ' off'}">
         <div class="section-label">
           <span class=${on ? "pwc-switch active" : "pwc-switch"} .value=${showKey} @click=${this._toggleVisibility}></span>
           <ha-icon class="section-icon" icon=${icon}></ha-icon>
           <div class="title-stack">
             <span class="section-title">${this._t(titleKey)}</span>
-            ${this._summary(block) ? html`<span class="row-summary">${this._summary(block)}</span>` : html``}
+            ${this._hint(block) ? html`<span class="row-summary">${this._hint(block)}</span>` : html``}
           </div>
         </div>
         <div>
@@ -2582,106 +2634,26 @@ get _forecast_type(): string {
       <div class="topics-heading">${this._t('topics_heading')}</div>
       ${WeatherCardEditor._TOPICS.map(([id, icon]) => html`
         <button class="topic-row" .value=${id} data-topic=${id} @click=${this._editSubmenu}>
-          <ha-icon class="section-icon" icon=${icon}></ha-icon>
+          <span class="topic-tile"><ha-icon icon=${icon}></ha-icon></span>
           <div class="title-stack topic-title">
             <span class="section-title">${this._t(id)}</span>
-            <span class="row-summary">${this._summary(id)}</span>
+            <span class="row-summary">${this._hint(id)}</span>
           </div>
           <ha-icon class="topic-chevron" icon="mdi:chevron-right"></ha-icon>
         </button>`)}
     `;
   }
 
-  // What a row is set to, in a line under its title, so that a setting can be seen without opening its page.
-  private static readonly _PACK_NAMES: Record<string, string> = {
-    photoreal: 'Photoreal', 'meteocons-fill': 'Meteocons (fill)', 'meteocons-line': 'Meteocons (line)', 'ha-official': 'Home Assistant', 'wcc-2': 'amCharts', custom: 'Custom',
+  // A hint under the title of each row of the first screen: what is in that section or topic, so that one knows which to open (2.7). It says
+  // what is there rather than what it is set to, which the card beside the editor shows.
+  private static readonly _HINTS: Record<string, string> = {
+    warnings: 'hint_warnings', overview: 'hint_overview', extended: 'hint_extended', slots: 'hint_slots', daily_forecast: 'hint_daily_forecast',
+    hourly_forecast: 'hint_hourly_forecast', charts: 'hint_charts', topic_appearance: 'hint_topic_appearance', topic_warnings: 'hint_topic_warnings',
+    topic_sky: 'hint_topic_sky', topic_local_forecast: 'hint_topic_local_forecast', topic_card: 'hint_topic_card',
   };
-  private static readonly _LOCALE_NAMES: Record<string, string> = {
-    bg: 'Български', cs: 'Čeština', da: 'Dansk', de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', he: 'עברית', it: 'Italiano', nl: 'Nederlands',
-    pl: 'Polski', sr: 'Српски', 'sr-Latn': 'Srpski', ru: 'Русский', ua: 'Українська',
-  };
-
-  private _nameOf(entity: unknown): string {
-    if (typeof entity !== 'string' || !entity) return '';
-    const name = this.hass?.states?.[entity]?.attributes?.friendly_name;
-    return typeof name === 'string' && name ? name : entity;
-  }
-
-  private _fmt(key: string, values: Record<string, string | number>): string {
-    return this._t(key).replace(/\{(\w+)\}/g, (_m: string, k: string) => String(values[k] ?? ''));
-  }
-
-  private _summary(id: string): string {
-    const c = (this._config ?? {}) as Record<string, unknown>;
-    const parts: string[] = [];
-    switch (id) {
-      case 'topic_appearance': {
-        const pack = typeof c.icon_pack === 'string' && c.icon_pack ? c.icon_pack : 'default';
-        parts.push(`${this._t('icon_pack')}: ${pack === 'default' ? this._t('opt_default') : (WeatherCardEditor._PACK_NAMES[pack] ?? pack)}`);
-        if (c.option_effects === 'subtle' || c.option_effects === 'full') parts.push(`${this._t('group_effects')}: ${this._t('effects_' + c.option_effects)}`);
-        break;
-      }
-      case 'topic_warnings': {
-        parts.push(c.entity_warning ? this._nameOf(c.entity_warning) : this._t('summary_no_entity'));
-        if (c.entity_lightning_distance) {
-          const limit = Number(c.option_lightning_max_distance);
-          const unit = this.hass?.states?.[c.entity_lightning_distance as string]?.attributes?.unit_of_measurement ?? 'km';
-          parts.push(this._fmt('summary_lightning', { n: `${isFinite(limit) && limit > 0 ? limit : 50} ${unit}` }));
-        }
-        parts.push(this._t(c.option_warning_style === 'classic' ? 'warning_style_classic' : 'warning_style_soft'));
-        break;
-      }
-      case 'topic_sky': {
-        if (c.entity_solar_radiation) parts.push(this._t('summary_pyranometer') + (c.option_cloud_overrides_icon === true ? `, ${this._t('summary_corrects_icon')}` : ''));
-        if (c.entity_rain_rate) parts.push(this._t('summary_rain_gauge'));
-        if (c.entity_cloud_cover) parts.push(this._nameOf(c.entity_cloud_cover));
-        if (!parts.length) parts.push(this._t('summary_no_sensors'));
-        break;
-      }
-      case 'topic_local_forecast': {
-        if (c.option_local_forecast !== true) { parts.push(this._t('summary_off')); break; }
-        parts.push(c.option_forecast_algorithm === 'sager' ? 'Sager' : 'Zambretti');
-        if (c.option_local_forecast_verbose === true) parts.push(this._t('local_forecast_verbose'));
-        break;
-      }
-      case 'topic_card': {
-        if (typeof c.text_card_title === 'string' && c.text_card_title) parts.push(`“${c.text_card_title}”`);
-        const lang = typeof c.option_locale === 'string' ? c.option_locale : '';
-        parts.push(lang ? (WeatherCardEditor._LOCALE_NAMES[lang] ?? lang) : this._t('summary_language_ha'));
-        break;
-      }
-      case 'overview': {
-        const layouts: Record<string, string> = { complete: 'opt_complete', observations: 'opt_observations', forecast: 'opt_forecast', 'title only': 'opt_title_only' };
-        parts.push(this._t(layouts[String(c.overview_layout ?? 'complete')] ?? 'opt_complete'));
-        break;
-      }
-      case 'slots': {
-        let n = 0;
-        for (let i = 1; i <= 8; i++) n += (c[`slot_l${i}`] ? 1 : 0) + (c[`slot_r${i}`] ? 1 : 0);
-        if (n) parts.push(this._fmt('summary_slots', { n }));
-        break;
-      }
-      case 'daily_forecast': {
-        const days = Number(c.daily_forecast_days);
-        parts.push(this._fmt('summary_days', { n: isFinite(days) && days > 0 ? days : 5 }));
-        parts.push(this._t(c.daily_forecast_layout === 'vertical' ? 'opt_vertical' : 'opt_horizontal'));
-        break;
-      }
-      case 'hourly_forecast': {
-        if (!c.entity_hourly) { parts.push(this._t('summary_no_entity')); break; }
-        const hours = Number(c.hourly_forecast_hours);
-        const step = Math.round(Number(c.hourly_forecast_step));
-        let line = this._fmt('summary_hours', { n: isFinite(hours) && hours > 0 ? Math.min(hours, 48) : 12 });
-        if (isFinite(step) && step > 1) line += `, ${this._fmt('summary_every', { m: step })}`;
-        parts.push(line, this._nameOf(c.entity_hourly));
-        break;
-      }
-      case 'extended': {
-        if (c.entity_extended) parts.push(this._nameOf(c.entity_extended));
-        break;
-      }
-    }
-    return parts.filter(Boolean).join(' · ');
+  private _hint(id: string): string {
+    const key = WeatherCardEditor._HINTS[id];
+    return key ? this._t(key) : '';
   }
 
   protected render(): TemplateResult | void {
@@ -2914,6 +2886,99 @@ get _forecast_type(): string {
     .topic-chevron {
       color: var(--secondary-text-color);
     }
+    /* each topic on a tile of its own colour (2.7): coral, amber, blue, teal and slate, light enough for a white icon on either theme */
+    .topic-tile {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      margin-right: 6px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      --mdc-icon-size: 20px;
+      background: #67758a;
+    }
+    .topic-row[data-topic="topic_appearance"] .topic-tile { background: #d9694f; }
+    .topic-row[data-topic="topic_warnings"] .topic-tile { background: #bd8110; }
+    .topic-row[data-topic="topic_sky"] .topic-tile { background: #3a7fd0; }
+    .topic-row[data-topic="topic_local_forecast"] .topic-tile { background: #1b8f84; }
+    .topic-row[data-topic="topic_card"] .topic-tile { background: #67758a; }
+    /* a section that is off: dimmed, its switch and its pencil as they are */
+    .section-row.off .section-icon,
+    .section-row.off .title-stack,
+    .section-row.off .down-icon,
+    .section-row.off .up-icon {
+      opacity: 0.45;
+    }
+    /* choices made by pressing a picture */
+    .picker {
+      display: grid;
+      gap: 10px;
+      margin: 6px 0 14px;
+    }
+    .picker-packs { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+    .picker-effects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .picker-warnings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pick {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+      padding: 9px 6px 8px;
+      border: 1px solid var(--divider-color);
+      border-radius: 12px;
+      background: var(--secondary-background-color, transparent);
+      color: var(--primary-text-color);
+      font: 500 12.5px var(--paper-font-body1_-_font-family, inherit);
+      cursor: pointer;
+    }
+    .pick.chosen {
+      border: 2px solid var(--primary-color);
+      padding: 8px 5px 7px;
+    }
+    .pick.chosen::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary-color);
+    }
+    .pick img { width: 54px; height: 54px; object-fit: contain; }
+    .pick ha-icon { --mdc-icon-size: 34px; height: 54px; display: flex; align-items: center; color: var(--secondary-text-color); }
+    .pick svg { width: 100%; height: auto; display: block; border-radius: 8px; }
+    .pick > span:last-child { text-align: center; }
+    .pick .ws { align-self: stretch; display: flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 6px 8px; }
+    .pick .ws svg { width: 14px; height: 14px; border-radius: 0; flex: none; }
+    .pick .soft-bar { border-radius: 10px; background: rgba(255, 152, 0, 0.16); color: #ffb74d; }
+    .pick .soft-pill { align-self: flex-start; border-radius: 999px; padding: 3px 9px; background: rgba(255, 193, 7, 0.14); color: #ffd54f; }
+    .pick .classic-bar { border-left: 4px solid; color: var(--primary-text-color); }
+    .pick .classic-bar.orange { border-color: #ff9800; background: rgba(255, 152, 0, 0.24); }
+    .pick .classic-bar.yellow { border-color: #ffc107; background: rgba(255, 193, 7, 0.16); }
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin: 6px 0 10px;
+      border: 1px solid var(--divider-color);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .seg {
+      min-height: 44px;
+      border: 0;
+      background: none;
+      color: var(--primary-text-color);
+      font: 500 14px var(--paper-font-body1_-_font-family, inherit);
+      cursor: pointer;
+    }
+    .seg + .seg { border-left: 1px solid var(--divider-color); }
+    .seg.chosen { background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.22); color: var(--primary-color); }
     .page-title {
       font-size: 18px;
       font-weight: 500;

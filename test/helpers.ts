@@ -144,3 +144,16 @@ export function forgetSharedState(): void {
     (C[f] as Map<string, unknown>).clear();
   }
 }
+
+// A choice of the editor made by pressing a picture or a button (2.7): the buttons that carry a configValue, as a select's options did.
+// The values they offer, and the one that is chosen (aria-pressed), as the options and the value of a select.
+export function choice(box: Element, key: string): { values: string[]; value: string | undefined; button: (v: string) => HTMLElement | undefined } | undefined {
+  const buttons = [...box.querySelectorAll('button')].filter((b) => (b as unknown as { configValue?: string }).configValue === key) as HTMLElement[];
+  if (!buttons.length) return undefined;
+  const val = (b: HTMLElement) => (b as unknown as { value: string }).value;
+  return {
+    values: buttons.map(val),
+    value: buttons.filter((b) => b.getAttribute('aria-pressed') === 'true').map(val)[0],
+    button: (v) => buttons.find((b) => val(b) === v),
+  };
+}

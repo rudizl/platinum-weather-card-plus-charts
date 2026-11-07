@@ -3,7 +3,7 @@ import { render } from 'lit';
 import '../src/platinum-weather-card';
 import '../src/editor';
 import { TRANSLATIONS } from '../src/translations';
-import { makeHass } from './helpers';
+import { makeHass, choice } from './helpers';
 
 // The two effects options in the visual editor, in the Appearance panel beside the icon pack:
 // the choice of how much, and the choice of where.
@@ -23,9 +23,9 @@ async function editor(config: Record<string, unknown> = {}) {
   render(el._topicAppearance() as never, box);
   return { el, box };
 }
-const select = (box: HTMLElement, key: string) =>
-  [...box.querySelectorAll('select')].find((s) => (s as unknown as { configValue: string }).configValue === key) as HTMLSelectElement | undefined;
-const options = (s: HTMLSelectElement | undefined) => [...(s?.querySelectorAll('option') ?? [])].map((o) => o.getAttribute('value'));
+// the choices are pictures and buttons since 2.7, read as a select was: the values offered and the one chosen
+const select = (box: HTMLElement, key: string) => choice(box, key);
+const options = (c: ReturnType<typeof choice>) => c?.values ?? [];
 
 describe('the effects choice in the editor', () => {
   it('is there, with off, subtle and full', async () => {
@@ -38,18 +38,18 @@ describe('the effects choice in the editor', () => {
   });
   it('shows off and the top part when the configuration says nothing', async () => {
     const { box } = await editor();
-    expect((select(box, 'option_effects') as unknown as { value: string }).value).toBe('off');
-    expect((select(box, 'option_effects_area') as unknown as { value: string }).value).toBe('overview');
+    expect(select(box, 'option_effects')?.value).toBe('off');
+    expect(select(box, 'option_effects_area')?.value).toBe('overview');
   });
   it('shows what the configuration says', async () => {
     const { box } = await editor({ option_effects: 'full', option_effects_area: 'card' });
-    expect((select(box, 'option_effects') as unknown as { value: string }).value).toBe('full');
-    expect((select(box, 'option_effects_area') as unknown as { value: string }).value).toBe('card');
+    expect(select(box, 'option_effects')?.value).toBe('full');
+    expect(select(box, 'option_effects_area')?.value).toBe('card');
   });
   it('shows off for a word it does not know, as the card itself reads it', async () => {
     const { box } = await editor({ option_effects: 'bogus', option_effects_area: 'bogus' });
-    expect((select(box, 'option_effects') as unknown as { value: string }).value).toBe('off');
-    expect((select(box, 'option_effects_area') as unknown as { value: string }).value).toBe('overview');
+    expect(select(box, 'option_effects')?.value).toBe('off');
+    expect(select(box, 'option_effects_area')?.value).toBe('overview');
   });
   it('writes the choice into the configuration', async () => {
     const { el } = await editor();

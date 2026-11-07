@@ -3,7 +3,7 @@ import { render } from 'lit';
 import '../src/platinum-weather-card';
 import '../src/editor';
 import { TRANSLATIONS } from '../src/translations';
-import { makeHass, baseConfig, renderCard } from './helpers';
+import { makeHass, baseConfig, renderCard, choice } from './helpers';
 
 // The warning bar, seen on a real card: a flat rectangle of fixed yellow over a dark glass background, with
 // a hard edge on its left, came out a muddy olive. The soft style is the default now; the old one is a choice.
@@ -128,15 +128,16 @@ describe('the editor offers the choice', () => {
     render(el._topicWarnings() as never, box);
     return box;
   }
-  const sel = (box: HTMLElement) => [...box.querySelectorAll('select')].find((s) => (s as unknown as { configValue: string }).configValue === 'option_warning_style') as HTMLSelectElement | undefined;
+  // two pictures since 2.7, read as the select was: the values offered and the one chosen
+  const sel = (box: HTMLElement) => choice(box, 'option_warning_style');
   it('in Appearance, with the soft style first', async () => {
     const s = sel(await panel());
-    expect([...(s?.querySelectorAll('option') ?? [])].map((o) => o.getAttribute('value'))).toEqual(['soft', 'classic']);
+    expect(s?.values).toEqual(['soft', 'classic']);
   });
   it('showing soft unless the configuration says classic', async () => {
-    expect((sel(await panel()) as unknown as { value: string }).value).toBe('soft');
-    expect((sel(await panel({ option_warning_style: 'classic' })) as unknown as { value: string }).value).toBe('classic');
-    expect((sel(await panel({ option_warning_style: 'bogus' })) as unknown as { value: string }).value).toBe('soft');
+    expect(sel(await panel())?.value).toBe('soft');
+    expect(sel(await panel({ option_warning_style: 'classic' }))?.value).toBe('classic');
+    expect(sel(await panel({ option_warning_style: 'bogus' }))?.value).toBe('soft');
   });
   it('and its words are in every language', () => {
     const en = (TRANSLATIONS as Record<string, Record<string, unknown>>).en;

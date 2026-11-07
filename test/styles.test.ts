@@ -146,7 +146,7 @@ describe('a row with one column says so', () => {
     // Matching by structure proved unreliable, so this names the selects that
     // have no permanent partner. A new one added beside a conditional should be
     // added here too.
-    for (const configValue of ['icon_pack', 'forecast_text_alignment']) {
+    for (const configValue of ['forecast_text_alignment']) {
       const at = editor.indexOf(`.configValue=\${'${configValue}'}`);
       expect(at, `${configValue} not found`).toBeGreaterThan(-1);
       const rowStart = editor.lastIndexOf('<div class="side-by-side">', at);
@@ -154,6 +154,13 @@ describe('a row with one column says so', () => {
       expect(row, `${configValue} is in half a row, so its options are truncated`)
         .toContain('class="full-width"');
     }
+  });
+  it('the icon packs are pictures across the whole width, not a select in half a row', () => {
+    // since 2.7: a grid of their own, outside any row of two columns
+    const at = editor.indexOf('<div class="picker picker-packs"');
+    expect(at, 'the pictures of the packs').toBeGreaterThan(-1);
+    const fn = editor.slice(editor.lastIndexOf('private _apIconPack()', at), at);
+    expect(fn, 'nothing wraps the pictures in a row of two').not.toContain('side-by-side');
   });
 });
 
