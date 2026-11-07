@@ -142,3 +142,19 @@ describe('the effects and the warnings, as pictures', () => {
     expect(written(el, () => choice(box, 'option_warning_style')!.button('classic')!.click())?.option_warning_style).toBe('classic');
   });
 });
+
+describe('seen in Home Assistant on beta.5', () => {
+  it('a hint wraps to a second line rather than being cut beside the arrows', () => {
+    const rule = /\.row-summary \{([^}]*)\}/.exec(SRC)![1];
+    expect(rule).not.toMatch(/white-space:\s*nowrap/);
+    expect(rule).toMatch(/-webkit-line-clamp:\s*2/);
+  });
+  it('the effects are not named twice, by the heading of their group and by a label under it', async () => {
+    const el = await editor();
+    const box = draw(el, el._topicAppearance());
+    const labels = [...box.querySelectorAll('label.label')].map((l) => l.textContent?.trim());
+    const groups = [...box.querySelectorAll('.group-heading')].map((h) => h.textContent?.trim());
+    expect(groups).toContain(el.shadowRoot ? (groups.find((g) => /effect|ефект/i.test(g ?? '')) ?? groups[1]) : '');
+    for (const g of groups) expect(labels, `"${g}" twice`).not.toContain(g);
+  });
+});

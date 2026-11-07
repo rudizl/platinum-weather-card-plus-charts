@@ -2265,7 +2265,6 @@ get _forecast_type(): string {
     const level = this._option_effects;
     const area = this._option_effects_area;
     return html`
-      <label class="label">${this._t("effects")}</label>
       <div class="picker picker-effects" role="group" aria-label=${this._t("effects")}>
         ${['off', 'subtle', 'full'].map((v) => html`
           <button class="pick${level === v ? ' chosen' : ''}" aria-pressed=${level === v ? 'true' : 'false'}
@@ -2876,12 +2875,15 @@ get _forecast_type(): string {
       flex-direction: column;
       min-width: 0;
     }
+    /* a hint wraps to a second line rather than lose its end beside the arrows; a third is cut */
     .row-summary {
       font-size: 12px;
+      line-height: 1.35;
       color: var(--secondary-text-color);
-      white-space: nowrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
     .topic-chevron {
       color: var(--secondary-text-color);
