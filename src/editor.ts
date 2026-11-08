@@ -1738,7 +1738,7 @@ get _forecast_type(): string {
         <div>
           <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
           </ha-input>
-          <div class="help-text">${this._t("forecast_altitude_hint")} ${this._t("forecast_altitude_relative")}</div>
+          <div class="help-text">${WeatherCardEditor._sentence(this._t("forecast_altitude_hint"))} ${this._t("forecast_altitude_relative")}</div>
           ${this._haElevationOffer()}
         </div>
         <div>
@@ -2185,6 +2185,11 @@ get _forecast_type(): string {
 
   // The height of the home that Home Assistant knows, offered beside an empty station altitude, taken with one press (#46). Never filled in on
   // its own: with a barometer that already gives the relative pressure, a height would correct it twice, and fair weather would read as a storm.
+  // a hint written as a phrase gets its full stop when a second sentence follows it
+  private static _sentence(text: string): string {
+    return /[.!?։。…]$/.test(text.trim()) ? text : `${text.trim()}.`;
+  }
+
   private _haElevationOffer(): TemplateResult {
     const set = Number(this._config?.option_forecast_altitude);
     const ha = Number((this.hass?.config as { elevation?: number } | undefined)?.elevation);

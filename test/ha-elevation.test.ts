@@ -43,6 +43,8 @@ describe('the height of Home Assistant, offered', () => {
   it('and the hint says how to tell a relative barometer', async () => {
     const { box } = await page({}, 154);
     expect(box.textContent).toContain('A relative barometer reads about 1013 hPa on an average day');
+    // the first sentence ends before the second begins (seen on beta.6: "…pressure A relative barometer…")
+    expect(box.textContent?.replace(/\s+/g, ' ')).toMatch(/pressure\. A relative barometer/);
   });
   it('in every language, with the place for the number', () => {
     for (const [lang, t] of Object.entries(TRANSLATIONS)) {
