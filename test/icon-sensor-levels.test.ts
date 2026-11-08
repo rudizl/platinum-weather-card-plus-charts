@@ -45,7 +45,7 @@ describe('the rain gauge decides the icon, in three levels', () => {
 
 describe('no name the card can produce is a tornado, unless it is meant to be', () => {
   // the names that every condition of Home Assistant gives, by day and by night, and the ones the two sensors give
-  it('is true of the table of picture names that the custom and wcc-2 packs use', async () => {
+  it('is true of the table of picture names that the custom pack uses', async () => {
     const ON_PURPOSE = new Set(['unknown', 'dust', 'tropical-storm']);
     const names = new Set<string>(['cloudy']);
     for (const state of ['above_horizon', 'below_horizon']) {

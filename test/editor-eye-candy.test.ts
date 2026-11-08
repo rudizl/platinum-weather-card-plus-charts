@@ -77,7 +77,7 @@ describe('the icon packs, as pictures', () => {
   it('one for each pack, in the order of the list they replace, and the chosen one pressed', async () => {
     const el = await editor({ icon_pack: 'photoreal' });
     const c = choice(draw(el, el._topicAppearance()), 'icon_pack')!;
-    expect(c.values).toEqual(['default', 'photoreal', 'meteocons-fill', 'meteocons-line', 'ha-official', 'wcc-2', 'custom']);
+    expect(c.values).toEqual(['default', 'photoreal', 'meteocons-fill', 'meteocons-line', 'ha-official', 'custom']);
     expect(c.value).toBe('photoreal');
   });
   it('each shows its own partly cloudy day: the built-in from their modules, the others from where the card takes them', async () => {
@@ -91,7 +91,6 @@ describe('the icon packs, as pictures', () => {
     expect(src('photoreal')).toBe('data:image/webp;base64,P');
     expect(src('meteocons-fill')).toMatch(/basmilius\/weather-icons\/production\/fill\/all\/partly-cloudy-day\.svg$/);
     expect(src('ha-official')).toMatch(/scinos\/lovelace-weather-icons@main\/svg\/partlycloudy\.svg$/);
-    expect(src('wcc-2')).toBe('/hacsfiles/weather-chart-card/icons2/partlycloudy-day.svg');
     expect(choice(box, 'icon_pack')!.button('custom')!.querySelector('img')).toBeNull();
   });
   it('a press on the picture inside the button chooses the pack', async () => {

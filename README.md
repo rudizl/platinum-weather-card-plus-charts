@@ -532,7 +532,6 @@ The card supports multiple icon packs, selectable from the editor's **Appearance
 | `photoreal` | Photorealistic pictures: a real sun and moon, volumetric clouds, drops, snowflakes, hail, lightning (bundled with the card; experimental) | None |
 | `meteocons-fill` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — filled style | Internet (jsDelivr CDN) |
 | `meteocons-line` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — line style | Internet (jsDelivr CDN) |
-| `wcc-2` | [ammap Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
 | `ha-official` | [Home Assistant's own weather icons](https://github.com/scinos/lovelace-weather-icons) — the card then matches the rest of your dashboard rather than introducing a second style | Internet (jsDelivr CDN) |
 | `custom` | Any icon set — set `icon_pack_path` with `{condition}` placeholder | User-provided |
 
@@ -546,7 +545,7 @@ For `custom`, set `icon_pack_path` to a path template such as `/local/my-icons/{
 |---|---|---|
 | [basmilius/weather-icons](https://github.com/basmilius/weather-icons) (Meteocons) | [Bas Milius](https://bas.dev) | [MIT](https://github.com/basmilius/weather-icons/blob/master/LICENSE) |
 | [scinos/lovelace-weather-icons](https://github.com/scinos/lovelace-weather-icons) (Home Assistant's official icons, `ha-official`) | [scinos](https://github.com/scinos) | [MIT](https://github.com/scinos/lovelace-weather-icons/blob/main/LICENSE) |
-| [amCharts Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) (via `rudizl/weather-chart-card`, `wcc-2`) | amCharts / ammap.com | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — free including commercial use, attribution required |
+| [amCharts Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) (the `default` pack) | amCharts / ammap.com | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — free including commercial use, attribution required |
 
 > **Note:** The card's **default built-in icons** are also based on amCharts weather icons, extended by [@makin-things](https://github.com/Makin-Things/weather-icons).
 
@@ -765,7 +764,7 @@ The lists of the pickers offer what each field can read: the solar radiation fie
 
 | Option | Type | Description |
 | ------ | ---- | ----------- |
-| Icon Pack | String | `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, or `custom` |
+| Icon Pack | String | `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, or `custom` |
 | Icon Pack Path | String | Path template for `custom` icon pack (e.g. `/local/icons/{condition}.svg`) |
 | Show Static Icons | Boolean | Disable animated icons |
 | Time Format | String | `system` (follows [Settings → Profile](https://my.home-assistant.io/redirect/profile/) in HA), `12hour`, or `24hour` |
@@ -796,7 +795,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `hold_action` | Action | none | Action on hold |
 | `double_tap_action` | Action | none | Action on double-tap |
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
-| `icon_pack` | String | `default` | Icon pack: `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, `custom` |
+| `icon_pack` | String | `default` | Icon pack: `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, `custom` |
 | `option_effects` | String | `off` | The weather behind the card (experimental): `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Appearance |
 | `option_warning_style` | String | `soft` | The style of the warning rows: `soft` (a stripe that fades out, a small pill for a storm far away) or `classic` (the flat tinted bar) |
 | `option_effects_area` | String | `overview` | Where it is drawn: behind the top part of the card (`overview`) or behind the whole card (`card`) |

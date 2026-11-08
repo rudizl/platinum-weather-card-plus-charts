@@ -2173,18 +2173,18 @@ get _forecast_type(): string {
       case 'meteocons-fill': return 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/partly-cloudy-day.svg';
       case 'meteocons-line': return 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/partly-cloudy-day.svg';
       case 'ha-official': return 'https://cdn.jsdelivr.net/gh/scinos/lovelace-weather-icons@main/svg/partlycloudy.svg';
-      case 'wcc-2': return '/hacsfiles/weather-chart-card/icons2/partlycloudy-day.svg';
       default: return null;
     }
   }
 
   private static readonly _PACKS: [string, string][] = [
     ['default', ''], ['photoreal', 'Photoreal'], ['meteocons-fill', 'Meteocons Fill'], ['meteocons-line', 'Meteocons Line'],
-    ['ha-official', 'Home Assistant'], ['wcc-2', 'amCharts'], ['custom', ''],
+    ['ha-official', 'Home Assistant'], ['custom', ''],
   ];
 
   private _apIconPack(): TemplateResult {
-    const chosen = this._icon_pack || 'default';
+    // wcc-2 went in 2.7 and is drawn as the default pack: it is shown as that
+    const chosen = this._icon_pack === 'wcc-2' ? 'default' : (this._icon_pack || 'default');
     return html`
       <label class="label">${this._t("icon_pack")}</label>
       <div class="picker picker-packs" role="group" aria-label=${this._t("icon_pack")}>
@@ -2218,8 +2218,8 @@ get _forecast_type(): string {
       <div class="side-by-side">
         <div>
           <!-- the static icons are of the default pack: greyed, and no click, with any other, as the colours of the fire danger are without its entity -->
-          <div class="toggle-row${(this._icon_pack || 'default') === 'default' ? '' : ' disabled'}">
-              ${(this._icon_pack || 'default') === 'default'
+          <div class="toggle-row${['default', 'wcc-2'].includes(this._icon_pack || 'default') ? '' : ' disabled'}">
+              ${['default', 'wcc-2'].includes(this._icon_pack || 'default')
                 ? html`<span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} @click=${this._toggleVisibility}></span>`
                 : html`<span class=${this._option_static_icons !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_static_icons'} aria-disabled="true"></span>`}
               <span class="toggle-label">${this._t("show_static_icons")}</span>

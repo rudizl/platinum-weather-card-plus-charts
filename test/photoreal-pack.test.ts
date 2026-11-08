@@ -133,7 +133,7 @@ describe('the levels of the sky and of the rain look different', () => {
       expect(el._iconToWcc(n), n).toBe(want);
     }
     expect(el._iconToWcc('tornado')).toBe('exceptional');
-    expect(el._iconToWcc('something-new')).toBe('cloudy');   // the custom and the wcc-2 packs have no picture for a name that is not known: the plain cloud
+    expect(el._iconToWcc('something-new')).toBe('cloudy');   // the custom pack has no picture for a name that is not known: the plain cloud
   });
 });
 

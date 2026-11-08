@@ -4470,7 +4470,6 @@ export class PlatinumWeatherCard extends LitElement {
     }
 
     const wccName = this._iconToWcc(adjusted);
-    if (pack === 'wcc-2') return `/hacsfiles/weather-chart-card/icons2/${wccName}.svg`;
     if (pack === 'ha-official')
       return `https://cdn.jsdelivr.net/gh/scinos/lovelace-weather-icons@main/svg/${this._iconToHa(adjusted)}.svg`;
 
@@ -4483,7 +4482,8 @@ export class PlatinumWeatherCard extends LitElement {
     if (pack === 'custom' && this._config?.icon_pack_path)
       return this._config.icon_pack_path.replace('{condition}', wccName);
 
-    // fallback to default
+    // a pack the card does not know is the default pack: so is wcc-2, the amCharts icons as Weather Chart Card ships them, the same drawings
+    // with fewer pictures, which went in 2.7, so that a configuration that still names it does not break
     const prefix = this._config?.option_static_icons ? 's-' : 'a-';
     return this._iconBaseUrl() + prefix + adjusted + '.svg';
   }
