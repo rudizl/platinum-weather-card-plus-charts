@@ -2781,8 +2781,8 @@ export class PlatinumWeatherCard extends LitElement {
   private get _humidityPercent(): number | null {
     const entity = this._config.entity_humidity;
     const st = entity ? this.hass.states[entity] : undefined;
-    if (!st) return null;
-    const v = Number(entity!.startsWith('weather.') ? st.attributes?.humidity : st.state);
+    if (!entity || !st) return null;
+    const v = Number(entity.startsWith('weather.') ? st.attributes?.humidity : st.state);
     return isFinite(v) ? v : null;
   }
 
