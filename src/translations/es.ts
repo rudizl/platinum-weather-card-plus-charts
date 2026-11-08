@@ -221,6 +221,8 @@ const es: Translation = {
     "entity_wind_bearing_6h": "Dirección del viento hace seis horas",
     "entity_wind_bearing_6h_hint": "Un ayudante Statistics sobre el sensor de dirección — Sager necesita el cambio, que un panel no recuerda",
     "forecast_altitude_hint": "Dejar vacío si el sensor informa presión relativa (nivel del mar)",
+    "forecast_altitude_relative": "Un barómetro relativo marca unos 1013 hPa en un día normal, sea cual sea la altura.",
+    "forecast_altitude_use_ha": "Usar {n} m de Home Assistant",
     "trend_window": "Ventana de tendencia (h)",
     "trend_window_hint": "Debe coincidir con la ventana temporal de tu ayudante Derivative — por defecto 3",
     "compact_slots": "Etiquetas compactas",

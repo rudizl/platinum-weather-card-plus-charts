@@ -221,6 +221,8 @@ const da: Translation = {
     "entity_wind_bearing_6h": "Vindretning for seks timer siden",
     "entity_wind_bearing_6h_hint": "En Statistics-hjælper på din vindretningssensor — Sager har brug for ændringen, som et dashboard ikke husker",
     "forecast_altitude_hint": "Lad stå tomt, hvis sensoren rapporterer relativt tryk (havniveau)",
+    "forecast_altitude_relative": "Et relativt barometer viser omkring 1013 hPa på en almindelig dag, uanset højden.",
+    "forecast_altitude_use_ha": "Brug {n} m fra Home Assistant",
     "trend_window": "Trendvindue (t)",
     "trend_window_hint": "Skal matche tidsvinduet for din Derivative-hjælper — standard 3",
     "compact_slots": "Kompakte etiketter",

@@ -221,6 +221,8 @@ const he: Translation = {
     "entity_wind_bearing_6h": "כיוון הרוח לפני שש שעות",
     "entity_wind_bearing_6h_hint": "עוזר Statistics על חיישן הכיוון — Sager זקוק לשינוי, שלוח מחוונים אינו זוכר",
     "forecast_altitude_hint": "השאר ריק אם החיישן מדווח לחץ יחסי (גובה פני הים)",
+    "forecast_altitude_relative": "ברומטר יחסי מראה כ-1013 hPa ביום רגיל, בכל גובה.",
+    "forecast_altitude_use_ha": "השתמש ב-{n} מ' מ-Home Assistant",
     "trend_window": "חלון מגמה (שעות)",
     "trend_window_hint": "חייב להתאים לחלון הזמן של עוזר ה-Derivative — ברירת מחדל 3",
     "compact_slots": "תוויות קומפקטיות",

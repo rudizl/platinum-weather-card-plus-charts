@@ -221,6 +221,8 @@ const pl: Translation = {
     "entity_wind_bearing_6h": "Kierunek wiatru sprzed sześciu godzin",
     "entity_wind_bearing_6h_hint": "Pomocnik Statistics na czujniku kierunku — Sager potrzebuje zmiany, której pulpit nie pamięta",
     "forecast_altitude_hint": "Pozostaw puste, jeśli czujnik podaje ciśnienie względne (poziom morza)",
+    "forecast_altitude_relative": "Barometr względny pokazuje w zwykły dzień około 1013 hPa, na każdej wysokości.",
+    "forecast_altitude_use_ha": "Użyj {n} m z Home Assistant",
     "trend_window": "Okno trendu (godz.)",
     "trend_window_hint": "Musi odpowiadać oknu czasowemu pomocnika Derivative — domyślnie 3",
     "compact_slots": "Kompaktowe etykiety",

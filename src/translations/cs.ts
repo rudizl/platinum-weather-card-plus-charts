@@ -221,6 +221,8 @@ const cs: Translation = {
     "entity_wind_bearing_6h": "Směr větru před šesti hodinami",
     "entity_wind_bearing_6h_hint": "Pomocník Statistics nad senzorem směru — Sager potřebuje změnu, kterou nástěnka nepamatuje",
     "forecast_altitude_hint": "Nechte prázdné, pokud senzor hlásí relativní tlak (k hladině moře)",
+    "forecast_altitude_relative": "Relativní barometr ukazuje v běžný den asi 1013 hPa, v jakékoli výšce.",
+    "forecast_altitude_use_ha": "Použít {n} m z Home Assistant",
     "trend_window": "Okno trendu (h)",
     "trend_window_hint": "Musí odpovídat časovému oknu pomocníka Derivative — výchozí 3",
     "compact_slots": "Kompaktní popisky slotů",

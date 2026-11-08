@@ -221,6 +221,8 @@ const en: Translation = {
     "entity_wind_bearing_6h": "Wind bearing six hours ago",
     "entity_wind_bearing_6h_hint": "A statistics helper over your wind direction sensor — Sager needs the change, which a dashboard cannot remember",
     "forecast_altitude_hint": "Leave empty if the sensor reports relative (sea-level) pressure",
+    "forecast_altitude_relative": "A relative barometer reads about 1013 hPa on an average day, whatever the height.",
+    "forecast_altitude_use_ha": "Use {n} m from Home Assistant",
     "trend_window": "Pressure trend window (h)",
     "trend_window_hint": "Must match the time window of your Derivative helper — default 3",
     "compact_slots": "Compact slot labels",

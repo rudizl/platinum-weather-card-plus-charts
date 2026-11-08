@@ -221,6 +221,8 @@ const ru: Translation = {
     "entity_wind_bearing_6h": "Направление ветра шесть часов назад",
     "entity_wind_bearing_6h_hint": "Помощник Statistics по датчику направления — Sager нужно изменение, которое панель не запоминает",
     "forecast_altitude_hint": "Оставьте пустым, если датчик сообщает относительное давление (уровень моря)",
+    "forecast_altitude_relative": "Относительный барометр в обычный день показывает около 1013 гПа на любой высоте.",
+    "forecast_altitude_use_ha": "Взять {n} м из Home Assistant",
     "trend_window": "Окно тренда (ч)",
     "trend_window_hint": "Должно совпадать с временным окном помощника Derivative — по умолчанию 3",
     "compact_slots": "Компактные подписи",

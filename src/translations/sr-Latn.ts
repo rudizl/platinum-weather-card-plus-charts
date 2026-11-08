@@ -221,6 +221,8 @@ const srLatn: Translation = {
     "entity_wind_bearing_6h": "Pravac vetra pre šest sati",
     "entity_wind_bearing_6h_hint": "Statistički pomoćnik nad senzorom pravca vetra — Sageru treba promena, koju kontrolna tabla ne pamti",
     "forecast_altitude_hint": "Ostavite prazno ako senzor prijavljuje relativan (na nivou mora) pritisak",
+    "forecast_altitude_relative": "Relativni barometar u običan dan pokazuje oko 1013 hPa, na bilo kojoj visini.",
+    "forecast_altitude_use_ha": "Uzmi {n} m iz Home Assistant-a",
     "trend_window": "Prozor trenda pritiska (h)",
     "trend_window_hint": "Mora da se poklapa sa vremenskim okvirom vašeg Derivative pomoćnika — podrazumevano 3",
     "compact_slots": "Kompaktne oznake slotova",

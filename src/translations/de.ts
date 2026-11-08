@@ -221,6 +221,8 @@ const de: Translation = {
     "entity_wind_bearing_6h": "Windrichtung vor sechs Stunden",
     "entity_wind_bearing_6h_hint": "Ein Statistics-Helfer über dem Windrichtungssensor — Sager braucht die Änderung, die ein Dashboard nicht speichert",
     "forecast_altitude_hint": "Leer lassen, wenn der Sensor relativen Druck (Meereshöhe) liefert",
+    "forecast_altitude_relative": "Ein relatives Barometer zeigt an einem durchschnittlichen Tag etwa 1013 hPa, gleich in welcher Höhe.",
+    "forecast_altitude_use_ha": "{n} m aus Home Assistant übernehmen",
     "trend_window": "Trendfenster (h)",
     "trend_window_hint": "Muss dem Zeitfenster Ihres Derivative-Helfers entsprechen — Standard 3",
     "compact_slots": "Kompakte Beschriftungen",

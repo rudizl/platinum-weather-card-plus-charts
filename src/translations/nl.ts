@@ -221,6 +221,8 @@ const nl: Translation = {
     "entity_wind_bearing_6h": "Windrichting zes uur geleden",
     "entity_wind_bearing_6h_hint": "Een Statistics-helper op je windrichtingssensor — Sager heeft de verandering nodig, die een dashboard niet onthoudt",
     "forecast_altitude_hint": "Leeg laten als de sensor relatieve druk (zeeniveau) rapporteert",
+    "forecast_altitude_relative": "Een relatieve barometer geeft op een gewone dag ongeveer 1013 hPa aan, op welke hoogte ook.",
+    "forecast_altitude_use_ha": "{n} m uit Home Assistant gebruiken",
     "trend_window": "Trendvenster (u)",
     "trend_window_hint": "Moet overeenkomen met het tijdvenster van je Derivative-helper — standaard 3",
     "compact_slots": "Compacte labels",

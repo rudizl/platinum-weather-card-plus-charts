@@ -1738,7 +1738,8 @@ get _forecast_type(): string {
         <div>
           <ha-input type="number" label=${this._t("forecast_altitude")} .value=${this._config?.option_forecast_altitude ?? ''} .configValue=${'option_forecast_altitude'} @input=${this._valueChangedNumber}>
           </ha-input>
-          <div class="help-text">${this._t("forecast_altitude_hint")}</div>
+          <div class="help-text">${this._t("forecast_altitude_hint")} ${this._t("forecast_altitude_relative")}</div>
+          ${this._haElevationOffer()}
         </div>
         <div>
           <ha-input type="number" label=${this._t("trend_window")} .value=${this._config?.option_trend_window_hours ?? ''} .configValue=${'option_trend_window_hours'} @input=${this._valueChangedNumber}>
@@ -2181,6 +2182,17 @@ get _forecast_type(): string {
     ['default', ''], ['photoreal', 'Photoreal'], ['meteocons-fill', 'Meteocons Fill'], ['meteocons-line', 'Meteocons Line'],
     ['ha-official', 'Home Assistant'], ['custom', ''],
   ];
+
+  // The height of the home that Home Assistant knows, offered beside an empty station altitude, taken with one press (#46). Never filled in on
+  // its own: with a barometer that already gives the relative pressure, a height would correct it twice, and fair weather would read as a storm.
+  private _haElevationOffer(): TemplateResult {
+    const set = Number(this._config?.option_forecast_altitude);
+    const ha = Number((this.hass?.config as { elevation?: number } | undefined)?.elevation);
+    if ((isFinite(set) && set > 0) || !isFinite(ha) || ha <= 0) return html``;
+    const n = Math.round(ha);
+    return html`<button class="offer" .configValue=${'option_forecast_altitude'} .value=${n}
+      @click=${(ev: Event) => this._valueChangedNumber({ target: ev.currentTarget })}>${this._t('forecast_altitude_use_ha').replace('{n}', String(n))}</button>`;
+  }
 
   private _apIconPack(): TemplateResult {
     // wcc-2 went in 2.7 and is drawn as the default pack: it is shown as that
@@ -2980,6 +2992,18 @@ get _forecast_type(): string {
       cursor: pointer;
     }
     .seg + .seg { border-left: 1px solid var(--divider-color); }
+    /* a value offered to be taken with one press: the height of Home Assistant beside an empty station altitude */
+    .offer {
+      margin-top: 6px;
+      min-height: 36px;
+      padding: 6px 14px;
+      border: 1px solid var(--primary-color);
+      border-radius: 18px;
+      background: none;
+      color: var(--primary-color);
+      font: 500 13px var(--paper-font-body1_-_font-family, inherit);
+      cursor: pointer;
+    }
     .seg.chosen { background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.22); color: var(--primary-color); }
     .page-title {
       font-size: 18px;
