@@ -358,7 +358,9 @@ Up to 8 rows of data in 2 columns. The required entities update dynamically base
 | `possible_today` | Forecast rain today | Forecast 15-25mm |
 | `possible_tomorrow` | Forecast rain tomorrow | Fore Tom 5-10mm |
 | `uv_summary` | UV forecast, as the provider words it | UV High |
-| `uv_index` | Measured UV index, coloured by the WHO exposure bands | UV 7 |
+| `uv_index` | Measured UV index, the number coloured by the WHO exposure bands | UV 7 |
+| `pm25` | Fine particulates from `entity_pm25`, in µg/m³, the number coloured by the European Air Quality Index | PM2.5 5 µg/m³ |
+| `pm10` | Coarse particulates from `entity_pm10`, in µg/m³, the number coloured by the European Air Quality Index | PM10 7 µg/m³ |
 | `fire_danger` | Fire danger | Moderate |
 | `custom1`–`custom4` | Custom entity with icon and unit | |
 | `empty` | Blank slot (preserves space) | |
@@ -424,6 +426,8 @@ The card shows the warnings that would otherwise need cards of their own: a seve
 | 15 | Drought | `mdi:water-off` |
 
 When the title of a warning names a second hazard (`Heavy precipitation and strong wind!`, of the type rain), the row shows both, with an icon for each: see the note below.
+
+**Air quality.** Point **PM2.5 sensor** or **PM10 sensor** at a particulate sensor in µg/m³ (an Ecowitt or a Sensor.Community sensor, for instance) and add the `pm25` or `pm10` slot. The number is coloured by the bands of the European Air Quality Index as the EEA revised them in 2024: for PM2.5, good up to 5 µg/m³, fair to 15, moderate to 50, poor to 90, very poor to 140, extremely poor above; for PM10, 15, 45, 120, 195 and 270. When either is poor or worse, a row appears in the warnings, orange for poor and red beyond. Cheap sensors read the droplets of fog as dust, so above 90% humidity (from the humidity entity) the row adds that it may be fog. A sensor in another unit, such as the per-pollutant indices of WAQI, is shown as it comes, without a colour or a warning. `option_air_warning: false` turns the row off; `option_air_decimals: true` shows one decimal.
 
 **Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown. The distance is read in the unit of its entity, which Blitzortung takes from the unit system of Home Assistant: in miles the row is red within 9 mi, orange to 19 mi, and the range is written in miles too (31 mi unless you set it).
 
@@ -922,6 +926,10 @@ double_tap_action:
 | `entity_dew_point` | String | none | Dew point sensor, for the comfort line under the apparent temperature |
 | `option_show_comfort` | Boolean | `false` | Show how the air feels, in a word |
 | `entity_uv_index` | String | none | UV index sensor for the UV index slot |
+| `entity_pm25` | String | none | PM2.5 sensor in µg/m³, for the `pm25` slot and the air quality warning |
+| `entity_pm10` | String | none | PM10 sensor in µg/m³, for the `pm10` slot and the air quality warning |
+| `option_air_warning` | Boolean | `true` | A row in the warnings when PM2.5 or PM10 is poor or worse |
+| `option_air_decimals` | Boolean | `false` | One decimal for PM2.5 and PM10 |
 | `option_cloud_cover_oktas` | Boolean | `false` | Show oktas instead of a percentage |
 | `option_cloud_overrides_icon` | Boolean | `false` | Let the measured cloud cover and rain rate correct the condition icon |
 | `option_slot_tap_more_info` | Boolean | `true` | Tap on a slot value opens the more-info history dialog |

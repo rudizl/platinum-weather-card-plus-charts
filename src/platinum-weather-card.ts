@@ -28,6 +28,7 @@ import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
 import { iconData } from './icon-packs';
 import { kmPer } from './distance';
+import { AIR_BANDS, AIR_COLOURS, POOR, airBand, isMicrograms, Pollutant } from './air';
 
 
 // What the overview and the slots read their figures from: today's condition, the
@@ -1153,8 +1154,9 @@ export class PlatinumWeatherCard extends LitElement {
   private _renderWarningsSection(): TemplateResult {
     if (this._config?.show_section_warnings === false) return html``;
     const lightning = this._renderLightningWarning();
+    const air = this._renderAirWarning();
     const provider = this._renderProviderWarning();
-    return html`${lightning}${provider}`;
+    return html`${lightning}${air}${provider}`;
   }
 
   private _renderProviderWarning(): TemplateResult {
@@ -2564,6 +2566,8 @@ export class PlatinumWeatherCard extends LitElement {
       case 'rainfall': return this.slotRainfall;
       case 'rain_rate': return this.slotRainRate;
       case 'uv_index': return this.slotUvIndex;
+      case 'pm25': return this._slotAir('pm25');
+      case 'pm10': return this._slotAir('pm10');
       case 'humidity': return this.slotHumidity;
       case 'pressure': return this.slotPressure;
       case 'observed_max': return this.slotObservedMax;
@@ -2739,6 +2743,81 @@ export class PlatinumWeatherCard extends LitElement {
 
   // How hard it is raining right now, as distinct from how much has fallen: the
   // rainfall slot totals millimetres, this one reports millimetres an hour.
+  // A reading of particulates, its number coloured by the band of the European index (#42). Only a concentration in µg/m³ is banded: a sensor
+  // in another unit, or none, such as the per-pollutant indices of WAQI, is shown as it comes, without a colour.
+  private _airReading(p: Pollutant): { value: number; band: number | null; unit: string } | null {
+    const entity = p === 'pm25' ? this._config.entity_pm25 : this._config.entity_pm10;
+    const st = entity ? this.hass.states[entity] : undefined;
+    const value = st ? Number(st.state) : NaN;
+    if (!st || !isFinite(value) || st.state === '') return null;
+    const unit = st.attributes?.unit_of_measurement;
+    const grams = isMicrograms(unit);
+    return { value, band: grams ? airBand(p, value) : null, unit: grams ? 'µg/m³' : (typeof unit === 'string' ? unit : '') };
+  }
+
+  private _slotAir(p: Pollutant): TemplateResult {
+    const r = this._airReading(p);
+    // whole micrograms by default: the decimals of a cheap sensor are noise
+    const display = r === null ? '---'
+      : r.value.toLocaleString(this.locale, this._config.option_air_decimals === true
+        ? { minimumFractionDigits: 1, maximumFractionDigits: 1 } : { maximumFractionDigits: 0 });
+    const style = r?.band != null ? `color:${AIR_COLOURS[r.band]};` : '';
+    const title = r?.band != null ? tCard(this.locale, `air_${AIR_BANDS[r.band]}`) : '';
+    return html`
+      <li data-slot="${p}">
+        <div class="slot">
+          <div class="slot-icon">
+            <ha-icon icon="${p === 'pm25' ? 'mdi:blur' : 'mdi:blur-radial'}"></ha-icon>
+          </div>
+          <div class="slot-text">${p === 'pm25' ? 'PM2.5' : 'PM10'}&nbsp;</div>
+          <div class="slot-text air-text" style="${style}" title="${title}">${display}</div>
+          ${r === null || !r.unit ? html`` : html`<div class="slot-text unit">${r.unit}</div>`}
+        </div>
+      </li>
+    `;
+  }
+
+  // The humidity as a number, from a sensor or a weather entity, for the warning about the air: null when there is none
+  private get _humidityPercent(): number | null {
+    const entity = this._config.entity_humidity;
+    const st = entity ? this.hass.states[entity] : undefined;
+    if (!st) return null;
+    const v = Number(entity!.startsWith('weather.') ? st.attributes?.humidity : st.state);
+    return isFinite(v) ? v : null;
+  }
+
+  // A row in the warnings when PM2.5 or PM10 is poor or worse by the European index (#42), the worse of the two, orange for poor and red
+  // beyond. Cheap sensors (an SDS011 and the like) read the droplets of fog as dust, so above 90% humidity the row says it may be fog.
+  private _renderAirWarning(): TemplateResult {
+    if (this._config.option_air_warning === false) return html``;
+    const readings = (['pm25', 'pm10'] as Pollutant[]).map((p) => ({ p, r: this._airReading(p) }))
+      .filter((x) => x.r !== null && x.r.band !== null && x.r.band >= POOR) as { p: Pollutant; r: { value: number; band: number; unit: string } }[];
+    if (!readings.length) return html``;
+    const worst = readings.reduce((a, b) => (b.r.band > a.r.band ? b : a));
+    const levelNum = worst.r.band === POOR ? '3' : '4';
+    const colour = levelNum === '4' ? '#f44336' : '#ff9800';
+    const tintRgb = levelNum === '4' ? '244, 67, 54' : '255, 152, 0';
+    const tintAlpha = levelNum === '4' ? '0.34' : '0.24';
+    const levelClass = levelNum === '4' ? 'warning-row level-red' : 'warning-row level-orange';
+    const fog = (this._humidityPercent ?? 0) > 90 ? ` · ${tCard(this.locale, 'air_fog')}` : '';
+    const name = worst.p === 'pm25' ? 'PM2.5' : 'PM10';
+    const headline = `${tCard(this.locale, 'air_quality')}: ${tCard(this.locale, `air_${AIR_BANDS[worst.r.band]}`)} · ${name} ${Math.round(worst.r.value)} µg/m³${fog}`;
+    if (this._warningStyle === 'classic') {
+      return html`
+        <div class="${levelClass} air-warning" style="border-left-color: ${colour}; background: rgba(${tintRgb}, ${tintAlpha});">
+          <ha-icon class="warning-icon" style="color: ${colour};" icon="mdi:blur"></ha-icon>
+          <div class="warning-text">${headline}</div>
+        </div>
+      `;
+    }
+    return html`
+      <div class="${levelClass} soft air-warning" style="--sev: ${colour};">
+        <ha-icon class="warning-icon" icon="mdi:blur"></ha-icon>
+        <div class="warning-text">${headline}</div>
+      </div>
+    `;
+  }
+
   get slotRainRate(): TemplateResult {
     const rate = this.measuredRainRate;
     const display = rate === null ? '---'
@@ -3120,7 +3199,7 @@ export class PlatinumWeatherCard extends LitElement {
       temp_maximums: c.entity_forecast_max, temp_minimums: c.entity_forecast_min,
       uv_summary: c.entity_uv_alert_summary, fire_danger: c.entity_fire_danger,
       wind: c.entity_wind_speed, wind_gust: c.entity_wind_gust, wind_kt: c.entity_wind_speed_kt,
-      visibility: c.entity_visibility, moon: c.entity_moon,
+      visibility: c.entity_visibility, moon: c.entity_moon, pm25: c.entity_pm25, pm10: c.entity_pm10,
       custom1: c.custom1_value, custom2: c.custom2_value, custom3: c.custom3_value, custom4: c.custom4_value,
     };
     const entity = map[slot];

@@ -184,6 +184,10 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_cloud_overrides_icon?: boolean;
   entity_rain_rate?: string;
   entity_uv_index?: string;
+  entity_pm25?: string;
+  entity_pm10?: string;
+  option_air_warning?: boolean;
+  option_air_decimals?: boolean;
   entity_dew_point?: string;
   option_show_comfort?: boolean;
   option_forecast_algorithm?: 'zambretti' | 'sager';

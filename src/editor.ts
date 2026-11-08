@@ -768,6 +768,12 @@ get _forecast_type(): string {
         case 'uv_index':
           entities.add('entity_uv_index');
           break;
+        case 'pm25':
+          entities.add('entity_pm25');
+          break;
+        case 'pm10':
+          entities.add('entity_pm10');
+          break;
         case 'cloud_cover':
           entities.add('entity_solar_radiation');
           entities.add('entity_sun');
@@ -957,6 +963,14 @@ get _forecast_type(): string {
         </ha-entity-picker>
       ` : '';
 
+    // the particulates (#42): only a concentration in µg/m³, which the slots band by the European index
+    const airPicker = (key: 'entity_pm25' | 'entity_pm10') => entities.has(key) ? html`
+        <ha-entity-picker .hass=${this.hass} .configValue=${key} .value=${this._config?.[key] || ''} .includeDomains=${['sensor']} .entityFilter=${this._filterFor(key)}
+          name=${key} label=${this._t(key)} allow-custom-entity @value-changed=${this._valueChangedPicker}>
+        </ha-entity-picker>` : '';
+    const entity_pm25 = airPicker('entity_pm25');
+    const entity_pm10 = airPicker('entity_pm10');
+
     const entity_moon = entities.has("entity_moon") ?
       html`
         <ha-entity-picker .hass=${this.hass} .configValue=${'entity_moon'} .value=${this._entity_moon} .includeDomains=${['sensor']} .entityFilter=${this._filterFor('entity_moon')}
@@ -1107,6 +1121,8 @@ get _forecast_type(): string {
       ${entity_solar_radiation}
       ${entity_cloud_cover}
       ${entity_uv_index}
+      ${entity_pm25}
+      ${entity_pm10}
       ${entity_moon}
       ${entity_pop}
       ${entity_pos}
@@ -1373,6 +1389,8 @@ get _forecast_type(): string {
       ['rainfall',          "Today's recorded rainfall"],
       ['rain_rate',         'How hard it is raining now'],
       ['uv_index',          'Measured UV index'],
+      ['pm25',              'Particulates PM2.5'],
+      ['pm10',              'Particulates PM10'],
       ['pressure',          'Current air pressure'],
       ['wind',              'Current wind conditions'],
       ['wind_gust',         'Current wind gust'],
@@ -1787,6 +1805,16 @@ get _forecast_type(): string {
           <div class="help-text">${this._t('wind_decimals_hint')}</div>
         </div>
         <div></div>
+      </div>
+    `;
+  }
+
+  private _numAir(): TemplateResult {
+    if (!this._config?.entity_pm25 && !this._config?.entity_pm10) return html``;
+    return html`
+      <div class="toggle-row">
+        <span class=${this._config?.option_air_decimals === true ? "pwc-switch active" : "pwc-switch"} .value=${'option_air_decimals'} @click=${this._toggleVisibility}></span>
+        <span class="toggle-label">${this._t("air_decimals")}</span>
       </div>
     `;
   }
@@ -2362,7 +2390,7 @@ get _forecast_type(): string {
       <div class="group-heading">${this._t("group_overview")}</div>
       ${this._ovLayout()}${this._ovDecimals()}
       <div class="group-heading">${this._t("group_numbers")}</div>
-      ${this._numTempPressure()}${this._numWind()}${this._numRainForecast()}
+      ${this._numTempPressure()}${this._numWind()}${this._numRainForecast()}${this._numAir()}
       <div class="group-heading">${this._t("group_readings")}</div>
       ${this._readGustTap()}${this._readArrowMoon()}
     `;
@@ -2371,9 +2399,22 @@ get _forecast_type(): string {
   private _topicWarnings(): TemplateResult {
     return html`
       ${this._sectionWarningsEditor()}
+      ${this._airWarning()}
       ${this._warnStyle()}
       <div class="group-heading">${this._t("group_fire_danger")}</div>
       ${this._fireColourSlots()}${this._fireColourDaily()}
+    `;
+  }
+
+  // the row in the warnings when the air is poor (#42), offered once a sensor of particulates is chosen
+  private _airWarning(): TemplateResult {
+    if (!this._config?.entity_pm25 && !this._config?.entity_pm10) return html``;
+    return html`
+      <div class="toggle-row">
+        <span class=${this._config?.option_air_warning !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_air_warning'} @click=${this._toggleVisibility}></span>
+        <span class="toggle-label">${this._t("air_warning")}</span>
+      </div>
+      <div class="help-text">${this._t("air_warning_hint")}</div>
     `;
   }
 
@@ -2505,6 +2546,8 @@ get _forecast_type(): string {
       entity_pos_1: { classes: ['precipitation'], units: ['mm', 'in'] },
       entity_possible_tomorrow: { classes: ['precipitation'], units: ['mm', 'in'] },
       entity_uv_index: { unitMatch: /uv/i, weather: 'uv_index' },
+      entity_pm25: { classes: ['pm25'], units: ['\u03bcg/m\u00b3', '\u00b5g/m\u00b3', 'ug/m3'] },
+      entity_pm10: { classes: ['pm10'], units: ['\u03bcg/m\u00b3', '\u00b5g/m\u00b3', 'ug/m3'] },
       entity_visibility: { classes: ['distance'], units: ['km', 'mi', 'm'], weather: 'visibility' },
       entity_moon: { options: 'full_moon', name: /moon|луна|lune|mond|luna|maan|księż|měsíc|måne|місяц/i },
       entity_lightning_distance: { classes: ['distance'], units: ['km', 'mi', 'm'], name: WeatherCardEditor._LIGHTNING_NAME, strictName: true },
