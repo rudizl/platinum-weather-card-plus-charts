@@ -2793,7 +2793,8 @@ export class PlatinumWeatherCard extends LitElement {
       <li data-slot="uv_index">
         <div class="slot">
           <div class="slot-icon">
-            <ha-icon icon="mdi:weather-sunny-alert" style="${style}"></ha-icon>
+            <!-- the number carries the colour of the band; the icon is the colour of the other icons -->
+            <ha-icon icon="mdi:weather-sunny-alert"></ha-icon>
           </div>
           <div class="slot-text">${tCard(this.locale, this.compact ? 'uv_index_compact' : 'uv_index')}&nbsp;</div>
           <div class="slot-text uv-index-text" style="${style}">${display}</div>
