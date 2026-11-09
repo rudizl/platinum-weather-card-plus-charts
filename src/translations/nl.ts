@@ -243,7 +243,7 @@ const nl: Translation = {
     "effects_area": "Waar de effecten te zien zijn",
     "effects_area_overview": "Bovenste deel van de kaart",
     "effects_area_card": "Hele kaart",
-    "effects_hint": "Wolken, regen, sneeuw, sterren, mist en bliksem achter de kaart, naar het pictogram dat de kaart heeft gekozen. Experimenteel. Er beweegt niets als het apparaat is ingesteld op minder beweging",
+    "effects_hint": "Wolken, regen, sneeuw, sterren, mist en bliksem achter de kaart, naar het pictogram dat de kaart heeft gekozen. Er beweegt niets als het apparaat is ingesteld op minder beweging",
     "warning_style": "Stijl van de waarschuwingen",
     "warning_style_soft": "Zacht",
     "warning_style_classic": "Klassiek",

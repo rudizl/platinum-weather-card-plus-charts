@@ -243,7 +243,7 @@ const pl: Translation = {
     "effects_area": "Gdzie widać efekty",
     "effects_area_overview": "Górna część karty",
     "effects_area_card": "Cała karta",
-    "effects_hint": "Chmury, deszcz, śnieg, gwiazdy, mgła i błyskawice za kartą, według ikony wybranej przez kartę. Eksperymentalne. Nic się nie rusza, jeśli urządzenie ma ograniczony ruch",
+    "effects_hint": "Chmury, deszcz, śnieg, gwiazdy, mgła i błyskawice za kartą, według ikony wybranej przez kartę. Nic się nie rusza, jeśli urządzenie ma ograniczony ruch",
     "warning_style": "Styl ostrzeżeń",
     "warning_style_soft": "Łagodny",
     "warning_style_classic": "Klasyczny",

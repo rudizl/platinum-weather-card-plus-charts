@@ -243,7 +243,7 @@ const srLatn: Translation = {
     "effects_area": "Gde se vide efekti",
     "effects_area_overview": "Gornji deo kartice",
     "effects_area_card": "Cela kartica",
-    "effects_hint": "Oblaci, kiša, sneg, zvezde, magla i munje iza kartice, prema ikoni koju je kartica izabrala. Eksperimentalno. Ništa se ne pomera ako je uređaj podešen na smanjeno kretanje",
+    "effects_hint": "Oblaci, kiša, sneg, zvezde, magla i munje iza kartice, prema ikoni koju je kartica izabrala. Ništa se ne pomera ako je uređaj podešen na smanjeno kretanje",
     "warning_style": "Stil upozorenja",
     "warning_style_soft": "Mek",
     "warning_style_classic": "Klasičan",

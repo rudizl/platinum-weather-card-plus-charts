@@ -243,7 +243,7 @@ const cs: Translation = {
     "effects_area": "Kde se efekty zobrazují",
     "effects_area_overview": "Horní část karty",
     "effects_area_card": "Celá karta",
-    "effects_hint": "Mraky, déšť, sníh, hvězdy, mlha a blesky za kartou, podle ikony, kterou karta zvolila. Experimentální. Pokud je zařízení nastaveno na omezený pohyb, nic se nehýbe",
+    "effects_hint": "Mraky, déšť, sníh, hvězdy, mlha a blesky za kartou, podle ikony, kterou karta zvolila. Pokud je zařízení nastaveno na omezený pohyb, nic se nehýbe",
     "warning_style": "Styl varování",
     "warning_style_soft": "Jemný",
     "warning_style_classic": "Klasický",

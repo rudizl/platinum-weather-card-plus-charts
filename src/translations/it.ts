@@ -243,7 +243,7 @@ const it: Translation = {
     "effects_area": "Dove si vedono gli effetti",
     "effects_area_overview": "Parte alta della scheda",
     "effects_area_card": "Tutta la scheda",
-    "effects_hint": "Nuvole, pioggia, neve, stelle, nebbia e fulmini dietro la scheda, secondo l'icona che ha scelto. Sperimentale. Niente si muove se il dispositivo è impostato per ridurre i movimenti",
+    "effects_hint": "Nuvole, pioggia, neve, stelle, nebbia e fulmini dietro la scheda, secondo l'icona che ha scelto. Niente si muove se il dispositivo è impostato per ridurre i movimenti",
     "warning_style": "Stile degli avvisi",
     "warning_style_soft": "Morbido",
     "warning_style_classic": "Classico",

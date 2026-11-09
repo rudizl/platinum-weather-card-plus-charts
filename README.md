@@ -93,7 +93,7 @@ The two cards register under different names, so you can try this one beside the
 
 2.7.0 is in beta. It is everything of 2.6.0, and:
 
-- **Weather effects** (experimental): behind the top of the card, or the whole of it, clouds drift with the wind, rain and snow fall, stars come out on a clear night, fog rolls in and a storm flashes. They follow the icon the card settles on, after the rain gauge and the pyranometer have had their say. Off unless you turn them on, and still when your device asks for less motion.
+- **Weather effects**: behind the top of the card, or the whole of it, clouds drift with the wind, rain and snow fall, stars come out on a clear night, fog rolls in and a storm flashes. They follow the icon the card settles on, after the rain gauge and the pyranometer have had their say. Off unless you turn them on, and still when your device asks for less motion.
 - **The `photoreal` icon pack**: twenty-five pictures, bundled with the card, with skies drawn for the cloud cover that a pyranometer measures.
 - **Soft warnings**, the new default: the row is a stripe in the colour of the level that fades out, and a storm far away is a small pill instead of a row. The classic flat bar is still there.
 - Every version since 2.0.0, by what was added, what changed and what was fixed, is in the **[full changelog](https://github.com/rudizl/platinum-weather-card-plus-charts/blob/master/CHANGELOG.md)**.
@@ -533,7 +533,7 @@ The card supports multiple icon packs, selectable from the editor's **Appearance
 | Value | Description | Requirement |
 |---|---|---|
 | `default` | Built-in animated SVG icons (bundled with the card) | None |
-| `photoreal` | Photorealistic pictures: a real sun and moon, volumetric clouds, drops, snowflakes, hail, lightning (bundled with the card; experimental) | None |
+| `photoreal` | Photorealistic pictures: a real sun and moon, volumetric clouds, drops, snowflakes, hail, lightning (bundled with the card; the default for a new card) | None |
 | `meteocons-fill` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — filled style | Internet (jsDelivr CDN) |
 | `meteocons-line` | [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius — line style | Internet (jsDelivr CDN) |
 | `ha-official` | [Home Assistant's own weather icons](https://github.com/scinos/lovelace-weather-icons) — the card then matches the rest of your dashboard rather than introducing a second style | Internet (jsDelivr CDN) |
@@ -557,8 +557,10 @@ For `custom`, set `icon_pack_path` to a path template such as `/local/my-icons/{
 
 **The `photoreal` pack.** The twenty-five pictures were generated with Google's Gemini by the card's author and cut out of their backgrounds by hand (the sun is drawn, not generated; a tropical storm, dust, the unknown name, the warning triangle and the question mark are made of the others and drawn; and the pictures of 25 to 55 per cent and of broken clouds are the pack's own sun and moon, with its stars, and streaks of cloud that Gemini drew across them, cut out of a green background); they are WebPs of 384 pixels with a transparent background, shipped with the card in one file of their own, which a card loads only when it shows this pack (0.6 MB; they were PNGs of 2.3 MB until 2.7). The sun and the moon are single pictures, and the pictures of a sky with clouds are made of them and the set's cloud. The levels of the sky and of the rain look different: clear, a thin streak of cloud across the sun, partly cloudy (a sun with a cloud, for what a provider calls partly cloudy and for a forecast of it), broken clouds (a sun or a moon with two torn streaks of cloud in front, for a sky that the sensors measure at 55 to 85 per cent, with `option_cloud_overrides_icon`), a sun nearly hidden, and then plain cloud; a light rain, a rain and a pouring. The strange conditions have a picture each, and only one of them is alarming: *exceptional* (and a tornado or a hurricane) is a dark storm with lightning and a warning triangle, a tropical storm is heavy rain with wind, dust is a warm haze, and a name that the card does not know at all is a cloud with a question mark. The vortex that stood for all of them, and for any name that was new, is gone. (The `custom` pack asks for fifteen names only, and keeps them; for it a name that is not known is the plain cloud.) They are experimental: their licence terms are to be reviewed and settled before the next stable release, and until then the pack is part of the pre-releases only. They do not change colour with the theme, and the white ones (hail, snowflakes) are easy to lose on a white card.
 
-## Weather effects (experimental)
+## Weather effects
 
+
+A card added from the picker starts with the light effects over the overview, the `photoreal` pictures, the warnings on top and, when the provider has an hourly forecast, the hours beside the days. A card you already have keeps what it has. The effects are CSS animations of movement and transparency, which the browser hands to the graphics chip: measured on a phone-sized page with the processor slowed four times, the page's main thread stayed busy 0.1% of the time at 60 frames a second, light or full. Nothing moves if the device is set to reduce motion.
 ```yaml
 option_effects: subtle    # off, subtle or full
 option_effects_area: overview    # overview or card
@@ -800,7 +802,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `double_tap_action` | Action | none | Action on double-tap |
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
 | `icon_pack` | String | `default` | Icon pack: `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, `custom` |
-| `option_effects` | String | `off` | The weather behind the card (experimental): `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Appearance |
+| `option_effects` | String | `off` (`subtle` for a new card) | The weather behind the card: `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Appearance |
 | `option_warning_style` | String | `soft` | The style of the warning rows: `soft` (a stripe that fades out, a small pill for a storm far away) or `classic` (the flat tinted bar) |
 | `option_effects_area` | String | `overview` | Where it is drawn: behind the top part of the card (`overview`) or behind the whole card (`card`) |
 | `icon_pack_path` | String | — | Path template for custom icon pack |

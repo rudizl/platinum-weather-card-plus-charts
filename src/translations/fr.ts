@@ -243,7 +243,7 @@ const fr: Translation = {
     "effects_area": "Où les effets s'affichent",
     "effects_area_overview": "Partie haute de la carte",
     "effects_area_card": "Toute la carte",
-    "effects_hint": "Nuages, pluie, neige, étoiles, brouillard et éclairs derrière la carte, d'après l'icône qu'elle a choisie. Expérimental. Rien ne bouge si l'appareil est réglé pour réduire les animations",
+    "effects_hint": "Nuages, pluie, neige, étoiles, brouillard et éclairs derrière la carte, d'après l'icône qu'elle a choisie. Rien ne bouge si l'appareil est réglé pour réduire les animations",
     "warning_style": "Style des alertes",
     "warning_style_soft": "Doux",
     "warning_style_classic": "Classique",

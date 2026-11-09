@@ -243,7 +243,7 @@ const de: Translation = {
     "effects_area": "Wo die Effekte erscheinen",
     "effects_area_overview": "Oberer Teil der Karte",
     "effects_area_card": "Ganze Karte",
-    "effects_hint": "Wolken, Regen, Schnee, Sterne, Nebel und Blitze hinter der Karte, passend zum Symbol, das die Karte gewählt hat. Experimentell. Nichts bewegt sich, wenn das Gerät auf reduzierte Bewegung eingestellt ist",
+    "effects_hint": "Wolken, Regen, Schnee, Sterne, Nebel und Blitze hinter der Karte, passend zum Symbol, das die Karte gewählt hat. Nichts bewegt sich, wenn das Gerät auf reduzierte Bewegung eingestellt ist",
     "warning_style": "Stil der Warnungen",
     "warning_style_soft": "Weich",
     "warning_style_classic": "Klassisch",

@@ -243,7 +243,7 @@ const es: Translation = {
     "effects_area": "Dónde se muestran los efectos",
     "effects_area_overview": "Parte superior de la tarjeta",
     "effects_area_card": "Toda la tarjeta",
-    "effects_hint": "Nubes, lluvia, nieve, estrellas, niebla y rayos detrás de la tarjeta, según el icono que ha elegido. Experimental. Nada se mueve si el dispositivo está configurado para reducir el movimiento",
+    "effects_hint": "Nubes, lluvia, nieve, estrellas, niebla y rayos detrás de la tarjeta, según el icono que ha elegido. Nada se mueve si el dispositivo está configurado para reducir el movimiento",
     "warning_style": "Estilo de los avisos",
     "warning_style_soft": "Suave",
     "warning_style_classic": "Clásico",

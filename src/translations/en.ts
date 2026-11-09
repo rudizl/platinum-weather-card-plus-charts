@@ -243,7 +243,7 @@ const en: Translation = {
     "effects_area": "Where the effects show",
     "effects_area_overview": "Top part of the card",
     "effects_area_card": "Whole card",
-    "effects_hint": "Clouds, rain, snow, stars, fog and lightning behind the card, drawn from the icon the card has chosen. Experimental. Nothing moves if the device is set to reduce motion",
+    "effects_hint": "Clouds, rain, snow, stars, fog and lightning behind the card, drawn from the icon the card has chosen. Nothing moves if the device is set to reduce motion",
     "warning_style": "Warnings style",
     "warning_style_soft": "Soft",
     "warning_style_classic": "Classic",

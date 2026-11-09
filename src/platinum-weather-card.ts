@@ -72,14 +72,22 @@ console.info(
 // A new card made of nothing but a weather entity: the overview, the slots, the days
 // and the charts, which is everything that can be drawn from it alone. Shared by the
 // card picker's two ways in, the stub (By card) and the suggestion (By entity).
-function weatherEntityCard(hass: HomeAssistant | undefined, entity: string): Record<string, unknown> {
+// Since 2.7 a new card also starts with what 2.7 is for (Руди, 9 November): the warnings
+// on top (they take no room until there is one), the photoreal pictures, the light
+// weather effects over the overview, and the hours beside the days when the provider has
+// them. Only a new card: a configuration that exists is not touched.
+function weatherEntityCard(hass: HomeAssistant | undefined, entity: string, withHours = true): Record<string, unknown> {
+  const hours = withHours && ((forecastFeatures(hass, entity) ?? 0) & 2) === 2;
   return {
     weather_entity: entity,
     ...(hass?.states?.['sun.sun'] ? { entity_sun: 'sun.sun' } : {}),
-    section_order: ['overview', 'slots', 'daily_forecast', 'charts'],
+    section_order: ['warnings', 'overview', 'slots', 'daily_forecast', 'charts'],
     show_section_charts: true,
     option_show_temperature_chart: true,
     option_show_precipitation_chart: true,
+    icon_pack: 'photoreal',
+    option_effects: 'subtle',
+    ...(hours ? { entity_hourly: entity, show_section_hourly_forecast: true } : {}),
   };
 }
 
@@ -107,7 +115,8 @@ function forecastFeatures(hass: HomeAssistant | undefined, entity: string): numb
     const features = forecastFeatures(hass, entityId);
     // no daily forecast, no strip and no charts: a card of that would be mostly empty
     if (features !== undefined && (features & 1) === 0) return null;
-    const card = { type: 'custom:platinum-weather-card-plus-charts', ...weatherEntityCard(hass, entityId) };
+    // the first of the two is the days alone, as its label says; the second has the hours too
+    const card = { type: 'custom:platinum-weather-card-plus-charts', ...weatherEntityCard(hass, entityId, false) };
     if (features !== undefined && (features & 2) === 2) {
       return [
         { label: 'Daily forecast and charts', config: card },

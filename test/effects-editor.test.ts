@@ -69,9 +69,11 @@ describe('the effects choice in the editor', () => {
     el._valueChanged({ target: { configValue: 'option_effects', value: 'subtle' } });
     expect(seen).toHaveLength(0);
   });
-  it('explains itself, and says it is experimental', async () => {
+  // since 2.7 a new card starts with the light effects: they are no longer called experimental (Руди, 9 November)
+  it('explains itself, and says nothing moves when the device asks for less motion', async () => {
     const { box } = await editor();
-    expect(box.textContent).toMatch(/experimental/i);
+    expect(box.textContent).not.toMatch(/experimental/i);
+    expect(box.textContent).toMatch(/reduce motion/i);
   });
 });
 

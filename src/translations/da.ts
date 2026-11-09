@@ -243,7 +243,7 @@ const da: Translation = {
     "effects_area": "Hvor effekterne vises",
     "effects_area_overview": "Kortets øverste del",
     "effects_area_card": "Hele kortet",
-    "effects_hint": "Skyer, regn, sne, stjerner, tåge og lyn bag kortet, ud fra det ikon, kortet har valgt. Eksperimentelt. Intet bevæger sig, hvis enheden er sat til reduceret bevægelse",
+    "effects_hint": "Skyer, regn, sne, stjerner, tåge og lyn bag kortet, ud fra det ikon, kortet har valgt. Intet bevæger sig, hvis enheden er sat til reduceret bevægelse",
     "warning_style": "Advarselsstil",
     "warning_style_soft": "Blød",
     "warning_style_classic": "Klassisk",
