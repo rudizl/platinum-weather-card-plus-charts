@@ -130,6 +130,9 @@ Four layout options are available:
 | **Forecast** | <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-forecast.png" alt="The overview, forecast" width="456"> |
 | **Title Only** | <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/overview-section-title-only.png" alt="The overview, title only" width="456"> |
 
+<details>
+<summary>Overview Section: options in the editor (15)</summary>
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Card Title Text Line 1 | String | Optional title line 1 |
@@ -147,6 +150,8 @@ Four layout options are available:
 | Local forecast (Zambretti) | Boolean | Replace the summary text with a locally computed Zambretti forecast |
 | &nbsp;&nbsp;Verbose forecast text | Boolean | Full-sentence forecast with a pressure-tendency clause |
 | &nbsp;&nbsp;Station altitude (m) | Number | Only for absolute-pressure sensors — leave empty for relative/sea-level |
+
+</details>
 
 Wind bearing sensors may report either numeric degrees or compass text. Both Latin (`NW`, `SSE`) and Cyrillic (`СЗ`, `ЮЮИ`, and the Russian/Ukrainian `В` for east) abbreviations are recognised — some providers return them localized, or mixed in with the Latin ones.
 
@@ -310,6 +315,9 @@ Shows today's detailed forecast text.
 
 Where several entities feed it, **Separate sources** puts each on its own line rather than running them into one paragraph — which matters because providers rarely end their text with a full stop, so without it two forecasts collide mid-sentence.
 
+<details>
+<summary>Extended Section: options in the editor (5)</summary>
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Entity Extended Forecast | Entity | Entity providing the detailed forecast |
@@ -317,6 +325,8 @@ Where several entities feed it, **Separate sources** puts each on its own line r
 | &nbsp;&nbsp;Attribute | String | The attribute containing the forecast text |
 | Entity Today's UV Forecast | String | Optional entity appended to the extended forecast |
 | Entity Today's Fire Danger | String | Optional entity appended to the extended forecast |
+
+</details>
 
 ## Slots Section
 
@@ -331,6 +341,9 @@ Up to 8 rows of data in 2 columns. The required entities update dynamically base
 <p align="center">
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/slots-section.png" alt="The overview and the slots of a card" width="400">
 </p>
+
+<details>
+<summary>All slot values (30)</summary>
 
 | Slot Value | Description | Example |
 | ---------- | ----------- | ------- |
@@ -364,6 +377,8 @@ Up to 8 rows of data in 2 columns. The required entities update dynamically base
 | `custom1`–`custom4` | Custom entity with icon and unit | |
 | `empty` | Blank slot (preserves space) | |
 | `remove` | Remove slot entirely | |
+
+</details>
 
 
 ### Pressure trend indicator
@@ -406,6 +421,9 @@ The card shows the warnings that would otherwise need cards of their own: a seve
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/warning-levels.png" alt="Yellow, orange and red warnings" width="460">
 </p>
 
+<details>
+<summary>Warning types and their icons (15)</summary>
+
 | Type | Hazard | Icon |
 | --- | --- | --- |
 | 1 | Wind | `mdi:weather-windy` |
@@ -424,6 +442,8 @@ The card shows the warnings that would otherwise need cards of their own: a seve
 | 14 | Marine hazard | `mdi:sail-boat` |
 | 15 | Drought | `mdi:water-off` |
 
+</details>
+
 When the title of a warning names a second hazard (`Heavy precipitation and strong wind!`, of the type rain), the row shows both, with an icon for each: see the note below.
 
 **Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown.
@@ -432,10 +452,15 @@ When the title of a warning names a second hazard (`Heavy precipitation and stro
 
 This is deliberately part of the warnings section rather than a slot. An approaching storm is a warning in the same sense a rain alert is, and the section already appears and vanishes on its own, where a slot would sit empty most of the time — six weeks of readings at the station this was built against recorded no strikes at all. **Show expiry time** appends when it lifts; without it the row states the hazard alone.
 
+<details>
+<summary>Warnings Section: options in the editor (2)</summary>
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Warning entity | Entity | MeteoAlarm-compatible binary sensor |
 | Show expiry time | Boolean | Append when the warning ends |
+
+</details>
 
 ```yaml
 type: custom:platinum-weather-card-plus-charts
@@ -525,6 +550,9 @@ The two are independent: the sun override only changes day to night and back, ne
 
 The card supports multiple icon packs, selectable from the editor's **Global Options → Icon Pack** dropdown.
 
+<details>
+<summary>Icon packs (6)</summary>
+
 | Value | Description | Requirement |
 |---|---|---|
 | `default` | Built-in animated SVG icons (bundled with the card) | None |
@@ -533,6 +561,8 @@ The card supports multiple icon packs, selectable from the editor's **Global Opt
 | `wcc-2` | [ammap Weather Icons](https://www.amcharts.com/free-animated-svg-weather-icons/) — included in `rudizl/weather-chart-card` | Install `rudizl/weather-chart-card` via HACS |
 | `ha-official` | [Home Assistant's own weather icons](https://github.com/scinos/lovelace-weather-icons) — the card then matches the rest of your dashboard rather than introducing a second style | Internet (jsDelivr CDN) |
 | `custom` | Any icon set — set `icon_pack_path` with `{condition}` placeholder | User-provided |
+
+</details>
 
 > **Note:** `wcc-1` has been removed — it was byte-for-byte identical to the Meteocons Fill pack. Use `meteocons-fill` instead.
 
@@ -573,6 +603,9 @@ The days can share the section with an hourly view, shown as a second tab or on 
 
 Hovering over any forecast day column shows a tooltip with date, weather description, max/min temperatures, precipitation, and wind speed/direction. The tooltip content is identical to the Charts section tooltip.
 
+<details>
+<summary>Daily Forecast Section: options in the editor (13)</summary>
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Weather Entity with Forecasts | String | Main weather entity for forecast data |
@@ -588,6 +621,8 @@ Hovering over any forecast day column shows a tooltip with date, weather descrip
 | Include Today in Forecast | Boolean | Start the strip from today instead of tomorrow |
 | Show date next to day | Boolean | Locale-formatted date after the day name (day label font shrinks to fit) |
 | Show forecast wind | Boolean | Wind speed/direction in each forecast column |
+
+</details>
 
 With **Show date next to day** enabled, the date follows the day name and the label shrinks to fit:
 
@@ -624,6 +659,9 @@ Opened with the settings button on the **Hourly forecast** row:
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-hourly.png" alt="The Hourly forecast settings in the editor" width="720">
 </p>
 
+<details>
+<summary>Settings and their keys (9)</summary>
+
 | Setting | Key | Default | |
 | --- | --- | --- | --- |
 | Hourly forecast (the row's switch) | `show_section_hourly_forecast` | off | Show the hourly view. Needs an hourly entity |
@@ -635,6 +673,8 @@ Opened with the settings button on the **Hourly forecast** row:
 | Show rainfall | `option_hourly_precipitation` | on | A figure under the hours expecting some; the row vanishes when the whole span is dry, rather than printing a column of zeroes |
 | Show chance of rain | `option_hourly_pop` | on | A percentage under the hours where rain is possible, in the colour of the rain; the row vanishes when the whole span is dry or the provider gives none. For grouped hours, the highest of the group |
 | Show wind | `option_hourly_wind` | off | Speed under each hour, in the unit the hourly entity reports |
+
+</details>
 
 ### What it shows
 
@@ -664,10 +704,15 @@ option_hourly_wind: true
 
 An integrated chart rendered directly below the daily forecast, showing the same days as the forecast strip.
 
+<details>
+<summary>Charts Section: options in the editor (2)</summary>
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Show Temperature Chart | Boolean | Show max/min temperature polylines |
 | Show Precipitation Chart | Boolean | Show precipitation bars with mm labels |
+
+</details>
 
 The chart is drawn from the weather entity's daily forecast, the same subscription the forecast strip uses, so no additional entities are required. A card configured with per-day sensors (`entity_forecast_icon_1` and the like) and no weather entity draws its charts from those instead, over the same days as the strip: the temperature chart from `entity_forecast_max_1` and `entity_forecast_min_1`, the rain chart from `entity_pos_1`. A chart whose sensor isn't configured is left out rather than drawn as zeroes.
 
@@ -716,6 +761,9 @@ The lists of the pickers offer what each field can read: the solar radiation fie
   <img src="https://raw.githubusercontent.com/rudizl/platinum-weather-card-plus-charts/master/images/editor-picker-narrowed.png" alt="The list of the solar radiation field offers only the two sensors that fit" width="720">
 </p>
 
+<details>
+<summary>Global Options: options in the editor (8)</summary>
+
 | Option | Type | Description |
 | ------ | ---- | ----------- |
 | Icon Pack | String | `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, or `custom` |
@@ -727,6 +775,8 @@ The lists of the pickers offer what each field can read: the solar radiation fie
 | Show Gust in Wind Slot | Boolean | Append the gust value to the wind slot |
 | Show Beaufort | Boolean | Prefix the wind slot with the Beaufort force |
 
+</details>
+
 ---
 
 # YAML Reference
@@ -734,6 +784,9 @@ The lists of the pickers offer what each field can read: the solar radiation fie
 Almost all settings can be configured in the GUI editor. The YAML reference below is for advanced use or bulk configuration. Access it via **Show Code Editor** in the card editor.
 
 ## Global Settings
+
+<details>
+<summary>Global Settings: YAML keys (14)</summary>
 
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
@@ -751,6 +804,8 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
 | `icon_pack` | String | `default` | Icon pack: `default`, `meteocons-fill`, `meteocons-line`, `ha-official`, `wcc-2`, `custom` |
 | `icon_pack_path` | String | — | Path template for custom icon pack |
+
+</details>
 
 ## Actions
 
@@ -785,6 +840,9 @@ double_tap_action:
 
 ## Overview Settings
 
+<details>
+<summary>Overview Settings: YAML keys (21)</summary>
+
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
 | `overview_layout` | String | `complete` | `complete`, `observations`, `forecast` or `title only` |
@@ -809,7 +867,12 @@ double_tap_action:
 | `option_cloud_min_elevation_am` | Number | `10` | Sun elevation below which the sky is not measured, morning |
 | `option_cloud_min_elevation_pm` | Number | `10` | The same for the evening, set separately for obstructions on one side |
 
+</details>
+
 ## Extended Section
+
+<details>
+<summary>Extended Section: YAML keys (6)</summary>
 
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
@@ -820,7 +883,12 @@ double_tap_action:
 | `entity_todays_uv_forecast` | String | none | UV forecast entity |
 | `entity_todays_fire_danger` | String | none | Fire danger entity |
 
+</details>
+
 ## Slots Section
+
+<details>
+<summary>Slots Section: YAML keys (60)</summary>
 
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
@@ -885,11 +953,16 @@ double_tap_action:
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |
 | `option_show_beaufort` | Boolean | `false` | Prefix the wind slot with the Beaufort force, e.g. "BFT: 4 - SE 12 km/h" |
 
+</details>
+
 Default slot values: l1=`forecast_max`, l2=`forecast_min`, l3=`wind`, l4=`pressure`, l5=`sun_next`, l6–l8=`remove`, r1=`popforecast`, r2=`humidity`, r3=`uv_summary`, r4=`moon`, r5=`sun_following`, r6–r8=`remove`.
 
 A slot that you did not choose, and that has nothing to read, is not drawn, and not a row of `---`: the wind, the pressure and the humidity when the weather entity does not give them (and no entity of their own is set), the UV summary when `entity_uv_alert_summary` is not set, the chance of rain when the forecast gives neither a chance nor an amount, as the moon, which was not drawn without its entity, and the sun without `entity_sun`. A slot that you choose is always drawn, with `---` when it finds nothing; and so is one whose entity you set, while it is unavailable.
 
 ## Daily Forecast Section
+
+<details>
+<summary>Daily Forecast Section: YAML keys (22)</summary>
 
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
@@ -916,7 +989,12 @@ A slot that you did not choose, and that has nothing to read, is not drawn, and 
 | `old_daily_format` | Boolean | `false` | Stack max/min vertically instead of side by side |
 | `tempformat` | String | — | `highlow` = show max before min |
 
+</details>
+
 ## Hourly Forecast Section
+
+<details>
+<summary>Hourly Forecast Section: YAML keys (10)</summary>
 
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
@@ -931,12 +1009,19 @@ A slot that you did not choose, and that has nothing to read, is not drawn, and 
 | `option_editor_all_entities` | Boolean | `false` | Editor only: offer every entity in the lists of the pickers that offer what a field can read, instead of what it can read |
 | `option_hourly_wind` | Boolean | `false` | Wind speed under each hour, in the hourly entity's unit |
 
+</details>
+
 ## Charts Section
+
+<details>
+<summary>Charts Section: YAML keys (2)</summary>
 
 | Variable | Type | Default | Description |
 | -------- | ---- | ------- | ----------- |
 | `option_show_temperature_chart` | Boolean | `false` | Show max/min temperature lines. Hides the max/min text in the forecast columns while on |
 | `option_show_precipitation_chart` | Boolean | `false` | Show precipitation bars. Hides the millimetre text in the forecast columns while on |
+
+</details>
 
 The chart uses the same `weather_entity` and `daily_forecast_days` settings as the Daily Forecast section. No additional entities are required.
 
