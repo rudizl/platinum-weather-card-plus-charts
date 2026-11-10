@@ -3519,7 +3519,7 @@ export class PlatinumWeatherCard extends LitElement {
   // Fifteen minutes bridges the gaps and still lets go in a lull.
   private _gaugeRateForIcon(): number | null {
     const entity = this._config?.entity_rain_rate;
-    const live = this.measuredRainRate;
+    const live = this.measuredRainRateMmH;
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = Date.now();
     if (live !== null && entity) {
@@ -3546,6 +3546,28 @@ export class PlatinumWeatherCard extends LitElement {
     return isFinite(rate) ? rate : null;
   }
 
+  // The same rate in mm/h, for what compares it with thresholds in mm/h: the bands of the icon and the forecast. A gauge in another unit was
+  // read as mm/h, so 0.5 in/h, which is heavy rain, made the light-rain icon. The slot shows measuredRainRate, in the unit of the sensor.
+  get measuredRainRateMmH(): number | null {
+    const rate = this.measuredRainRate;
+    if (rate === null) return null;
+    const unit = String(this.hass.states[this._config.entity_rain_rate ?? '']?.attributes?.unit_of_measurement ?? '').trim().toLowerCase();
+    return rate * PlatinumWeatherCard.rainRatePerMmH(unit);
+  }
+
+  // millimetres an hour in one unit of a rain rate, for the units Home Assistant gives one in; a unit it does not know, or none, is mm/h
+  static rainRatePerMmH(unit: string): number {
+    switch (unit.replace(/\s+/g, '')) {
+      case 'in/h': return 25.4;
+      case 'in/d': return 25.4 / 24;
+      case 'mm/min': return 60;
+      case 'mm/s': return 3600;
+      case 'mm/d': return 1 / 24;
+      case 'cm/h': return 10;
+      default: return 1;
+    }
+  }
+
   // Cloud cover for the forecast, which unlike the slot would rather have a
   // stale figure than none: a pyranometer says nothing after dark, and the sky
   // seldom turns over completely between dusk and dawn. Falls back to the last
@@ -3560,7 +3582,7 @@ export class PlatinumWeatherCard extends LitElement {
   // showers in one convective spell rather than the start of a dry evening.
   get forecastRainRate(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
-    const now = this.measuredRainRate;
+    const now = this.measuredRainRateMmH;
     const gauge = this._config.entity_rain_rate;
     if (!gauge) return now;   // no gauge: nothing measured, nothing to remember
     if (now !== null && now > 0) {
