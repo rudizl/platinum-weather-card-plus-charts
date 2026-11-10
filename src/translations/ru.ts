@@ -386,6 +386,7 @@ const ru: Translation = {
     "rain_rate": "Интенсивность",
     "rain_rate_compact": "Инт.",
     "uv_index": "УФ-индекс",
+    "icons_not_loaded": "Значки не загрузились ({file}). Переустановите карточку или перезагрузите страницу.",
     "air_good": "Хорошее",
     "air_fair": "Удовлетворительное",
     "air_moderate": "Умеренное",

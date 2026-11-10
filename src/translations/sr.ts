@@ -386,6 +386,7 @@ const sr: Translation = {
     "rain_rate": "Интензитет кише",
     "rain_rate_compact": "Интензитет",
     "uv_index": "UV индекс",
+    "icons_not_loaded": "Иконе се нису учитале ({file}). Поново инсталирај картицу или освежи страницу.",
     "air_good": "Добар",
     "air_fair": "Прихватљив",
     "air_moderate": "Умерен",

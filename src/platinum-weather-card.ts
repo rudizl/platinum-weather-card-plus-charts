@@ -26,7 +26,7 @@ import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
 import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
-import { iconData } from './icon-packs';
+import { iconData, failedPacks } from './icon-packs';
 import { kmPer } from './distance';
 import { AIR_BANDS, AIR_COLOURS, POOR, airBand, isMicrograms, Pollutant } from './air';
 
@@ -2355,7 +2355,10 @@ export class PlatinumWeatherCard extends LitElement {
   
     // An entity that is missing (deleted, renamed, not loaded yet) is a row at the top of the card, inside it: a box of Home Assistant's above the card
     // pushed the card out of its cell in the sections view, and one missing optional sensor left only the warning to be seen.
-    const configWarning = this._checkForErrors() ? this._showConfigWarning(this._error) : html``;
+    const warnings = this._checkForErrors() ? [...this._error] : [];
+    // a pack of icons that did not load: said in the same row, rather than icons that are invisible and no word (review of 2.7, finding 5)
+    for (const pack of failedPacks()) warnings.push(tCard(this.locale, 'icons_not_loaded').replace('{file}', `icons-${pack}.js`));
+    const configWarning = warnings.length ? this._showConfigWarning(warnings) : html``;
 
     const sections: TemplateResult[] = [];
     if (this._config.section_order !== undefined) {
@@ -4637,6 +4640,9 @@ export class PlatinumWeatherCard extends LitElement {
   // (a CDN, a custom path) is the address. _getIconUrl keeps naming the file, which says which picture it is.
   private _iconSrc(url: string): string {
     const base = this._iconBaseUrl();
+    // a pack of the user's own, or one from a CDN, is its address, even with files named a-, s- or p- beside the card (review of 2.7, finding 6)
+    const pack = this._config?.icon_pack ?? 'default';
+    if (pack === 'custom' || pack === 'ha-official' || pack.startsWith('meteocons')) return url;
     if (!url.startsWith(base)) return url;
     const file = url.slice(base.length).split('?')[0];
     return iconData(base, file, CARD_VERSION, () => this.requestUpdate()) ?? url;

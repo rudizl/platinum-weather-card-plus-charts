@@ -386,6 +386,7 @@ const en: Translation = {
     "rain_rate": "Rain rate",
     "rain_rate_compact": "Rate",
     "uv_index": "UV index",
+    "icons_not_loaded": "The icons did not load ({file}). Reinstall the card, or reload the page.",
     "air_good": "Good",
     "air_fair": "Fair",
     "air_moderate": "Moderate",

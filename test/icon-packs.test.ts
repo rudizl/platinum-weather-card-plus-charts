@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from 'fs';
 import { join, resolve } from 'path';
 import '../src/platinum-weather-card';
 import { makeHass, baseConfig, renderCard } from './helpers';
-import { iconData, packUrl, packOf, BLANK, _setLoader, _forgetPacks } from '../src/icon-packs';
+import { iconData, packUrl, packOf, BLANK, RETRY_MS, _setLoader, _forgetPacks } from '../src/icon-packs';
 import { CARD_VERSION } from '../src/const';
 // @ts-expect-error a script of the build, in JavaScript
 import { buildPack } from '../scripts/build-icons.mjs';
@@ -79,13 +79,21 @@ describe('loading a pack', () => {
     await new Promise((r) => setTimeout(r, 0));
     expect(iconData('/b/', 'a-nothing.svg', CARD_VERSION, () => undefined)).toBe(BLANK);
   });
-  it('a pack that fails to come is asked for again the next time', async () => {
+  // since the review of 2.7 (finding 5): not at the next redraw, which came at every change of state in the home, but after a pause
+  it('a pack that fails to come is asked for again after a pause, not at the next redraw', async () => {
     let calls = 0;
     answer = async () => { calls++; if (calls === 1) throw new Error('offline'); return { default: { 'a-clear-day.svg': 'X' } }; };
     expect(iconData('/b/', 'a-clear-day.svg', CARD_VERSION, () => undefined)).toBe(BLANK);
     await new Promise((r) => setTimeout(r, 0));
     iconData('/b/', 'a-clear-day.svg', CARD_VERSION, () => undefined);
     await new Promise((r) => setTimeout(r, 0));
+    expect(calls).toBe(1);
+    const realNow = Date.now;
+    Date.now = () => realNow() + RETRY_MS + 1;
+    try {
+      iconData('/b/', 'a-clear-day.svg', CARD_VERSION, () => undefined);
+      await new Promise((r) => setTimeout(r, 0));
+    } finally { Date.now = realNow; }
     expect(calls).toBe(2);
     expect(iconData('/b/', 'a-clear-day.svg', CARD_VERSION, () => undefined)).toBe('X');
   });

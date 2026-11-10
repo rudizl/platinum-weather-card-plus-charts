@@ -386,6 +386,7 @@ const he: Translation = {
     "rain_rate": "עוצמת גשם",
     "rain_rate_compact": "עוצמה",
     "uv_index": "מדד UV",
+    "icons_not_loaded": "הסמלים לא נטענו ({file}). התקן מחדש את הכרטיס או טען מחדש את הדף.",
     "air_good": "טובה",
     "air_fair": "סבירה",
     "air_moderate": "בינונית",

@@ -386,6 +386,7 @@ const da: Translation = {
     "rain_rate": "Regnintensitet",
     "rain_rate_compact": "Int.",
     "uv_index": "UV-indeks",
+    "icons_not_loaded": "Ikonerne blev ikke indlæst ({file}). Geninstallér kortet, eller genindlæs siden.",
     "air_good": "God",
     "air_fair": "Rimelig",
     "air_moderate": "Moderat",
