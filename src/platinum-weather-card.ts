@@ -2163,7 +2163,12 @@ export class PlatinumWeatherCard extends LitElement {
         _chartCond = String(_chartProp('detailed_description') ?? _chartProp('condition') ?? '');
       } else if (_summaryStart && this._config.entity_summary_1) {
         const _summaryEntity = this._config.entity_summary_1.replace(/(\d+)(?!.*\d)/g, String(Number(_summaryStart) + i));
-        _chartCond = this.hass.states[_summaryEntity] ? this.hass.states[_summaryEntity].state : '';
+        const _summaryState = this.hass.states[_summaryEntity];
+        // the attribute when "Use attribute" is on, as the tooltip of the days across and the text of the days down read it (#39)
+        _chartCond = !_summaryState ? ''
+          : this._config.summary_1_use_attr && this._config.summary_1_name_attr
+            ? String(_summaryState.attributes?.[this._config.summary_1_name_attr] ?? '')
+            : _summaryState.state;
       }
       const _uomWind = this._getWindUnit();
       const _uomPrecip = sensorMode
