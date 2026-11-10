@@ -23,3 +23,10 @@ export function airBand(p: Pollutant, microgramsPerM3: number): number {
 export function isMicrograms(unit: unknown): boolean {
   return typeof unit === 'string' && /^\s*[μµu]g\s*\/\s*m(³|3|\^3)\s*$/i.test(unit);
 }
+
+// micrograms in one unit of a concentration: 1 for µg/m³, 1000 for mg/m³, null for anything else (an index, say), which is not banded
+export function microgramsPer(unit: unknown): number | null {
+  if (isMicrograms(unit)) return 1;
+  if (typeof unit === 'string' && /^\s*mg\s*\/\s*m(³|3|\^3)\s*$/i.test(unit)) return 1000;
+  return null;
+}

@@ -28,7 +28,7 @@ import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
 import { iconData, failedPacks } from './icon-packs';
 import { kmPer } from './distance';
-import { AIR_BANDS, AIR_COLOURS, POOR, airBand, isMicrograms, Pollutant } from './air';
+import { AIR_BANDS, AIR_COLOURS, POOR, airBand, microgramsPer, Pollutant } from './air';
 
 
 // What the overview and the slots read their figures from: today's condition, the
@@ -2183,7 +2183,7 @@ export class PlatinumWeatherCard extends LitElement {
     const _precipSet = Number(this._config.option_precip_chart_min);
     const _precipFloor = isFinite(_precipSet) && this._config.option_precip_chart_min !== undefined && this._config.option_precip_chart_min !== null && String(this._config.option_precip_chart_min) !== ''
       ? Math.max(0, _precipSet)
-      : (/^\s*in(ch(es)?)?\s*$/i.test(String(_precipRawUnit ?? '')) ? 0.4 : 10);
+      : (/^\s*in(ch(es)?)?\s*$/i.test(String(_precipRawUnit ?? '')) ? 0.4 : /^\s*cm\s*$/i.test(String(_precipRawUnit ?? '')) ? 1 : 10);
 
     // ── Per-column HTML ────────────────────────────────────────────────────
     const colItems = data.map((d, i) => {
@@ -2773,8 +2773,11 @@ export class PlatinumWeatherCard extends LitElement {
     const value = st ? Number(st.state) : NaN;
     if (!st || !isFinite(value) || st.state === '') return null;
     const unit = st.attributes?.unit_of_measurement;
-    const grams = isMicrograms(unit);
-    return { value, band: grams ? airBand(p, value) : null, unit: grams ? 'µg/m³' : (typeof unit === 'string' ? unit : '') };
+    // a concentration in µg/m³, or in mg/m³ turned into it (review of 2.7, finding 8: 0.2 mg/m³ showed as 0 and gave no warning); anything else,
+    // such as an index, as it comes and not banded
+    const per = microgramsPer(unit);
+    if (per !== null) return { value: value * per, band: airBand(p, value * per), unit: 'µg/m³' };
+    return { value, band: null, unit: typeof unit === 'string' ? unit : '' };
   }
 
   private _slotAir(p: Pollutant): TemplateResult {
