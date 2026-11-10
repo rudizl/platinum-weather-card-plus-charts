@@ -6,6 +6,8 @@ All notable changes to Platinum Weather Card Plus Charts. The newest version is 
 
 ### Fixed
 
+- **A rain gauge in another unit than mm/h** is read in mm/h for the icon and the forecast. A gauge in inches an hour was read as millimetres, so 0.5 in/h, which is heavy rain, made the light-rain icon; mm/min and mm/d were wrong the same way. The slot still shows the number in the unit of the sensor. Found in the review of 2.7. Five tests.
+
 - **A lightning detector in miles is read in miles** (#38). The distance was compared, as it came, with limits written for kilometres, so with a detector in miles (Blitzortung follows the unit system of Home Assistant) the default range of 50 was 50 miles, the row turned red within 15 miles and amber within 30, and the editor said *Warn within (km)*. The colours work in kilometres whatever the unit: red within 15 km (9 mi), amber to 30 km (19 mi). The range stays in the unit of the entity, as it has always been compared, so a value someone set keeps meaning what it meant; left unset, it is 50 km in that unit (31 mi). The editor names the unit of the chosen detector, and the default in it, in the 15 languages. A distance without a unit is read in kilometres, as before. Ten tests, four breakages caught.
 
 - **"Use attribute" for the summary of the days is read by the tooltip of the charts too** (#39). With the switch on, the text of each day comes from an attribute of its sensor instead of its state; the tooltip of the days across and the text of the days down read it, and the tooltip of the days drawn with the charts read the state alone. All three read it now. Eight tests: the three places with and without the switch, and the switch in the editor.
