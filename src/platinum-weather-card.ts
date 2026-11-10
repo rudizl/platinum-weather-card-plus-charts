@@ -219,6 +219,8 @@ export class PlatinumWeatherCard extends LitElement {
   private _impliedKeys = new Set<string>();
   // The last real gauge reading, for the icon: see _gaugeRateForIcon().
   private static _gaugeSeen = new Map<string, { t: number; rate: number }>();
+  // the readings of a particulate sensor in the last hour, in µg/m³, one in 30 s however many cards ask: the warning goes by their mean
+  private static _airSamples = new Map<string, { t: number; v: number }[]>();
   // The last time the gauge read above zero, and what it read; see _gaugeRateForIcon().
   private static _gaugeRain = new Map<string, { t: number; rate: number }>();
   // The last real condition of the weather entity behind the icon; see forecastIcon.
@@ -2780,6 +2782,23 @@ export class PlatinumWeatherCard extends LitElement {
     return { value, band: null, unit: typeof unit === 'string' ? unit : '' };
   }
 
+  // The mean of the last hour of readings of a sensor, in µg/m³, and its band: the bands of the European index are for hourly values, and one
+  // reading of a cheap sensor over the line, a chimney or a gust, raised the warning and the next took it away (my review of 2.7).
+  private _airHour(p: Pollutant): { value: number; band: number } | null {
+    const entity = p === 'pm25' ? this._config.entity_pm25 : this._config.entity_pm10;
+    const r = this._airReading(p);
+    if (!entity || !r || r.band === null) return null;
+    const cls = this.constructor as typeof PlatinumWeatherCard;
+    const now = Date.now();
+    let samples = cls._airSamples.get(entity) ?? [];
+    const last = samples[samples.length - 1];
+    if (!last || now - last.t >= 30_000) samples.push({ t: now, v: r.value });
+    samples = samples.filter((x) => now - x.t <= 3_600_000);
+    cls._airSamples.set(entity, samples);
+    const mean = samples.reduce((a, x) => a + x.v, 0) / samples.length;
+    return { value: mean, band: airBand(p, mean) };
+  }
+
   private _slotAir(p: Pollutant): TemplateResult {
     const r = this._airReading(p);
     // whole micrograms by default: the decimals of a cheap sensor are noise
@@ -2815,8 +2834,8 @@ export class PlatinumWeatherCard extends LitElement {
   // beyond. Cheap sensors (an SDS011 and the like) read the droplets of fog as dust, so above 90% humidity the row says it may be fog.
   private _renderAirWarning(): TemplateResult {
     if (this._config.option_air_warning === false) return html``;
-    const readings = (['pm25', 'pm10'] as Pollutant[]).map((p) => ({ p, r: this._airReading(p) }))
-      .filter((x) => x.r !== null && x.r.band !== null && x.r.band >= POOR) as { p: Pollutant; r: { value: number; band: number; unit: string } }[];
+    const readings = (['pm25', 'pm10'] as Pollutant[]).map((p) => ({ p, r: this._airHour(p) }))
+      .filter((x) => x.r !== null && x.r.band >= POOR) as { p: Pollutant; r: { value: number; band: number } }[];
     if (!readings.length) return html``;
     const worst = readings.reduce((a, b) => (b.r.band > a.r.band ? b : a));
     const levelNum = worst.r.band === POOR ? '3' : '4';
@@ -3800,6 +3819,18 @@ export class PlatinumWeatherCard extends LitElement {
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   }
 
+  // The sun too low for a pyranometer to say anything: after dark, or under the cut-off of the morning or the evening (option_cloud_min_elevation_am
+  // and _pm, 10 degrees unless set), the cut-offs _instantCloudFraction uses. With no sun entity, the night alone.
+  private get _sunTooLowForPyranometer(): boolean {
+    const sunState = this._config.entity_sun ? this.hass.states[this._config.entity_sun] : undefined;
+    const elevation = Number(sunState?.attributes?.elevation);
+    if (!sunState || !isFinite(elevation)) return this.dayOrNight === 'night';
+    const azimuth = Number(sunState.attributes?.azimuth);
+    const evening = isFinite(azimuth) ? azimuth > 180 : false;
+    const configured = Number(evening ? this._config.option_cloud_min_elevation_pm : this._config.option_cloud_min_elevation_am);
+    return elevation < (isFinite(configured) && configured > 0 ? configured : 10);
+  }
+
   private get _instantCloudFraction(): number | null {
     const solarEntity = this._config.entity_solar_radiation;
     const sunEntity = this._config.entity_sun;
@@ -4569,7 +4600,8 @@ export class PlatinumWeatherCard extends LitElement {
         // the cloud slot shows and Sager reads: the icon read the provider alone, and on 6 November at 20:14 a partly cloudy night (a station of
         // Weather Underground, which measures no cloud) stood beside a cloud cover of 1% and "the sky is clear" (met.no). A plain sky only:
         // a forecast of cloud does not overrule a claim of rain, snow or a storm, so sunlitAndDry above stays the pyranometer's.
-        const cloud = measured ?? this.namedCloudFraction;
+        // only when the sun is too low for a pyranometer: by day it changed the icon of a card with no pyranometer at all (my review of 2.7)
+        const cloud = measured ?? (this._sunTooLowForPyranometer ? this.namedCloudFraction : null);
         if (cloud === null && rainDenied) {
           // The gauge has ruled the rain out, and the sky cannot be measured —
           // after dark, or with the sun under the cut-off — so there is nothing

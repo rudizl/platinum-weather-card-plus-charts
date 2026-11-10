@@ -2420,6 +2420,9 @@ get _forecast_type(): string {
   // the row in the warnings when the air is poor (#42), offered once a sensor of particulates is chosen
   private _airWarning(): TemplateResult {
     if (!this._config?.entity_pm25 && !this._config?.entity_pm10) return html``;
+    // only on a card that shows its warnings: with the section switched off the switch did nothing (my review of 2.7). The editor puts every
+    // section in section_order, so the switch of the section is what says whether the card has it.
+    if (this._config?.show_section_warnings === false) return html``;
     return html`
       <div class="toggle-row">
         <span class=${this._config?.option_air_warning !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_air_warning'} @click=${this._toggleVisibility}></span>
