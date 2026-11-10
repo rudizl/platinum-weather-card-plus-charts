@@ -56,7 +56,9 @@ const fr: Translation = {
     "level_2": "Vigilance jaune",
     "level_3": "Vigilance orange",
     "level_4": "Vigilance rouge",
-    "until": "jusqu'à"
+    "until": "jusqu'à",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Le temps restera stable et beau.",

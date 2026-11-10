@@ -56,7 +56,9 @@ const cs: Translation = {
     "level_2": "Žlutá výstraha",
     "level_3": "Oranžová výstraha",
     "level_4": "Červená výstraha",
-    "until": "do"
+    "until": "do",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Počasí zůstane ustálené a pěkné.",

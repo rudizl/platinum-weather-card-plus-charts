@@ -56,7 +56,9 @@ const ua: Translation = {
     "level_2": "Жовтий рівень",
     "level_3": "Помаранчевий рівень",
     "level_4": "Червоний рівень",
-    "until": "до"
+    "until": "до",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Погода залишиться стійкою та ясною.",

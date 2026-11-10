@@ -56,7 +56,9 @@ const sr: Translation = {
     "level_2": "Жуто упозорење",
     "level_3": "Наранџасто упозорење",
     "level_4": "Црвено упозорење",
-    "until": "до"
+    "until": "до",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Време ће остати стабилно и ведро.",

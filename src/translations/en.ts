@@ -56,7 +56,9 @@ const en: Translation = {
     "level_2": "Yellow warning",
     "level_3": "Orange warning",
     "level_4": "Red warning",
-    "until": "until"
+    "until": "until",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "The weather will remain settled and fair.",

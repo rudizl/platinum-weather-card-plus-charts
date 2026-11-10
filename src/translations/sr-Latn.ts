@@ -56,7 +56,9 @@ const srLatn: Translation = {
     "level_2": "Žuto upozorenje",
     "level_3": "Narandžasto upozorenje",
     "level_4": "Crveno upozorenje",
-    "until": "do"
+    "until": "do",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Vreme će ostati stabilno i vedro.",

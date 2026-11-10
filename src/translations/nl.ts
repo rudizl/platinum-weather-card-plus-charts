@@ -56,7 +56,9 @@ const nl: Translation = {
     "level_2": "Code geel",
     "level_3": "Code oranje",
     "level_4": "Code rood",
-    "until": "tot"
+    "until": "tot",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Het weer blijft bestendig en mooi.",
