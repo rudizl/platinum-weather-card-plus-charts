@@ -2,6 +2,12 @@
 
 All notable changes to Platinum Weather Card Plus Charts. The newest version is at the top. Each version lists what was **added**, what **changed** and what was **fixed**; the notes of every release, with the same text, are on the [releases page](https://github.com/rudizl/platinum-weather-card-plus-charts/releases).
 
+## 2.6.1 (unreleased)
+
+### Fixed
+
+- **Small words.** The hint under the path of a custom icon pack was in English for everyone, though every language had a translation; it is the translation now. Two Bulgarian texts said a word in English and misspelt another. The README gave the bands of the icon as 55% and 85%; they are 50% and 75%, as the card has used since 2.6.0.
+
 ## 2.6.0 (2026-11-06)
 
 **In short:** one weather entity is enough for a whole card, and the card offers itself under *Add to dashboard → By entity*; the lists of the editor offer what each field can read; a twice-daily forecast fills the strip and the charts; the hourly strip has the chance of rain and a moon at night; Sager has a sky at night; a warning that names two hazards shows both; a sky that is wholly covered is drawn as one; and the fixes below.
