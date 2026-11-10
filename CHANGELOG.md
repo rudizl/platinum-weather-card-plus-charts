@@ -2,6 +2,12 @@
 
 All notable changes to Platinum Weather Card Plus Charts. The newest version is at the top. Each version lists what was **added**, what **changed** and what was **fixed**; the notes of every release, with the same text, are on the [releases page](https://github.com/rudizl/platinum-weather-card-plus-charts/releases).
 
+## 2.6.1 (unreleased)
+
+### Fixed
+
+- **The precipitation bars no longer make a little rain look like a lot** (#47, thefan418). They were scaled to the wettest day of the period, so its bar always stood at 85% of the height, whether it was 0.3 mm or 30 mm. The bars are drawn against at least 10 mm now (0.4 in in inches): 0.3 mm is a thin line and 5 mm about half the height, while a wetter day still reaches the top, as Weather Chart Card does it, and nothing is cut off. `option_precip_chart_min` sets the amount, in the editor under the switch of the precipitation chart; `0` brings back the scale of the wettest day. Five tests.
+
 ## 2.6.0 (2026-11-06)
 
 **In short:** one weather entity is enough for a whole card, and the card offers itself under *Add to dashboard → By entity*; the lists of the editor offer what each field can read; a twice-daily forecast fills the strip and the charts; the hourly strip has the chance of rain and a moon at night; Sager has a sky at night; a warning that names two hazards shows both; a sky that is wholly covered is drawn as one; and the fixes below.

@@ -310,6 +310,8 @@ const he: Translation = {
     "include_today": "כלול את היום בתחזית",
     "show_temp_chart": "הצג תרשים טמפרטורה",
     "show_precip_chart": "הצג תרשים משקעים",
+    "precip_chart_min": "סולם המשקעים, לפחות",
+    "precip_chart_min_hint": "העמודות נמדדות מול לפחות כמות זו, כך שמעט גשם הוא עמודה נמוכה. ריק: 10 מ\"מ (0.4 in). 0: מול היום הגשום ביותר.",
     "forecast_tooltips": "הפעל חלוניות תחזית",
     "charts_section": "תרשימים",
     "opt_daily": "יומי",

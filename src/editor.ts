@@ -1798,6 +1798,17 @@ get _forecast_type(): string {
           </div>
         </div>
       </div>
+      ${this._option_show_precipitation_chart === true ? html`
+      <div class="side-by-side">
+        <div>
+          <!-- #47: the bars against at least this much rain; empty is 10 mm or 0.4 in, 0 the wettest day -->
+          <ha-input type="number" min="0" step="any" label=${this._t("precip_chart_min")}
+            .value=${this._config?.option_precip_chart_min ?? ''}
+            .configValue=${'option_precip_chart_min'} @change=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("precip_chart_min_hint")}</div>
+        </div>
+      </div>` : html``}
     `;
   }
 

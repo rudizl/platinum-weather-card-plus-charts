@@ -2109,10 +2109,18 @@ export class PlatinumWeatherCard extends LitElement {
 
     // Precipitation unit: entity attribute first (HA converts forecast values
     // to this unit), then unit-system fallback; localized for display
-    const _precipUnit = this._localizeUnit(sensorMode
+    const _precipRawUnit = sensorMode
       ? this._precipUnit(this._perDayEntity('entity_pos_1', 0))
       : (this._config.entity ? (this.hass.states[this._config.entity]?.attributes?.precipitation_unit as string | undefined) : undefined)
-        || this.getUOM('precipitation'));
+        || this.getUOM('precipitation');
+    const _precipUnit = this._localizeUnit(_precipRawUnit);
+    // The bars are drawn against at least this much rain (#47): scaled to the wettest day alone, its bar stood at 85% of the height whether
+    // it was 0.3 mm or 30 mm. 10 mm, or 0.4 in, unless option_precip_chart_min says otherwise; 0 is the scale of the wettest day. A day
+    // wetter than the floor still reaches the top, as Weather Chart Card does with suggestedMax: nothing is cut off.
+    const _precipSet = Number(this._config.option_precip_chart_min);
+    const _precipFloor = isFinite(_precipSet) && this._config.option_precip_chart_min !== undefined && this._config.option_precip_chart_min !== null && String(this._config.option_precip_chart_min) !== ''
+      ? Math.max(0, _precipSet)
+      : (/^\s*in(ch(es)?)?\s*$/i.test(String(_precipRawUnit ?? '')) ? 0.4 : 10);
 
     // ── Per-column HTML ────────────────────────────────────────────────────
     const colItems = data.map((d, i) => {
@@ -2126,7 +2134,7 @@ export class PlatinumWeatherCard extends LitElement {
         colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
       }
       if (showPrecip) {
-        const pMax  = Math.max(...data.map(x => x.precip), 0.1);
+        const pMax  = Math.max(...data.map(x => x.precip), _precipFloor, 0.1);
         const maxBarH = tempH * 0.85; // bars use up to 85% of the temp area height
         if (d.precip > 0) {
           const bH    = Math.max((d.precip / pMax) * maxBarH, 2);

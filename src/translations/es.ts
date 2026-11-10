@@ -310,6 +310,8 @@ const es: Translation = {
     "include_today": "Incluir hoy en el pronóstico",
     "show_temp_chart": "Mostrar gráfico de temperatura",
     "show_precip_chart": "Mostrar gráfico de precipitación",
+    "precip_chart_min": "Escala de lluvia, al menos",
+    "precip_chart_min_hint": "Las barras se miden con al menos esta cantidad, para que poca lluvia sea una barra corta. Vacío: 10 mm (0,4 in). 0: según el día más lluvioso.",
     "forecast_tooltips": "Activar información emergente",
     "charts_section": "Gráficos",
     "opt_daily": "Diario",
