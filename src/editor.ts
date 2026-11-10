@@ -2263,7 +2263,7 @@ get _forecast_type(): string {
           <ha-input .label=${this._t("icon_path")} .value=${this._icon_pack_path}
             .configValue=${'icon_pack_path'} @change=${this._valueChanged}>
           </ha-input>
-          <div class="help-text">Use {condition} as placeholder — e.g. /local/icons/{condition}.svg</div>
+          <div class="help-text">${this._t("icon_path_hint")}</div>
         </div>
       </div>` : html``}
     `;

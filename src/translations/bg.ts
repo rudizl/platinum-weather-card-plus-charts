@@ -252,7 +252,7 @@ const bg: Translation = {
     "hold_action": "Действие при задържане",
     "double_tap_action": "Двойно натискане",
     "icon_path": "Път до икона",
-    "icon_path_hint": "Използвай {condition} като плейсхолър",
+    "icon_path_hint": "Използвай {condition} на мястото на името на времето — напр. /local/icons/{condition}.svg",
     "overview_layout": "Оформление на преглед",
     "condition_alignment": "Подравняване на текста",
     "align_left": "Ляво",
