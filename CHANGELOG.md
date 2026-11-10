@@ -30,6 +30,8 @@ All notable changes to Platinum Weather Card Plus Charts. The newest version is 
 
 ### Fixed
 
+- **Units, after the review of 2.7.** Particulates in mg/m³ showed as 0 and gave no warning: they are turned into µg/m³ and banded. The floor of the precipitation bars was 10 cm for a forecast in centimetres; it is 1 cm, the same as 10 mm. A lightning distance in `miles`, `mile`, `mm` or `in` was read as kilometres. Tests for a nautical mile, a foot and visibility in feet, which were right but untested.
+
 - **The hint under the path of a custom icon pack** was in English for everyone, though every language had a translation; it is the translation now, and the Bulgarian one is spelt right.
 
 - **The precipitation bars no longer make a little rain look like a lot** (#47, thefan418). They were scaled to the wettest day of the period, so its bar always stood at 85% of the height, whether it was 0.3 mm or 30 mm. The bars are drawn against at least 10 mm now (0.4 in in inches): 0.3 mm is a thin line and 5 mm about half the height, while a wetter day still reaches the top, as Weather Chart Card does it, and nothing is cut off. `option_precip_chart_min` sets the amount, in the editor under the switch of the precipitation chart; `0` brings back the scale of the wettest day. Five tests.
