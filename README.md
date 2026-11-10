@@ -164,7 +164,7 @@ The card can compute a short local forecast entirely from your own weather stati
 
 Enable it in the editor: **Local forecast → Local forecast**. When enabled, the computed forecast text replaces the `entity_summary` text in the overview section, localized to the card's configured language (one of 26 phrases, e.g. *"Fine weather"*, *"Unsettled, rain later"*, *"Stormy, much rain"*).
 
-A **Verbose forecast text** toggle expands the short phrase into a full sentence with a pressure-tendency clause, e.g. *"Unsettled weather, with rain expected later. The pressure is falling."*
+A **Verbose forecast text** toggle expands the short phrase into a full sentence with a pressure-tendency clause, e.g. *"Unsettled weather, with rain expected later. The pressure is falling."* The forecast stays in the large type of the overview; what follows it, the pressure here and the sky, the wind and the temperature with Sager, is a smaller line under it.
 
 | Short | Verbose |
 |-------|---------|
