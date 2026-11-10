@@ -219,6 +219,9 @@ export class PlatinumWeatherCard extends LitElement {
   private _impliedKeys = new Set<string>();
   // The last real gauge reading, for the icon: see _gaugeRateForIcon().
   private static _gaugeSeen = new Map<string, { t: number; rate: number }>();
+  // the local forecast in two parts: the forecast itself, drawn large, and what follows it (the sky, the wind, the temperature, the pressure),
+  // drawn small under it. On a day when Sager foresaw a change of both wind and temperature, four sentences in large type took half the card.
+  private _forecastSplit: { main: string; details: string } | null = null;
   // the readings of a particulate sensor in the last hour, in µg/m³, one in 30 s however many cards ask: the warning goes by their mean
   private static _airSamples = new Map<string, { t: number; v: number }[]>();
   // The last time the gauge read above zero, and what it read; see _gaugeRateForIcon().
@@ -921,9 +924,11 @@ export class PlatinumWeatherCard extends LitElement {
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
+    this._forecastSplit = null;
     const localForecast = this.sagerForecastText ?? this.localForecastText;
+    const split = localForecast !== null ? this._forecastSplit as { main: string; details: string } | null : null;
     const forecastText = localForecast !== null ?
-      html`<div class="forecast-text">${localForecast}</div>` :
+      html`<div class="forecast-text">${split ? split.main : localForecast}${split?.details ? html`<div class="forecast-details">${split.details}</div>` : ''}</div>` :
       (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
       html`<div class="forecast-text">${this.hassExtended.formatEntityState(this.hass.states[this._config.entity_summary])}</div>` ?? html`<div class="forecast-text">---</div>` : html``;
     //html`<div class="forecast-text">${entityComputeStateDisplay(this.hass.localize, this.hass.states[this._config.entity_summary], getLocale(this.hass))}</div>` ?? html`<div class="forecast-text">---</div>` : html``;
@@ -1012,9 +1017,11 @@ export class PlatinumWeatherCard extends LitElement {
 
 
   //tjl use the new formatEntityState method for formatting an entity's presentation state (sunny to Sunny).
+    this._forecastSplit = null;
     const localForecast = this.sagerForecastText ?? this.localForecastText;
+    const split = localForecast !== null ? this._forecastSplit as { main: string; details: string } | null : null;
     const forecastText = localForecast !== null ?
-      html`<div class="forecast-text-right">${localForecast}</div>` :
+      html`<div class="forecast-text-right">${split ? split.main : localForecast}${split?.details ? html`<div class="forecast-details">${split.details}</div>` : ''}</div>` :
       (this._config.entity_summary) && (this.hass.states[this._config.entity_summary]) ?
       html`<div class="forecast-text-right">${this.hassExtended.formatEntityState(this.hass.states[this._config.entity_summary])}</div>` ?? html`<div class="forecast-text-right">---</div>` : html``;
 
@@ -3098,6 +3105,8 @@ export class PlatinumWeatherCard extends LitElement {
     // very differently under a clear sky and under a covered one.
     let text = tSager(this.locale, result.weather);
     if (text && !/[.!?]$/.test(text)) text += '.';
+    // the forecast is the line in large type; the sky, the wind and the temperature follow it in smaller type (_forecastSplit)
+    const main = text;
 
     // The sky goes in a sentence of its own rather than trailing the forecast:
     // several of Sager's phrases already end in a temperature clause, and
@@ -3126,6 +3135,7 @@ export class PlatinumWeatherCard extends LitElement {
         if (temp) text += ` ${tSager(this.locale, 'temp_label')} ${temp.toLowerCase()}.`;
       }
     }
+    this._forecastSplit = { main, details: text.slice(main.length).trim() };
     return text;
   }
 
@@ -3199,9 +3209,13 @@ export class PlatinumWeatherCard extends LitElement {
       // The tendency clause is read live from the same source as the pressure
       // slot's arrow, so the two can never contradict each other on screen.
       const shownCat = this.pressureTrend;
-      return shownCat ? `${text} ${tZambretti(this.locale, shownCat, true)}` : text;
+      const tendency = shownCat ? tZambretti(this.locale, shownCat, true) : '';
+      this._forecastSplit = { main: text, details: tendency };
+      return tendency ? `${text} ${tendency}` : text;
     }
-    return tZambretti(this.locale, this._zamShownKey);
+    const short = tZambretti(this.locale, this._zamShownKey);
+    this._forecastSplit = { main: short, details: '' };
+    return short;
   }
 
   // Wind bearing for the local forecast: the current bearing in degrees, or null
@@ -5448,6 +5462,13 @@ export class PlatinumWeatherCard extends LitElement {
         font-size: ${unsafeCSS(forecastTextFontSize)};
         text-align: ${unsafeCSS(forecastTextAlignment)};
         line-height: 25px;
+      }
+      /* what follows the forecast: the sky, the wind, the temperature, the pressure */
+      .forecast-details {
+        font-size: 14px;
+        line-height: 20px;
+        margin-top: 4px;
+        color: var(--secondary-text-color);
       }
       .forecast-text-right {
         font-size: ${unsafeCSS(forecastTextFontSize)};
