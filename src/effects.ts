@@ -115,8 +115,10 @@ export function effectPlan(i: EffectsInput): EffectPlan | null {
 
   // A gauge that reads rain says how hard; otherwise the name of the icon does.
   // Sleet and snow are not the gauge's to judge: a tipping bucket reads them poorly.
+  // A gauge that reads nothing, rain or no rain in the name of the icon, draws no rain: it drew the icon's heavy rain, heavier than a drizzle measured.
   let rain: EffectPlan['rain'] = null;
-  if (look.rain !== null) {
+  const gaugeDry = !look.snow && i.rainRateMmH !== null && i.rainRateMmH <= 0;
+  if (look.rain !== null && !gaugeDry) {
     const fromGauge = !look.snow && i.rainRateMmH !== null && i.rainRateMmH > 0;
     const intensity = fromGauge ? clamp(0.15 + (i.rainRateMmH as number) / 12, 0.15, 1) : look.rain;
     rain = {

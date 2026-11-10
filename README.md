@@ -855,7 +855,7 @@ Almost all settings can be configured in the GUI editor. The YAML reference belo
 | `double_tap_action` | Action | none | Action on double-tap |
 | `option_static_icons` | Boolean | `false` | Use non-animated icons |
 | `icon_pack` | String | `default` | Icon pack: `default`, `photoreal`, `meteocons-fill`, `meteocons-line`, `ha-official`, `custom` |
-| `option_effects` | String | `off` (`subtle` for a new card) | The weather behind the card: `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on, so a rain the gauge has ruled out is not shown. Set in the editor, under Appearance |
+| `option_effects` | String | `off` (`subtle` for a new card) | The weather behind the card: `off`, `subtle` or `full`. Clouds drift with the wind, rain and snow fall, stars come out at night, fog rolls in and a storm flashes. It is drawn from the icon the card has settled on; a rain gauge that reads nothing draws no rain, whatever the icon says, and a detector whose last strike is more than half an hour old does not flash. The wind is read from the wind speed in its unit, a weather entity's included. Set in the editor, under Appearance |
 | `option_warning_style` | String | `soft` | The style of the warning rows: `soft` (a stripe that fades out, a small pill for a storm far away) or `classic` (the flat tinted bar) |
 | `option_effects_area` | String | `overview` | Where it is drawn: behind the top part of the card (`overview`) or behind the whole card (`card`) |
 | `icon_pack_path` | String | — | Path template for custom icon pack |

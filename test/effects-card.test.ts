@@ -27,7 +27,8 @@ function states(s: Scene = {}): Record<string, St> {
   };
   if (s.rain !== null) st['sensor.rain'] = { state: s.rain ?? '0.0' };
   if (s.vis !== null && s.vis !== undefined) st['sensor.vis'] = { state: s.vis, attributes: { unit_of_measurement: s.visUnit ?? 'km' } };
-  if (s.km !== null && s.km !== undefined) st['sensor.km'] = { state: s.km, attributes: { unit_of_measurement: 'km' } };
+  // a strike now: since 2.7 a distance older than half an hour does not flash, and the helper dates every state in August
+  if (s.km !== null && s.km !== undefined) st['sensor.km'] = { state: s.km, attributes: { unit_of_measurement: 'km' }, last_changed: new Date().toISOString() };
   if (s.wind !== null && s.wind !== undefined) st['sensor.wind'] = { state: s.wind, attributes: { unit_of_measurement: 'km/h' } };
   return st;
 }

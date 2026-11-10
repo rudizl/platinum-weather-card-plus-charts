@@ -649,7 +649,8 @@ export class PlatinumWeatherCard extends LitElement {
       return;
     }
     // the weather behind the card: its speeds are set on the animations already running
-    if (this._fxPlan) applyEffectRates(this.shadowRoot?.querySelector('.fx') ?? null, this._fxPlan);
+    // every layer of the card, not only the first: a layout with more than one would leave the others at the default pace
+    if (this._fxPlan) { const plan = this._fxPlan; this.shadowRoot?.querySelectorAll('.fx').forEach((fx) => applyEffectRates(fx, plan)); }
     if (changedProps.has("_config") || !this._subscribed) {
       this._subscribeForecastEvents();
     }
@@ -966,7 +967,8 @@ export class PlatinumWeatherCard extends LitElement {
     const separator = this._config.option_show_overview_separator === true ? html`<hr class=line>` : ``;
 
     return html`
-      <div class="overview-section section${stack}${this._fxHost('overview')}">${this._fxLayer('overview')}
+      <!-- one layer of effects, behind the temperatures: on the title too, it was a second layer, and the host's position:relative undid stacked -->
+      <div class="overview-section section${stack}">
         ${this._config.text_card_title ? html`<div class="card-header">${this._config.text_card_title}</div>` : html``}
         ${this._config.text_card_title_2 ? html`<div class="card-header">${this._config.text_card_title_2}</div>` : html``}
         ${this._config.entity_update_time ? html`<div class="updated">${this._config.text_update_time_prefix ? this._config.text_update_time_prefix + ' ' : ''}${this._renderUpdateTime()}</div>` : html``}
@@ -3639,7 +3641,7 @@ export class PlatinumWeatherCard extends LitElement {
   // Fifteen minutes bridges the gaps and still lets go in a lull.
   private _gaugeRateForIcon(): number | null {
     const entity = this._config?.entity_rain_rate;
-    const live = this.measuredRainRate;
+    const live = this.measuredRainRateMmH;
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = Date.now();
     if (live !== null && entity) {
@@ -3666,6 +3668,28 @@ export class PlatinumWeatherCard extends LitElement {
     return isFinite(rate) ? rate : null;
   }
 
+  // The same rate in mm/h, for what compares it with thresholds in mm/h: the bands of the icon, the forecast and the effects. A gauge in another
+  // unit was read as mm/h, so 0.5 in/h, which is heavy rain, made the light-rain icon. The slot shows measuredRainRate, in the unit of the sensor.
+  get measuredRainRateMmH(): number | null {
+    const rate = this.measuredRainRate;
+    if (rate === null) return null;
+    const unit = String(this.hass.states[this._config.entity_rain_rate ?? '']?.attributes?.unit_of_measurement ?? '').trim().toLowerCase();
+    return rate * PlatinumWeatherCard.rainRatePerMmH(unit);
+  }
+
+  // millimetres an hour in one unit of a rain rate, for the units Home Assistant gives one in; a unit it does not know, or none, is mm/h
+  static rainRatePerMmH(unit: string): number {
+    switch (unit.replace(/\s+/g, '')) {
+      case 'in/h': return 25.4;
+      case 'in/d': return 25.4 / 24;
+      case 'mm/min': return 60;
+      case 'mm/s': return 3600;
+      case 'mm/d': return 1 / 24;
+      case 'cm/h': return 10;
+      default: return 1;
+    }
+  }
+
   // Cloud cover for the forecast, which unlike the slot would rather have a
   // stale figure than none: a pyranometer says nothing after dark, and the sky
   // seldom turns over completely between dusk and dawn. Falls back to the last
@@ -3680,7 +3704,7 @@ export class PlatinumWeatherCard extends LitElement {
   // showers in one convective spell rather than the start of a dry evening.
   get forecastRainRate(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
-    const now = this.measuredRainRate;
+    const now = this.measuredRainRateMmH;
     const gauge = this._config.entity_rain_rate;
     if (!gauge) return now;   // no gauge: nothing measured, nothing to remember
     if (now !== null && now > 0) {
@@ -4356,14 +4380,15 @@ export class PlatinumWeatherCard extends LitElement {
   private _effectsPlan(): EffectPlan | null {
     const quality = this._config?.option_effects;
     if (quality !== 'subtle' && quality !== 'full') return null;
-    const force = Number(this.currentBeaufort);
+    const force = this._effectsBeaufort();
     return effectPlan({
       iconName: this._effectiveIconName(this._weatherIcon(this.forecastIcon)),
       night: this.dayOrNight === 'night',
       rainRateMmH: this._gaugeRateForIcon(),
       cloudFraction: this.measuredCloudFraction,
-      beaufort: Number.isFinite(force) ? force : null,
-      lightningKm: this._lightningDistance()?.km ?? null,
+      beaufort: force,
+      // a strike of more than half an hour ago does not flash: a sensor that keeps the last distance until the next strike would flash for days
+      lightningKm: this._lightningFresh() ? this._lightningDistance()?.km ?? null : null,
       temperatureC: this._temperatureC,
       visibilityKm: this._visibilityKm,
       sunElevation: this._sunAttribute('elevation'),
@@ -4371,6 +4396,29 @@ export class PlatinumWeatherCard extends LitElement {
       minutesSinceRain: this._minutesSinceRain(),
       quality,
     });
+  }
+
+  // The Beaufort force of the wind for the effects, from the reading in its unit (a sensor, or the wind_speed of a weather entity): currentBeaufort
+  // reads the state of entity_wind_speed in mph or m/s, so a card of a weather entity alone had no wind, and a sensor in knots was read as km/h.
+  private _effectsBeaufort(): number | null {
+    const r = this._reading(this._config.entity_wind_speed, 'wind_speed', 'wind_speed_unit');
+    if (!r) return null;
+    if (/^\s*(b(eau)?f(or)?t?|beaufort)\s*$/i.test(r.unit)) return Math.max(0, Math.min(12, Math.round(r.value)));
+    // no unit: the one of the unit system of Home Assistant
+    const kmh = windSpeedToKmh(r.value, r.unit || (this.getUOM('length') === 'mi' ? 'mph' : 'km/h'));
+    // the upper bound of each force in km/h, 0 to 11; above 117 km/h is 12
+    const upper = [0.99, 5, 11, 19, 28, 38, 49, 61, 74, 88, 102, 117];
+    const f = upper.findIndex((u) => kmh <= u);
+    return f === -1 ? 12 : f;
+  }
+
+  // the distance to the last strike is fresh: changed within half an hour (Blitzortung clears it by itself; others keep it until the next strike)
+  private _lightningFresh(): boolean {
+    const entity = this._config?.entity_lightning_distance;
+    const changed = entity ? this.hass?.states?.[entity]?.last_changed : undefined;
+    if (!changed) return true;
+    const t = Date.parse(changed);
+    return !isFinite(t) || Date.now() - t <= 30 * 60 * 1000;
   }
 
   // The readings the effects work from, as numbers in the units the effects want. The card's own getters
