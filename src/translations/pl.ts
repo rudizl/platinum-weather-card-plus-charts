@@ -356,6 +356,8 @@ const pl: Translation = {
     "include_today": "Uwzględnij dziś w prognozie",
     "show_temp_chart": "Pokaż wykres temperatury",
     "show_precip_chart": "Pokaż wykres opadów",
+    "precip_chart_min": "Skala opadów, co najmniej",
+    "precip_chart_min_hint": "Słupki są mierzone względem co najmniej tylu opadów, więc mały deszcz to krótki słupek. Puste: 10 mm (0,4 in). 0: względem najbardziej deszczowego dnia.",
     "forecast_tooltips": "Włącz podpowiedzi prognozy",
     "charts_section": "Wykresy",
     "opt_daily": "Codziennie",

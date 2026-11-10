@@ -356,6 +356,8 @@ const en: Translation = {
     "include_today": "Include today in forecast",
     "show_temp_chart": "Show temperature chart",
     "show_precip_chart": "Show precipitation chart",
+    "precip_chart_min": "Rain scale, at least",
+    "precip_chart_min_hint": "Bars are drawn against at least this much rain, so a little rain is a short bar. Empty: 10 mm (0.4 in). 0: against the wettest day.",
     "forecast_tooltips": "Enable forecast tooltips",
     "charts_section": "Charts",
     "opt_daily": "Daily",

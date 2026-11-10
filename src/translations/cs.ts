@@ -356,6 +356,8 @@ const cs: Translation = {
     "include_today": "Zahrnout dnešek do předpovědi",
     "show_temp_chart": "Zobrazit graf teploty",
     "show_precip_chart": "Zobrazit graf srážek",
+    "precip_chart_min": "Stupnice srážek, alespoň",
+    "precip_chart_min_hint": "Sloupce se měří vůči alespoň tolika srážkám, takže malý déšť je krátký sloupec. Prázdné: 10 mm (0,4 in). 0: vůči nejdeštivějšímu dni.",
     "forecast_tooltips": "Povolit tooltipy předpovědi",
     "charts_section": "Grafy",
     "opt_daily": "Denní",

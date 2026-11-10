@@ -356,6 +356,8 @@ const de: Translation = {
     "include_today": "Heute in Vorhersage einbeziehen",
     "show_temp_chart": "Temperaturdiagramm anzeigen",
     "show_precip_chart": "Niederschlagsdiagramm anzeigen",
+    "precip_chart_min": "Regenskala, mindestens",
+    "precip_chart_min_hint": "Die Balken werden an mindestens so viel Regen gemessen, damit wenig Regen ein kurzer Balken ist. Leer: 10 mm (0,4 in). 0: am nassesten Tag.",
     "forecast_tooltips": "Vorhersage-Tooltips aktivieren",
     "charts_section": "Diagramme",
     "opt_daily": "Täglich",

@@ -356,6 +356,8 @@ const da: Translation = {
     "include_today": "Inkluder i dag i vejrudsigt",
     "show_temp_chart": "Vis temperaturdiagram",
     "show_precip_chart": "Vis nedbørsdiagram",
+    "precip_chart_min": "Regnskala, mindst",
+    "precip_chart_min_hint": "Søjlerne måles mod mindst så meget regn, så lidt regn er en kort søjle. Tom: 10 mm (0,4 in). 0: mod den vådeste dag.",
     "forecast_tooltips": "Aktivér vejrudsigts-tooltips",
     "charts_section": "Diagrammer",
     "opt_daily": "Dagligt",

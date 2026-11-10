@@ -356,6 +356,8 @@ const srLatn: Translation = {
     "include_today": "Uključi današnji dan u prognozu",
     "show_temp_chart": "Prikaži grafikon temperature",
     "show_precip_chart": "Prikaži grafikon padavina",
+    "precip_chart_min": "Skala padavina, najmanje",
+    "precip_chart_min_hint": "Stubići se mere prema najmanje ovoliko padavina, pa je mala kiša nizak stubić. Prazno: 10 mm (0,4 in). 0: prema najkišovitijem danu.",
     "forecast_tooltips": "Omogući objašnjenja prognoze",
     "charts_section": "Grafikoni",
     "opt_daily": "Dnevno",

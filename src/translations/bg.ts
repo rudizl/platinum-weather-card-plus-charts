@@ -356,6 +356,8 @@ const bg: Translation = {
     "include_today": "Включи днес в прогнозата",
     "show_temp_chart": "Покажи графика на температурата",
     "show_precip_chart": "Покажи графика на валежите",
+    "precip_chart_min": "Скала на валежите, поне",
+    "precip_chart_min_hint": "Стълбовете се мерят спрямо поне толкова валеж, така че малкият дъжд е нисък стълб. Празно: 10 mm (0,4 in). 0: спрямо най-дъждовния ден.",
     "forecast_tooltips": "Tooltip-ове в прогнозата",
     "charts_section": "Графики",
     "opt_daily": "Дневна",

@@ -356,6 +356,8 @@ const nl: Translation = {
     "include_today": "Vandaag opnemen in voorspelling",
     "show_temp_chart": "Temperatuurgrafiek tonen",
     "show_precip_chart": "Neerslaggrafiek tonen",
+    "precip_chart_min": "Regenschaal, minstens",
+    "precip_chart_min_hint": "De balken worden afgezet tegen minstens zoveel regen, zodat weinig regen een korte balk is. Leeg: 10 mm (0,4 in). 0: tegen de natste dag.",
     "forecast_tooltips": "Voorspellings-tooltips inschakelen",
     "charts_section": "Grafieken",
     "opt_daily": "Dagelijks",

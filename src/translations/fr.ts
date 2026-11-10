@@ -356,6 +356,8 @@ const fr: Translation = {
     "include_today": "Inclure aujourd'hui dans les prévisions",
     "show_temp_chart": "Afficher le graphique de température",
     "show_precip_chart": "Afficher le graphique de précipitations",
+    "precip_chart_min": "Échelle de pluie, au moins",
+    "precip_chart_min_hint": "Les barres sont rapportées à au moins cette quantité, pour qu’une petite pluie reste une barre courte. Vide : 10 mm (0,4 in). 0 : au jour le plus pluvieux.",
     "forecast_tooltips": "Activer les infobulles de prévision",
     "charts_section": "Graphiques",
     "opt_daily": "Quotidien",
