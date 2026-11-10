@@ -512,7 +512,7 @@ If your station has a rain gauge, point **Rain rate entity** at it too (mm/h). A
 
 A weather entity that drops out for a moment, as some providers do at a fixed time every hour, keeps its last condition for ten seconds, so the icon does not flash.
 
-The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess.
+The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 50%, cloudy to 75%, overcast above — rather than the provider's guess.
 
 Only the plain sky icons are normally touched: rain, snow and fog are things a provider knows about and the sensors cannot see, so those are left alone. There are two exceptions, and they are not the same.
 
