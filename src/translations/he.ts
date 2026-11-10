@@ -56,7 +56,9 @@ const he: Translation = {
     "level_2": "התרעה צהובה",
     "level_3": "התרעה כתומה",
     "level_4": "התרעה אדומה",
-    "until": "עד"
+    "until": "עד",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "מזג האוויר יישאר יציב ונאה.",

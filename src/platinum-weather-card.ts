@@ -1201,7 +1201,15 @@ export class PlatinumWeatherCard extends LitElement {
     const extras = typeName
       ? hazardsNamedIn(`${a.event ?? ''} ${a.headline ?? ''}`).filter((t) => !typeCovers(Number(typeNum), t)).slice(0, 2)
       : [];
-    const hazards = [hazard, ...extras.map((t) => tWarning(this.locale, `type_${t}`))].join(' + ');
+    // How the language writes them after the level (warning.join, warning.lower_after_level): English "Orange warning: Rain + Wind",
+    // Bulgarian "Оранжев код: значителни валежи и силен вятър". Only our own names take a small letter: a provider's text is left as it came.
+    const join = tWarning(this.locale, 'join') || ' + ';
+    const lower = !!level && tWarning(this.locale, 'lower_after_level') === 'yes';
+    const names = [{ text: hazard, ours: !!typeName }, ...extras.map((t) => ({ text: tWarning(this.locale, `type_${t}`), ours: true }))]
+      .map((n) => (lower && n.ours ? n.text.charAt(0).toLocaleLowerCase(this.locale) + n.text.slice(1) : n.text));
+    const hazards = join.trim() === '+' || names.length < 2
+      ? names.join(join)
+      : `${names.slice(0, -1).join(', ')}${join}${names[names.length - 1]}`;
     const headline = level ? `${level}: ${hazards}` : hazards;
     // with two hazards the text does not fit beside the time of the end on a phone: the row says so, and its text takes a second line instead of being cut
     const multi = extras.length > 0 ? ' multi' : '';

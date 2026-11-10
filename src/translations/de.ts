@@ -56,7 +56,9 @@ const de: Translation = {
     "level_2": "Warnstufe Gelb",
     "level_3": "Warnstufe Orange",
     "level_4": "Warnstufe Rot",
-    "until": "bis"
+    "until": "bis",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Das Wetter bleibt beständig und schön.",

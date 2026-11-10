@@ -56,7 +56,9 @@ const da: Translation = {
     "level_2": "Gult varsel",
     "level_3": "Orange varsel",
     "level_4": "Rødt varsel",
-    "until": "indtil"
+    "until": "indtil",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Vejret forbliver stabilt og godt.",

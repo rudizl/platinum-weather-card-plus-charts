@@ -56,7 +56,9 @@ const it: Translation = {
     "level_2": "Allerta gialla",
     "level_3": "Allerta arancione",
     "level_4": "Allerta rossa",
-    "until": "fino alle"
+    "until": "fino alle",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Il tempo rimarrà stabile e bello.",

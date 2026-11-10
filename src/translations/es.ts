@@ -56,7 +56,9 @@ const es: Translation = {
     "level_2": "Aviso amarillo",
     "level_3": "Aviso naranja",
     "level_4": "Aviso rojo",
-    "until": "hasta"
+    "until": "hasta",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "El tiempo se mantendrá estable y despejado.",

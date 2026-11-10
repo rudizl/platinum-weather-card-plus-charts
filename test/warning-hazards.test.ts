@@ -122,6 +122,7 @@ describe('the bar of a warning that names a second hazard', () => {
     (hass as unknown as { locale: { language: string } }).locale = { language: 'bg' };
     const el = (await renderCard(baseConfig({ weather_entity: 'weather.w', entity_warning: 'binary_sensor.alarm', section_order: ['warnings', 'overview'], option_locale: 'bg' } as never), hass)) as HTMLElement;
     const text = el.shadowRoot!.querySelector('.warning-row .warning-text')!.textContent!.trim();
-    expect(text).toBe(`${tWarning('bg', 'level_4')}: ${tWarning('bg', 'type_10')} + ${tWarning('bg', 'type_1')}`);
+    // in Bulgarian after the level: small letters, joined by "и" (see warning-join.test.ts)
+    expect(text).toBe('Червен код: значителни валежи и силен вятър');
   });
 });

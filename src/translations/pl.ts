@@ -56,7 +56,9 @@ const pl: Translation = {
     "level_2": "Alert żółty",
     "level_3": "Alert pomarańczowy",
     "level_4": "Alert czerwony",
-    "until": "do"
+    "until": "do",
+    "join": " + ",
+    "lower_after_level": "no"
   },
   "zambrettiLong": {
     "a": "Pogoda pozostanie stabilna i ładna.",
