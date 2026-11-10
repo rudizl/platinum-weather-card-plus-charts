@@ -386,6 +386,7 @@ const srLatn: Translation = {
     "rain_rate": "Intenzitet kiše",
     "rain_rate_compact": "Intenzitet",
     "uv_index": "UV indeks",
+    "icons_not_loaded": "Ikone se nisu učitale ({file}). Ponovo instaliraj karticu ili osveži stranicu.",
     "air_good": "Dobar",
     "air_fair": "Prihvatljiv",
     "air_moderate": "Umeren",

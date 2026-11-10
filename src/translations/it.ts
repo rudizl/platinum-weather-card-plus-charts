@@ -386,6 +386,7 @@ const it: Translation = {
     "rain_rate": "Intensità",
     "rain_rate_compact": "Int.",
     "uv_index": "Indice UV",
+    "icons_not_loaded": "Le icone non sono state caricate ({file}). Reinstalla la scheda o ricarica la pagina.",
     "air_good": "Buona",
     "air_fair": "Discreta",
     "air_moderate": "Moderata",

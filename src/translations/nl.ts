@@ -386,6 +386,7 @@ const nl: Translation = {
     "rain_rate": "Regenintensiteit",
     "rain_rate_compact": "Int.",
     "uv_index": "UV-index",
+    "icons_not_loaded": "De pictogrammen zijn niet geladen ({file}). Installeer de kaart opnieuw of laad de pagina opnieuw.",
     "air_good": "Goed",
     "air_fair": "Redelijk",
     "air_moderate": "Matig",

@@ -386,6 +386,7 @@ const ua: Translation = {
     "rain_rate": "Інтенсивність",
     "rain_rate_compact": "Інт.",
     "uv_index": "УФ-індекс",
+    "icons_not_loaded": "Значки не завантажилися ({file}). Перевстановіть картку або перезавантажте сторінку.",
     "air_good": "Добра",
     "air_fair": "Задовільна",
     "air_moderate": "Помірна",

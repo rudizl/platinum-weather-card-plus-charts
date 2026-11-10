@@ -386,6 +386,7 @@ const bg: Translation = {
     "rain_rate": "Интензитет",
     "rain_rate_compact": "Инт.",
     "uv_index": "UV индекс",
+    "icons_not_loaded": "Иконите не се заредиха ({file}). Инсталирай картата наново или презареди страницата.",
     "air_good": "Добро",
     "air_fair": "Задоволително",
     "air_moderate": "Умерено",

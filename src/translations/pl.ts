@@ -386,6 +386,7 @@ const pl: Translation = {
     "rain_rate": "Natężenie",
     "rain_rate_compact": "Nat.",
     "uv_index": "Indeks UV",
+    "icons_not_loaded": "Ikony się nie wczytały ({file}). Zainstaluj kartę ponownie albo przeładuj stronę.",
     "air_good": "Dobra",
     "air_fair": "Zadowalająca",
     "air_moderate": "Umiarkowana",

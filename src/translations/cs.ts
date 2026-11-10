@@ -386,6 +386,7 @@ const cs: Translation = {
     "rain_rate": "Intenzita deště",
     "rain_rate_compact": "Int.",
     "uv_index": "UV index",
+    "icons_not_loaded": "Ikony se nenačetly ({file}). Přeinstalujte kartu nebo znovu načtěte stránku.",
     "air_good": "Dobrá",
     "air_fair": "Přijatelná",
     "air_moderate": "Mírně znečištěná",

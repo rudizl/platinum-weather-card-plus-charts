@@ -30,6 +30,8 @@ All notable changes to Platinum Weather Card Plus Charts. The newest version is 
 
 ### Fixed
 
+- **An icon pack that does not load** (review of 2.7). The icons were invisible with no word, and the pack was asked for again at every change of state in the home. The card says now in a row at the top which file did not load, and tries again every half minute, at an address of its own each time, since a browser keeps a module that failed. A pack of your own whose files sit beside the card, named like ours (`a-`, `s-`, `p-`), is shown from its address, no longer looked for in our packs and left blank. Seven tests.
+
 - **The hint under the path of a custom icon pack** was in English for everyone, though every language had a translation; it is the translation now, and the Bulgarian one is spelt right.
 
 - **The precipitation bars no longer make a little rain look like a lot** (#47, thefan418). They were scaled to the wettest day of the period, so its bar always stood at 85% of the height, whether it was 0.3 mm or 30 mm. The bars are drawn against at least 10 mm now (0.4 in in inches): 0.3 mm is a thin line and 5 mm about half the height, while a wetter day still reaches the top, as Weather Chart Card does it, and nothing is cut off. `option_precip_chart_min` sets the amount, in the editor under the switch of the precipitation chart; `0` brings back the scale of the wettest day. Five tests.

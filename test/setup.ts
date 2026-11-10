@@ -23,3 +23,8 @@ class ResizeObserverStub {
   createRowElement: () => document.createElement('div'),
   createHuiElement: () => document.createElement('div'),
 });
+
+// The icon packs are files beside the card, which the tests do not have: a loader that gives an empty pack, so that a card is not told its
+// icons did not load (since the review of 2.7, finding 5, it says so). The tests of the loading give a loader of their own.
+import { _setLoader } from '../src/icon-packs';
+_setLoader(async () => ({ default: {} }));
