@@ -30,6 +30,8 @@ All notable changes to Platinum Weather Card Plus Charts. The newest version is 
 
 ### Fixed
 
+- **Three things from my own review of 2.7.** The cloud cover entity, which is for the night, changed the icon by day on a card with no pyranometer; it is read only when the sun is too low for a pyranometer now. The warning about the air rose and fell with single readings, though the bands of the index are for hourly values; it goes by the mean of the last hour now, and the slot still shows the reading of the moment. The switch of the air warning in the editor showed with the warnings section switched off, where it did nothing.
+
 - **The hint under the path of a custom icon pack** was in English for everyone, though every language had a translation; it is the translation now, and the Bulgarian one is spelt right.
 
 - **The precipitation bars no longer make a little rain look like a lot** (#47, thefan418). They were scaled to the wettest day of the period, so its bar always stood at 85% of the height, whether it was 0.3 mm or 30 mm. The bars are drawn against at least 10 mm now (0.4 in in inches): 0.3 mm is a thin line and 5 mm about half the height, while a wetter day still reaches the top, as Weather Chart Card does it, and nothing is cut off. `option_precip_chart_min` sets the amount, in the editor under the switch of the precipitation chart; `0` brings back the scale of the wettest day. Five tests.

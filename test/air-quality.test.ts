@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render } from 'lit';
 import '../src/platinum-weather-card';
 import '../src/editor';
-import { makeHass, baseConfig, renderCard, choice } from './helpers';
+import { makeHass, baseConfig, renderCard, choice, forgetSharedState } from './helpers';
 import { airBand, isMicrograms } from '../src/air';
 import { TRANSLATIONS } from '../src/translations';
 
@@ -79,6 +79,8 @@ describe('the slots', () => {
 });
 
 describe('the warning', () => {
+  // the warning goes by the mean of the hour of readings of a sensor (my review of 2.7): each test starts with none
+  beforeEach(() => forgetSharedState());
   it('says nothing while the air is moderate or better', async () => {
     expect(warning(await card(pm('50', '120')))).toBeNull();
   });

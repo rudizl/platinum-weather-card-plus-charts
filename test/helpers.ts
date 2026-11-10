@@ -140,7 +140,7 @@ export function warnings(el: HTMLElement): string[] {
 export function forgetSharedState(): void {
   const C = customElements.get('platinum-weather-card-plus-charts') as unknown as Record<string, unknown> | undefined;
   if (!C) return;
-  for (const f of ['_cloudSamples', '_cloudBand', '_lastDaylightCloud', '_lastRain', '_gaugeSeen', '_gaugeRain', '_lastCondition']) {
+  for (const f of ['_cloudSamples', '_cloudBand', '_lastDaylightCloud', '_lastRain', '_gaugeSeen', '_gaugeRain', '_lastCondition', '_airSamples']) {
     (C[f] as Map<string, unknown>).clear();
   }
 }
