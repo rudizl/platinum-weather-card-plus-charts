@@ -6,6 +6,8 @@ All notable changes to Platinum Weather Card Plus Charts. The newest version is 
 
 ### Fixed
 
+- **Sunrise and sunset at dawn and dusk.** For about four minutes around each, both slots showed the day of tomorrow's sunrise, today's sunset included, and the sunrise came first („нд 06:58 · нд 16:46“ on a Saturday morning). Home Assistant counts the sun as risen at −0.83° and the card counted it at 0°. The card goes by the times of Home Assistant now: the earlier is next, and each time shows its day only when it is not today. Five tests.
+
 - **A rain gauge in another unit than mm/h** is read in mm/h for the icon and the forecast. A gauge in inches an hour was read as millimetres, so 0.5 in/h, which is heavy rain, made the light-rain icon; mm/min and mm/d were wrong the same way. The slot still shows the number in the unit of the sensor. Found in the review of 2.7. Five tests.
 
 - **A lightning detector in miles is read in miles** (#38). The distance was compared, as it came, with limits written for kilometres, so with a detector in miles (Blitzortung follows the unit system of Home Assistant) the default range of 50 was 50 miles, the row turned red within 15 miles and amber within 30, and the editor said *Warn within (km)*. The colours work in kilometres whatever the unit: red within 15 km (9 mi), amber to 30 km (19 mi). The range stays in the unit of the entity, as it has always been compared, so a value someone set keeps meaning what it meant; left unset, it is 50 km in that unit (31 mi). The editor names the unit of the chosen detector, and the default in it, in the 15 languages. A distance without a unit is read in kilometres, as before. Ten tests, four breakages caught.
