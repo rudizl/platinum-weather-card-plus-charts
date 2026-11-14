@@ -1,0 +1,132 @@
+name: 'Retire betas'
+
+# Only the newest pre-release of a version is kept. The ones before it are retired: their download counts are written to
+# downloads.csv in the stats branch first, since GitHub counts downloads per release file and a deleted release takes its
+# counts with it, and only then are the releases deleted. The tags stay.
+#
+# Publish release calls this once the new release has its files. By hand it only shows what it would do, unless dry_run is
+# switched off.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to keep, without the v, for example 2.7.0-beta.11. Older pre-releases of the same X.Y.Z are retired.'
+        required: true
+        type: string
+      dry_run:
+        description: 'Only show what would be written and deleted'
+        type: boolean
+        default: true
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      dry_run:
+        type: boolean
+        default: false
+
+jobs:
+  retire:
+    name: Record the downloads, then delete the releases
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: retire-betas
+      cancel-in-progress: false
+    env:
+      VERSION: ${{ inputs.version }}
+      DRY_RUN: ${{ inputs.dry_run }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Find the pre-releases to retire
+        id: find
+        run: |
+          set -euo pipefail
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$'; then
+            echo "::error::'$VERSION' is not a version. Write it like 2.7.0-beta.11 or 2.7.0, without the v."
+            exit 1
+          fi
+          keep="v$VERSION"
+          prefix="v${VERSION%%-*}-"
+          gh api --paginate "repos/$GH_REPO/releases?per_page=100" > "$RUNNER_TEMP/pages.json"
+          jq -s 'add' "$RUNNER_TEMP/pages.json" > "$RUNNER_TEMP/releases.json"
+          # Nothing is retired for a release that is not there, is a draft or has no files yet.
+          kept="$(jq -r --arg keep "$keep" '.[] | select(.tag_name == $keep and (.draft | not)) | select((.assets | length) > 0 and all(.assets[]; .state == "uploaded")) | .published_at' "$RUNNER_TEMP/releases.json")"
+          if [ -z "$kept" ]; then
+            echo "::error::$keep is not a published release with its files uploaded, so nothing before it is retired."
+            exit 1
+          fi
+          # tag, published, downloads of the card file, downloads of all files: the older pre-releases of the same X.Y.Z
+          jq -r --arg keep "$keep" --arg prefix "$prefix" --arg kept "$kept" '
+            .[] | select(.prerelease and (.draft | not))
+                | select(.tag_name != $keep and (.tag_name | startswith($prefix)) and .published_at < $kept)
+                | [.tag_name, .published_at,
+                   ([.assets[] | select(.name == "platinum-weather-card.js") | .download_count] | add // 0),
+                   ([.assets[].download_count] | add // 0)]
+                | @tsv' "$RUNNER_TEMP/releases.json" | sort -k2 > "$RUNNER_TEMP/retire.tsv"
+          count="$(wc -l < "$RUNNER_TEMP/retire.tsv")"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "Keeping $keep (published $kept). To retire: $count"
+          cat "$RUNNER_TEMP/retire.tsv"
+
+      - uses: actions/checkout@v4
+        if: steps.find.outputs.count != '0'
+        with:
+          ref: stats
+
+      - name: Write the downloads to stats
+        if: steps.find.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          retired="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          while IFS=$'\t' read -r tag published card all; do
+            if grep -q "^$tag," downloads.csv; then
+              echo "$tag is already in downloads.csv; its line is left as it is."
+            else
+              echo "$tag,$published,$retired,$card,$all" >> downloads.csv
+              echo "+ $tag,$published,$retired,$card,$all"
+            fi
+          done < "$RUNNER_TEMP/retire.tsv"
+          if [ "$DRY_RUN" = true ]; then
+            echo "Dry run: nothing is pushed."
+            git diff
+            exit 0
+          fi
+          if ! git diff --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -q -am "stats: $(cut -f1 "$RUNNER_TEMP/retire.tsv" | paste -sd' ' -) retired"
+            git push origin HEAD:stats
+          fi
+
+      # The releases go only when every one of them has its line in the stats branch as GitHub holds it.
+      - name: Delete the releases, keep the tags
+        if: steps.find.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          git fetch -q origin stats
+          while IFS=$'\t' read -r tag _; do
+            if ! git show origin/stats:downloads.csv | grep -q "^$tag,"; then
+              if [ "$DRY_RUN" = true ]; then
+                echo "Dry run: $tag would get its line in stats, and then its release would be deleted."
+                continue
+              fi
+              echo "::error::$tag has no line in downloads.csv of the stats branch. No release is deleted."
+              exit 1
+            fi
+          done < "$RUNNER_TEMP/retire.tsv"
+          if [ "$DRY_RUN" = true ]; then
+            exit 0
+          fi
+          while IFS=$'\t' read -r tag _; do
+            gh release delete "$tag" --yes
+            if ! git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+              echo "::error::The tag $tag went with its release. It should have stayed."
+              exit 1
+            fi
+            echo "Retired $tag: the release is deleted, the tag stays." | tee -a "$GITHUB_STEP_SUMMARY"
+          done < "$RUNNER_TEMP/retire.tsv"
