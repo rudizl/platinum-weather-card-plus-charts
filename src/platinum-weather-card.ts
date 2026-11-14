@@ -4339,13 +4339,24 @@ export class PlatinumWeatherCard extends LitElement {
         nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" am", "am").replace(" pm", "pm") : "";
         break;
     }
-    var nextDate = new Date();
-    nextDate.setDate(nextDate.getDate() + 1);
     if ((this._config.entity_sun) && (this.hass.states[this._config.entity_sun] !== undefined)) {
-      const _sunElevation = this.hass.states[this._config.entity_sun].attributes?.elevation;
-      const _sunAbove = _sunElevation !== undefined ? _sunElevation > 0 : this.hass.states[this._config.entity_sun].state === 'above_horizon';
+      // Which comes first, and the day of each, from the times of Home Assistant (14 November): it counts the sun as risen at -0.83
+      // degrees and moves next_rising to the next day then, while the card counted it risen at 0 degrees. For about four minutes at
+      // dawn and at dusk the card took the morning for night, put the sunrise first and gave both times the day of the next sunrise,
+      // today's sunset included. Each time has its own day now, shown only when that day is not today.
+      const sunAttrs = this.hass.states[this._config.entity_sun].attributes ?? {};
+      const rising = new Date(sunAttrs.next_rising);
+      const setting = new Date(sunAttrs.next_setting);
+      const today = new Date().toDateString();
+      const withDay = (d: Date, text: string) => isNaN(d.getTime()) || d.toDateString() === today
+        ? text : `${d.toLocaleDateString(this.locale, { weekday: 'short' })} ${text}`;
+      nextSunRise = withDay(rising, nextSunRise);
+      nextSunSet = withDay(setting, nextSunSet);
+      const _sunElevation = sunAttrs.elevation;
+      const _sunAbove = !isNaN(rising.getTime()) && !isNaN(setting.getTime())
+        ? setting.getTime() < rising.getTime()
+        : _sunElevation !== undefined ? _sunElevation > 0 : this.hass.states[this._config.entity_sun].state === 'above_horizon';
       if (_sunAbove) {
-        nextSunRise = nextDate.toLocaleDateString(this.locale, { weekday: 'short' }) + " " + nextSunRise;
         return {
           'next': html`
             <li>
@@ -4367,10 +4378,6 @@ export class PlatinumWeatherCard extends LitElement {
           'followingIcon': "mdi:weather-sunset-up",
         };
       } else {
-        if (new Date().getDate() != new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).getDate()) {
-          nextSunRise = nextDate.toLocaleDateString(this.locale, { weekday: 'short' }) + " " + nextSunRise;
-          nextSunSet = nextDate.toLocaleDateString(this.locale, { weekday: 'short' }) + " " + nextSunSet;
-        }
         return {
           'next': html`
             <li>
