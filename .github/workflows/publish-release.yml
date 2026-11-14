@@ -1,0 +1,121 @@
+name: 'Publish release'
+
+# Run by hand with a version. It checks that the branch is ready for that version, makes the tag and the release from the notes
+# kept in the branch, then builds and uploads the files with the Release workflow.
+#   2.7.0-beta.11 -> branch release/2.7.0, a pre-release that is not the latest
+#   2.7.0         -> branch master, the latest release
+# The notes are release-notes/v<version>.md in that branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version without the v, for example 2.7.0-beta.11'
+        required: true
+        type: string
+
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Check, tag and create the release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.plan.outputs.tag }}
+    env:
+      VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Work out the tag and the branch
+        id: plan
+        run: |
+          set -euo pipefail
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$'; then
+            echo "::error::'$VERSION' is not a version. Write it like 2.7.0-beta.11 or 2.7.0, without the v."
+            exit 1
+          fi
+          base="${VERSION%%-*}"
+          if [ "$VERSION" = "$base" ]; then
+            branch=master
+            prerelease=false
+          else
+            branch="release/$base"
+            prerelease=true
+          fi
+          if ! git ls-remote --exit-code --heads "https://x-access-token:${GH_TOKEN}@github.com/${GH_REPO}" "refs/heads/$branch" > /dev/null; then
+            echo "::error::There is no branch $branch to release $VERSION from."
+            exit 1
+          fi
+          {
+            echo "tag=v$VERSION"
+            echo "branch=$branch"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+          echo "v$VERSION from $branch, pre-release: $prerelease"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.plan.outputs.branch }}
+
+      - name: Check that the branch is ready for this version
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+          BRANCH: ${{ steps.plan.outputs.branch }}
+        run: |
+          set -euo pipefail
+          failed=0
+          card="$(sed -nE "s/^export const CARD_VERSION = '([^']+)';.*/\1/p" src/const.ts)"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$card" != "$VERSION" ]; then
+            echo "::error file=src/const.ts::CARD_VERSION in $BRANCH is '$card', not '$VERSION'."
+            failed=1
+          fi
+          if [ "$pkg" != "$VERSION" ]; then
+            echo "::error file=package.json::version in $BRANCH is '$pkg', not '$VERSION'."
+            failed=1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            echo "::error::The tag $TAG is already there. A version that went out is not made again: use the next number."
+            failed=1
+          fi
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "::error::There is already a release for $TAG."
+            failed=1
+          fi
+          if [ ! -s "release-notes/$TAG.md" ]; then
+            echo "::error::The notes are missing: release-notes/$TAG.md in $BRANCH is not there or is empty."
+            failed=1
+          fi
+          exit "$failed"
+
+      - name: Tag and create the release
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+          PRERELEASE: ${{ steps.plan.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "$TAG" -m "$TAG"
+          git push origin "refs/tags/$TAG"
+          if [ "$PRERELEASE" = true ]; then
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "release-notes/$TAG.md" --prerelease --latest=false
+          else
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "release-notes/$TAG.md" --latest
+          fi
+          echo "Released $TAG from $(git rev-parse HEAD)." >> "$GITHUB_STEP_SUMMARY"
+
+  # A release made with GITHUB_TOKEN does not start the Release workflow, so it is called here: one build for both ways in.
+  build:
+    name: Build and upload
+    needs: publish
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.publish.outputs.tag }}
