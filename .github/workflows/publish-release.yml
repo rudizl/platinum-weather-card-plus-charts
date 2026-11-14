@@ -1,7 +1,8 @@
 name: 'Publish release'
 
 # Run by hand with a version. It checks that the branch is ready for that version, makes the tag and the release from the notes
-# kept in the branch, then builds and uploads the files with the Release workflow.
+# kept in the branch, then builds and uploads the files with the Release workflow. When the files are there, the pre-releases of
+# that version before it are retired with the Retire betas workflow.
 #   2.7.0-beta.11 -> branch release/2.7.0, a pre-release that is not the latest
 #   2.7.0         -> branch master, the latest release
 # The notes are release-notes/v<version>.md in that branch.
@@ -119,3 +120,13 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       tag: ${{ needs.publish.outputs.tag }}
+
+  # Only once the new release has its files: the downloads of the pre-releases before it go to stats, then their releases go.
+  retire:
+    name: Retire the betas before it
+    needs: [publish, build]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/retire-betas.yml
+    with:
+      version: ${{ inputs.version }}
