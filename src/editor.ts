@@ -2683,12 +2683,18 @@ get _forecast_type(): string {
           <span class="topic-tile whats-new-tile"><ha-icon icon="mdi:creation-outline"></ha-icon></span>
           <h3 id="pwc-whats-new-title">${this._t('whats_new_title')}</h3>
         </div>
-        <p>${this._t(tried ? 'whats_new_tried' : 'whats_new_body')}</p>
+        <p>${this._t(tried ? 'whats_new_tried' : 'whats_new_body').replace('{save}', this._saveWord())}</p>
         <div class="whats-new-actions">
           <button class="whats-new-hide" @click=${this._whatsNewHide}>${this._t('whats_new_hide')}</button>
           <button class="whats-new-primary" @click=${tried ? this._whatsNewUndo : this._whatsNewTry}>${this._t(tried ? 'whats_new_undo' : 'whats_new_try')}</button>
         </div>
       </section>`;
+  }
+  // The word on Home Assistant's own Save button, so the note names the button the user sees; our translation only when it does not say.
+  private _saveWord(): string {
+    let word: unknown;
+    try { word = (this.hass as unknown as { localize?: (key: string) => string })?.localize?.('ui.common.save'); } catch { word = undefined; }
+    return typeof word === 'string' && word.trim() !== '' && word !== 'ui.common.save' ? word : this._t('whats_new_save');
   }
   // Turns on what is missing, in the editor only: nothing is saved until Save, and Cancel drops it.
   private _whatsNewTry(): void {

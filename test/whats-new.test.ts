@@ -20,10 +20,10 @@ if (typeof globalThis.localStorage === 'undefined') {
 type Editor = HTMLElement & { setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown> };
 const KEY = 'pwc-whats-new-2.7';
 
-async function editor(config: Record<string, unknown> = {}, language = 'bg') {
+async function editor(config: Record<string, unknown> = {}, language = 'bg', localize?: (key: string) => string) {
   const el = document.createElement('platinum-weather-card-plus-charts-editor') as Editor;
   el.setConfig({ card_config_version: 8, weather_entity: 'weather.home', ...config });
-  el.hass = { ...(makeHass({ 'weather.home': { state: 'cloudy' } }) as object), language };
+  el.hass = { ...(makeHass({ 'weather.home': { state: 'cloudy' } }) as object), language, ...(localize ? { localize } : {}) };
   const fired: Record<string, unknown>[] = [];
   el.addEventListener('config-changed', (e) => fired.push((e as CustomEvent).detail.config));
   document.body.appendChild(el);
@@ -73,6 +73,24 @@ describe('the card „Ново в 2.7“', () => {
   });
 });
 
+describe('the Save button, named as Home Assistant names it', () => {
+  beforeEach(() => { localStorage.clear(); document.body.innerHTML = ''; });
+
+  it('takes the word from Home Assistant when it gives one', async () => {
+    const { el, root } = await editor({}, 'bg', (k) => (k === 'ui.common.save' ? 'Съхрани' : k));
+    expect(card(root)!.textContent).toContain('„Съхрани“');
+    await click(el, root, '.whats-new-primary');
+    expect(card(root)!.textContent).toContain('„Съхрани“');
+    expect(card(root)!.textContent).not.toContain('{save}');
+  });
+
+  it('falls back on its own translation when Home Assistant gives none, or gives back the key', async () => {
+    expect(card((await editor({}, 'de')).root)!.textContent).toContain('Speichern');
+    expect(card((await editor({}, 'de', (k) => k)).root)!.textContent).toContain('Speichern');
+    expect(card((await editor({}, 'de', () => '')).root)!.textContent).toContain('Speichern');
+  });
+});
+
 describe('„Ново“ beside the new settings of 2.7', () => {
   beforeEach(() => { localStorage.clear(); document.body.innerHTML = ''; });
 
@@ -88,7 +106,7 @@ describe('„Ново“ beside the new settings of 2.7', () => {
   });
 
   it('every language has the texts, and only English says them in English', () => {
-    const KEYS = ['whats_new_title', 'whats_new_body', 'whats_new_tried', 'whats_new_try', 'whats_new_undo', 'whats_new_hide', 'badge_new', 'badge_new_count'];
+    const KEYS = ['whats_new_title', 'whats_new_body', 'whats_new_tried', 'whats_new_save', 'whats_new_try', 'whats_new_undo', 'whats_new_hide', 'badge_new', 'badge_new_count'];
     const all = TRANSLATIONS as unknown as Record<string, { editor: Record<string, string> }>;
     for (const [lang, t] of Object.entries(all)) {
       for (const k of KEYS) {
@@ -96,6 +114,7 @@ describe('„Ново“ beside the new settings of 2.7', () => {
         if (lang !== 'en') expect(t.editor[k], `${lang}: ${k} is English`).not.toBe(all.en.editor[k]);
       }
       expect(t.editor.badge_new_count, `${lang}: {n}`).toContain('{n}');
+      for (const k of ['whats_new_body', 'whats_new_tried']) expect(t.editor[k], `${lang}: ${k} names the button by {save}`).toContain('{save}');
     }
   });
 });
