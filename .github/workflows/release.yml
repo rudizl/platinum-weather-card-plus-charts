@@ -3,14 +3,26 @@ name: 'Release'
 on:
   release:
     types: [published]
+  # "Publish release" calls this for the release it has just made: a release made with GITHUB_TOKEN starts no workflow of its own.
+  workflow_call:
+    inputs:
+      tag:
+        description: 'The tag of the release to build and upload to, for example v2.7.0-beta.11'
+        required: true
+        type: string
 
 jobs:
   release:
     name: Build and upload release assets
-    permissions: write-all
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.event.release.tag_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.TAG }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,9 +50,38 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dist/*
-          tag: ${{ github.ref }}
+          tag: refs/tags/${{ env.TAG }}
           overwrite: true
           file_glob: true
+
+      # The dist of the tag is committed, and Home Assistant serves what the release carries. The two must be the same files:
+      # the same names (111 for 2.6, 4 from 2.7 on), every one uploaded, and the card itself the same byte for byte.
+      - name: Check the release against the dist of the tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git ls-tree -r --name-only HEAD dist | sed 's#^dist/##' | sort > "$RUNNER_TEMP/committed.txt"
+          gh release view "$TAG" --json assets --jq '.assets[] | [.name, .state] | @tsv' | sort > "$RUNNER_TEMP/assets.tsv"
+          cut -f1 "$RUNNER_TEMP/assets.tsv" > "$RUNNER_TEMP/released.txt"
+          echo "dist of $TAG: $(wc -l < "$RUNNER_TEMP/committed.txt") files; release: $(wc -l < "$RUNNER_TEMP/released.txt") files"
+          failed=0
+          if ! diff "$RUNNER_TEMP/committed.txt" "$RUNNER_TEMP/released.txt"; then
+            echo "::error::The files of the release are not the files of dist/ at $TAG (< only in dist, > only in the release)."
+            failed=1
+          fi
+          if awk -F'\t' '$2 != "uploaded"' "$RUNNER_TEMP/assets.tsv" | grep .; then
+            echo "::error::The files listed above are not in the state 'uploaded'."
+            failed=1
+          fi
+          gh release download "$TAG" --pattern platinum-weather-card.js --dir "$RUNNER_TEMP/released"
+          git show HEAD:dist/platinum-weather-card.js > "$RUNNER_TEMP/committed.js"
+          if ! cmp "$RUNNER_TEMP/committed.js" "$RUNNER_TEMP/released/platinum-weather-card.js"; then
+            echo "::error::platinum-weather-card.js in the release differs from dist/ at $TAG. Was dist rebuilt and committed with the version?"
+            failed=1
+          fi
+          exit "$failed"
 
       # The notes of every release begin with the line that asks for a star or a beer. The notes are written when the release is made;
       # this puts the line there if it is not (and does nothing if it is), so that no release goes out without it. A failure here
@@ -49,7 +90,7 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.release.tag_name }}
+          GH_REPO: ${{ github.repository }}
         run: |
           LINE='> ⭐ Enjoying the card? [Star the repository](https://github.com/${{ github.repository }}) and/or [buy me a beer 🍺](https://www.buymeacoffee.com/rudizl). Thank you!'
           BODY="$(gh release view "$TAG" --json body --jq .body)"
