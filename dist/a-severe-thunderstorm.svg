@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- (c) ammap.com | SVG weather icons -->
 <!-- Severe Thunderstorm | Contributed by hsoJ95 on GitHub: https://github.com/hsoj95 -->
-<svg width="56" height="48" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 3.5 56 48" width="56" height="48" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <filter id="blur" x="-.17571" y="-.19575" width="1.3379" height="1.4959">
             <feGaussianBlur in="SourceAlpha" stdDeviation="3" />

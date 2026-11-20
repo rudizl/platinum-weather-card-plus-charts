@@ -25,6 +25,7 @@ import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
 import { hazardsNamedIn, typeCovers, WARNING_ICONS } from './warning_hazards';
 import { sagerForecast } from './sager';
+import { kmPer } from './distance';
 
 // What the overview and the slots read their figures from: today's condition, the
 // measurements, and today's high and low. A card that has a weather_entity and
@@ -1078,20 +1079,25 @@ export class PlatinumWeatherCard extends LitElement {
     const distance = Number(distState.state);
     if (!isFinite(distance)) return html``;
 
+    // The distance is in the unit of its entity (#38): a detector in miles was compared with limits written for kilometres. The
+    // colours work in kilometres whatever the unit. The range stays in the unit of the entity, as it has always been compared, so a
+    // value someone set keeps meaning what it meant; left unset, it is 50 km in that unit.
+    const unit = distState.attributes?.unit_of_measurement ?? 'km';
+    const perUnit = kmPer(unit);
+    const km = distance * perUnit;
     const threshold = Number(this._config.option_lightning_max_distance);
-    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50;
+    const limit = isFinite(threshold) && threshold > 0 ? threshold : 50 / perUnit;
     if (distance > limit) return html``;
 
     // Red within fifteen kilometres — near enough that the next strike could be
     // overhead; amber to thirty; yellow beyond.
-    const levelNum = distance <= 15 ? '4' : distance <= 30 ? '3' : '2';
+    const levelNum = km <= 15 ? '4' : km <= 30 ? '3' : '2';
     const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum]!;
     const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum]!;
     const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum]!;
     const levelClass = levelNum === '4' ? 'warning-row level-red'
       : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
 
-    const unit = distState.attributes?.unit_of_measurement ?? 'km';
     let headline = `${tWarning(this.locale, 'type_3')} ${Math.round(distance)} ${unit}`;
 
     const bearingEntity = this._config.entity_lightning_azimuth;
@@ -2109,10 +2115,18 @@ export class PlatinumWeatherCard extends LitElement {
 
     // Precipitation unit: entity attribute first (HA converts forecast values
     // to this unit), then unit-system fallback; localized for display
-    const _precipUnit = this._localizeUnit(sensorMode
+    const _precipRawUnit = sensorMode
       ? this._precipUnit(this._perDayEntity('entity_pos_1', 0))
       : (this._config.entity ? (this.hass.states[this._config.entity]?.attributes?.precipitation_unit as string | undefined) : undefined)
-        || this.getUOM('precipitation'));
+        || this.getUOM('precipitation');
+    const _precipUnit = this._localizeUnit(_precipRawUnit);
+    // The bars are drawn against at least this much rain (#47): scaled to the wettest day alone, its bar stood at 85% of the height whether
+    // it was 0.3 mm or 30 mm. 10 mm, or 0.4 in, unless option_precip_chart_min says otherwise; 0 is the scale of the wettest day. A day
+    // wetter than the floor still reaches the top, as Weather Chart Card does with suggestedMax: nothing is cut off.
+    const _precipSet = Number(this._config.option_precip_chart_min);
+    const _precipFloor = isFinite(_precipSet) && this._config.option_precip_chart_min !== undefined && this._config.option_precip_chart_min !== null && String(this._config.option_precip_chart_min) !== ''
+      ? Math.max(0, _precipSet)
+      : (/^\s*in(ch(es)?)?\s*$/i.test(String(_precipRawUnit ?? '')) ? 0.4 : 10);
 
     // ── Per-column HTML ────────────────────────────────────────────────────
     const colItems = data.map((d, i) => {
@@ -2126,7 +2140,7 @@ export class PlatinumWeatherCard extends LitElement {
         colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
       }
       if (showPrecip) {
-        const pMax  = Math.max(...data.map(x => x.precip), 0.1);
+        const pMax  = Math.max(...data.map(x => x.precip), _precipFloor, 0.1);
         const maxBarH = tempH * 0.85; // bars use up to 85% of the temp area height
         if (d.precip > 0) {
           const bH    = Math.max((d.precip / pMax) * maxBarH, 2);
@@ -2157,7 +2171,12 @@ export class PlatinumWeatherCard extends LitElement {
         _chartCond = String(_chartProp('detailed_description') ?? _chartProp('condition') ?? '');
       } else if (_summaryStart && this._config.entity_summary_1) {
         const _summaryEntity = this._config.entity_summary_1.replace(/(\d+)(?!.*\d)/g, String(Number(_summaryStart) + i));
-        _chartCond = this.hass.states[_summaryEntity] ? this.hass.states[_summaryEntity].state : '';
+        const _summaryState = this.hass.states[_summaryEntity];
+        // the attribute when "Use attribute" is on, as the tooltip of the days across and the text of the days down read it (#39)
+        _chartCond = !_summaryState ? ''
+          : this._config.summary_1_use_attr && this._config.summary_1_name_attr
+            ? String(_summaryState.attributes?.[this._config.summary_1_name_attr] ?? '')
+            : _summaryState.state;
       }
       const _uomWind = this._getWindUnit();
       const _uomPrecip = sensorMode
@@ -3500,7 +3519,7 @@ export class PlatinumWeatherCard extends LitElement {
   // Fifteen minutes bridges the gaps and still lets go in a lull.
   private _gaugeRateForIcon(): number | null {
     const entity = this._config?.entity_rain_rate;
-    const live = this.measuredRainRate;
+    const live = this.measuredRainRateMmH;
     const cls = this.constructor as typeof PlatinumWeatherCard;
     const now = Date.now();
     if (live !== null && entity) {
@@ -3527,6 +3546,28 @@ export class PlatinumWeatherCard extends LitElement {
     return isFinite(rate) ? rate : null;
   }
 
+  // The same rate in mm/h, for what compares it with thresholds in mm/h: the bands of the icon and the forecast. A gauge in another unit was
+  // read as mm/h, so 0.5 in/h, which is heavy rain, made the light-rain icon. The slot shows measuredRainRate, in the unit of the sensor.
+  get measuredRainRateMmH(): number | null {
+    const rate = this.measuredRainRate;
+    if (rate === null) return null;
+    const unit = String(this.hass.states[this._config.entity_rain_rate ?? '']?.attributes?.unit_of_measurement ?? '').trim().toLowerCase();
+    return rate * PlatinumWeatherCard.rainRatePerMmH(unit);
+  }
+
+  // millimetres an hour in one unit of a rain rate, for the units Home Assistant gives one in; a unit it does not know, or none, is mm/h
+  static rainRatePerMmH(unit: string): number {
+    switch (unit.replace(/\s+/g, '')) {
+      case 'in/h': return 25.4;
+      case 'in/d': return 25.4 / 24;
+      case 'mm/min': return 60;
+      case 'mm/s': return 3600;
+      case 'mm/d': return 1 / 24;
+      case 'cm/h': return 10;
+      default: return 1;
+    }
+  }
+
   // Cloud cover for the forecast, which unlike the slot would rather have a
   // stale figure than none: a pyranometer says nothing after dark, and the sky
   // seldom turns over completely between dusk and dawn. Falls back to the last
@@ -3541,7 +3582,7 @@ export class PlatinumWeatherCard extends LitElement {
   // showers in one convective spell rather than the start of a dry evening.
   get forecastRainRate(): number | null {
     const cls = this.constructor as typeof PlatinumWeatherCard;
-    const now = this.measuredRainRate;
+    const now = this.measuredRainRateMmH;
     const gauge = this._config.entity_rain_rate;
     if (!gauge) return now;   // no gauge: nothing measured, nothing to remember
     if (now !== null && now > 0) {
@@ -4112,13 +4153,24 @@ export class PlatinumWeatherCard extends LitElement {
         nextSunRise = this._config.entity_sun && (this.hass.states[this._config.entity_sun] !== undefined) ? new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).toLocaleTimeString(navigator.language, { timeStyle: 'short' } as Intl.DateTimeFormatOptions).replace(" am", "am").replace(" pm", "pm") : "";
         break;
     }
-    var nextDate = new Date();
-    nextDate.setDate(nextDate.getDate() + 1);
     if ((this._config.entity_sun) && (this.hass.states[this._config.entity_sun] !== undefined)) {
-      const _sunElevation = this.hass.states[this._config.entity_sun].attributes?.elevation;
-      const _sunAbove = _sunElevation !== undefined ? _sunElevation > 0 : this.hass.states[this._config.entity_sun].state === 'above_horizon';
+      // Which comes first, and the day of each, from the times of Home Assistant (14 November): it counts the sun as risen at -0.83
+      // degrees and moves next_rising to the next day then, while the card counted it risen at 0 degrees. For about four minutes at
+      // dawn and at dusk the card took the morning for night, put the sunrise first and gave both times the day of the next sunrise,
+      // today's sunset included. Each time has its own day now, shown only when that day is not today.
+      const sunAttrs = this.hass.states[this._config.entity_sun].attributes ?? {};
+      const rising = new Date(sunAttrs.next_rising);
+      const setting = new Date(sunAttrs.next_setting);
+      const today = new Date().toDateString();
+      const withDay = (d: Date, text: string) => isNaN(d.getTime()) || d.toDateString() === today
+        ? text : `${d.toLocaleDateString(this.locale, { weekday: 'short' })} ${text}`;
+      nextSunRise = withDay(rising, nextSunRise);
+      nextSunSet = withDay(setting, nextSunSet);
+      const _sunElevation = sunAttrs.elevation;
+      const _sunAbove = !isNaN(rising.getTime()) && !isNaN(setting.getTime())
+        ? setting.getTime() < rising.getTime()
+        : _sunElevation !== undefined ? _sunElevation > 0 : this.hass.states[this._config.entity_sun].state === 'above_horizon';
       if (_sunAbove) {
-        nextSunRise = nextDate.toLocaleDateString(this.locale, { weekday: 'short' }) + " " + nextSunRise;
         return {
           'next': html`
             <li>
@@ -4140,10 +4192,6 @@ export class PlatinumWeatherCard extends LitElement {
           'followingIcon': "mdi:weather-sunset-up",
         };
       } else {
-        if (new Date().getDate() != new Date(this.hass.states[this._config.entity_sun].attributes.next_rising).getDate()) {
-          nextSunRise = nextDate.toLocaleDateString(this.locale, { weekday: 'short' }) + " " + nextSunRise;
-          nextSunSet = nextDate.toLocaleDateString(this.locale, { weekday: 'short' }) + " " + nextSunSet;
-        }
         return {
           'next': html`
             <li>

@@ -2,6 +2,8 @@
 
 **Everything about the weather, on one card:** now, the next hours and the days ahead, with charts; severe-weather warnings and lightning as they come; and a forecast of its own, read from your barometer. Start with a single weather entity and add your station's sensors as you go. In fifteen languages.
 
+It is at its best with a weather station of your own. A rain gauge and a pyranometer tell it what is happening outside right now, and it trusts them over the weather service.
+
 It started as a mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) and [Weather Chart Card](https://github.com/mlamberts78/weather-chart-card) — two of the best weather cards for Home Assistant, neither of which has seen active development for a while. I used to run Weather Chart Card on my main dashboard and Platinum on a dedicated weather view. At some point it felt pointless to maintain two separate cards with overlapping functionality, so I merged them as far as makes sense.
 
 Based on the original Platinum Weather Card by [@makin-things](https://www.github.com/makin-things), extended by [@tommyjlong](https://github.com/tommyjlong). Weather Chart Card by [@mlamberts78](https://github.com/mlamberts78). Maintained and further developed here by me, [@rudizl](https://github.com/rudizl). If you like my work, you can <a href="https://buymeacoffee.com/rudizl"><img src="https://img.shields.io/badge/-Buy%20me%20a%20beer-FFDD00?style=flat&amp;logo=buymeacoffee&amp;logoColor=black" alt="Buy me a beer" align="absmiddle"></a> and/or [drop a ⭐ on GitHub](https://github.com/rudizl/platinum-weather-card-plus-charts).
@@ -446,7 +448,7 @@ The card shows the warnings that would otherwise need cards of their own: a seve
 
 When the title of a warning names a second hazard (`Heavy precipitation and strong wind!`, of the type rain), the row shows both, with an icon for each: see the note below.
 
-**Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown.
+**Lightning.** Point **Lightning distance entity** at a strike detector — [Blitzortung](https://github.com/mrk-its/homeassistant-blitzortung) is the usual one, and needs no hardware — and a storm within range gets a row of its own above any warning: `Thunderstorms 8 km NE`, with the direction when **Lightning azimuth entity** is set as well. The row is red within 15 km, orange to 30 km and yellow beyond, up to `option_lightning_max_distance` (50 km unless you set it); a storm further away is not shown. The distance is read in the unit of its entity, which Blitzortung takes from the unit system of Home Assistant: in miles the row is red within 9 mi, orange to 19 mi, and the range is written in miles too (31 mi unless you set it).
 
 [![Open your Home Assistant instance and show Blitzortung in the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=mrk-its&repository=homeassistant-blitzortung&category=integration)
 
@@ -512,7 +514,7 @@ If your station has a rain gauge, point **Rain rate entity** at it too (mm/h). A
 
 A weather entity that drops out for a moment, as some providers do at a fixed time every hour, keeps its last condition for ten seconds, so the icon does not flash.
 
-The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 55%, cloudy to 85%, overcast above — rather than the provider's guess.
+The measurement can also correct the condition icon, under **Measurement corrects the icon**. The icon then follows the ordinary cloud bands — clear below 25%, lightly cloudy to 50%, cloudy to 75%, overcast above — rather than the provider's guess.
 
 Only the plain sky icons are normally touched: rain, snow and fog are things a provider knows about and the sensors cannot see, so those are left alone. There are two exceptions, and they are not the same.
 
@@ -947,7 +949,7 @@ double_tap_action:
 | `entity_warning` | String | none | MeteoAlarm-compatible binary sensor for the warnings section |
 | `entity_lightning_distance` | String | none | Strike detector distance sensor — adds its own warning row |
 | `entity_lightning_azimuth` | String | none | Strike detector bearing sensor, for the direction |
-| `option_lightning_max_distance` | Number | `50` | Storms further away than this are ignored |
+| `option_lightning_max_distance` | Number | 50 km | Storms further away than this are ignored. In the unit of the distance entity (31 when it is in miles) |
 | `show_section_warnings` | Boolean | `true` | Show the warnings section |
 | `option_warning_show_expiry` | Boolean | `true` | Show when the warning expires |
 | `option_show_gust_in_wind` | Boolean | `true` | Append the wind gust to the wind slot, e.g. "SE 12 (Gust 20) km/h" |
@@ -980,6 +982,8 @@ A slot that you did not choose, and that has nothing to read, is not drawn, and 
 | `entity_pop_1` | String | none | Chance of rain for day 1 (auto-incremented for each day) |
 | `entity_pos_1` | String | none | Possible amount of rain for day 1 (auto-incremented for each day) |
 | `entity_summary_1` | String | none | Weather summary for day 1, also used in the hover tooltip (auto-incremented for each day) |
+| `summary_1_use_attr` | Boolean | `false` | Read the summary of each day from an attribute of its `entity_summary_N` instead of its state; the row of the summary and the tooltip of the charts both read it |
+| `summary_1_name_attr` | String | none | Name of that attribute |
 | `entity_fire_danger_1` | String | none | Fire danger for day 1, vertical layout only (auto-incremented for each day) |
 | `entity_extended_1` | String | none | Extended forecast text for day 1, vertical layout (auto-incremented for each day) |
 | `daily_extended_use_attr` | Boolean | `false` | Read the extended forecast text from an attribute of `entity_extended_1` instead of its state |
@@ -1020,6 +1024,7 @@ A slot that you did not choose, and that has nothing to read, is not drawn, and 
 | -------- | ---- | ------- | ----------- |
 | `option_show_temperature_chart` | Boolean | `false` | Show max/min temperature lines. Hides the max/min text in the forecast columns while on |
 | `option_show_precipitation_chart` | Boolean | `false` | Show precipitation bars. Hides the millimetre text in the forecast columns while on |
+| `option_precip_chart_min` | Number | 10 mm (0.4 in) | The bars are drawn against at least this much rain, in the unit of the precipitation, so a little rain is a short bar; a wetter day still reaches the top. `0` scales to the wettest day of the period |
 
 </details>
 
