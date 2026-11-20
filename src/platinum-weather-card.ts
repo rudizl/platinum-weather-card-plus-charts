@@ -20,7 +20,7 @@ import type { timeFormat, WeatherCardConfig, HassFormatEntityState } from './typ
 //  From  https://github.com/bramkragten/weather-card/blob/master/dist/weather-card.js
 import { ForecastEvent, subscribeForecast, getForecast, ForecastAttribute } from './weather';
 
-import { CARD_VERSION } from './const';
+import { CARD_VERSION, SLOT_DEFAULTS } from './const';
 import { sectionNames } from './types';
 import { tCard, tMoonPhase, tSager, tUnit, tWarning, tWindDirections, tZambretti } from './translations';
 import { zambrettiLetter, pressureToHpa, seaLevelPressure, windSpeedToKmh, tidalTrendHpaPerHour, cloudCoverFraction, cloudCoverOktas, sunElevation } from './zambretti';
@@ -2549,12 +2549,6 @@ export class PlatinumWeatherCard extends LitElement {
     return this.slotValue('r8', this._config.slot_r8);
   }
 
-  // What a slot shows when it is not chosen (README: Default slot values).
-  private static readonly _DEFAULT_SLOTS: Record<string, string> = {
-    l1: 'forecast_max', l2: 'forecast_min', l3: 'wind', l4: 'pressure', l5: 'sun_next', l6: 'remove', l7: 'remove', l8: 'remove',
-    r1: 'popforecast', r2: 'humidity', r3: 'uv_summary', r4: 'moon', r5: 'sun_following', r6: 'remove', r7: 'remove', r8: 'remove',
-  };
-
   // Whether the entity of a setting is a source for a slot. An entity that the user set is one whatever it gives now (it may be unavailable for a minute, and a slot that comes and goes is worse than
   // a `---`). One that the card supplied from the weather entity, or a weather entity itself, is one if the attribute that the slot reads is there.
   private _hasEntitySource(key: string, attr: string): boolean {
@@ -2591,7 +2585,7 @@ export class PlatinumWeatherCard extends LitElement {
     const value = (this._config as any)[`slot_${position}`] as string | undefined;
     if (value === 'remove') return false;
     if (value !== undefined) return true;
-    const standing = PlatinumWeatherCard._DEFAULT_SLOTS[position];
+    const standing = SLOT_DEFAULTS[position];
     return standing !== undefined && standing !== 'remove' && this._defaultSlotHasSource(standing);
   }
 
@@ -2637,7 +2631,7 @@ export class PlatinumWeatherCard extends LitElement {
 
     // If no value can be matched pass back a default for the slot, unless the card has nothing to read for it: a slot that nobody chose and that has no source is not drawn,
     // as the moon was not, and not a row of `---` that was never asked for. A slot that was chosen is drawn whatever it finds (the branch above).
-    const standing = PlatinumWeatherCard._DEFAULT_SLOTS[slot];
+    const standing = SLOT_DEFAULTS[slot];
     if (standing !== undefined) {
       if (standing !== 'remove' && !this._defaultSlotHasSource(standing)) return this.slotRemove;
       return this.slotValue(slot, standing);
