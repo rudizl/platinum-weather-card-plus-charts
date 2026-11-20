@@ -2,7 +2,11 @@
 
 All notable changes to Platinum Weather Card Plus Charts. The newest version is at the top. Each version lists what was **added**, what **changed** and what was **fixed**; the notes of every release, with the same text, are on the [releases page](https://github.com/rudizl/platinum-weather-card-plus-charts/releases).
 
-## 2.6.1 (unreleased)
+## 2.6.1 (2026-11-20)
+
+### Changed
+
+- **The reference tables in the README fold away.** Each table of options sits under a heading you open, so the page is short enough to find your way in, and the Marketplace shows it this way from 2.6.1 on.
 
 ### Fixed
 
@@ -19,6 +23,8 @@ All notable changes to Platinum Weather Card Plus Charts. The newest version is 
 - **The precipitation bars no longer make a little rain look like a lot** (#47, thefan418). They were scaled to the wettest day of the period, so its bar always stood at 85% of the height, whether it was 0.3 mm or 30 mm. The bars are drawn against at least 10 mm now (0.4 in in inches): 0.3 mm is a thin line and 5 mm about half the height, while a wetter day still reaches the top, as Weather Chart Card does it, and nothing is cut off. `option_precip_chart_min` sets the amount, in the editor under the switch of the precipitation chart; `0` brings back the scale of the wettest day. Five tests.
 
 - **Small words.** The hint under the path of a custom icon pack was in English for everyone, though every language had a translation; it is the translation now. Two Bulgarian texts said a word in English and misspelt another. The README gave the bands of the icon as 55% and 85%; they are 50% and 75%, as the card has used since 2.6.0.
+
+  Forty-one new tests, 1027 in all.
 
 ## 2.6.0 (2026-11-06)
 
