@@ -1366,45 +1366,14 @@ get _forecast_type(): string {
     `;
   }
 
+  // The labels come from the translations, slot_opt_<value> (#70); the four custom entities share one, numbered.
+  private static readonly _SLOT_MENU = ['humidity', 'rainfall', 'rain_rate', 'uv_index', 'pm25', 'pm10', 'pressure', 'wind', 'wind_gust', 'wind_kt',
+    'visibility', 'observed_max', 'observed_min', 'forecast_max', 'forecast_min', 'temp_next', 'temp_following', 'temp_maximums', 'temp_minimums',
+    'sun_next', 'sun_following', 'moon', 'cloud_cover', 'pop', 'popforecast', 'possible_today', 'possible_tomorrow', 'uv_summary', 'fire_danger',
+    'custom1', 'custom2', 'custom3', 'custom4', 'empty', 'remove'];
   private _slotOptions(currentValue: string): TemplateResult {
-    const opts: Array<[string, string]> = [
-      ['humidity',          'Current humidity'],
-      ['rainfall',          "Today's recorded rainfall"],
-      ['rain_rate',         'How hard it is raining now'],
-      ['uv_index',          'Measured UV index'],
-      ['pm25',              'Particulates PM2.5'],
-      ['pm10',              'Particulates PM10'],
-      ['pressure',          'Current air pressure'],
-      ['wind',              'Current wind conditions'],
-      ['wind_gust',         'Current wind gust'],
-      ['wind_kt',           'Current wind conditions kts'],
-      ['visibility',        'Current visibility'],
-      ['observed_max',      "Today's observed max"],
-      ['observed_min',      "Today's observed min"],
-      ['forecast_max',      "Today's forecast max"],
-      ['forecast_min',      "Today's forecast min"],
-      ['temp_next',         'Next temp min/max'],
-      ['temp_following',    'Following temp min/max'],
-      ['temp_maximums',     'Observed/forecast max'],
-      ['temp_minimums',     'Observed/forecast min'],
-      ['sun_next',          'Next sun rise/set time'],
-      ['sun_following',     'Following sun rise/set time'],
-      ['moon',              'Moon phase'],
-      ['cloud_cover',       'Cloud cover'],
-      ['pop',               'Chance of rain'],
-      ['popforecast',       'Rainfall forecast'],
-      ['possible_today',    "Today's forecast rainfall"],
-      ['possible_tomorrow', "Tomorrow's forecast rainfall"],
-      ['uv_summary',        "Today's uv forecast"],
-      ['fire_danger',       "Today's fire danger"],
-      ['custom1',           'Custom entity 1'],
-      ['custom2',           'Custom entity 2'],
-      ['custom3',           'Custom entity 3'],
-      ['custom4',           'Custom entity 4'],
-      ['empty',             'Blank slot'],
-      ['remove',            'Remove slot'],
-    ];
-    return html`${opts.map(([v, l]) => html`<option value="${v}" ?selected=${currentValue === v}>${l}</option>`)}`;
+    const label = (v: string) => /^custom\d$/.test(v) ? this._t('slot_opt_custom').replace('{n}', v.slice(-1)) : this._t(`slot_opt_${v}`);
+    return html`${WeatherCardEditor._SLOT_MENU.map((v) => html`<option value="${v}" ?selected=${currentValue === v}>${label(v)}</option>`)}`;
   }
 
   private _sectionSlotsEditor(): TemplateResult {

@@ -9,6 +9,11 @@ import { join } from 'path';
 const SRC = join(__dirname, '..', 'src');
 const editor = readFileSync(join(SRC, 'editor.ts'), 'utf8');
 const card = readFileSync(join(SRC, 'platinum-weather-card.ts'), 'utf8');
+// The values of the slot menu of the editor, as _SLOT_MENU lists them (the labels are in the translations since #70).
+const slotMenu = (): string[] => {
+  const start = editor.indexOf('_SLOT_MENU = [');
+  return start < 0 ? [] : Array.from(editor.slice(start, editor.indexOf('];', start)).matchAll(/'(\w+)'/g)).map((m) => m[1]);
+};
 
 // Everything inside css`...` blocks
 function stylesheet(source: string): string {
@@ -345,10 +350,7 @@ describe('the README lists every slot the editor offers', () => {
   const readme = readFileSync(join(__dirname, '..', 'README.md'), 'utf8');
 
   it('documents each entry in the slot dropdown', () => {
-    const start = editor.indexOf("['humidity',");
-    expect(start, 'slot list not found').toBeGreaterThan(-1);
-    const list = editor.slice(start, editor.indexOf(']', editor.indexOf("'remove'", start)));
-    const slots = Array.from(list.matchAll(/\['(\w+)',/g)).map((m) => m[1]);
+    const slots = slotMenu();
     expect(slots.length).toBeGreaterThan(20);
 
     // custom2..4 are covered by a range in the table rather than a row each
@@ -361,9 +363,7 @@ describe('the README lists every slot the editor offers', () => {
     // rain_rate appeared twice, so the dropdown listed it twice — and the
     // duplicate case in the entity switch was dead code the runtime never
     // reached.
-    const start = editor.indexOf("['humidity',");
-    const list = editor.slice(start, editor.indexOf(']', editor.indexOf("'remove'", start)));
-    const slots = Array.from(list.matchAll(/\['(\w+)',/g)).map((m) => m[1]);
+    const slots = slotMenu();
     const seen = new Set<string>();
     const duplicated = slots.filter((s) => (seen.has(s) ? true : (seen.add(s), false)));
     expect(duplicated, 'the same slot is offered more than once').toEqual([]);
