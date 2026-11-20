@@ -8,6 +8,7 @@ import { mdiPencil, mdiArrowDown, mdiArrowUp } from '@mdi/js';
 
 import { tEditor } from './translations';
 import { kmPer } from './distance';
+import { readableOn } from './contrast';
 import { iconData } from './icon-packs';
 import { CARD_VERSION, SLOT_DEFAULTS } from './const';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
@@ -2686,7 +2687,7 @@ get _forecast_type(): string {
         <p>${this._t(tried ? 'whats_new_tried' : 'whats_new_body').replace('{save}', this._saveWord())}</p>
         <div class="whats-new-actions">
           <button class="whats-new-hide" @click=${this._whatsNewHide}>${this._t('whats_new_hide')}</button>
-          <button class="whats-new-primary" @click=${tried ? this._whatsNewUndo : this._whatsNewTry}>${this._t(tried ? 'whats_new_undo' : 'whats_new_try')}</button>
+          <button class="whats-new-primary" style=${this._onPrimary()} @click=${tried ? this._whatsNewUndo : this._whatsNewTry}>${this._t(tried ? 'whats_new_undo' : 'whats_new_try')}</button>
         </div>
       </section>`;
   }
@@ -2695,6 +2696,13 @@ get _forecast_type(): string {
     let word: unknown;
     try { word = (this.hass as unknown as { localize?: (key: string) => string })?.localize?.('ui.common.save'); } catch { word = undefined; }
     return typeof word === 'string' && word.trim() !== '' && word !== 'ui.common.save' ? word : this._t('whats_new_save');
+  }
+  // White or black on the theme's primary colour, whichever stands out more; the theme's own text colour when the colour cannot be read.
+  private _onPrimary(): string {
+    let primary = '';
+    try { primary = getComputedStyle(this).getPropertyValue('--primary-color'); } catch { primary = ''; }
+    const text = readableOn(primary);
+    return text ? `color: ${text}` : '';
   }
   // Turns on what is missing, in the editor only: nothing is saved until Save, and Cancel drops it.
   private _whatsNewTry(): void {
@@ -3010,9 +3018,9 @@ get _forecast_type(): string {
       font-weight: 500;
       cursor: pointer;
     }
-    .whats-new-hide { background: transparent; border: none; color: var(--primary-color); }
-    /* the text takes the colour of the page: dark on the light blue of a dark theme, light on the blue of a light one */
-    .whats-new-primary { background: var(--primary-color); border: none; color: var(--primary-background-color, #fff); }
+    .whats-new-hide { background: transparent; border: none; color: var(--secondary-text-color); }
+    /* the text is set white or black from the primary colour (_onPrimary); this is for a colour that cannot be read */
+    .whats-new-primary { background: var(--primary-color); border: none; color: var(--text-primary-color, #fff); }
     .badge-new {
       display: inline-block;
       margin-inline-start: 8px;
