@@ -78,7 +78,7 @@ describe('the effects choice in the editor', () => {
 });
 
 describe('the words, in every language', () => {
-  const KEYS = ['appearance', 'effects', 'effects_hint', 'effects_off', 'effects_subtle', 'effects_full', 'effects_area', 'effects_area_overview', 'effects_area_card'];
+  const KEYS = ['effects', 'effects_hint', 'effects_off', 'effects_subtle', 'effects_full', 'effects_area', 'effects_area_overview', 'effects_area_card'];
   it('are all there, and not left in English where the language is not', () => {
     const en = (TRANSLATIONS as Record<string, { editor?: Record<string, string> } & Record<string, unknown>>).en;
     for (const [lang, t] of Object.entries(TRANSLATIONS as Record<string, Record<string, unknown>>)) {

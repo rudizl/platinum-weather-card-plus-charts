@@ -299,12 +299,6 @@ export function applyEffectRates(root: Element | null, plan: EffectPlan): void {
   if (plan.hail) setRate('.fx-hail', BASE_HAIL / plan.hail.fallSeconds);
 }
 
-// For a page that draws the layer by itself, as the demo does: draw, then set the rates.
-export function renderEffects(container: HTMLElement, plan: EffectPlan | null, area: EffectsArea): void {
-  render(plan ? effectsTemplate(plan, area) : nothing, container);
-  if (plan) applyEffectRates(container.querySelector('.fx'), plan);
-}
-
 // ── stylesheet ────────────────────────────────────────────────────────────
 
 // Small repeating pictures, drawn here rather than shipped: a handful of streaks, flakes
