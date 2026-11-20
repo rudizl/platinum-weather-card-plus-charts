@@ -2,6 +2,8 @@
 
 **Everything about the weather, on one card:** now, the next hours and the days ahead, with charts; severe-weather warnings and lightning as they come; and a forecast of its own, read from your barometer. Start with a single weather entity and add your station's sensors as you go. In fifteen languages.
 
+It is at its best with a weather station of your own. A rain gauge and a pyranometer tell it what is happening outside right now, and it trusts them over the weather service.
+
 It started as a mashup of [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) and [Weather Chart Card](https://github.com/mlamberts78/weather-chart-card) — two of the best weather cards for Home Assistant, neither of which has seen active development for a while. I used to run Weather Chart Card on my main dashboard and Platinum on a dedicated weather view. At some point it felt pointless to maintain two separate cards with overlapping functionality, so I merged them as far as makes sense.
 
 Based on the original Platinum Weather Card by [@makin-things](https://www.github.com/makin-things), extended by [@tommyjlong](https://github.com/tommyjlong). Weather Chart Card by [@mlamberts78](https://github.com/mlamberts78). Maintained and further developed here by me, [@rudizl](https://github.com/rudizl). If you like my work, you can <a href="https://buymeacoffee.com/rudizl"><img src="https://img.shields.io/badge/-Buy%20me%20a%20beer-FFDD00?style=flat&amp;logo=buymeacoffee&amp;logoColor=black" alt="Buy me a beer" align="absmiddle"></a> and/or [drop a ⭐ on GitHub](https://github.com/rudizl/platinum-weather-card-plus-charts).
@@ -558,6 +560,9 @@ The card supports multiple icon packs, selectable from the editor's **Appearance
 <details>
 <summary>Icon packs (6)</summary>
 
+<details>
+<summary>Icon packs (6)</summary>
+
 | Value | Description | Requirement |
 |---|---|---|
 | `default` | Built-in animated SVG icons (bundled with the card) | None |
@@ -1039,6 +1044,8 @@ A slot that you did not choose, and that has nothing to read, is not drawn, and 
 | `entity_pop_1` | String | none | Chance of rain for day 1 (auto-incremented for each day) |
 | `entity_pos_1` | String | none | Possible amount of rain for day 1 (auto-incremented for each day) |
 | `entity_summary_1` | String | none | Weather summary for day 1, also used in the hover tooltip (auto-incremented for each day) |
+| `summary_1_use_attr` | Boolean | `false` | Read the summary of each day from an attribute of its `entity_summary_N` instead of its state; the row of the summary and the tooltip of the charts both read it |
+| `summary_1_name_attr` | String | none | Name of that attribute |
 | `entity_fire_danger_1` | String | none | Fire danger for day 1, vertical layout only (auto-incremented for each day) |
 | `entity_extended_1` | String | none | Extended forecast text for day 1, vertical layout (auto-incremented for each day) |
 | `daily_extended_use_attr` | Boolean | `false` | Read the extended forecast text from an attribute of `entity_extended_1` instead of its state |
