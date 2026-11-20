@@ -59,7 +59,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "v$VERSION from $branch, pre-release: $prerelease"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ steps.plan.outputs.branch }}
 

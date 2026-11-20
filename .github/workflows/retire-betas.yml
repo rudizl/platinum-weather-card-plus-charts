@@ -73,7 +73,7 @@ jobs:
           echo "Keeping $keep (published $kept). To retire: $count"
           cat "$RUNNER_TEMP/retire.tsv"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: steps.find.outputs.count != '0'
         with:
           ref: stats

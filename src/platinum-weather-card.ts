@@ -1127,10 +1127,10 @@ export class PlatinumWeatherCard extends LitElement {
 
     // Red within fifteen kilometres — near enough that the next strike could be
     // overhead; amber to thirty; yellow beyond.
-    const levelNum = km <= 15 ? '4' : km <= 30 ? '3' : '2';
-    const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum]!;
-    const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum]!;
-    const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum]!;
+    const levelNum: '2' | '3' | '4' = km <= 15 ? '4' : km <= 30 ? '3' : '2';
+    const colour = ({ '2': '#ffc107', '3': '#ff9800', '4': '#f44336' })[levelNum];
+    const tintRgb = ({ '2': '255, 193, 7', '3': '255, 152, 0', '4': '244, 67, 54' })[levelNum];
+    const tintAlpha = ({ '2': '0.16', '3': '0.24', '4': '0.34' })[levelNum];
     const levelClass = levelNum === '4' ? 'warning-row level-red'
       : levelNum === '3' ? 'warning-row level-orange' : 'warning-row';
 
