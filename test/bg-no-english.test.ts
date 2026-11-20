@@ -38,4 +38,10 @@ describe('the Bulgarian texts', () => {
     });
     expect(found).toEqual([]);
   });
+
+  // The words of the national weather service (NIMH): „барична тенденция“, not „тренд“; „дъждомер“, not „валежомер“.
+  it('use the terms of NIMH', () => {
+    const wrong = src.split('\n').map((l, i) => [i + 1, l] as const).filter(([, l]) => /тренд|валежомер/i.test(l)).map(([n, l]) => `bg.ts:${n}: ${l.trim()}`);
+    expect(wrong).toEqual([]);
+  });
 });
