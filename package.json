@@ -55,8 +55,9 @@
   },
   "scripts": {
     "start": "rollup -c rollup.config.dev.js --watch",
-    "build": "npm run lint && npm run typecheck && npm run test && npm run rollup",
+    "build": "npm run lint:strict && npm run typecheck && npm run test && npm run rollup",
     "lint": "eslint src/*.ts",
+    "lint:strict": "eslint --max-warnings 0 src/*.ts",
     "rollup": "node scripts/build-icons.mjs && rollup -c",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",

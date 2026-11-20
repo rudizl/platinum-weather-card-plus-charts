@@ -150,7 +150,6 @@ export function sagerForecast(input: SagerInput): SagerForecast | null {
   const risingFast = trend === '1';
   const rising = trend === '2' || risingFast;
   const low = pressureHpa < 1005.76;
-  const high = pressureHpa > 1019.30;
 
   // Where the air is coming from. In the northern hemisphere the southerly and
   // easterly quadrants carry moisture ahead of a depression; northerly and
