@@ -1,4 +1,4 @@
-export const CARD_VERSION = '2.7.0-beta.11';
+export const CARD_VERSION = '2.7.0-beta.12';
 
 // What a slot shows when it is not chosen (README: Default slot values). The card and the editor both read this one list: each had its own
 // once, and they drifted apart (#61), so the card drew the moon in r4 while the editor offered the field of the fire danger.
