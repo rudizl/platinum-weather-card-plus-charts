@@ -8,6 +8,7 @@ import { mdiPencil, mdiArrowDown, mdiArrowUp } from '@mdi/js';
 
 import { tEditor } from './translations';
 import { kmPer } from './distance';
+import { readableOn } from './contrast';
 import { iconData } from './icon-packs';
 import { CARD_VERSION, SLOT_DEFAULTS } from './const';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
@@ -34,6 +35,10 @@ export class WeatherCardEditor extends LitElement implements LovelaceCardEditor 
   @state() private _helpers?: any;
 
   @state() private _subElementEditor: string | undefined = undefined;
+
+  // „Ново в 2.7“ (2.7): the two options as they were before „Опитай“, while it is tried, and whether this browser has hidden the card.
+  @state() private _whatsNewBefore?: { icon_pack?: unknown; option_effects?: unknown };
+  @state() private _whatsNewHidden = WeatherCardEditor._whatsNewSeen();
 
   private _initialized = false;
   private _config_version = 8;
@@ -2187,7 +2192,7 @@ get _forecast_type(): string {
     if ((isFinite(set) && set > 0) || !isFinite(ha) || ha <= 0) return html``;
     const n = Math.round(ha);
     return html`<button class="offer" .configValue=${'option_forecast_altitude'} .value=${n}
-      @click=${(ev: Event) => this._valueChangedNumber({ target: ev.currentTarget })}>${this._t('forecast_altitude_use_ha').replace('{n}', String(n))}</button>`;
+      @click=${(ev: Event) => this._valueChangedNumber({ target: ev.currentTarget })}>${this._t('forecast_altitude_use_ha').replace('{n}', String(n))}</button>${this._new()}`;
   }
 
   private _apIconPack(): TemplateResult {
@@ -2205,7 +2210,7 @@ get _forecast_type(): string {
             ${picture !== null
               ? html`<img src=${picture} alt="" @error=${(e: Event) => ((e.currentTarget as HTMLElement).style.visibility = 'hidden')}>`
               : html`<ha-icon icon="mdi:folder-image"></ha-icon>`}
-            <span>${label}</span>
+            <span>${label}${pack === 'photoreal' ? this._new() : ''}</span>
           </button>`;
         })}
       </div>
@@ -2280,7 +2285,7 @@ get _forecast_type(): string {
             ${WeatherCardEditor._effectsPicture(v)}<span>${this._t(`effects_${v}`)}</span>
           </button>`)}
       </div>
-      <label class="label">${this._t("effects_area")}</label>
+      <label class="label">${this._t("effects_area")}${this._new()}</label>
       <div class="segmented" role="group" aria-label=${this._t("effects_area")}>
         ${['overview', 'card'].map((v) => html`
           <button class="seg${area === v ? ' chosen' : ''}" aria-pressed=${area === v ? 'true' : 'false'}
@@ -2295,7 +2300,7 @@ get _forecast_type(): string {
     const bolt = svg`<path d="M13 2 4 14h6l-1 8 9-12h-6z"></path>`;
     const icon = (c: string) => html`<svg viewBox="0 0 24 24" fill="none" stroke=${c} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${bolt}</svg>`;
     return html`
-      <label class="label">${this._t("warning_style")}</label>
+      <label class="label">${this._t("warning_style")}${this._new()}</label>
       <div class="picker picker-warnings" role="group" aria-label=${this._t("warning_style")}>
         <button class="pick${style === 'soft' ? ' chosen' : ''}" aria-pressed=${style === 'soft' ? 'true' : 'false'}
           .configValue=${'option_warning_style'} .value=${'soft'} @click=${this._pick}>
@@ -2348,7 +2353,7 @@ get _forecast_type(): string {
     return html`
       <div class="group-heading">${this._t("group_icons")}</div>
       ${this._apIconPack()}${this._apStaticCompact()}${this._apSunIcon()}
-      <div class="group-heading">${this._t("group_effects")}</div>
+      <div class="group-heading">${this._t("group_effects")}${this._new()}</div>
       ${this._apEffects()}
       <div class="group-heading">${this._t("group_overview")}</div>
       ${this._ovLayout()}${this._ovDecimals()}
@@ -2378,7 +2383,7 @@ get _forecast_type(): string {
     return html`
       <div class="toggle-row">
         <span class=${this._config?.option_air_warning !== false ? "pwc-switch active" : "pwc-switch"} .value=${'option_air_warning'} @click=${this._toggleVisibility}></span>
-        <span class="toggle-label">${this._t("air_warning")}</span>
+        <span class="toggle-label">${this._t("air_warning")}${this._new()}</span>
       </div>
       <div class="help-text">${this._t("air_warning_hint")}</div>
     `;
@@ -2609,7 +2614,7 @@ get _forecast_type(): string {
           <span class=${on ? "pwc-switch active" : "pwc-switch"} .value=${showKey} @click=${this._toggleVisibility}></span>
           <ha-icon class="section-icon" icon=${icon}></ha-icon>
           <div class="title-stack">
-            <span class="section-title">${this._t(titleKey)}</span>
+            <span class="section-title">${this._t(titleKey)}${this._newBadge(block)}</span>
             ${this._hint(block) ? html`<span class="row-summary">${this._hint(block)}</span>` : html``}
           </div>
         </div>
@@ -2649,6 +2654,84 @@ get _forecast_type(): string {
     return html``;
   }
 
+  // „Ново“ beside what 2.7 added, and on each row of the first screen how many new settings it holds. They stay through 2.7.x and go in 2.8.
+  private static readonly _NEW_IN: Record<string, string[]> = {
+    topic_appearance: ['icon_pack: photoreal', 'option_effects', 'option_effects_area'],
+    topic_warnings: ['option_air_warning', 'option_warning_style'],
+    topic_local_forecast: ['forecast_altitude from Home Assistant'],
+    slots: ['pm25 and pm10'],
+  };
+  private _new(n = 1): TemplateResult {
+    return html`<span class="badge-new">${n === 1 ? this._t('badge_new') : this._t('badge_new_count').replace('{n}', String(n))}</span>`;
+  }
+  private _newBadge(id: string): TemplateResult | string {
+    const n = WeatherCardEditor._NEW_IN[id]?.length ?? 0;
+    return n ? this._new(n) : '';
+  }
+
+  // „Ново в 2.7“ is shown while this card lacks the photoreal icons or the weather effects, until „Не показвай повече“ in this browser.
+  private static readonly _WHATS_NEW_KEY = `pwc-whats-new-${CARD_VERSION.split('.').slice(0, 2).join('.')}`;
+  private static _whatsNewSeen(): boolean {
+    try { return localStorage.getItem(WeatherCardEditor._WHATS_NEW_KEY) === '1'; } catch { return false; }
+  }
+  private _whatsNew(): TemplateResult {
+    const tried = this._whatsNewBefore !== undefined;
+    const has = this._config?.icon_pack === 'photoreal' && this._option_effects !== 'off';
+    if (this._whatsNewHidden || (has && !tried)) return html``;
+    return html`
+      <section class="whats-new" aria-labelledby="pwc-whats-new-title">
+        <div class="whats-new-head">
+          <span class="topic-tile whats-new-tile"><ha-icon icon="mdi:creation-outline"></ha-icon></span>
+          <h3 id="pwc-whats-new-title">${this._t('whats_new_title')}</h3>
+        </div>
+        <p>${this._t(tried ? 'whats_new_tried' : 'whats_new_body').replace('{save}', this._saveWord())}</p>
+        <div class="whats-new-actions">
+          <button class="whats-new-hide" @click=${this._whatsNewHide}>${this._t('whats_new_hide')}</button>
+          <button class="whats-new-primary" style=${this._onPrimary()} @click=${tried ? this._whatsNewUndo : this._whatsNewTry}>${this._t(tried ? 'whats_new_undo' : 'whats_new_try')}</button>
+        </div>
+      </section>`;
+  }
+  // The word on Home Assistant's own Save button, so the note names the button the user sees; our translation only when it does not say.
+  private _saveWord(): string {
+    let word: unknown;
+    try { word = (this.hass as unknown as { localize?: (key: string) => string })?.localize?.('ui.common.save'); } catch { word = undefined; }
+    return typeof word === 'string' && word.trim() !== '' && word !== 'ui.common.save' ? word : this._t('whats_new_save');
+  }
+  // White or black on the theme's primary colour, whichever stands out more; the theme's own text colour when the colour cannot be read.
+  private _onPrimary(): string {
+    let primary = '';
+    try { primary = getComputedStyle(this).getPropertyValue('--primary-color'); } catch { primary = ''; }
+    const text = readableOn(primary);
+    return text ? `color: ${text}` : '';
+  }
+  // Turns on what is missing, in the editor only: nothing is saved until Save, and Cancel drops it.
+  private _whatsNewTry(): void {
+    const cfg = { ...(this._config as Record<string, unknown>) };
+    this._whatsNewBefore = { icon_pack: cfg.icon_pack, option_effects: cfg.option_effects };
+    if (cfg.icon_pack !== 'photoreal') cfg.icon_pack = 'photoreal';
+    if (this._option_effects === 'off') cfg.option_effects = 'subtle';
+    this._whatsNewApply(cfg);
+  }
+  // Both options as they were before „Опитай“; one that was not set is not set again.
+  private _whatsNewUndo(): void {
+    const before = this._whatsNewBefore;
+    if (!before) return;
+    const cfg = { ...(this._config as Record<string, unknown>) };
+    for (const key of ['icon_pack', 'option_effects'] as const) {
+      if (before[key] === undefined) delete cfg[key]; else cfg[key] = before[key];
+    }
+    this._whatsNewBefore = undefined;
+    this._whatsNewApply(cfg);
+  }
+  private _whatsNewHide(): void {
+    try { localStorage.setItem(WeatherCardEditor._WHATS_NEW_KEY, '1'); } catch { /* without storage it shows again next time */ }
+    this._whatsNewHidden = true;
+  }
+  private _whatsNewApply(cfg: Record<string, unknown>): void {
+    this._config = cfg as WeatherCardConfig;
+    fireEvent(this, 'config-changed', { config: this.sortObjectByKeys(this._config) });
+  }
+
   private static readonly _TOPICS: [string, string][] = [
     ['topic_appearance', 'mdi:palette-outline'], ['topic_warnings', 'mdi:alert-outline'], ['topic_sky', 'mdi:weather-partly-cloudy'],
     ['topic_local_forecast', 'mdi:gauge'], ['topic_card', 'mdi:card-text-outline'],
@@ -2661,7 +2744,7 @@ get _forecast_type(): string {
         <button class="topic-row" .value=${id} data-topic=${id} @click=${this._editSubmenu}>
           <span class="topic-tile"><ha-icon icon=${icon}></ha-icon></span>
           <div class="title-stack topic-title">
-            <span class="section-title">${this._t(id)}</span>
+            <span class="section-title">${this._t(id)}${this._newBadge(id)}</span>
             <span class="row-summary">${this._hint(id)}</span>
           </div>
           <ha-icon class="topic-chevron" icon="mdi:chevron-right"></ha-icon>
@@ -2691,6 +2774,7 @@ get _forecast_type(): string {
     const htmlConfig: TemplateResult[] = [];
     const slots = this._section_order || [];
 
+    htmlConfig.push(this._whatsNew());
     htmlConfig.push(html`<div class="topics-heading">${this._t('sections_heading')}</div>`);
     slots.forEach((slot, index) => {
       htmlConfig.push(this.getConfigBlock(slot, index === 0, index + 1 === slots.length));
@@ -2915,6 +2999,39 @@ get _forecast_type(): string {
       color: var(--secondary-text-color);
     }
     /* each topic on a tile of its own colour (2.7): coral, amber, blue, teal and slate, light enough for a white icon on either theme */
+    .whats-new {
+      border: 1px solid var(--primary-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+    }
+    .whats-new-head { display: flex; align-items: center; gap: 12px; }
+    .whats-new h3 { margin: 0; font-size: 1.05em; font-weight: 500; }
+    .whats-new p { margin: 10px 0; line-height: 1.5; color: var(--secondary-text-color); }
+    .whats-new .whats-new-tile { background: #3a7fd0; }
+    .whats-new-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .whats-new-actions button {
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font: inherit;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .whats-new-hide { background: transparent; border: none; color: var(--secondary-text-color); }
+    /* the text is set white or black from the primary colour (_onPrimary); this is for a colour that cannot be read */
+    .whats-new-primary { background: var(--primary-color); border: none; color: var(--text-primary-color, #fff); }
+    .badge-new {
+      display: inline-block;
+      margin-inline-start: 8px;
+      padding: 1px 8px;
+      border-radius: 999px;
+      font-size: 0.75em;
+      font-weight: 600;
+      vertical-align: middle;
+      color: var(--primary-color);
+      background: color-mix(in srgb, var(--primary-color) 16%, transparent);
+    }
     .topic-tile {
       flex: none;
       width: 34px;

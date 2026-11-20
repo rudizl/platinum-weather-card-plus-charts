@@ -8,7 +8,7 @@ import { join } from 'path';
 
 // Names of products and methods, abbreviations and units, which are written so in Bulgarian too.
 const ANYWHERE = new Set([
-  'Home', 'Assistant', 'MeteoAlarm', 'Sager', 'Zambretti', 'UV', 'PM2.5', 'PM10',
+  'Home', 'Assistant', 'MeteoAlarm', 'Sager', 'Zambretti', 'photoreal', 'UV', 'PM2.5', 'PM10',
   'hPa', 'mm', 'in', 'kn', 'W', 'm', 'h', 's', 'g', 'n', // units, and the n of „n-ти“
 ]);
 // The English names of helpers and domains of Home Assistant: only in brackets, after the Bulgarian name.
