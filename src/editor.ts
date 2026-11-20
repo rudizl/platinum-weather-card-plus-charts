@@ -9,7 +9,7 @@ import { mdiPencil, mdiArrowDown, mdiArrowUp } from '@mdi/js';
 import { tEditor } from './translations';
 import { kmPer } from './distance';
 import { iconData } from './icon-packs';
-import { CARD_VERSION } from './const';
+import { CARD_VERSION, SLOT_DEFAULTS } from './const';
 import { WeatherCardConfig, layoutOverview, layoutOrientation, layoutDays, extendedDays, sectionType, timeFormat, sectionNames, pressureDecimals, HassCustomElement } from './types';
 import { customElement, property, state } from 'lit/decorators';
 
@@ -700,25 +700,8 @@ get _forecast_type(): string {
 
   get _optional_entities(): TemplateResult {
     const entities = new Set();
-    for (const slot of
-      [
-        this._config?.slot_l1 || 'forecast_max' as string,
-        this._config?.slot_l2 || 'forecast_min' as string,
-        this._config?.slot_l3 || 'wind' as string,
-        this._config?.slot_l4 || 'pressure' as string,
-        this._config?.slot_l5 || 'sun_next' as string,
-        this._config?.slot_l6 || 'remove' as string,
-        this._config?.slot_l7 || 'remove' as string,
-        this._config?.slot_l8 || 'remove' as string,
-        this._config?.slot_r1 || 'popforecast' as string,
-        this._config?.slot_r2 || 'humidity' as string,
-        this._config?.slot_r3 || 'uv_summary' as string,
-        this._config?.slot_r4 || 'fire_danger' as string,
-        this._config?.slot_r5 || 'sun_following' as string,
-        this._config?.slot_r6 || 'remove' as string,
-        this._config?.slot_r7 || 'remove' as string,
-        this._config?.slot_r8 || 'remove' as string,
-      ]) {
+    // the defaults are those the card draws (#61)
+    for (const slot of Object.keys(SLOT_DEFAULTS).map((p) => (this._config as Record<string, unknown> | undefined)?.[`slot_${p}`] as string || SLOT_DEFAULTS[p])) {
       switch (slot) {
         case 'observed_max':
           entities.add('entity_observed_max');
