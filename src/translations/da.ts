@@ -391,6 +391,8 @@ const da: Translation = {
     "show_precip_chart": "Vis nedbørsdiagram",
     "precip_chart_min": "Regnskala, mindst",
     "precip_chart_min_hint": "Søjlerne måles mod mindst så meget regn, så lidt regn er en kort søjle. Tom: 10 mm (0,4 in). 0: mod den vådeste dag.",
+    "chart_height": "Diagrammets højde",
+    "chart_height_hint": "Diagrammets højde i pixels; etiketterne vokser med den. Tom: 75.",
     "forecast_tooltips": "Aktivér vejrudsigts-tooltips",
     "charts_section": "Diagrammer",
     "opt_daily": "Dagligt",

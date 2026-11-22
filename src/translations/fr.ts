@@ -391,6 +391,8 @@ const fr: Translation = {
     "show_precip_chart": "Afficher le graphique de précipitations",
     "precip_chart_min": "Échelle de pluie, au moins",
     "precip_chart_min_hint": "Les barres sont rapportées à au moins cette quantité, pour qu’une petite pluie reste une barre courte. Vide : 10 mm (0,4 in). 0 : au jour le plus pluvieux.",
+    "chart_height": "Hauteur du graphique",
+    "chart_height_hint": "La hauteur du graphique en pixels ; les étiquettes grandissent avec elle. Vide : 75.",
     "forecast_tooltips": "Activer les infobulles de prévision",
     "charts_section": "Graphiques",
     "opt_daily": "Quotidien",

@@ -391,6 +391,8 @@ const he: Translation = {
     "show_precip_chart": "הצג תרשים משקעים",
     "precip_chart_min": "סולם המשקעים, לפחות",
     "precip_chart_min_hint": "העמודות נמדדות מול לפחות כמות זו, כך שמעט גשם הוא עמודה נמוכה. ריק: 10 מ\"מ (0.4 in). 0: מול היום הגשום ביותר.",
+    "chart_height": "גובה הגרף",
+    "chart_height_hint": "גובה הגרף בפיקסלים; התוויות גדלות איתו. ריק: 75.",
     "forecast_tooltips": "הפעל חלוניות תחזית",
     "charts_section": "תרשימים",
     "opt_daily": "יומי",

@@ -103,6 +103,7 @@ describe('„Ново“ beside the new settings of 2.7', () => {
     expect(badge('[data-topic="topic_sky"]')).toBeNull();
     expect(badge('[data-topic="topic_card"]')).toBeNull();
     expect(badge('.edit-slots-section')).toBe('New');
+    expect(badge('.edit-charts-section')).toBe('New');
   });
 
   it('every language has the texts, and only English says them in English', () => {

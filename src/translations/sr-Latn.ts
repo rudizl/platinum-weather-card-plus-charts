@@ -391,6 +391,8 @@ const srLatn: Translation = {
     "show_precip_chart": "Prikaži grafikon padavina",
     "precip_chart_min": "Skala padavina, najmanje",
     "precip_chart_min_hint": "Stubići se mere prema najmanje ovoliko padavina, pa je mala kiša nizak stubić. Prazno: 10 mm (0,4 in). 0: prema najkišovitijem danu.",
+    "chart_height": "Visina grafikona",
+    "chart_height_hint": "Visina grafikona u pikselima; oznake rastu s njom. Prazno: 75.",
     "forecast_tooltips": "Omogući objašnjenja prognoze",
     "charts_section": "Grafikoni",
     "opt_daily": "Dnevno",

@@ -391,6 +391,8 @@ const nl: Translation = {
     "show_precip_chart": "Neerslaggrafiek tonen",
     "precip_chart_min": "Regenschaal, minstens",
     "precip_chart_min_hint": "De balken worden afgezet tegen minstens zoveel regen, zodat weinig regen een korte balk is. Leeg: 10 mm (0,4 in). 0: tegen de natste dag.",
+    "chart_height": "Hoogte van de grafiek",
+    "chart_height_hint": "De hoogte van de grafiek in pixels; de labels groeien mee. Leeg: 75.",
     "forecast_tooltips": "Voorspellings-tooltips inschakelen",
     "charts_section": "Grafieken",
     "opt_daily": "Dagelijks",

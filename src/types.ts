@@ -169,6 +169,7 @@ export interface WeatherCardConfig extends LovelaceCardConfig {
   option_show_temperature_chart?: boolean;
   option_show_precipitation_chart?: boolean;
   option_precip_chart_min?: number;
+  option_chart_height?: number;
   icon_pack?: string;
   icon_pack_path?: string;
   option_show_gust_in_wind?: boolean;

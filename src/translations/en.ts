@@ -391,6 +391,8 @@ const en: Translation = {
     "show_precip_chart": "Show precipitation chart",
     "precip_chart_min": "Rain scale, at least",
     "precip_chart_min_hint": "Bars are drawn against at least this much rain, so a little rain is a short bar. Empty: 10 mm (0.4 in). 0: against the wettest day.",
+    "chart_height": "Chart height",
+    "chart_height_hint": "The height of the chart in pixels; the labels grow with it. Empty: 75.",
     "forecast_tooltips": "Enable forecast tooltips",
     "charts_section": "Charts",
     "opt_daily": "Daily",

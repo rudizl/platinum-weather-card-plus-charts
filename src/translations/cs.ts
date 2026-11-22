@@ -391,6 +391,8 @@ const cs: Translation = {
     "show_precip_chart": "Zobrazit graf srážek",
     "precip_chart_min": "Stupnice srážek, alespoň",
     "precip_chart_min_hint": "Sloupce se měří vůči alespoň tolika srážkám, takže malý déšť je krátký sloupec. Prázdné: 10 mm (0,4 in). 0: vůči nejdeštivějšímu dni.",
+    "chart_height": "Výška grafu",
+    "chart_height_hint": "Výška grafu v pixelech; popisky se zvětšují s ní. Prázdné: 75.",
     "forecast_tooltips": "Povolit tooltipy předpovědi",
     "charts_section": "Grafy",
     "opt_daily": "Denní",
