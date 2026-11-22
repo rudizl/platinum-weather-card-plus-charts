@@ -1087,7 +1087,7 @@ A slot that you did not choose, and that has nothing to read, is not drawn, and 
 | `option_show_temperature_chart` | Boolean | `false` | Show max/min temperature lines. Hides the max/min text in the forecast columns while on |
 | `option_show_precipitation_chart` | Boolean | `false` | Show precipitation bars. Hides the millimetre text in the forecast columns while on |
 | `option_precip_chart_min` | Number | 10 mm (1 cm, 0.4 in) | The bars are drawn against at least this much rain, in the unit of the precipitation, so a little rain is a short bar; a wetter day still reaches the top. `0` scales to the wettest day of the period |
-| `option_chart_height` | Number | `75` | The height of the chart in pixels, from 40 to 1000. The lines, the bars and the labels are placed to fit it, and the labels grow with it from 8 px up to 13 px |
+| `option_chart_height` | Number | `75` | The height of the chart in pixels, from 40 to 1000. The lines, the bars and the labels are placed to fit it, and the labels grow with it, from 8 px at 75 to 13 px at 250 and above |
 
 </details>
 

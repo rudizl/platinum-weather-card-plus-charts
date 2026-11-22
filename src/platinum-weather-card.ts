@@ -2145,7 +2145,7 @@ export class PlatinumWeatherCard extends LitElement {
     const chartH  = isFinite(_chartSet) && _chartSet > 0 ? Math.min(1000, Math.max(40, _chartSet)) : 75;
     const k       = chartH / 75;
     const tempH   = showTemp   ? chartH : 52 * k;
-    const fs      = Math.min(13, Math.max(8, Math.round(8 * k)));
+    const fs      = Math.min(13, Math.max(8, Math.round(8 + 5 * (chartH - 75) / 175))); // 8 px at 75, 13 px from 250, in a line between
     const BH = fs + 5;
     const totalH  = tempH + (showPrecip ? BH + 3 : 0); // a strip for the rain labels below if precip enabled
     const MIN_SEP = BH + 5;
