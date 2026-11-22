@@ -152,3 +152,24 @@ describe('the row of the height and the scale of the rain', () => {
     expect(await rows({ option_show_precipitation_chart: true })).toEqual([['option_chart_height', 'option_precip_chart_min']]);
   });
 });
+
+describe('the box of a label', () => {
+  it('has a line of its own, so that its middle is the point on the line whatever the font of the theme', async () => {
+    // 2 px of padding and 1.6 px of border around the line make the box that the positions count with: the font + 5
+    for (const h of [75, 200, 435]) {
+      const el = (await renderCard(baseConfig({ weather_entity: 'weather.home', section_order: ['daily_forecast'], daily_forecast_layout: 'horizontal',
+        daily_forecast_days: 3, option_show_current_day: true, show_section_charts: true, option_show_precipitation_chart: true,
+        option_show_temperature_chart: true, option_chart_height: h } as never), makeHass(
+        { 'weather.home': { state: 'rainy', attributes: { supported_features: 1 } } }, { forecast: makeForecast(3) } as never))) as Card;
+      await new Promise((r) => setTimeout(r, 20)); await el.updateComplete;
+      const labels = [...el.shadowRoot!.querySelectorAll('div')].filter((d) => (d.getAttribute('style') ?? '').includes('border:0.8px solid'));
+      expect(labels.length, `${h}`).toBeGreaterThan(0);
+      for (const d of labels) {
+        const st = d.getAttribute('style')!;
+        const font = Number(/font-size:([\d.]+)px/.exec(st)![1]);
+        const line = Number(/line-height:([\d.]+)px/.exec(st)?.[1]);
+        expect(line + 2 + 1.6, `${h}: ${st}`).toBeCloseTo(font + 5, 6);
+      }
+    }
+  });
+});
