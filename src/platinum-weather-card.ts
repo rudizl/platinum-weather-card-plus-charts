@@ -2146,6 +2146,8 @@ export class PlatinumWeatherCard extends LitElement {
     const k       = chartH / 75;
     const tempH   = showTemp   ? chartH : 52 * k;
     const fs      = Math.min(13, Math.max(8, Math.round(8 + 5 * (chartH - 75) / 175))); // 8 px at 75, 13 px from 250, in a line between
+    // The box of a label: its line, 2 px of padding and 1.6 px of border. The line is set, not left to the theme's font: in Home Assistant the
+    // line of Roboto is taller, and the labels sat 2 to 3 px below their points on the lines.
     const BH = fs + 5;
     const totalH  = tempH + (showPrecip ? BH + 3 : 0); // a strip for the rain labels below if precip enabled
     const MIN_SEP = BH + 5;
@@ -2217,8 +2219,8 @@ export class PlatinumWeatherCard extends LitElement {
       if (showTemp && isFinite(tempYs[i].maxY) && isFinite(tempYs[i].minY)) {
         const maxTop = tempYs[i].maxY - BH / 2;
         const minTop = tempYs[i].minY - BH / 2;
-        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:${fs}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
-        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:${fs}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:${fs}px;line-height:${fs + 1.4}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:${fs}px;line-height:${fs + 1.4}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
       }
       if (showPrecip) {
         const pMax  = Math.max(...data.map(x => x.precip), _precipFloor, 0.1);
@@ -2230,7 +2232,7 @@ export class PlatinumWeatherCard extends LitElement {
           // Bar behind everything (z-index 0), rising from bottom of temp area
           colHtml = `<div style="position:absolute;top:${bTop}px;left:0;right:0;height:${bH}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>` + colHtml;
           // Label centered ON the baseline
-          colHtml += `<div style="position:absolute;top:${tempH - Math.floor(BH / 2)}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBgRain});padding:1px 4px;font-size:${fs}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${label}</div>`;
+          colHtml += `<div style="position:absolute;top:${tempH - Math.floor(BH / 2)}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBgRain});padding:1px 4px;font-size:${fs}px;line-height:${fs + 1.4}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${label}</div>`;
         } else {
           // 0mm: subtle dash at baseline
           colHtml += `<div style="position:absolute;top:${tempH - 1}px;left:0;right:0;height:2px;background:rgba(151,230,255,0.15);border-radius:1px;"></div>`;
