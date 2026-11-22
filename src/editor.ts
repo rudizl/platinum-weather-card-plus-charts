@@ -1597,6 +1597,17 @@ get _forecast_type(): string {
           </div>
         </div>
       </div>
+      ${this._option_show_temperature_chart === true || this._option_show_precipitation_chart === true ? html`
+      <div class="side-by-side">
+        <div>
+          <!-- #73: the height of the chart in px; empty is 75, as it was -->
+          <ha-input type="number" min="40" max="1000" step="1" label=${this._t("chart_height")}
+            .value=${this._config?.option_chart_height ?? ''}
+            .configValue=${'option_chart_height'} @change=${this._valueChangedNumber}>
+          </ha-input>
+          <div class="help-text">${this._t("chart_height_hint")}${this._new()}</div>
+        </div>
+      </div>` : html``}
       ${this._option_show_precipitation_chart === true ? html`
       <div class="side-by-side">
         <div>
@@ -2660,6 +2671,7 @@ get _forecast_type(): string {
     topic_warnings: ['option_air_warning', 'option_warning_style'],
     topic_local_forecast: ['forecast_altitude from Home Assistant'],
     slots: ['pm25 and pm10'],
+    charts: ['option_chart_height'],
   };
   private _new(n = 1): TemplateResult {
     return html`<span class="badge-new">${n === 1 ? this._t('badge_new') : this._t('badge_new_count').replace('{n}', String(n))}</span>`;

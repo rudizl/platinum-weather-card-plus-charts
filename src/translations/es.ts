@@ -391,6 +391,8 @@ const es: Translation = {
     "show_precip_chart": "Mostrar gráfico de precipitación",
     "precip_chart_min": "Escala de lluvia, al menos",
     "precip_chart_min_hint": "Las barras se miden con al menos esta cantidad, para que poca lluvia sea una barra corta. Vacío: 10 mm (0,4 in). 0: según el día más lluvioso.",
+    "chart_height": "Altura del gráfico",
+    "chart_height_hint": "La altura del gráfico en píxeles; las etiquetas crecen con ella. Vacío: 75.",
     "forecast_tooltips": "Activar información emergente",
     "charts_section": "Gráficos",
     "opt_daily": "Diario",

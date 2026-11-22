@@ -391,6 +391,8 @@ const de: Translation = {
     "show_precip_chart": "Niederschlagsdiagramm anzeigen",
     "precip_chart_min": "Regenskala, mindestens",
     "precip_chart_min_hint": "Die Balken werden an mindestens so viel Regen gemessen, damit wenig Regen ein kurzer Balken ist. Leer: 10 mm (0,4 in). 0: am nassesten Tag.",
+    "chart_height": "Höhe des Diagramms",
+    "chart_height_hint": "Die Höhe des Diagramms in Pixeln; die Beschriftungen wachsen mit. Leer: 75.",
     "forecast_tooltips": "Vorhersage-Tooltips aktivieren",
     "charts_section": "Diagramme",
     "opt_daily": "Täglich",

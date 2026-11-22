@@ -2138,9 +2138,16 @@ export class PlatinumWeatherCard extends LitElement {
     }
     if (data.length === 0) return html``;
 
-    const tempH   = showTemp   ? 75 : 52;
-    const totalH  = tempH + (showPrecip ? 16 : 0); // 16px label strip below if precip enabled
-    const BH = 13;
+    // #73: the height of the temperature area is option_chart_height, 75 px when it is not set, and every position below is taken from it:
+    // the margins of the lines, the bars, the labels and the strip under them. The labels grow with it, from 8 px at 75 to at most 13 px,
+    // so that a tall chart on a wall tablet can be read and a short one still holds its labels.
+    const _chartSet = Number(this._config.option_chart_height);
+    const chartH  = isFinite(_chartSet) && _chartSet > 0 ? Math.min(1000, Math.max(40, _chartSet)) : 75;
+    const k       = chartH / 75;
+    const tempH   = showTemp   ? chartH : 52 * k;
+    const fs      = Math.min(13, Math.max(8, Math.round(8 * k)));
+    const BH = fs + 5;
+    const totalH  = tempH + (showPrecip ? BH + 3 : 0); // a strip for the rain labels below if precip enabled
     const MIN_SEP = BH + 5;
 
     // ── Pre-calculate y positions with min separation ──────────────────────
@@ -2151,8 +2158,8 @@ export class PlatinumWeatherCard extends LitElement {
     const tMax2 = showTemp && tAll.length ? Math.max(...tAll) : 0;
     const tMin2 = showTemp && tAll.length ? Math.min(...tAll) : 0;
     const tRng2 = tMax2 - tMin2 || 1;
-    const tTop2 = 16;
-    const tBot2 = tempH - 16;
+    const tTop2 = 16 * k;
+    const tBot2 = tempH - 16 * k;
     const tyRaw = (t: number) => tTop2 + (tMax2 - t) / tRng2 * (tBot2 - tTop2);
 
     const tempYs: { maxY: number; minY: number }[] = data.map(d => {
@@ -2210,8 +2217,8 @@ export class PlatinumWeatherCard extends LitElement {
       if (showTemp && isFinite(tempYs[i].maxY) && isFinite(tempYs[i].minY)) {
         const maxTop = tempYs[i].maxY - BH / 2;
         const minTop = tempYs[i].minY - BH / 2;
-        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
-        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${maxTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(255,152,0,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:${fs}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.maxT)}°</div>`;
+        colHtml += `<div style="position:absolute;top:${minTop}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(90,150,210,0.9);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBg});padding:1px 4px;font-size:${fs}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${Math.round(d.minT)}°</div>`;
       }
       if (showPrecip) {
         const pMax  = Math.max(...data.map(x => x.precip), _precipFloor, 0.1);
@@ -2223,7 +2230,7 @@ export class PlatinumWeatherCard extends LitElement {
           // Bar behind everything (z-index 0), rising from bottom of temp area
           colHtml = `<div style="position:absolute;top:${bTop}px;left:0;right:0;height:${bH}px;background:rgba(151,230,255,0.50);border-radius:2px 2px 0 0;z-index:0;"></div>` + colHtml;
           // Label centered ON the baseline
-          colHtml += `<div style="position:absolute;top:${tempH - 6}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBgRain});padding:1px 4px;font-size:8px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${label}</div>`;
+          colHtml += `<div style="position:absolute;top:${tempH - Math.floor(BH / 2)}px;left:50%;transform:translateX(-50%);border:0.8px solid rgba(115,198,239,0.85);border-radius:2.5px;background:var(--pwcc-chart-label-background, ${labelBgRain});padding:1px 4px;font-size:${fs}px;color:var(--pwcc-chart-label-color, ${labelFg});white-space:nowrap;">${label}</div>`;
         } else {
           // 0mm: subtle dash at baseline
           colHtml += `<div style="position:absolute;top:${tempH - 1}px;left:0;right:0;height:2px;background:rgba(151,230,255,0.15);border-radius:1px;"></div>`;
