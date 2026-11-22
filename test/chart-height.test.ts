@@ -5,7 +5,7 @@ import { makeHass, baseConfig, renderCard, makeForecast } from './helpers';
 // #73 (chriscortez1976): the chart under the days was 75 px high, fixed. On a wall tablet, as a tile beside others, the lines were flat and
 // the card shorter than its neighbours; card_mod could not help, since the labels and the bars are placed with pixels taken from that 75.
 // option_chart_height sets it, and everything is taken from it: the margins of the lines, the bars, the labels and the strip under them.
-// The labels grow with the height, from 8 px at 75 to at most 13 px.
+// The labels grow with the height in a line, from 8 px at 75 to 13 px at 250.
 
 type Card = HTMLElement & { updateComplete: Promise<unknown> };
 const ORANGE = 'rgba(255,152,0,0.9)';
@@ -79,15 +79,19 @@ describe('the height of the chart', () => {
     const base = await chart({}, false, true);
     const tall = await chart({ option_chart_height: 150 }, false, true);
     expect(base.columns[0]).toBe(52 + 16);
-    // 52 × 2, and the strip of 13 px labels (a box of 18, and 3) under it
-    expect(tall.columns[0]).toBe(104 + 21);
+    // 52 × 2, and the strip of 10 px labels (a box of 15, and 3) under it
+    expect(tall.columns[0]).toBe(104 + 18);
     tall.bars.forEach((b, i) => expect(b.height).toBeCloseTo(base.bars[i].height * 2, 6));
   });
 
-  it('the labels grow with the height, from 8 to 13 px', async () => {
-    expect((await chart({ option_chart_height: 40 })).fonts).toEqual([8]);
-    expect((await chart({ option_chart_height: 100 })).fonts).toEqual([11]);
-    expect((await chart({ option_chart_height: 1000 })).fonts).toEqual([13]);
+  it('the labels grow with the height in a line, from 8 px at 75 to 13 px at 250', async () => {
+    const font = async (h: number) => (await chart({ option_chart_height: h })).fonts;
+    expect(await font(40)).toEqual([8]);
+    expect(await font(100)).toEqual([9]);
+    expect(await font(175)).toEqual([11]);
+    expect(await font(200)).toEqual([12]);
+    expect(await font(250)).toEqual([13]);
+    expect(await font(1000)).toEqual([13]);
   });
 
   it('a height that is not a number, or 0, is the 75 of before', async () => {
