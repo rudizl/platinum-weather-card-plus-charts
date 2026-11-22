@@ -125,3 +125,26 @@ describe('the field of the height in the editor', () => {
     }
   });
 });
+
+describe('the row of the height and the scale of the rain', () => {
+  it('is one row, the height on the left, with both charts; the height alone with the temperature only', async () => {
+    await import('../src/editor');
+    const { render } = await import('lit');
+    type Editor = HTMLElement & { setConfig: (c: unknown) => void; hass: unknown; updateComplete: Promise<unknown>; _optionChartsEditor: () => unknown };
+    const rows = async (cfg: Record<string, unknown>) => {
+      const el = document.createElement('platinum-weather-card-plus-charts-editor') as Editor;
+      el.setConfig({ card_config_version: 8, weather_entity: 'weather.home', show_section_charts: true, ...cfg });
+      el.hass = makeHass({ 'weather.home': { state: 'rainy' } });
+      document.body.appendChild(el); await el.updateComplete;
+      const box = document.createElement('div');
+      render(el._optionChartsEditor() as never, box);
+      el.remove();
+      // each row of fields, as the keys of its fields from left to right
+      return [...box.querySelectorAll('.side-by-side')].map((r) => [...r.querySelectorAll('ha-input')]
+        .map((i) => (i as unknown as { configValue: string }).configValue)).filter((r) => r.length);
+    };
+    expect(await rows({ option_show_temperature_chart: true, option_show_precipitation_chart: true })).toEqual([['option_chart_height', 'option_precip_chart_min']]);
+    expect(await rows({ option_show_temperature_chart: true })).toEqual([['option_chart_height']]);
+    expect(await rows({ option_show_precipitation_chart: true })).toEqual([['option_chart_height', 'option_precip_chart_min']]);
+  });
+});

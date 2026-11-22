@@ -1598,6 +1598,7 @@ get _forecast_type(): string {
         </div>
       </div>
       ${this._option_show_temperature_chart === true || this._option_show_precipitation_chart === true ? html`
+      <!-- #73: the height on the left and, with the rain chart, the scale of the rain beside it; the height alone with the temperature only -->
       <div class="side-by-side">
         <div>
           <!-- #73: the height of the chart in px; empty is 75, as it was -->
@@ -1607,9 +1608,7 @@ get _forecast_type(): string {
           </ha-input>
           <div class="help-text">${this._t("chart_height_hint")}${this._new()}</div>
         </div>
-      </div>` : html``}
-      ${this._option_show_precipitation_chart === true ? html`
-      <div class="side-by-side">
+        ${this._option_show_precipitation_chart === true ? html`
         <div>
           <!-- #47: the bars against at least this much rain; empty is 10 mm or 0.4 in, 0 the wettest day -->
           <ha-input type="number" min="0" step="any" label=${this._t("precip_chart_min")}
@@ -1617,7 +1616,7 @@ get _forecast_type(): string {
             .configValue=${'option_precip_chart_min'} @change=${this._valueChangedNumber}>
           </ha-input>
           <div class="help-text">${this._t("precip_chart_min_hint")}</div>
-        </div>
+        </div>` : html``}
       </div>` : html``}
     `;
   }
