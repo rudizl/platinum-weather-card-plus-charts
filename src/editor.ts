@@ -2991,10 +2991,13 @@ get _forecast_type(): string {
     .topic-title {
       flex: 1;
     }
+    /* A hint on two lines made a row as tall as its text, so its title met the hint of the row above. The air is around the text, not the
+       row: a row of one line is as tall as its buttons and stays so; only a row whose text is taller grows by it. */
     .title-stack {
       display: flex;
       flex-direction: column;
       min-width: 0;
+      padding: 4px 0;
     }
     /* a hint wraps to a second line rather than lose its end beside the arrows; a third is cut */
     .row-summary {
