@@ -36,6 +36,7 @@ All notable changes to Platinum Weather Card Plus Charts. The newest version is 
 
 ### Fixed
 
+- **The back arrow of the editor is a real button again.** It was a Material `mwc-icon-button`, which Home Assistant no longer defines: the arrow showed and took a click, but had no name and could not be reached with Tab. It is Home Assistant's own `ha-icon-button` now, named *Back* in your language, and looks as before. No element that Home Assistant is removing (`mwc-*`, and in 2026.12 `ha-list` and its items) is left in the card, and a test keeps it so.
 - **The rows of the editor's first screen no longer touch.** A row whose hint ran to two lines was as tall as its text, and its title met the hint of the row above. The text of a row has a little air above and below now; a row of one line keeps its height.
 - **Sunrise and sunset at dawn and dusk.** For about four minutes around each, both slots showed the day of tomorrow's sunrise, today's sunset included, and the sunrise came first („нд 06:58 · нд 16:46“ on a Saturday morning). Home Assistant counts the sun as risen at −0.83° and the card counted it at 0°. The card goes by the times of Home Assistant now: the earlier is next, and each time shows its day only when it is not today. Five tests.
 

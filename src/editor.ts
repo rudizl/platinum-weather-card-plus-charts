@@ -4,7 +4,7 @@ import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helper
 
 import { keys } from 'ts-transformer-keys';
 
-import { mdiPencil, mdiArrowDown, mdiArrowUp } from '@mdi/js';
+import { mdiPencil, mdiArrowDown, mdiArrowUp, mdiArrowLeft } from '@mdi/js';
 
 import { tEditor } from './translations';
 import { kmPer } from './distance';
@@ -2441,9 +2441,10 @@ get _forecast_type(): string {
     return html`
       <div class="header">
         <div class="back-title">
-          <mwc-icon-button @click=${this._goBack}>
-            <ha-icon icon="mdi:arrow-left"></ha-icon>
-          </mwc-icon-button>
+          <!-- Home Assistant's own button, as the arrows of the rows: the MWC elements are leaving its frontend -->
+          <ha-icon-button class="back-button" .path=${mdiArrowLeft} .label=${this.hass?.localize?.('ui.common.back') || 'Back'}
+            @click=${this._goBack}>
+          </ha-icon-button>
           <span class="page-title">${this._t(page[0])}</span>
         </div>
       </div>
@@ -3302,9 +3303,14 @@ get _forecast_type(): string {
       align-items: center;
       font-size: 18px;
     }
-    .back-title mwc-icon-button {
+    /* The arrow looks as it did (22 px, at the left edge, the title beside it) while the button keeps a 36 px target: the extra size is
+       taken back with negative margins. Both the Material variables and Home Assistant's own, since its button reads the latter now. */
+    .back-title .back-button {
+      --ha-icon-button-size: 36px;
       --mdc-icon-button-size: 36px;
       --mdc-icon-size: 22px;
+      --ha-icon-size: 22px;
+      margin: -7px;
     }
     .global-options-flex {
       display: flex;
